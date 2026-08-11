@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>투자계약 대시보드 (데모)</title>
+<style>
+:root{
+  --bg:#f3f6fb; --card:#ffffff; --ink:#172033; --sub:#5d687b; --line:#dfe5ee;
+  --navy:#172033; --blue:#1d5fd1; --blue-2:#4a83e5; --blue-bg:#edf4ff;
+  --red:#c93333; --red-bg:#fff0f0; --amber:#a75a05; --amber-bg:#fff7e6;
+  --green:#13733d; --green-bg:#ebf8f0; --violet:#6d45c1; --violet-bg:#f3efff;
+  --gray-bg:#f0f3f7; --shadow:0 7px 24px rgba(23,32,51,.055);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Pretendard','Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.58}
+button,input,select{font:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,[tabindex="0"]:focus-visible{outline:3px solid rgba(29,95,209,.28);outline-offset:2px}
+.wrap{max-width:1220px;margin:0 auto;padding:24px 18px 80px}
+header{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin:6px 0 12px}
+.eyebrow{font-size:11.5px;font-weight:800;letter-spacing:.08em;color:var(--blue);text-transform:uppercase;margin-bottom:4px}
+header h1{font-size:23px;font-weight:800;letter-spacing:-0.5px}
+header p{color:var(--sub);font-size:12.5px;margin-top:5px;max-width:860px}
+.asof{flex:0 0 auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 11px;color:var(--sub);font-size:11.5px;box-shadow:var(--shadow)}
+.asof b{display:block;color:var(--ink);font-size:12.5px}
+.tabs{display:flex;gap:7px;margin:14px 0 20px;flex-wrap:wrap;position:sticky;top:0;background:rgba(243,246,251,.96);backdrop-filter:blur(10px);padding:9px 0;z-index:20;border-bottom:1px solid rgba(223,229,238,.75)}
+.tab{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:8px 15px;font-size:13.5px;font-weight:700;color:var(--sub);cursor:pointer;transition:background .16s ease,color .16s ease,border-color .16s ease,transform .16s ease}
+.tab:hover{border-color:#bac5d5;color:var(--ink);transform:translateY(-1px)}
+.tab.on,.tab[aria-selected="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.tab .count{font-size:10.5px;opacity:.7;margin-left:4px}
+.tab-set{display:contents}
+.viewer-link{margin-left:auto;border:1px solid #c9d7ec;background:var(--blue-bg);color:var(--blue);border-radius:9px;padding:8px 13px;font-size:13px;font-weight:800;text-decoration:none;white-space:nowrap}
+.viewer-link:hover{border-color:#9eb6db;background:#e4eeff}
+.source-link{display:inline-flex;align-items:center;gap:4px;border:1px solid #bfd0ea;background:#f5f9ff;color:var(--blue);border-radius:6px;padding:2px 7px;margin:3px 3px 0 0;font-size:10.5px;font-weight:800;line-height:1.5;text-decoration:none;white-space:nowrap;vertical-align:middle}
+.source-link:hover{border-color:var(--blue);background:#e8f1ff}
+.source-link::after{content:'\2192';font-weight:700}
+.source-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.source-cell{min-width:70px}
+.panel{display:none}.panel.on{display:block}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:var(--blue)}
+.kpi.risk::before{background:var(--red)}
+.kpi .v{font-size:21px;font-weight:800;letter-spacing:-0.55px;font-variant-numeric:tabular-nums}
+.kpi .k{font-size:11.5px;color:var(--sub);margin-top:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:17px 18px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card h3{font-size:15.5px;font-weight:800;margin-bottom:9px;letter-spacing:-0.3px}
+.card h3 .sub{font-weight:500;color:var(--sub);font-size:12px;margin-left:6px}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.card-head h3{margin:0}
+.card-head p{color:var(--sub);font-size:11.5px;margin-top:2px}
+.chart-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:12px;margin-bottom:12px}
+.chart-grid .card{margin-bottom:0}
+.chart-box{min-height:260px;width:100%;position:relative}
+.chart-box svg{display:block;width:100%;overflow:visible}
+.chart-box .axis{stroke:#cbd4e1;stroke-width:1}
+.chart-box .gridline{stroke:#e7ebf1;stroke-width:1}
+.chart-box text{font-family:'Pretendard','Malgun Gothic',sans-serif;fill:var(--sub);font-size:11px}
+.chart-box .axis-label{fill:var(--ink);font-weight:700}
+.chart-box .value-label{fill:var(--ink);font-weight:800}
+.chart-box .bar{fill:var(--blue-2)}
+.chart-box .line{fill:none;stroke:var(--violet);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.chart-box .point{fill:var(--card);stroke:var(--violet);stroke-width:2.5}
+.chart-box .today{stroke:var(--red);stroke-width:1.5;stroke-dasharray:4 4}
+.chart-box .hit{cursor:pointer}
+.legend{display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:var(--sub);font-size:11.5px}
+.legend-item{display:inline-flex;align-items:center;gap:5px}
+.swatch{width:10px;height:10px;border-radius:3px;background:var(--blue-2);display:inline-block}
+.swatch.line{height:3px;border-radius:4px;background:var(--violet)}
+.swatch.red{background:var(--red)}
+.chart-note{color:var(--sub);font-size:11.5px;margin-top:7px}
+.donut-layout{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:center;min-height:246px}
+.donut{width:150px;height:150px;border-radius:50%;background:conic-gradient(var(--blue) 0 31.58%,var(--green) 31.58% 36.84%,var(--violet) 36.84% 94.73%,var(--amber) 94.73% 100%);position:relative}
+.donut::after{content:'';position:absolute;inset:29px;border-radius:50%;background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
+.donut-center{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.donut-center strong{font-size:24px;line-height:1;font-variant-numeric:tabular-nums}
+.donut-center span{font-size:10.5px;color:var(--sub);margin-top:4px}
+.class-list{display:grid;gap:5px}
+.class-key{display:grid;grid-template-columns:9px 1fr auto;gap:7px;align-items:center;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--ink);padding:6px 7px;text-align:left;cursor:pointer}
+.class-key:hover{background:var(--gray-bg)}
+.class-key[aria-pressed="true"]{border-color:#b7c5da;background:var(--blue-bg)}
+.class-key i{display:block;width:9px;height:9px;border-radius:3px;background:var(--blue)}
+.class-key.cps i{background:var(--green)}.class-key.rcps i{background:var(--violet)}.class-key.bw i{background:var(--amber)}
+.class-key b{font-size:12.5px}.class-key em{font-style:normal;font-weight:800;font-size:12px;color:var(--sub)}
+.class-detail{font-size:11.5px;color:var(--sub);min-height:37px;margin-top:6px}
+.decision-strip{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;border:1px solid #f0c7c7;background:var(--red-bg);border-radius:11px;padding:11px 13px;margin-bottom:12px}
+.decision-strip .flag{font-size:11px;color:#fff;background:var(--red);font-weight:800;border-radius:6px;padding:3px 7px;white-space:nowrap}
+.decision-strip b{display:block}
+.decision-strip span{font-size:12px;color:#733939}
+.jump{border:1px solid #e6aaaa;background:var(--card);color:var(--red);font-size:12px;font-weight:800;border-radius:7px;padding:6px 9px;cursor:pointer;white-space:nowrap}
+.judge{border-left:4px solid var(--blue);background:var(--blue-bg);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:13.5px}
+.judge.red{border-left-color:var(--red);background:var(--red-bg)}
+.judge.amber{border-left-color:var(--amber);background:var(--amber-bg)}
+.judge.green{border-left-color:var(--green);background:var(--green-bg)}
+.judge b{font-weight:800}
+.badge{display:inline-block;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;margin:1px 3px 1px 0;vertical-align:middle}
+.b-blue{background:var(--blue-bg);color:var(--blue)}
+.b-red{background:var(--red-bg);color:var(--red)}
+.b-amber{background:var(--amber-bg);color:var(--amber)}
+.b-green{background:var(--green-bg);color:var(--green)}
+.b-violet{background:var(--violet-bg);color:var(--violet)}
+.b-gray{background:var(--gray-bg);color:var(--sub)}
+details{border:1px solid var(--line);border-radius:10px;background:var(--card);margin-bottom:10px;overflow:hidden}
+details summary{cursor:pointer;padding:12px 16px;font-weight:700;font-size:13.5px;list-style:none;display:flex;align-items:center;gap:8px}
+details summary::before{content:'+';font-weight:800;color:var(--sub);width:14px}
+details[open] summary::before{content:'-'}
+details .body{padding:0 16px 14px;border-top:1px dashed var(--line);padding-top:12px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border-bottom:1px solid var(--line);padding:8px 9px;text-align:left;vertical-align:top}
+th{background:var(--gray-bg);font-weight:800;white-space:nowrap;position:sticky;top:0;z-index:1}
+tbody tr:nth-child(even) td{background:#fafbfd}
+.tbl-scroll{overflow-x:auto}
+.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.inv{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow);transition:transform .16s ease,border-color .16s ease}
+.inv:hover{transform:translateY(-2px);border-color:#c8d2e0}
+.inv .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.inv h4{font-size:14.5px;font-weight:800;letter-spacing:-0.3px}
+.inv .gp{font-size:11.5px;color:var(--sub)}
+.inv .amt{font-size:17px;font-weight:800;letter-spacing:-0.4px}
+.inv .amt small{font-size:11.5px;color:var(--sub);font-weight:500;margin-left:6px}
+.inv ul{list-style:none;font-size:12.5px;color:#374151}
+.inv ul li{padding:3px 0 3px 12px;position:relative}
+.inv ul li::before{content:'';position:absolute;left:0;top:10px;width:5px;height:5px;border-radius:50%;background:#cbd5e1}
+.inv ul li.hot::before{background:var(--red)}
+.inv ul li.hot{color:var(--red);font-weight:600}
+.tl{position:relative;margin:14px 0 4px;padding-left:20px}
+.tl::before{content:'';position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:var(--line)}
+.tl-item{position:relative;padding:0 0 16px 12px}
+.tl-item::before{content:'';position:absolute;left:-18px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--blue);border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.tl-item.debt::before{background:var(--amber)}
+.tl-item .yr{font-weight:800;font-size:13.5px}
+.tl-item .desc{color:var(--sub);font-size:12.5px;margin-top:2px}
+.tl-item .amt2{font-weight:700;font-size:13px;margin-top:2px}
+.duelist{list-style:none}
+.duelist li{display:flex;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px;align-items:flex-start}
+.duelist li:last-child{border-bottom:none}
+.duelist .when{flex:0 0 118px;font-weight:800;font-size:12.5px;padding-top:1px}
+.toolbox{display:flex;gap:10px;align-items:end;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.field{display:flex;flex-direction:column;gap:4px;min-width:210px;flex:1}
+.field.select{min-width:175px;flex:0 1 220px}
+.field label{font-size:11.5px;font-weight:800;color:var(--sub)}
+.field input,.field select{border:1px solid #cbd4e1;border-radius:8px;background:#fff;color:var(--ink);padding:8px 10px;min-height:38px}
+.filter-meta{font-size:12px;color:var(--sub);padding:8px 2px;white-space:nowrap}
+.filter-meta b{color:var(--ink)}
+.reset{border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);padding:8px 11px;min-height:38px;font-weight:700;cursor:pointer}
+.cycle-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.cycle-btn{border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--sub);padding:5px 9px;font-size:12px;font-weight:700;cursor:pointer}
+.cycle-btn[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.deadline-viz{display:grid;gap:8px}
+.deadline-row{display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:start;padding:8px 0;border-bottom:1px dashed var(--line)}
+.deadline-row:last-child{border-bottom:0}
+.deadline-when{font-size:12px;font-weight:800;color:var(--blue)}
+.deadline-copy{font-size:12.5px;color:#374255}
+.timeline-list{display:grid;gap:7px;margin:4px 0 10px}
+.timeline-row{display:grid;grid-template-columns:minmax(160px,1.2fr) minmax(210px,2.8fr) 80px;gap:10px;align-items:center}
+.timeline-label b{display:block;font-size:12.5px}
+.timeline-label span{font-size:11px;color:var(--sub)}
+.timeline-track{height:20px;border-radius:6px;background:linear-gradient(to right,#f0f3f7 0,#f0f3f7 100%);position:relative;border:1px solid var(--line)}
+.timeline-track::before{content:'';position:absolute;left:52.3%;top:-4px;bottom:-4px;border-left:1.5px dashed var(--red)}
+.timeline-mark{position:absolute;top:3px;height:12px;min-width:8px;border-radius:4px;background:var(--amber)}
+.timeline-mark.open{background:var(--red)}
+.timeline-amt{text-align:right;font-weight:800;font-size:12.5px;font-variant-numeric:tabular-nums}
+.timeline-axis{display:grid;grid-template-columns:minmax(160px,1.2fr) minmax(210px,2.8fr) 80px;gap:10px;color:var(--sub);font-size:10.5px}
+.timeline-ticks{display:flex;justify-content:space-between}
+.status-filter{display:flex;gap:5px;flex-wrap:wrap}
+.status-filter button{border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--sub);padding:5px 8px;font-size:11.5px;font-weight:700;cursor:pointer}
+.status-filter button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.no-results{display:none;background:var(--card);border:1px dashed #bcc7d6;border-radius:12px;padding:24px;text-align:center;color:var(--sub)}
+.accounting-alert{border:1px solid #edc17f;background:var(--amber-bg);border-radius:12px;padding:13px 15px;margin-bottom:12px;color:#70400d}
+.accounting-alert b{display:block;color:#7f4300;margin-bottom:3px}
+.review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.review-card{border:1px solid var(--line);border-radius:11px;background:var(--card);padding:14px}
+.review-card h4{font-size:13.5px;margin-bottom:5px}.review-card p{color:var(--sub);font-size:12.2px}
+.state{display:inline-block;border-radius:5px;padding:2px 7px;margin-bottom:7px;font-size:10.5px;font-weight:800}
+.state.confirmed{background:var(--green-bg);color:var(--green)}.state.estimate{background:var(--amber-bg);color:var(--amber)}.state.judgment{background:var(--red-bg);color:var(--red)}
+.review-table td:first-child{font-weight:800;white-space:nowrap}.review-table td:last-child{min-width:220px}
+.foot{color:var(--sub);font-size:11.5px;margin-top:24px;border-top:1px solid var(--line);padding-top:12px;line-height:1.7}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+@media(max-width:820px){
+  .chart-grid{grid-template-columns:1fr}
+  .chart-grid .card{margin-bottom:0}
+  header{display:block}.asof{display:inline-block;margin-top:10px}
+}
+@media(max-width:640px){
+  .wrap{padding:14px 12px 64px}
+  header h1{font-size:20px}
+  .tabs{flex-wrap:nowrap;overflow-x:auto;margin-left:-12px;margin-right:-12px;padding-left:12px;padding-right:12px}
+  .tab{flex:0 0 auto;padding:8px 12px}
+  .viewer-link{flex:0 0 auto;margin-left:0}
+  .kpis{grid-template-columns:1fr 1fr}
+  .kpi{padding:13px}.kpi .v{font-size:18px}
+  .card{padding:14px}
+  .decision-strip{grid-template-columns:auto 1fr}.decision-strip .jump{grid-column:1/-1;width:100%}
+  .duelist li{display:block}.duelist .when{display:block;margin-bottom:5px}
+  .inv-grid{grid-template-columns:1fr}
+  .timeline-row{grid-template-columns:1fr 58px}.timeline-track{grid-column:1/-1;grid-row:2}.timeline-axis{display:none}
+  .field,.field.select{min-width:100%;flex-basis:100%}
+  .donut-layout{grid-template-columns:120px 1fr;gap:12px}.donut{width:120px;height:120px}.donut::after{inset:24px}
+  .review-grid{grid-template-columns:1fr}
+}
+@media(max-width:390px){.kpis{grid-template-columns:1fr}.timeline-row{grid-template-columns:1fr 55px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.tab,.inv{transition:none}}
+</style>
+</head>
+<body>
+<div id="demobar">
+  <b>가상 계약 데모</b>
+  <span>실제 투자계약이 아니라 새로 작성한 가상 계약 16건으로 동작합니다. 화면·분류·필터 로직은 실제 구현과 동일합니다.</span>
+  <a href="../../">← 포트폴리오</a>
+</div>
+<style>
+#demobar{position:sticky;top:0;z-index:99;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  background:#fff8e1;border-bottom:1px solid #f0dfa8;padding:9px 16px;font-size:12.5px;color:#6b5b21;
+  font-family:system-ui,-apple-system,'Malgun Gothic',sans-serif}
+#demobar b{background:#6b5b21;color:#fff8e1;padding:2px 8px;border-radius:10px;font-size:11.5px}
+#demobar a{margin-left:auto;color:#6b5b21;font-weight:700;text-decoration:none}
+</style>
+
+<div class="wrap">
+<header>
+  <div>
+    <div class="eyebrow">Investor contract control center</div>
+    <h1>주식회사 샘플기업 - 투자계약 대시보드</h1>
+    <p>투자계약서 19건 전수 분석 (2020.03 ~ 2026.07) &middot; 스캔본 OCR 기반이므로 집행 전 원본 대조 필수</p>
+  </div>
+  <div class="asof"><b>분석 기준일 2026-08-10</b>계약 19건 &middot; 투자자 16개사</div>
+</header>
+
+<nav class="tabs" aria-label="투자계약 대시보드 메뉴">
+  <div class="tab-set" role="tablist" aria-label="대시보드 보기 전환">
+    <button type="button" class="tab on" id="tab-t1" role="tab" aria-selected="true" aria-controls="t1" data-t="t1">한눈에</button>
+    <button type="button" class="tab" id="tab-t2" role="tab" aria-selected="false" aria-controls="t2" data-t="t2">지금 챙길 것 <span class="count">6</span></button>
+    <button type="button" class="tab" id="tab-t3" role="tab" aria-selected="false" aria-controls="t3" data-t="t3">투자사별 카드 <span class="count">16</span></button>
+    <button type="button" class="tab" id="tab-t4" role="tab" aria-selected="false" aria-controls="t4" data-t="t4">조건 비교표</button>
+    <button type="button" class="tab" id="tab-t5" role="tab" aria-selected="false" aria-controls="t5" data-t="t5">회계 점검</button>
+  </div>
+  <a class="viewer-link" href="?page=contracts" target="_top">계약 아카이브 &rarr;</a>
+</nav>
+
+<!-- ============ TAB 1 ============ -->
+<main>
+<section class="panel on" id="t1" role="tabpanel" aria-labelledby="tab-t1">
+  <h2 class="sr-only">한눈에</h2>
+  <div class="kpis">
+    <div class="kpi"><div class="v">203.5000억</div><div class="k">확정: 계약상 납입액 합계 (지분 202.30 + BW 1.2)</div></div>
+    <div class="kpi risk"><div class="v">186.6000억</div><div class="k">확정: 상환권이 있는 RCPS 계약 원금 전체</div></div>
+    <div class="kpi risk"><div class="v">20.0000억</div><div class="k">판단 필요: 분석일 후 12개월 내 상환 오픈분</div></div>
+    <div class="kpi"><div class="v">약 175.40억</div><div class="k">추정: 계약상 상환금액 (누적 우선배당 반영)</div></div>
+  </div>
+
+  <div class="decision-strip" role="status" aria-label="최우선 조치">
+    <div class="flag">기한 경과</div>
+    <div><b>관계사 정리 등기 완료 여부를 즉시 확인하세요.</b><span>계약상 기한 경과 · 미완 시 위약벌·주식매수청구 사유</span></div>
+    <button type="button" class="jump" data-go="t2">조치 항목 보기</button>
+  </div>
+
+  <div class="chart-grid">
+    <section class="card" aria-labelledby="round-chart-title">
+      <div class="card-head">
+        <div><h3 id="round-chart-title">라운드별 조달액과 주당 단가</h3><p>금액 집중도와 다음 거래의 가격 기준선을 함께 비교</p></div>
+        <div class="status-filter" aria-label="차트 계열 선택">
+          <button type="button" aria-pressed="true" data-round="all">함께</button>
+          <button type="button" aria-pressed="false" data-round="amount">조달액</button>
+          <button type="button" aria-pressed="false" data-round="price">단가</button>
+        </div>
+      </div>
+      <div class="legend" aria-hidden="true"><span class="legend-item"><i class="swatch"></i>조달액(억원)</span><span class="legend-item"><i class="swatch line"></i>주당 단가(만원)</span></div>
+      <div id="roundChart" class="chart-box" aria-live="polite"></div>
+      <p class="chart-note">2020 단가는 액면분할 전이므로 단가 추세선에서 제외했습니다. 막대의 2023년 1.2억은 BW입니다.</p>
+    </section>
+    <section class="card" aria-labelledby="class-chart-title">
+      <div class="card-head"><div><h3 id="class-chart-title">계약 유형 구성</h3><p>19건 기준 권리 구조</p></div></div>
+      <div class="donut-layout">
+        <div class="donut" role="img" aria-label="보통주 6건, CPS 1건, RCPS 11건, BW 1건">
+          <div class="donut-center"><strong id="classValue">19</strong><span id="classUnit">전체 계약</span></div>
+        </div>
+        <div>
+          <div class="class-list" role="group" aria-label="계약 유형 선택">
+            <button type="button" class="class-key" aria-pressed="false" data-class="common"><i></i><b>보통주</b><em>6건</em></button>
+            <button type="button" class="class-key cps" aria-pressed="false" data-class="cps"><i></i><b>CPS</b><em>1건</em></button>
+            <button type="button" class="class-key rcps" aria-pressed="false" data-class="rcps"><i></i><b>RCPS</b><em>11건</em></button>
+            <button type="button" class="class-key bw" aria-pressed="false" data-class="bw"><i></i><b>BW</b><em>1건</em></button>
+          </div>
+          <p id="classDetail" class="class-detail">유형을 선택하면 핵심 권리 구조를 확인할 수 있습니다.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="card">
+    <h3>판정 요약</h3>
+    <div class="judge red"><b>가장 급한 것:</b> 관계사 정리 등기 증빙 제출 기한이 이미 지났습니다. 완료 여부를 확인하고, 미완이면 위약벌·주식매수청구 사유가 됩니다.</div>
+    <div class="judge amber"><b>상환권 오픈:</b> 2022년 RCPS 20억은 이미 상환청구가 가능한 상태입니다(연복리 5% 가산). 청구 가능성을 자금계획에 반영해야 합니다.</div>
+    <div class="judge amber"><b>배당 제약:</b> BW 행사 전까지 발행 당시 잉여금의 현금배당이 금지되고, 우선주 전체에 누적 우선배당이 붙습니다.</div>
+    <div class="judge"><b>신주 발행 시 3중 체크:</b> (1) 전 투자자 사전 서면동의 (2) 기존 투자자 증자참여 우선권 (3) 기준가 미만 발행 시 전환가 조정.</div>
+    <div class="judge green"><b>이행 완료 확인:</b> 자기주식 소각과 대출 상환·근질권 해지는 주주명부·등기로 확인됩니다.</div>
+  </div>
+
+  <div class="card">
+    <h3>라운드 타임라인</h3>
+    <div class="tl">
+<div class="tl-item"><div class="yr">2020 시드 - 보통주 @820,000원</div><div class="desc">케이프캐피탈 1·2호 (개인투자조합)</div><div class="amt2">3.0억 / 350주</div></div>
+<div class="tl-item"><div class="yr">2021 - 보통주 @145,000원</div><div class="desc">세인벤처스, 노바파트너스, 그리드투자조합 · 특약: 자회사 인수 동의</div><div class="amt2">12.0억 / 8,280주</div></div>
+<div class="tl-item"><div class="yr">2022 - 우선주 @498,000원</div><div class="desc">세인벤처스(CPS·상환권 없음), 메리디안캐피탈(RCPS), 아틀라스벤처스(RCPS)</div><div class="amt2">30.0억 / 5,870주</div></div>
+<div class="tl-item debt"><div class="yr">2023 - 분리형 BW (부채성)</div><div class="desc">하버라인 · 행사가 498,000 · 행사 전 현금배당 제한</div><div class="amt2">1.2억</div></div>
+<div class="tl-item"><div class="yr">2025 - RCPS @1,090,000원 (2차 클로징 포함)</div><div class="desc">1차 6개사 + 2차 2개사 (8개사) · 특약: 전용통장 분리관리 + 정관 제출</div><div class="amt2">134.20억 / 11,840주</div></div>
+<div class="tl-item"><div class="yr">2026 - RCPS @1,320,000원</div><div class="desc">서밋캐피탈(전략적 투자자) · 별도 주주간계약 체결</div><div class="amt2">20.0억 / 1,515주</div></div>
+    </div>
+    <div class="judge">계약상 발행단가 궤적: 15만원(2021) → 49.8만원(2022) → 109.0만원(2025) → <b>132.0만원(2026)</b>.</div>
+  </div>
+
+  <div class="card">
+    <h3>서류 갭 <span class="sub">폴더에 없는 것</span></h3>
+    <div class="judge amber"><b>주주간계약서 2건</b>이 보관 폴더에 없습니다. 본계약이 얇은 대신 경영동의·처분제한이 그쪽에 있어 확보가 필요합니다.</div>
+  </div>
+</section>
+
+<!-- ============ TAB 2 ============ -->
+<section class="panel" id="t2" role="tabpanel" aria-labelledby="tab-t2">
+  <h2 class="sr-only">지금 챙길 것</h2>
+  <div class="card">
+    <div class="card-head">
+      <div><h3>긴급 확인 <span class="sub">기한 경과 또는 임박</span></h3><p>상태를 선택해 지금 처리할 항목만 좁혀보세요.</p></div>
+      <div class="status-filter" aria-label="긴급 항목 상태 필터">
+        <button type="button" aria-pressed="true" data-urgent="all">전체 6</button>
+        <button type="button" aria-pressed="false" data-urgent="now">즉시 2</button>
+        <button type="button" aria-pressed="false" data-urgent="check">확인 2</button>
+        <button type="button" aria-pressed="false" data-urgent="watch">상시 2</button>
+      </div>
+    </div>
+    <ul class="duelist" id="urgent"></ul>
+  </div>
+  <div class="card">
+    <div class="card-head"><div><h3>정기 보고 캘린더 <span class="sub">요청 없어도 자동 제출</span></h3><p>주기별 마감 창구를 한 번에 확인</p></div></div>
+    <div class="cycle-tabs" role="group" aria-label="보고 주기 선택">
+      <button type="button" class="cycle-btn" aria-pressed="true" data-cycle="quarter">분기 5</button>
+      <button type="button" class="cycle-btn" aria-pressed="false" data-cycle="annual">연간 3</button>
+      <button type="button" class="cycle-btn" aria-pressed="false" data-cycle="event">수시 1</button>
+    </div>
+    <div id="reportViz" class="deadline-viz" aria-live="polite"></div>
+    <details>
+      <summary>전체 보고 의무 문장 보기</summary>
+      <div class="body"><ul class="duelist" id="regular"></ul></div>
+    </details>
+  </div>
+  <div class="card">
+    <h3>이벤트 발생 시 체크리스트 <span class="sub">해당 행동 전에 반드시 확인</span></h3>
+    <div id="events"></div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <div><h3>상환권 오픈 타임라인 <span class="sub">청구 가능 시점과 원금 노출</span></h3><p>붉은 기준선은 분석 기준일 2026-08-10</p></div>
+      <div class="status-filter" aria-label="상환 일정 상태 필터">
+        <button type="button" aria-pressed="true" data-repay="all">전체</button>
+        <button type="button" aria-pressed="false" data-repay="open">이미 오픈</button>
+        <button type="button" aria-pressed="false" data-repay="future">예정</button>
+      </div>
+    </div>
+    <div id="repayViz" class="timeline-list" aria-live="polite"></div>
+    <div class="timeline-axis" aria-hidden="true"><span></span><div class="timeline-ticks"><span>2024</span><span>2025</span><span>2026</span><span>2027</span><span>2028</span><span>2029</span></div><span></span></div>
+    <details>
+      <summary>상환 조건 표로 보기</summary>
+      <div class="body tbl-scroll"><table>
+        <thead><tr><th>투자자</th><th>원금</th><th>상환청구 가능일</th><th>상환가</th><th>상태</th></tr></thead>
+        <tbody>
+        <tr><td>메리디안캐피탈 <a class="source-link" target="_top" href="?page=contracts&amp;contract=c2">원문</a></td><td>4.99758억</td><td>2024-12-09</td><td>원금 + 연복리 5%</td><td><span class="badge b-red">이미 오픈</span></td></tr>
+        <tr><td>아틀라스벤처스 <a class="source-link" target="_top" href="?page=contracts&amp;contract=c3">원문</a></td><td>10.00027억</td><td>2024-12-10</td><td>원금 + 연복리 5%</td><td><span class="badge b-red">이미 오픈</span></td></tr>
+        <tr><td>2025 라운드 1차 6개사 <a class="source-link" target="_top" href="?page=contracts&amp;q=2027-06-27">6건 조회</a></td><td>70.01420억</td><td>2027-06-27</td><td>원금 + 연복리 8%</td><td><span class="badge b-amber">12개월 내</span></td></tr>
+        <tr><td>2025 라운드 2차 2개사 <a class="source-link" target="_top" href="?page=contracts&amp;q=2027-07-05">2건 조회</a></td><td>58.49647억</td><td>2027-07-05</td><td>원금 + 연복리 8%</td><td><span class="badge b-amber">12개월 내</span></td></tr>
+        <tr><td>서밋캐피탈 <a class="source-link" target="_top" href="?page=contracts&amp;contract=h1">원문</a></td><td>19.99404억</td><td>2028-07-16</td><td>원금 + 연복리 8%</td><td><span class="badge b-gray">12개월 초과</span></td></tr>
+        <tr><td>세인벤처스 CPS(2022) <a class="source-link" target="_top" href="?page=contracts&amp;contract=c1">원문</a></td><td>4.99758억</td><td colspan="2">상환권 없음 (전환만 가능)</td><td><span class="badge b-green">해당없음</span></td></tr>
+        </tbody>
+      </table></div>
+    </details>
+    <div class="judge amber">상환은 배당가능이익 한도지만, 최근 계약은 <b>준비금까지 재원으로 보는 조항</b>이 있어 한도 판단이 달라집니다.</div>
+  </div>
+</section>
+
+<!-- ============ TAB 3 ============ -->
+<section class="panel" id="t3" role="tabpanel" aria-labelledby="tab-t3">
+  <h2 class="sr-only">투자사별 카드</h2>
+  <div class="judge">카드의 <b>빨간 항목</b>은 해당 투자사만의 특이 조건입니다. 금액은 계약서 기준입니다.</div>
+  <div class="toolbox" role="search" aria-label="투자사 카드 검색 및 필터">
+    <div class="field"><label for="invSearch">투자사 또는 조건 검색</label><input type="search" id="invSearch" placeholder="예: 상환, 주주간계약, 세인벤처스"></div>
+    <div class="field select"><label for="invFilter">위험 조건</label><select id="invFilter"><option value="all">전체 카드</option><option value="high">특이 조건 있음</option><option value="redeem">상환 관련</option><option value="missing">원본 확보 필요</option></select></div>
+    <button type="button" class="reset" id="invReset">초기화</button>
+    <div class="filter-meta" aria-live="polite"><b id="invCount">16</b>개 투자사 표시</div>
+  </div>
+  <div class="inv-grid" id="invcards"></div>
+  <div class="no-results" id="invEmpty">검색 조건에 맞는 투자사가 없습니다.</div>
+</section>
+
+<!-- ============ TAB 4 ============ -->
+<section class="panel" id="t4" role="tabpanel" aria-labelledby="tab-t4">
+  <h2 class="sr-only">조건 비교표</h2>
+  <details open>
+    <summary>핵심 경제조건 비교 (19건)</summary>
+    <div class="body tbl-scroll"><table id="mtx1"></table></div>
+  </details>
+  <details>
+    <summary>권리&middot;통제 비교 (동의권 / 임원지명 / 보고 / 위약벌)</summary>
+    <div class="body tbl-scroll"><table id="mtx2"></table></div>
+  </details>
+  <details>
+    <summary>전환가액 조정(리픽싱) 조건 비교 - 우선주만</summary>
+    <div class="body tbl-scroll"><table id="mtx3"></table></div>
+  </details>
+</section>
+
+<!-- ============ TAB 5 ============ -->
+<section class="panel" id="t5" role="tabpanel" aria-labelledby="tab-t5">
+  <h2 class="sr-only">회계 점검</h2>
+  <div class="accounting-alert"><b>선결사항: 적용 회계기준과 분류 검토 문서가 아직 확인되지 않았습니다.</b>K-IFRS 또는 일반기업회계기준 중 적용 기준을 먼저 확정하고, RCPS&middot;CPS&middot;BW의 계약상 현금지급 의무와 전환조건을 계약별로 판정해야 합니다. 법적 명칭만으로 자본 또는 부채를 확정하지 마세요.</div>
+  <div class="kpis">
+    <div class="kpi"><div class="v">203.5012억</div><div class="k">확정: 19건 계약상 납입액 합계 (지분 183.5087 + BW 1.2)</div></div>
+    <div class="kpi risk"><div class="v">186.6026억</div><div class="k">확정: 상환권이 있는 RCPS 계약 원금 전체</div></div>
+    <div class="kpi risk"><div class="v">150.20억</div><div class="k">판단 필요: 부채 분류 시 분석일 후 12개월 내 상환 오픈 원금</div></div>
+    <div class="kpi"><div class="v">약 175.40억</div><div class="k">추정: 서밋 제외 분석일 현재 계약상 상환금액 (배당 차감 전)</div></div>
+  </div>
+  <div class="review-grid">
+    <article class="review-card"><span class="state confirmed">계약 수치 확정</span><h4>원금과 상환 오픈 금액을 분리</h4><p>전체 RCPS 원금 186.60억과 2027-07까지 오픈되는 143.51억은 서로 다른 지표입니다. 기존 대시보드의 143.5억 라벨 오류를 바로잡았습니다.</p><div class="source-row"><a class="source-link" target="_top" href="?page=contracts&amp;q=%EC%83%81%ED%99%98%EA%B0%80%EC%95%A1">상환 조항 조회</a></div></article>
+    <article class="review-card"><span class="state estimate">관리 추정치</span><h4>계약상 상환금액 약 175.40억</h4><p>메리디안캐피탈&middot;아틀라스벤처스과 2025 RCPS를 분석일 기준 연복리로 단순 계산한 값입니다. 배당 차감, 실제 청구일, 거래원가, 공정가치 및 유효이자율을 반영하지 않아 장부금액이나 분개 금액으로 사용할 수 없습니다.</p><div class="source-row"><a class="source-link" target="_top" href="?page=contracts&amp;q=%EC%97%B0%EB%B3%B5%EB%A6%AC">연복리 원문</a></div></article>
+    <article class="review-card"><span class="state judgment">회계 판단 필요</span><h4>RCPS&middot;CPS 분류와 내재파생</h4><p>11건 RCPS의 상환의무, 전환가 풀래칫&middot;MFN, 간주청산 조건을 계약별로 분석해야 합니다. 상환권이 삭제된 CPS도 전환조건까지 검토하기 전에는 자본으로 단정할 수 없습니다.</p><div class="source-row"><a class="source-link" target="_top" href="?page=contracts&amp;q=%ED%92%80%EB%9E%98%EC%B9%AB">리픽싱 조회</a><a class="source-link" target="_top" href="?page=contracts&amp;contract=c1">CPS 원문</a></div></article>
+    <article class="review-card"><span class="state judgment">회계 판단 필요</span><h4>BW 주계약과 신주인수권</h4><p>하버라인 분리형 BW 1.2억은 주계약과 신주인수권을 나눠 최초 인식&middot;후속측정할지, 거래원가와 행사가 조정조건을 어떻게 반영할지 검토가 필요합니다.</p><div class="source-row"><a class="source-link" target="_top" href="?page=contracts&amp;contract=d1">BW 원문</a></div></article>
+  </div>
+  <div class="card">
+    <h3>결산 전 회계 검토 큐</h3>
+    <div class="tbl-scroll"><table class="review-table"><thead><tr><th>우선순위</th><th>검토 항목</th><th>현재 판정</th><th>바로 볼 근거</th></tr></thead><tbody>
+      <tr><td>1</td><td>적용 회계기준 확정</td><td><span class="badge b-red">미확인</span> K-IFRS / 일반기업회계기준 및 연결&middot;별도 기준</td><td><a class="source-link" href="https://www.kasb.or.kr/front/board/ingAccountingList.do" target="_blank" rel="noopener">회계기준원</a></td></tr>
+      <tr><td>2</td><td>RCPS 11건 부채&middot;자본 및 유동성 분류</td><td><span class="badge b-red">판단 필요</span> 12개월 내 오픈 원금 143.51억</td><td><a class="source-link" target="_top" href="?page=contracts&amp;q=%EC%83%81%ED%99%98">계약 검색</a></td></tr>
+      <tr><td>3</td><td>리픽싱&middot;MFN 내재파생 및 공정가치</td><td><span class="badge b-red">판단 필요</span> 후속 투자 조건과 전환가 대조</td><td><a class="source-link" target="_top" href="?page=contracts&amp;q=MFN">MFN 원문</a></td></tr>
+      <tr><td>4</td><td>청산 특약 위약벌 및 충당&middot;우발 검토</td><td><span class="badge b-amber">조건부 추정</span> 위반 확정 시 원금 16.0227억의 12% = 약 1.9227억</td><td><a class="source-link" target="_top" href="?page=contracts&amp;q=%EC%B2%AD%EC%82%B0%EB%93%B1%EA%B8%B0">특약 원문</a></td></tr>
+      <tr><td>5</td><td>주식수&middot;종류주식&middot;자기주식 대사</td><td><span class="badge b-amber">대사 필요</span> 계약, 정관, 등기, 주주명부 연결</td><td><a class="source-link" target="_top" href="?page=contracts&amp;q=%EC%A3%BC%EC%A3%BC%EB%AA%85%EB%B6%80">주주명부 조회</a></td></tr>
+      <tr><td>6</td><td>누락 주주간계약서 확보</td><td><span class="badge b-red">원본 없음</span> 퍼스트무브인베스트&middot;서밋 및 2022 합의서</td><td><a class="source-link" target="_top" href="?page=contracts&amp;q=%EC%A3%BC%EC%A3%BC%EA%B0%84%EA%B3%84%EC%95%BD">누락 표시 조회</a></td></tr>
+    </tbody></table></div>
+  </div>
+  <div class="card">
+    <h3>판정 기준 원문 <span class="sub">K-IFRS 적용 시 공식 기준서 확인</span></h3>
+    <p class="chart-note">금융상품 표시&middot;분류, 측정, 공정가치, 공시, 유동성 분류, 충당&middot;우발 항목을 각각 분리해 검토합니다.</p>
+    <div class="source-row"><a class="source-link" href="https://www.ifrs.org/issued-standards/list-of-standards/ias-32-financial-instruments-presentation/" target="_blank" rel="noopener">IAS 32 표시</a><a class="source-link" href="https://www.ifrs.org/issued-standards/list-of-standards/ifrs-9-financial-instruments/" target="_blank" rel="noopener">IFRS 9 측정</a><a class="source-link" href="https://www.ifrs.org/issued-standards/list-of-standards/ifrs-13-fair-value-measurement/" target="_blank" rel="noopener">IFRS 13 공정가치</a><a class="source-link" href="https://www.ifrs.org/issued-standards/list-of-standards/ifrs-7-financial-instruments-disclosures/" target="_blank" rel="noopener">IFRS 7 공시</a><a class="source-link" href="https://www.ifrs.org/issued-standards/list-of-standards/ias-1-presentation-of-financial-statements.html/" target="_blank" rel="noopener">IAS 1 유동성</a><a class="source-link" href="https://www.ifrs.org/issued-standards/list-of-standards/ias-37-provisions-contingent-liabilities-and-contingent-assets/" target="_blank" rel="noopener">IAS 37 충당·우발</a></div>
+  </div>
+  <div class="judge amber"><b>사용 제한:</b> 이 탭의 추정치는 자금계획과 결산 검토 우선순위를 위한 관리값입니다.</div>
+</section>
+</main>
+
+<div class="foot"> 근거: 가상 투자계약 16건 (데모용으로 새로 작성). 실제 계약서·수치는 포함하지 않습니다. </div>
+</div>
+
+<script>
+(function(){
+  var APP_URL='';
+  // 탭 (해시 라우팅 지원: #t1~#t5)
+  function showTab(t,writeHash){
+    if(!document.getElementById(t))return;
+    var ts=document.querySelectorAll('.tab'),ps=document.querySelectorAll('.panel'),i;
+    for(i=0;i<ts.length;i++){
+      var tabOn=ts[i].getAttribute('data-t')===t;
+      ts[i].classList.toggle('on',tabOn);
+      ts[i].setAttribute('aria-selected',tabOn?'true':'false');
+    }
+    for(i=0;i<ps.length;i++){
+      var panelOn=ps[i].id===t;
+      ps[i].classList.toggle('on',panelOn);
+      ps[i].setAttribute('aria-hidden',panelOn?'false':'true');
+    }
+    if(writeHash!==false&&location.hash!=='#'+t){history.replaceState(null,'','#'+t)}
+    window.scrollTo(0,0);
+    if(t==='t1'){window.requestAnimationFrame(renderRoundChart)}
+  }
+  document.querySelector('.tabs').addEventListener('click',function(e){
+    var el=e.target.closest('.tab');
+    if(el){showTab(el.getAttribute('data-t'),true);}
+  });
+  document.querySelector('.tabs').addEventListener('keydown',function(e){
+    if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight'&&e.key!=='Home'&&e.key!=='End')return;
+    var tabs=Array.prototype.slice.call(document.querySelectorAll('.tab'));
+    var current=tabs.indexOf(document.activeElement),next=current;
+    if(e.key==='ArrowRight')next=(current+1)%tabs.length;
+    if(e.key==='ArrowLeft')next=(current-1+tabs.length)%tabs.length;
+    if(e.key==='Home')next=0;
+    if(e.key==='End')next=tabs.length-1;
+    e.preventDefault();tabs[next].focus();showTab(tabs[next].getAttribute('data-t'),true);
+  });
+  document.querySelector('[data-go="t2"]').addEventListener('click',function(){showTab('t2',true)});
+  window.addEventListener('hashchange',function(){showTab(location.hash.replace('#',''),false)});
+
+  function esc(s){return String(s)}
+  function archiveHref(ref){
+    var h=APP_URL+'?page=contracts';
+    if(ref.id)h+='&contract='+encodeURIComponent(ref.id);
+    if(ref.section!==undefined)h+='&section='+encodeURIComponent(ref.section);
+    if(ref.article!==undefined)h+='&article='+encodeURIComponent(ref.article);
+    if(ref.q)h+='&q='+encodeURIComponent(ref.q);
+    return h;
+  }
+  function sourceLinks(refs){ return ''; }
+  function openArchive(ref){window.top.location.href=archiveHref(ref)}
+
+  // ---- 긴급 ----
+  var urgent=[
+    {when:'기한 경과',cls:'b-red',txt:'<b>관계사 정리 등기 증빙 제출</b> — 2건의 펀드 특약. 기한 경과. 완료 증빙을 두 투자자에게 제출해야 종결되고, 미완 시 위약벌·주식매수청구 사유가 됩니다.'},
+    {when:'즉시',cls:'b-red',txt:'<b>주주간계약서 원본 확보</b> — 같은 날 체결된 주주간계약 2건이 보관 폴더에 없습니다. 경영동의·처분제한 조항이 그쪽에 있어 관리 공백입니다.'},
+    {when:'확인 1건',cls:'b-amber',txt:'<b>대출 상환 증빙 제출 확인</b> — 라운드 특약(거래종결+70일). 근질권 소멸은 확인됐고, 상환영수증·주주명부·상표원부 3종을 각 투자자에게 냈는지 확인이 필요합니다.'},
+    {when:'확인 1건',cls:'b-amber',txt:'<b>정관 개정본 제출</b> — 존속기간·우선배당 반영 정관을 계약일+1개월 내 제출하는 의무. 이행 여부 확인.'},
+    {when:'상시 경계',cls:'b-amber',txt:'<b>외부감사 의견</b> — 적정 외 의견이 나오면 전 우선주의 기한 전 상환 사유와 매수청구 사유가 동시에 트리거됩니다. 결산 품질이 곧 상환 방어선입니다.'},
+    {when:'상시 경계',cls:'b-gray',txt:'<b>대표 지분 처분 제한</b> — 대표 보유주식은 사실상 전 계약에서 사전 서면동의 + 우선매수권·공동매도권 대상입니다.'}
+  ];
+  var urgentRefs=[[],[],[],[],[],[]];
+  var h='';
+  urgent.forEach(function(u,idx){
+    var group=(u.when==='기한 경과'||u.when==='즉시')?'now':(u.when==='확인 1건'?'check':'watch');
+    h+='<li data-urgent-group="'+group+'"><span class="when"><span class="badge '+u.cls+'">'+u.when+'</span></span><span>'+u.txt+'<span class="source-row">'+sourceLinks(urgentRefs[idx])+'</span></span></li>';
+  });
+  document.getElementById('urgent').innerHTML=h;
+  document.querySelector('[aria-label="긴급 항목 상태 필터"]').addEventListener('click',function(e){
+    var btn=e.target.closest('[data-urgent]');if(!btn)return;
+    var value=btn.getAttribute('data-urgent');
+    var buttons=document.querySelectorAll('[data-urgent]'),items=document.querySelectorAll('[data-urgent-group]'),i;
+    for(i=0;i<buttons.length;i++){buttons[i].setAttribute('aria-pressed',buttons[i]===btn?'true':'false')}
+    for(i=0;i<items.length;i++){items[i].style.display=(value==='all'||items[i].getAttribute('data-urgent-group')===value)?'':'none'}
+  });
+
+  // ---- 정기 ----
+  var regular=[
+    {when:'분기 + 7일',txt:'주주명부, 법인등기부등본 (펀드 6곳) / 4대보험 가입자명부 + 청년 고용현황 (3곳)'},
+    {when:'분기 + 30일',txt:'분기 재무제표 + 자금수지 + 부가세 신고서 (최근 2개 라운드) / 분기 매출·손익집계 + 사업진행 (BW 1건)'},
+    {when:'분기 + 45일',txt:'가결산 재무제표(BS·IS) + 주주명부 (펀드 2곳) / 분기 재무제표·경영보고서 (CPS 1건)'},
+    {when:'분기 + 60일',txt:'분기 재무제표 + 경영보고서 (보통주 계약 2건)'},
+    {when:'분기 1회',txt:'주주간담회 또는 이사회 개최 — 중요 변동이 없으면 보고서 제출로 갈음 가능'},
+    {when:'연도 + 45일',txt:'재무제표(BS·IS) + 합계잔액시산표 (초기 개인투자조합 2건 — 아직 유효한 의무)'},
+    {when:'연도 + 90일',txt:'감사받은 결산재무제표 + 세무조정계산서 + 연간경영보고서 + 주주명부 (전 투자자 공통)'},
+    {when:'연도말 - 1개월',txt:'부가세 신고서 + 금융기관 거래상황 확인서 (최근 라운드, 투자자 요청 시 더 단기)'},
+    {when:'수시(즉시~10일)',txt:'부도·소송·압류·행정제재·주요인력 변동·사업계획 변경·ESG 이슈 발생 시 서면통지 (계약별 즉시~10일)'}
+  ];
+  var regularRefs=[[],[],[],[],[],[],[],[],[]];
+  h='';
+  regular.forEach(function(u,idx){h+='<li><span class="when">'+u.when+'</span><span>'+u.txt+'<span class="source-row">'+sourceLinks(regularRefs[idx])+'</span></span></li>'});
+  document.getElementById('regular').innerHTML=h;
+
+  function cycleOf(item){
+    if(item.when.indexOf('분기')===0)return 'quarter';
+    if(item.when.indexOf('연도')===0)return 'annual';
+    return item.when.indexOf('수시')===0?'event':'annual';
+  }
+  function renderReports(cycle){
+    var rows='',i,item;
+    for(i=0;i<regular.length;i++){
+      item=regular[i];if(cycleOf(item)!==cycle)continue;
+      rows+='<div class="deadline-row"><div class="deadline-when">'+item.when+'</div><div class="deadline-copy">'+item.txt+'<span class="source-row">'+sourceLinks(regularRefs[i])+'</span></div></div>';
+    }
+    document.getElementById('reportViz').innerHTML=rows;
+  }
+  document.querySelector('.cycle-tabs').addEventListener('click',function(e){
+    var btn=e.target.closest('[data-cycle]');if(!btn)return;
+    var buttons=document.querySelectorAll('[data-cycle]'),i;
+    for(i=0;i<buttons.length;i++){buttons[i].setAttribute('aria-pressed',buttons[i]===btn?'true':'false')}
+    renderReports(btn.getAttribute('data-cycle'));
+  });
+  renderReports('quarter');
+
+  // ---- 이벤트 ----
+  var events=[
+    {t:'신주 발행 / 스톡옵션 / 주식연계사채',d:'전 투자자 사전 서면동의(시행 2주 전 통지) + 증자참여 우선권. 기준가 미만 발행 시 전 우선주 풀래칫과 행사가 하향 조정이 걸립니다. 스톡옵션 풀은 발행주식총수 10% 이내.'},
+    {t:'배당 결의',d:'BW는 발행 당시 잉여금의 현금배당 금지. 최근 라운드는 배당 자체가 사전동의 사항이고, 배당 시 우선주 누적 우선배당을 먼저 지급합니다.'},
+    {t:'자산 취득·처분 / 차입 / 담보',d:'기준이 계약마다 다릅니다 — 건당 자산총계 5%(연 10%) / 건당 10억(연 20억) / 건당 자산총계 10%(연 20%) / 건당 5억. <b>가장 타이트한 기준으로 통일 관리</b>하면 전 계약을 동시에 만족시킬 수 있습니다.'},
+    {t:'주요 자산 매각',d:'자산총액 30% 이상 처분 시 투자자 우선매수권 절차(30일 통지)가 필요합니다.'},
+    {t:'합병 / 분할 / 영업양수도 / 자회사 설립',d:'전 계약 공통 사전동의. 경영권 이전형 거래는 간주청산 조항이 발동해 우선주에 발행가+연복리 우선분배 후 잔여를 분배합니다.'},
+    {t:'대표이사·외부감사인 변경',d:'대표이사 선임·해임, 외부감사인 선임·변경 모두 사전동의 사항. 최근 라운드부터는 투자자 서면동의 회계법인 지정 의무가 붙습니다.'},
+    {t:'IPO 추진',d:'시기·공모가·주간사는 사전 협의·합의 사항. 요건 충족 후 투자자 서면요구를 무시하면 본질가치 배수로 매수청구가 가능하고, 공모가가 전환가를 하회하면 전환비율이 상향됩니다.'},
+    {t:'특수관계인 거래 / 관계사',d:'계열사·임직원·주주·특수관계인 거래는 전 계약 공통 사전동의. 관계사 내부거래는 통지 대상입니다.'},
+    {t:'투자금 집행',d:'용도 외 사용 금지(위반 시 매수청구+위약벌). 최근 라운드는 전용통장 분리관리 + 분기 사용내역 보고 + 소진 시 영업일 내 보고 의무가 있습니다.'}
+  ];
+  var eventRefs=[[],[],[],[],[],[],[],[],[]];
+  h='';
+  events.forEach(function(e,idx){h+='<details'+(idx===0?' open':'')+'><summary>'+e.t+'</summary><div class="body">'+e.d+'<div class="source-row">'+sourceLinks(eventRefs[idx])+'</div></div></details>'});
+  document.getElementById('events').innerHTML=h;
+
+  // ---- 투자사 카드 ----
+  var invs=[
+    {name:'케이프캐피탈 1호·2호',gp:'개인투자조합 | 2020.03~04 + 2023.02 (3건)',amt:'3.0억',det:'보통주 350주 @820,000',badges:[['b-gray','보통주'],['b-green','권리 대부분 소멸']],pts:['동의권은 체결 후 3년 자동소멸 — 3건 모두 만료','살아있는 의무: 연도 종료 후 45일 내 재무제표+합계잔액시산표 제출','대표 지분 처분 시 우선매수·동반매도권(10일)은 존속','관할 법원이 다른 계약과 달라 분쟁 시 절차가 갈립니다'],hot:[]},
+    {name:'세인벤처스 (언택트성장펀드1호)',gp:'GP 세인벤처스 | 2021.07 보통주 + 2022.11 CPS (2건)',amt:'10.0억',det:'보통주 3,450주 @145,000 + CPS 1,004주 @498,000',badges:[['b-blue','CPS(상환권 없음)'],['b-violet','임원지명 1인'],['b-red','본사 소재지 유지 특약']],pts:['CPS는 전 계약 중 유일하게 상환권이 삭제 — 자본 분류 판단 시 전환조건까지 함께 봐야 합니다','매출·흑자전환 목표 미달 시 전환가 리픽싱 조건 — 달성 여부 확인 필요','후행 투자자 조건이 유리하면 자동 적용(MFN) — 최근 라운드 조건과 대조 필요','보통주 계약: 투자자 동의 회계법인의 외부감사 의무'],hot:[1,2]},
+    {name:'노바파트너스 (그로스펀드2호)',gp:'GP 노바파트너스 | 2021.07 보통주',amt:'5.0억',det:'보통주 3,450주 @145,000',badges:[['b-gray','보통주'],['b-violet','임원지명 1인'],['b-amber','위약벌 15%']],pts:['동일 라운드 중 유일하게 위약벌·지연배상률이 15% (타사 12%)','투자자의 주식처분도 회사와 사전협의가 필요한 양방향 조항','자회사 인수 M&A의 시기·조건에 서면동의가 필요했던 계약','핵심인력 퇴사제한 5년 — 최근 만료. 경업금지는 계약 존속 중 유효'],hot:[0]},
+    {name:'그리드투자조합',gp:'법인 직접투자 | 2021.08 보통주',amt:'2.0억',det:'보통주 1,334주 @145,000 (현재 936주)',badges:[['b-gray','보통주']],pts:['동의권 없이 보고의무만 있는 가장 단순한 구조','일부 주식이 이미 처분되어 주주명부와 계약 수량이 다릅니다 — 대조 필요'],hot:[]},
+    {name:'메리디안캐피탈',gp:'GP 메리디안캐피탈 | 2022.11 RCPS',amt:'10.0억',det:'RCPS 2,008주 @498,000',badges:[['b-amber','RCPS(상환권)'],['b-red','상환 오픈']],pts:['상환청구 가능 시점이 이미 도래 — 연복리 5% 가산','간주청산 시 발행가+연복리 우선분배','분기 재무제표 45일 내 제출 의무'],hot:[0]},
+    {name:'아틀라스벤처스',gp:'증권사 직접투자 | 2022.12 RCPS',amt:'10.0억',det:'RCPS 2,008주 @498,000',badges:[['b-amber','RCPS(상환권)'],['b-red','상환 오픈']],pts:['상환청구 오픈 — 실제 청구 여부가 자금계획의 변수','자산 취득·처분 기준이 건당 자산총계 10%로 상대적으로 느슨','IPO 주관사 조건 제시 기회 부여 협의 의무'],hot:[0]},
+    {name:'하버라인 BW',gp:'은행 인수 | 2023.05 신주인수권부사채',amt:'1.2억',det:'BW 1.2억 (행사가 498,000)',badges:[['b-violet','BW'],['b-gray','배당 제한']],pts:['발행 당시 잉여금의 현금배당 금지','분기 매출·손익집계와 사업진행 보고를 별도 양식으로 요구','연간 감사보고서 + 차기 사업계획·추정재무제표 제출'],hot:[]},
+    {name:'퍼스트무브인베스트',gp:'GP 퍼스트무브 | 2025.06 RCPS (1차)',amt:'20.0억',det:'RCPS 1,835주 @1,090,000',badges:[['b-amber','RCPS'],['b-blue','전용통장']],pts:['투자금 전용통장 분리관리 + 분기 사용내역 보고','외부감사인은 투자자 서면동의 회계법인으로 지정','상환청구 오픈 2027년 — 연복리 8%'],hot:[2]},
+    {name:'온윈드캐피탈',gp:'GP 온윈드 | 2025.06 RCPS (1차)',amt:'15.0억',det:'RCPS 1,376주 @1,090,000',badges:[['b-amber','RCPS'],['b-violet','예금 출금 동의']],pts:['예금 2억 초과 출금도 사전동의 대상(통상 영업 제외) — 실무상 가장 타이트','분기 주주명부·등기부·고용현황 제출(분기+7일)','자산 처분 30% 이상 시 우선매수권 절차'],hot:[0]},
+    {name:'블루메사파트너스',gp:'GP 블루메사 | 2025.06 RCPS (1차)',amt:'12.0억',det:'RCPS 1,100주 @1,090,000',badges:[['b-amber','RCPS']],pts:['1차 6개사 공통 특약 — 정관 개정본 제출, 대출 상환 증빙 3종','동의권 항목은 12개로 표준 수준'],hot:[]},
+    {name:'스텔라그로스',gp:'GP 스텔라 | 2025.06 RCPS (1차)',amt:'10.0억',det:'RCPS 917주 @1,090,000',badges:[['b-amber','RCPS'],['b-green','동의권 슬림']],pts:['동의권 7개로 슬림 — 배당·조기상환·주식상환만 동의 대상','보고 주기는 다른 1차 참여사와 동일'],hot:[]},
+    {name:'코어밸류인베스트',gp:'GP 코어밸류 | 2025.06 RCPS (1차)',amt:'8.0억',det:'RCPS 734주 @1,090,000',badges:[['b-amber','RCPS']],pts:['소액 참여지만 특약은 1차 공통이 그대로 적용','주주간담회 분기 1회 — 보고서 제출로 갈음 가능'],hot:[]},
+    {name:'프리즘캐피탈',gp:'GP 프리즘 | 2025.06 RCPS (1차)',amt:'5.51억',det:'RCPS 506주 @1,090,000',badges:[['b-amber','RCPS']],pts:['1차 마지막 참여사 — 잔여 배정분','청년 고용현황 제출 의무 포함'],hot:[]},
+    {name:'라이트하우스벤처스',gp:'GP 라이트하우스 | 2025.07 RCPS (2차)',amt:'30.0억',det:'RCPS 2,750주 @1,090,000',badges:[['b-amber','RCPS'],['b-red','감사인 지정권']],pts:['투자자가 외부감사인 지정·변경권 보유 — 결산 일정에 직접 영향','관계사 내부거래는 10일 내 통지 대상','상환청구 오픈 2027년 — 연복리 8%'],hot:[0]},
+    {name:'델타원인베스트',gp:'GP 델타원 | 2025.07 RCPS (2차)',amt:'28.5억',det:'RCPS 2,620주 @1,090,000',badges:[['b-amber','RCPS'],['b-violet','IPO 주간사 동의']],pts:['IPO 주간사 변경이 동의사항','분기 재무제표·경영보고서 + 수주실적 제출'],hot:[]},
+    {name:'서밋캐피탈 (글로벌1호)',gp:'GP 서밋 | 2026.07 RCPS',amt:'20.0억',det:'RCPS 1,515주 @1,320,000',badges:[['b-amber','RCPS'],['b-blue','소진율 실사']],pts:['납입 1년 시점 투자금 소진율 70% 미만이면 회계법인 실사 조항','외부감사인 지정·변경권 보유 + 배당 사전동의','상환청구 오픈 2028년 — 연복리 8%'],hot:[0]}
+  ];
+  var invRefs=[[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]];
+  h='';
+  invs.forEach(function(v,vIdx){
+    var b='';
+    v.badges.forEach(function(x){b+='<span class="badge '+x[0]+'">'+x[1]+'</span>'});
+    var lis='';
+    v.pts.forEach(function(p,idx){
+      var hot=v.hot.indexOf(idx)>=0?' class="hot"':'';
+      lis+='<li'+hot+'>'+p+'</li>';
+    });
+    var fullText=[v.name,v.gp,v.amt,v.det].concat(v.pts).join(' ');
+    var high=v.hot.length>0?'1':'0';
+    var redeem=fullText.indexOf('상환')>=0?'1':'0';
+    var missing=(fullText.indexOf('확보 필수')>=0||fullText.indexOf('실물 확인')>=0)?'1':'0';
+    h+='<article class="inv" data-high="'+high+'" data-redeem="'+redeem+'" data-missing="'+missing+'"><div class="top"><div><h4>'+v.name+'</h4><div class="gp">'+v.gp+'</div></div></div>'
+      +'<div class="amt">'+v.amt+'<small>'+v.det+'</small></div>'
+      +'<div>'+b+'</div><ul>'+lis+'</ul><div class="source-row">'+sourceLinks(invRefs[vIdx])+'</div></article>';
+  });
+  document.getElementById('invcards').innerHTML=h;
+
+  function filterInvestorCards(){
+    var q=document.getElementById('invSearch').value.toLowerCase().replace(/^\s+|\s+$/g,'');
+    var mode=document.getElementById('invFilter').value;
+    var cards=document.querySelectorAll('.inv'),shown=0,i,card,matchText,matchMode;
+    for(i=0;i<cards.length;i++){
+      card=cards[i];matchText=!q||card.textContent.toLowerCase().indexOf(q)>=0;
+      matchMode=mode==='all'||(mode==='high'&&card.getAttribute('data-high')==='1')||(mode==='redeem'&&card.getAttribute('data-redeem')==='1')||(mode==='missing'&&card.getAttribute('data-missing')==='1');
+      card.style.display=matchText&&matchMode?'':'none';if(matchText&&matchMode)shown++;
+    }
+    document.getElementById('invCount').textContent=shown;
+    document.getElementById('invEmpty').style.display=shown?'none':'block';
+  }
+  document.getElementById('invSearch').addEventListener('input',filterInvestorCards);
+  document.getElementById('invFilter').addEventListener('change',filterInvestorCards);
+  document.getElementById('invReset').addEventListener('click',function(){document.getElementById('invSearch').value='';document.getElementById('invFilter').value='all';filterInvestorCards();document.getElementById('invSearch').focus()});
+
+  // ---- 라운드 콤보 차트 ----
+  var roundMode='all';
+  var roundData=[
+    {year:'2020',sub:'보통주',amount:3,price:null,ref:{}},
+    {year:'2021',sub:'보통주',amount:12,price:15,ref:{}},
+    {year:'2022',sub:'우선주',amount:20,price:49.8,ref:{}},
+    {year:'2023',sub:'BW',amount:1.2,price:null,ref:{}},
+    {year:'2025',sub:'RCPS',amount:134.20,price:109.0,ref:{}},
+    {year:'2026',sub:'RCPS',amount:20,price:132.0,ref:{}}
+  ];
+  function svgNode(name,attrs,copy){
+    var n=document.createElementNS('http://www.w3.org/2000/svg',name),k;
+    for(k in attrs){if(Object.prototype.hasOwnProperty.call(attrs,k)){n.setAttribute(k,attrs[k])}}
+    if(copy!==undefined)n.textContent=copy;
+    return n;
+  }
+  function renderRoundChart(){
+    var box=document.getElementById('roundChart');if(!box||box.offsetWidth===0)return;
+    box.innerHTML='';
+    var width=Math.max(300,Math.floor(box.clientWidth)),height=270,compact=width<500;
+    var left=compact?39:48,right=roundMode==='all'?(compact?35:46):16,top=25,bottom=46;
+    var plotW=width-left-right,plotH=height-top-bottom,showAmount=roundMode!=='price',showPrice=roundMode!=='amount';
+    var svg=svgNode('svg',{viewBox:'0 0 '+width+' '+height,height:height,role:'img','aria-labelledby':'roundSvgTitle roundSvgDesc'});
+    svg.appendChild(svgNode('title',{id:'roundSvgTitle'},'라운드별 조달액과 주당 단가'));
+    svg.appendChild(svgNode('desc',{id:'roundSvgDesc'},'2020년부터 2026년까지 조달액 막대와 액면분할 이후 주당 단가 추세를 비교합니다.'));
+    var maxPrimary=showAmount?140:150,ticks=compact?4:5,i,y,value,label,x,step=plotW/roundData.length;
+    for(i=0;i<=ticks;i++){
+      value=maxPrimary*i/ticks;y=top+plotH-(value/maxPrimary)*plotH;
+      svg.appendChild(svgNode('line',{x1:left,y1:y,x2:left+plotW,y2:y,'class':'gridline'}));
+      label=showAmount?String(Math.round(value)):String(Math.round(value));
+      svg.appendChild(svgNode('text',{x:left-7,y:y+4,'text-anchor':'end'},label));
+    }
+    svg.appendChild(svgNode('line',{x1:left,y1:top,x2:left,y2:top+plotH,'class':'axis'}));
+    svg.appendChild(svgNode('line',{x1:left,y1:top+plotH,x2:left+plotW,y2:top+plotH,'class':'axis'}));
+    svg.appendChild(svgNode('text',{x:left,y:13,'class':'axis-label'},showAmount?'조달액(억원)':'주당 단가(만원)'));
+    if(showAmount){
+      for(i=0;i<roundData.length;i++){
+        var d=roundData[i],barH=(d.amount/140)*plotH,barX=left+step*i+step*.22,barW=step*.56,barY=top+plotH-barH;
+        var rect=svgNode('rect',{x:barX,y:barY,width:barW,height:Math.max(2,barH),rx:4,'class':'bar hit',tabindex:'0',role:'link','data-round-year':d.year,'aria-label':d.year+'년 '+d.sub+' 조달액 '+d.amount+'억원, 계약 원문 열기'});
+        rect.appendChild(svgNode('title',{},d.year+'년 '+d.sub+': '+d.amount+'억원'));
+        svg.appendChild(rect);
+        svg.appendChild(svgNode('text',{x:barX+barW/2,y:Math.max(top+11,barY-5),'text-anchor':'middle','class':'value-label'},String(d.amount)));
+      }
+    }
+    if(showPrice){
+      var pts=[],priceY=function(p){return top+plotH-(p/150)*plotH};
+      for(i=0;i<roundData.length;i++){
+        if(roundData[i].price!==null){x=left+step*(i+.5);pts.push([x,priceY(roundData[i].price),roundData[i]])}
+      }
+      var path='';for(i=0;i<pts.length;i++){path+=(i===0?'M':'L')+pts[i][0]+' '+pts[i][1]+' '}
+      svg.appendChild(svgNode('path',{d:path,'class':'line'}));
+      for(i=0;i<pts.length;i++){
+        var point=svgNode('circle',{cx:pts[i][0],cy:pts[i][1],r:5,'class':'point hit',tabindex:'0',role:'link','data-round-year':pts[i][2].year,'aria-label':pts[i][2].year+'년 주당 단가 '+pts[i][2].price+'만원, 계약 원문 열기'});
+        point.appendChild(svgNode('title',{},pts[i][2].year+'년 주당 단가: '+pts[i][2].price+'만원'));
+        svg.appendChild(point);
+        svg.appendChild(svgNode('text',{x:pts[i][0],y:pts[i][1]-9,'text-anchor':'middle','class':'value-label'},pts[i][2].price));
+      }
+      if(roundMode==='all'){
+        for(i=0;i<=ticks;i++){
+          value=150*i/ticks;y=top+plotH-(value/150)*plotH;
+          svg.appendChild(svgNode('text',{x:left+plotW+7,y:y+4,'text-anchor':'start'},String(Math.round(value))));
+        }
+        svg.appendChild(svgNode('text',{x:left+plotW,y:13,'text-anchor':'end','class':'axis-label'},'단가(만원)'));
+      }
+    }
+    for(i=0;i<roundData.length;i++){
+      x=left+step*(i+.5);
+      svg.appendChild(svgNode('text',{x:x,y:top+plotH+17,'text-anchor':'middle','class':'axis-label'},roundData[i].year));
+      if(!compact)svg.appendChild(svgNode('text',{x:x,y:top+plotH+32,'text-anchor':'middle'},roundData[i].sub));
+    }
+    box.appendChild(svg);
+  }
+  document.querySelector('[aria-label="차트 계열 선택"]').addEventListener('click',function(e){
+    var btn=e.target.closest('[data-round]');if(!btn)return;
+    roundMode=btn.getAttribute('data-round');var buttons=document.querySelectorAll('[data-round]'),i;
+    for(i=0;i<buttons.length;i++){buttons[i].setAttribute('aria-pressed',buttons[i]===btn?'true':'false')}
+    renderRoundChart();
+  });
+  function openRoundTarget(el){
+    var year=el.getAttribute('data-round-year'),i;for(i=0;i<roundData.length;i++){if(roundData[i].year===year){openArchive(roundData[i].ref);return}}
+  }
+  document.getElementById('roundChart').addEventListener('click',function(e){var el=e.target.closest('[data-round-year]');if(el)openRoundTarget(el)});
+  document.getElementById('roundChart').addEventListener('keydown',function(e){var el=e.target.closest('[data-round-year]');if(el&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openRoundTarget(el)}});
+
+  // ---- 계약 유형 인터랙션 ----
+  var classInfo={
+    common:{value:'4',unit:'보통주 계약',detail:'상환권은 없지만 동의권·보고의무·지분처분 제한은 계속 확인해야 합니다.',refs:[]},
+    cps:{value:'1',unit:'CPS 계약',detail:'상환권이 삭제된 CPS는 전환조건까지 봐야 회계상 자본 여부를 판단할 수 있습니다.',refs:[]},
+    rcps:{value:'10',unit:'RCPS 계약',detail:'상환권과 누적 우선배당, 전환가 조정 조건이 관리·회계분류의 핵심입니다.',refs:[]},
+    bw:{value:'1',unit:'BW 계약',detail:'분리형 BW는 사채 주계약과 신주인수권의 분리·후속측정을 검토하고, 행사 전 현금배당 제한을 관리합니다.',refs:[]}
+  };
+  document.querySelector('[aria-label="계약 유형 선택"]').addEventListener('click',function(e){
+    var btn=e.target.closest('[data-class]');if(!btn)return;
+    var buttons=document.querySelectorAll('[data-class]'),i,info=classInfo[btn.getAttribute('data-class')];
+    for(i=0;i<buttons.length;i++){buttons[i].setAttribute('aria-pressed',buttons[i]===btn?'true':'false')}
+    document.getElementById('classValue').textContent=info.value;
+    document.getElementById('classUnit').textContent=info.unit;
+    document.getElementById('classDetail').innerHTML=info.detail+'<span class="source-row">'+sourceLinks(info.refs)+'</span>';
+  });
+
+  // ---- 상환 오픈 타임라인 ----
+  var repayData=[
+    {name:'메리디안캐피탈',amount:10.0,date:'2024-12-09',rate:'연복리 5%',status:'open',refs:[]},
+    {name:'아틀라스벤처스',amount:10.0,date:'2024-12-10',rate:'연복리 5%',status:'open',refs:[]},
+    {name:'2025 라운드 1차 6개사',amount:73.40,date:'2027-06-27',rate:'연복리 8%',status:'future',refs:[]},
+    {name:'2025 라운드 2차 2개사',amount:60.8,date:'2027-07-05',rate:'연복리 8%',status:'future',refs:[]},
+    {name:'서밋캐피탈 (글로벌1호)',amount:20.0,date:'2028-07-16',rate:'연복리 8%',status:'future',refs:[]}
+  ];
+  function renderRepay(filter){
+    var start=new Date('2024-01-01T00:00:00').getTime(),end=new Date('2029-01-01T00:00:00').getTime();
+    var rows='',i,r,pos,width,statusText;
+    for(i=0;i<repayData.length;i++){
+      r=repayData[i];if(filter!=='all'&&r.status!==filter)continue;
+      pos=(new Date(r.date+'T00:00:00').getTime()-start)/(end-start)*100;pos=Math.max(0,Math.min(100,pos));width=100-pos;
+      statusText=r.status==='open'?'이미 오픈':'오픈 예정';
+      rows+='<div class="timeline-row"><div class="timeline-label"><b>'+r.name+'</b><span>'+r.date+' &middot; '+r.rate+' &middot; '+statusText+'</span><span class="source-row">'+sourceLinks(r.refs)+'</span></div>'
+        +'<div class="timeline-track" role="img" aria-label="'+r.name+' '+r.date+'부터 상환청구 가능"><span class="timeline-mark '+(r.status==='open'?'open':'')+'" style="left:'+pos.toFixed(2)+'%;width:'+width.toFixed(2)+'%"></span></div>'
+        +'<div class="timeline-amt">'+r.amount+'억</div></div>';
+    }
+    rows+='<p class="chart-note">세인벤처스 CPS 5억원은 상환권이 없고 전환만 가능합니다.</p>';
+    document.getElementById('repayViz').innerHTML=rows;
+  }
+  document.querySelector('[aria-label="상환 일정 상태 필터"]').addEventListener('click',function(e){
+    var btn=e.target.closest('[data-repay]');if(!btn)return;
+    var buttons=document.querySelectorAll('[data-repay]'),i;
+    for(i=0;i<buttons.length;i++){buttons[i].setAttribute('aria-pressed',buttons[i]===btn?'true':'false')}
+    renderRepay(btn.getAttribute('data-repay'));
+  });
+  renderRepay('all');
+
+  // ---- 매트릭스 1: 경제조건 ----
+  var m1h=['계약','투자자','유형','금액','주식수 @단가','상환','배당','청산우선'];
+  var m1=[
+    ['2020 시드 3건','케이프캐피탈 1·2호','보통주','3.0억','350주 @820,000','없음','—','—'],
+    ['2021 보통주 3건','세인·노바·그리드','보통주','12.0억','8,280주 @145,000','없음','—','—'],
+    ['2022 CPS','세인벤처스','CPS','10.0억','1,004주 @498,000','삭제','연 1% 누적','발행가+연복리 5%'],
+    ['2022 RCPS 2건','메리디안·아틀라스','RCPS','20.0억','4,016주 @498,000','2024-12 오픈','연 1% 누적','발행가+연복리 5%'],
+    ['2023 BW','하버라인','BW','1.2억','행사가 498,000','—','배당 제한','—'],
+    ['2025 RCPS 6건 (1차)','퍼스트무브 외 5','RCPS','73.40억','6,470주 @1,090,000','2027-06 오픈','연 1% 누적','발행가+연복리 8%'],
+    ['2025 RCPS 2건 (2차)','라이트하우스·델타원','RCPS','60.8억','5,370주 @1,090,000','2027-07 오픈','연 1% 누적','발행가+연복리 8%'],
+    ['2026 RCPS','서밋캐피탈','RCPS','20.0억','1,515주 @1,320,000','2028-07 오픈','연 1% 누적','발행가+연복리 8%']
+  ];
+  var m1Refs=[];
+  function tbl(id,head,rows,refs){
+    var s='<thead><tr>';head.forEach(function(x){s+='<th scope="col">'+x+'</th>'});s+='</tr></thead><tbody>';
+    rows.forEach(function(r,ri){s+='<tr>';r.forEach(function(c,ci){s+='<td>'+c+(ci===0&&refs&&refs[ri]?'<div class="source-cell">'+sourceLinks(refs[ri])+'</div>':'')+'</td>'});s+='</tr>'});s+='</tbody>';
+    document.getElementById(id).innerHTML=s;
+  }
+  tbl('mtx1',m1h,m1,m1Refs);
+
+  // ---- 매트릭스 2: 권리 ----
+  var m2h=['투자자(대표계약)','동의권','임원지명','정기보고','위약벌','특기'];
+  var m2=[
+    ['케이프 3건','소멸(3년 경과)','없음','연45','12%','관할 법원 상이'],
+    ['세인 2022 CPS','7개','기타비상무 1인','연90/분기45','10%','본사 소재지 유지 / MFN'],
+    ['메리디안 2022','7개','기타비상무 1인','연90/분기45','12%','상환 오픈'],
+    ['아틀라스 2022','9개','없음','연90/분기45','12%','자산기준 10%'],
+    ['하버라인 BW','5개','없음','연90/분기30','—','배당 제한'],
+    ['2025 1차 6개사','12개','기타비상무 1인','연90/분기30·7','12%','전용통장·정관 제출'],
+    ['2025 2차 2개사','12개','기타비상무 1인','연90/분기30','12%','감사인 지정권'],
+    ['서밋 2026','12개','기타비상무 1인','연90/분기30','12%','소진율 실사']
+  ];
+  var m2Refs=[];
+  tbl('mtx2',m2h,m2,m2Refs);
+
+  // ---- 매트릭스 3: 리픽싱 ----
+  var m3h=['조정 사유','2022 세인벤처스&middot;메리디안캐피탈&middot;아틀라스벤처스','2025 라운드(공통)','2026 서밋'];
+  var m3=[
+    ['IPO 공모가 70%가 전환가 하회','전환비율 상향 조정','전환가를 공모가의 70%로','전환가를 공모가의 70%로'],
+    ['합병&middot;피인수 거래단가 70% 하회','조정','조정','조정'],
+    ['전환가 하회 신주&middot;사채 발행(풀래칫)','있음','있음','있음'],
+    ['주식배당&middot;무상증자','우선주 무상지급 산식','전환가 희석조정 산식','전환가 희석조정 산식'],
+    ['실적 조건 리픽싱','2022 매출 80억 + 영업이익 흑자전환 미달 시 전환가 = 발행가의 65%','없음','없음'],
+    ['후행 투자자 유리조건 자동적용(MFN)','있음','퍼스트무브인베스트만 있음','없음'],
+    ['복합 발생 시','최저 전환가 적용','최저 전환가 적용','최저 전환가 적용']
+  ];
+  var m3Refs=[
+    [{q:'IPO 공모가'}],[{q:'합병 평가액'}],[{q:'풀래칫'}],[{q:'주식배당'}],[{q:'65%'}],[{q:'MFN'}],[{q:'최저 전환가'}]
+  ];
+  tbl('mtx3',m3h,m3,m3Refs);
+
+  var resizeTimer;
+  window.addEventListener('resize',function(){
+    window.clearTimeout(resizeTimer);
+    resizeTimer=window.setTimeout(function(){if(document.getElementById('t1').classList.contains('on'))renderRoundChart()},120);
+  });
+  var startTab=location.hash.replace('#','');
+  if(!document.getElementById(startTab)||startTab.charAt(0)!=='t')startTab='t1';
+  showTab(startTab,false);
+})();
+</script>
+</body>
+</html>
