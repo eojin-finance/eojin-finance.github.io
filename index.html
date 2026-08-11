@@ -72,16 +72,19 @@
   .shead { display: flex; align-items: baseline; gap: var(--s2); flex-wrap: wrap;
            padding-bottom: var(--s2); border-bottom: 1px solid var(--line); margin-bottom: var(--s3); }
   .shead p { margin: 0; font-size: 13px; color: var(--ink-2); }
-  .lede { font-size: 14px; color: var(--ink-2); margin: 0 0 var(--s3); max-width: 68ch; }
+  /* 한글은 ch 단위가 실제보다 좁게 잡혀 em 기준으로 둔다 */
+  .lede { font-size: 14px; color: var(--ink-2); margin: 0 0 var(--s2); max-width: 46em; }
   .lede strong { color: var(--ink); font-weight: 600; }
   .note { font-size: 12px; color: var(--ink-3); margin: var(--s2) 0 0; }
 
   /* ── 대표 프로젝트 ── */
-  .flags { display: flex; flex-direction: column; gap: var(--s3); }
-  .flag { border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s3); background: var(--bg); }
+  /* 동일한 박스를 반복하지 않고 구분선으로 나눈다 */
+  .flags { display: flex; flex-direction: column; }
+  .flag { padding: var(--s3) 0; border-top: 1px solid var(--line-2); }
+  .flag:first-child { border-top: 0; padding-top: 0; }
   .flag > h3 { font-size: 16px; font-weight: 600; margin: 0 0 4px; letter-spacing: -.01em; }
   .flag .one { font-size: 13px; color: var(--ink-2); margin: 0 0 var(--s2); }
-  .flag dl { margin: 0; display: grid; grid-template-columns: 56px 1fr; gap: 6px var(--s2); font-size: 13.5px; }
+  .flag dl { margin: 0; display: grid; grid-template-columns: 52px minmax(0, 46em); gap: 6px var(--s2); font-size: 13.5px; }
   .flag dt { color: var(--ink-3); font-size: 12px; padding-top: 3px; }
   .flag dd { margin: 0; }
   .metrics { display: flex; flex-wrap: wrap; gap: var(--s3); margin: var(--s2) 0 0;
