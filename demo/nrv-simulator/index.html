@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>NRV 시뮬레이터 (데모) — 이어진 포트폴리오</title>
+<style>
+:root{
+  --ink:#191f28;--sub:#6b7684;--line:#e5e8eb;--bg:#f4f5f7;--card:#fff;
+  --navy:#1f3864;--blue:#3182f6;--red:#c00000;--green:#1a7f37;--yel:#fff2cc;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard','맑은 고딕','Malgun Gothic',-apple-system,sans-serif;
+  background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 80px}
+header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:8px 0 4px}
+header h1{font-size:22px;font-weight:800}
+header .ver{color:var(--sub);font-size:12.5px}
+.src{color:var(--sub);font-size:12px;margin-bottom:16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.src button{border:1px solid var(--line);background:#fff;border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--sub)}
+.badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11.5px;font-weight:700}
+.badge.ok{background:#e6f4ea;color:var(--green)} .badge.warn{background:#fdecea;color:var(--red)}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px}
+.step{display:flex;align-items:baseline;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:16px}
+.step .no{color:var(--sub);font-weight:700;font-size:13px;letter-spacing:2px}
+.step h2{font-size:17px;font-weight:800}
+.step .hint{margin-left:auto;color:var(--sub);font-size:12px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:6px}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi .t{color:var(--sub);font-size:12px;margin-bottom:4px}
+.kpi .v{font-size:21px;font-weight:800;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12px;color:var(--sub);margin-top:2px;font-variant-numeric:tabular-nums}
+.kpi.hl{background:#f8fafc;border-color:#cdd6e1}
+.pos{color:var(--green)} .neg{color:var(--red)}
+.grid2{display:grid;grid-template-columns:340px 1fr;gap:26px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.pgroup{margin-bottom:18px}
+.pgroup>.pt{font-weight:700;font-size:13px;margin-bottom:8px}
+.pgroup>.pt small{color:var(--sub);font-weight:400;margin-left:6px}
+.srow{display:grid;grid-template-columns:52px 1fr 64px;align-items:center;gap:10px;margin:7px 0}
+.srow label{font-size:12.5px;color:var(--sub)}
+.srow .val{font-size:13px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--ink);height:22px;cursor:pointer}
+.btnrow{display:flex;gap:8px;margin-top:6px}
+button.act{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;font-weight:600}
+button.act:hover{background:#f8f9fa}
+.verdict{border-left:3px solid var(--navy);background:#f8fafc;padding:10px 14px;border-radius:0 8px 8px 0;font-size:13.5px;margin:12px 0}
+.bars{margin-top:14px}
+.brow{display:grid;grid-template-columns:88px 1fr 150px;gap:10px;align-items:center;margin:6px 0;font-size:12.5px}
+.brow .nm{color:var(--sub);text-align:right}
+.btrack{position:relative;height:20px;background:#f1f3f5;border-radius:4px;overflow:hidden}
+.bfill{position:absolute;left:0;top:0;bottom:0;background:#b9c4d6;border-radius:4px}
+.bfill.sim{background:var(--navy);opacity:.85;top:auto;height:9px;bottom:0}
+.bfill.base{height:9px;top:0}
+.brow .num{text-align:right;font-variant-numeric:tabular-nums;color:var(--sub)}
+.brow .num b{color:var(--ink)}
+details{margin-top:12px}
+details summary{cursor:pointer;color:var(--sub);font-size:12.5px;user-select:none}
+table{border-collapse:collapse;width:100%;margin-top:10px;font-size:12.5px}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:right;font-variant-numeric:tabular-nums}
+th{background:#f8f9fa;font-weight:700}
+th:first-child,td:first-child{text-align:left}
+.tabs{display:flex;gap:0;border:1px solid var(--line);border-radius:9px;overflow:hidden;width:fit-content;margin-bottom:16px}
+.tabs button{border:0;background:#fff;padding:8px 18px;font-size:13px;cursor:pointer;font-weight:600;color:var(--sub)}
+.tabs button.on{background:var(--ink);color:#fff}
+.frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.frow .f label{display:block;font-size:12px;color:var(--sub);margin-bottom:4px}
+.frow .f input,.frow .f select{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px;font-weight:600;background:#fff}
+.searchbox{position:relative;max-width:420px}
+.searchbox input{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:14px}
+.sres{position:absolute;z-index:5;left:0;right:0;top:100%;background:#fff;border:1px solid var(--line);border-radius:8px;
+  max-height:260px;overflow:auto;box-shadow:0 6px 18px rgba(0,0,0,.08);display:none}
+.sres div{padding:7px 12px;font-size:12.5px;cursor:pointer;display:flex;justify-content:space-between;gap:8px}
+.sres div:hover{background:#f4f6f8}
+.sres .pn{font-weight:700}.sres .nm{color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note{color:var(--sub);font-size:12px;margin-top:8px}
+.itemcard{border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:10px 0;display:flex;gap:22px;flex-wrap:wrap;font-size:12.5px}
+.itemcard .g .t{color:var(--sub);font-size:11px}.itemcard .g .v{font-weight:700;font-variant-numeric:tabular-nums}
+#loading{padding:60px 0;text-align:center;color:var(--sub)}
+.spin{display:inline-block;width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--navy);border-radius:50%;
+  animation:sp 1s linear infinite;margin-bottom:12px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.err{background:#fdecea;color:var(--red);padding:14px 18px;border-radius:10px;font-size:13px;white-space:pre-wrap}
+footer{color:var(--sub);font-size:11.5px;margin-top:20px}
+</style>
+</head>
+<body>
+<div id="demobar">
+  <b>샘플 데이터 데모</b>
+  <span>실제 사내 데이터가 아닌 생성된 값으로 동작합니다. 화면·계산 로직은 실제 구현과 동일합니다.</span>
+  <a href="../../">← 포트폴리오</a>
+</div>
+<style>
+#demobar{position:sticky;top:0;z-index:20;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  background:#fff8e1;border-bottom:1px solid #f0dfa8;padding:9px 16px;font-size:12.5px;color:#6b5b21}
+#demobar b{background:#6b5b21;color:#fff8e1;padding:2px 8px;border-radius:10px;font-size:11.5px}
+#demobar a{margin-left:auto;color:#6b5b21;font-weight:700;text-decoration:none}
+#demobar a:hover{text-decoration:underline}
+</style>
+<div class="wrap">
+  <header>
+    <h1>NRV 시뮬레이터</h1>
+    <span class="ver" id="ver"></span>
+  </header>
+  <div class="src" id="src"></div>
+
+  <div id="loading"><div class="spin"></div><div>샘플 데이터를 생성하는 중…</div></div>
+  <div id="app" style="display:none">
+
+  <section>
+    <div class="step"><span class="no">01</span><h2>현황 — 샘플 기준본</h2><span class="hint" id="selfcheck"></span></div>
+    <div class="kpis">
+      <div class="kpi"><div class="t">기말재고 원가</div><div class="v" id="k-base-amt"></div><div class="s" id="k-base-amt2"></div></div>
+      <div class="kpi"><div class="t">평가충당금 (기준본)</div><div class="v neg" id="k-base-prov"></div><div class="s" id="k-base-prov2"></div></div>
+      <div class="kpi"><div class="t">충당률</div><div class="v" id="k-base-rate"></div><div class="s">충당금 ÷ 기말재고</div></div>
+    </div>
+    <div class="bars" id="bars-base"></div>
+    <details><summary>브랜드 × 연차 상세 표 열기</summary><div id="tbl-base"></div></details>
+  </section>
+
+  <section>
+    <div class="step"><span class="no">02</span><h2>전사 민감도 — 파라미터를 움직여 보세요</h2><span class="hint">전체 품번을 즉시 재계산합니다</span></div>
+    <div class="grid2">
+      <div>
+        <div class="pgroup">
+          <div class="pt">연차별 소진율 배수 <small>실측 소진율에 곱합니다 (100% = 기준 그대로)</small></div>
+          <div id="sl-s"></div>
+        </div>
+        <div class="pgroup">
+          <div class="pt">연차별 할인율 가감 <small>실측 할인율에 %p로 더합니다</small></div>
+          <div id="sl-d"></div>
+        </div>
+        <div class="pgroup">
+          <div class="pt">판매부대비용률 <small>수수료·물류·PG·포인트 합 (로열티는 품번별 별도 가산)</small></div>
+          <div id="sl-f"></div>
+        </div>
+        <div class="btnrow"><button class="act" onclick="resetSim()">기본값으로 되돌리기</button></div>
+      </div>
+      <div>
+        <div class="kpis">
+          <div class="kpi hl"><div class="t">시뮬 충당금</div><div class="v neg" id="k-sim-prov"></div><div class="s" id="k-sim-prov2"></div></div>
+          <div class="kpi"><div class="t">기준 대비</div><div class="v" id="k-sim-delta"></div><div class="s" id="k-sim-delta2"></div></div>
+          <div class="kpi"><div class="t">시뮬 충당률</div><div class="v" id="k-sim-rate"></div><div class="s" id="k-sim-rate2"></div></div>
+        </div>
+        <div class="verdict" id="verdict"></div>
+        <div class="bars" id="bars-sim"></div>
+        <div class="note">막대: 위(회색) = 기준 충당금, 아래(남색) = 시뮬 충당금 · 브랜드별 기말재고 대비</div>
+        <details><summary>연차별 충당금 변화 표 열기</summary><div id="tbl-sim"></div></details>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="step"><span class="no">03</span><h2>단건 3개년 전개 — 한 품번의 운명</h2><span class="hint">26H2 → 27 → 28 → 29 캐스케이드</span></div>
+    <div class="tabs">
+      <button id="tab-real" class="on" onclick="setTab('real')">실제 품번</button>
+      <button id="tab-virt" onclick="setTab('virt')">가상 상품 (직접 조작)</button>
+    </div>
+
+    <div id="pane-real">
+      <div class="searchbox">
+        <input id="q" placeholder="품번 또는 품명 검색 (2자 이상)" autocomplete="off">
+        <div class="sres" id="qres"></div>
+      </div>
+      <label style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--sub);margin-top:10px">
+        <input type="checkbox" id="applySim" onchange="renderReal()"> STEP 02 조정값을 반영해서 보기
+      </label>
+      <div id="real-out"></div>
+    </div>
+
+    <div id="pane-virt" style="display:none">
+      <div class="frow">
+        <div class="f"><label>그룹 (소진율·할인율 기본값)</label><select id="v-grp" onchange="virtDefaults()"></select></div>
+        <div class="f"><label>평가 대상 연차</label><select id="v-age" onchange="virtDefaults()">
+          <option value="0">0년차 (26 품번)</option><option value="1">1년차 (25 품번)</option>
+          <option value="2">2년차 (24 품번)</option><option value="3">3년차 이상</option></select></div>
+        <div class="f"><label>계절</label><select id="v-season" onchange="virtDefaults()">
+          <option value="0">비겨울</option><option value="4">겨울 (배수·가산 적용)</option></select></div>
+      </div>
+      <div class="frow">
+        <div class="f"><label>보유 수량 (장)</label><input id="v-qty" type="number" value="10000" oninput="renderVirt()"></div>
+        <div class="f"><label>단위원가 (원)</label><input id="v-cost" type="number" value="100000" oninput="renderVirt()"></div>
+        <div class="f"><label>정가 · 택가 (원)</label><input id="v-tag" type="number" value="300000" oninput="renderVirt()"></div>
+        <div class="f"><label>로열티율 (%)</label><input id="v-roy" type="number" value="0" step="0.1" oninput="renderVirt()"></div>
+      </div>
+      <div class="grid2" style="grid-template-columns:340px 1fr">
+        <div>
+          <div class="pgroup"><div class="pt">판매부대비용률</div><div id="v-sl-f"></div></div>
+          <div class="pgroup"><div class="pt">구간별 판매율 <small>잔량 대비</small></div><div id="v-sl-s"></div></div>
+          <div class="pgroup"><div class="pt">구간별 할인율 <small>정가 대비</small></div><div id="v-sl-d"></div></div>
+          <div class="btnrow"><button class="act" onclick="virtDefaults()">그룹 실측값으로</button></div>
+        </div>
+        <div id="virt-out"></div>
+      </div>
+    </div>
+  </section>
+
+  <details style="margin:0 4px">
+    <summary>산식 요약</summary>
+    <div class="note" style="line-height:2">
+      · 26H2 판매 = 잔량 × MIN(1, 소진율 × 겨울배수) × 하반기비중 &nbsp;|&nbsp; 27~29 판매 = 잔량 × MIN(1, 소진율 × 겨울배수)<br>
+      · 순회수 = 판매수량 × 정가 × MAX(0, 1 − 할인율 − 겨울가산 − 부대비용률 − 로열티율)<br>
+      · 충당금 = 3년차 이상·라이선스종료·연도불가는 원가 100%, 그 외 MAX(0, 원가 − 4개 구간 순회수 합)<br>
+      · 소진율·할인율은 브랜드그룹 × 연차별 실측값 테이블에서 조회, 겨울상품은 전년 코호트로 보정
+    </div>
+  </details>
+  <footer>포트폴리오 데모 · 실제 구현은 사내 DB(2.2만 행)를 원천으로 하고 확정 엑셀과 원 단위 일치를 검증했습니다. 이 페이지의 숫자는 전부 생성된 샘플입니다.</footer>
+  </div>
+</div>
+
+
+<script>
+/* ── 데모 데이터 생성기 (시드 고정 → 항상 같은 샘플) ────────────────
+   실제 앱은 이 자리에서 사내 DB를 읽는다. 구조(열 순서·파라미터 표)는 원본과 동일하게 맞춘다. */
+function DEMO_DATA(){
+  var seed=20260812;
+  function rnd(){ seed=(seed*1664525+1013904223)%4294967296; return seed/4294967296; }
+  function pick(a){ return a[Math.floor(rnd()*a.length)]; }
+  function jit(v,p){ return v*(1+(rnd()*2-1)*p); }
+
+  var BR=['AURORA','BLANC','CIEL','DUNE','ECHO','FERN','GRAIN'];
+  var PFX={AURORA:'AR',BLANC:'BL',CIEL:'CI',DUNE:'DN',ECHO:'EC',FERN:'FN',GRAIN:'GR'};
+  var P={소진율:{},H2비중:{},할인율:{},겨울배수:{},겨울가산:{},수수료:{},로열티:{},정책:{}};
+  BR.forEach(function(b){
+    P.소진율[b]=[jit(0.58,0.18),jit(0.34,0.20),jit(0.19,0.22),jit(0.11,0.25)].map(function(v){return Math.round(v*1e4)/1e4;});
+    P.할인율[b]=[jit(0.28,0.12),jit(0.44,0.10),jit(0.55,0.08),jit(0.63,0.06)].map(function(v){return Math.round(v*1e4)/1e4;});
+    P.H2비중[b]=[0.55,0.50,0.50,0.50];
+  });
+  P.겨울배수={'A군':[1.18,1.12,1.06,1.00],'그외':[1.10,1.06,1.02,1.00]};
+  P.겨울가산={'A군':[0.05,0.05,0.03,0.02],'그외':[0.04,0.04,0.02,0.01]};
+  P.수수료={'계':0.1850};
+  P.로열티={};
+  P.정책={};
+
+  var CAT=['후드 집업','오버핏 티셔츠','워시드 데님','나일론 아노락','울 블렌드 코트','카고 조거팬츠',
+           '크루넥 니트','패딩 베스트','플리스 자켓','치노 팬츠','볼캡','숄더백'];
+  var COL=['BLACK','IVORY','NAVY','CHARCOAL','OLIVE','SAND','BURGUNDY'];
+  var sku=[];
+  var N=1420;
+  for(var i=0;i<N;i++){
+    var b=pick(BR);
+    var r=rnd();
+    var ageE = r<0.44?0 : r<0.68?1 : r<0.83?2 : r<0.93?3 : 99;
+    var season = rnd()<0.3?4:0;
+    var qty=Math.round(Math.exp(rnd()*6.6)+2);                 // 3 ~ 750장
+    var unit=Math.round((8000+rnd()*72000)/100)*100;           // 단위원가
+    var amt=qty*unit;
+    var tag=Math.round(unit*(2.4+rnd()*1.4)/1000)*1000;        // 정가
+    var roy=rnd()<0.22?Math.round((0.02+rnd()*0.05)*1e4)/1e4:0;
+    var pn=PFX[b]+String(25+Math.floor(rnd()*2))+String(1000+Math.floor(rnd()*8999));
+    var nm=pick(CAT)+' '+pick(COL);
+    sku.push([pn,nm,b,PFX[b],season,ageE,qty,amt,tag,roy,0,ageE===99?'라이선스 종료':'']);
+  }
+  return {sku:sku,params:P,version:'데모 v1 (샘플 데이터)',
+          fetchedAt:'2026-08-12 09:00',cached:false};
+}
+</script>
+<script>
+var D=null, P=null, BRANDS=[], AGE_LB=['0년차','1년차','2년차','3년차+'], SPAN_LB=['26H2 (반기)','2027년','2028년','2029년'];
+var HIROGYE={'AURORA':1,'BLANC':1,'GRAIN':1};
+var sim={sMult:[1,1,1,1], dAdd:[0,0,0,0], fee:null};
+var FEE0=0; // 로드 후 P.수수료['계'] 원값 (기본값 판정 기준)
+var vsim={s:[0,0,0,0], d:[0,0,0,0], fee:0};
+var selReal=null;
+
+/* ── 핵심 계산 (확정 엑셀 수식 이식본) ── */
+function calcSku(grp,season,ageE,qty,amt,tag,roy,ov){
+  var wg=HIROGYE[grp]?'A군':'그외', win=(season===4);
+  var fee=(ov&&ov.fee!=null)?ov.fee:P.수수료['계'];
+  var Q=fee+roy, rem=Math.max(qty,0), rec=0, steps=[];
+  for(var j=0;j<4;j++){
+    if(ageE+j>3){steps.push({k:null,q:0,rev:0,rem:rem});continue;}
+    var k=Math.min(ageE+j,3);
+    var s=P.소진율[grp][k]*((ov&&ov.sMult)?ov.sMult[k]:1);
+    var wm=win?P.겨울배수[wg][k]:1;
+    var rate=Math.min(1,s*wm);
+    var q=rem*rate;
+    if(j===0)q*=P.H2비중[grp][k];
+    var d=P.할인율[grp][k]+(win?P.겨울가산[wg][k]:0)+((ov&&ov.dAdd)?ov.dAdd[k]:0);
+    var unit=tag*Math.max(0,1-d-Q);
+    var rev=q*unit;
+    rec+=rev;steps.push({k:k,q:q,rev:rev,rate:rate,d:d,unit:unit,rem:rem});rem-=q;
+  }
+  var N=Math.max(amt,0);
+  var aa=(ageE===99||ageE>=3)?-N:-Math.max(0,N-rec);
+  return {steps:steps,rec:rec,aa:aa};
+}
+function totals(ov){
+  // 분모(amt)는 순액. max(0)은 충당금 산식 내부에서만.
+  var t={amt:0,prov:0,byBrand:{},byAge:{}};
+  for(var i=0;i<D.sku.length;i++){
+    var r=D.sku[i]; // [품번,품명,그룹,prefix,시즌,연차E,수량,금액,TAG,로열티,충당금기준,판정]
+    var res=calcSku(r[2],r[4],r[5],r[6],r[7],r[8],r[9],ov);
+    t.amt+=r[7]; t.prov+=res.aa;
+    var b=r[2],a=(r[5]===99)?'특례':AGE_LB[Math.min(r[5],3)];
+    if(!t.byBrand[b])t.byBrand[b]={amt:0,prov:0,base:0};
+    t.byBrand[b].amt+=r[7]; t.byBrand[b].prov+=res.aa; t.byBrand[b].base+=r[10];
+    if(!t.byAge[a])t.byAge[a]={amt:0,prov:0,base:0};
+    t.byAge[a].amt+=r[7]; t.byAge[a].prov+=res.aa; t.byAge[a].base+=r[10];
+  }
+  return t;
+}
+
+/* ── 유틸 ── */
+function fmt(n){return Math.round(n).toLocaleString('ko-KR');}
+function eok(n){return (n/1e8).toFixed(1)+'억';}
+function pct(n,d){return d?(n/d*100).toFixed(2)+'%':'-';}
+function el(id){return document.getElementById(id);}
+
+/* ── 로드 ── */
+function boot(force){
+  el('loading').style.display=''; el('app').style.display='none';
+  setTimeout(function(){
+    var d=DEMO_DATA();
+    D=d; P=d.params;                       // calcSku가 P를 쓰므로 먼저 세팅
+    for(var i=0;i<d.sku.length;i++){       // 기준 충당금 열을 데모 기준값으로 채움
+      var r=d.sku[i];
+      r[10]=calcSku(r[2],r[4],r[5],r[6],r[7],r[8],r[9],null).aa;
+    }
+    onData(d);
+  }, 220);
+}
+function onData(d){
+  D=d;P=d.params;
+  el('ver').textContent=d.version;
+  el('src').innerHTML='샘플 데이터 · SKU '+D.sku.length.toLocaleString()+'개 · '+
+    (d.cached?'캐시':'실시간')+' ('+d.fetchedAt+' 기준) '+
+    '<button onclick="boot(true)">샘플 다시 생성</button>';
+  var ORDER=['AURORA','BLANC','CIEL','DUNE','ECHO','FERN','GRAIN'];
+  BRANDS=ORDER.filter(function(b){return P.소진율[b];})
+    .concat(Object.keys(P.소진율).filter(function(b){return ORDER.indexOf(b)<0&&b!=='기타(통합)';}));
+  var vg=el('v-grp'); vg.innerHTML='';
+  BRANDS.forEach(function(b){var o=document.createElement('option');o.value=b;o.textContent=b;vg.appendChild(o);});
+  buildSliders();
+  renderBase(); renderSim(); virtDefaults();
+  el('loading').style.display='none'; el('app').style.display='';
+}
+
+/* ── STEP1 ── */
+var BASE_T=null;
+function renderBase(){
+  BASE_T=totals(null);
+  var refSum=0; D.sku.forEach(function(r){refSum+=r[10];});
+  var diff=Math.abs(BASE_T.prov-refSum);
+  el('selfcheck').innerHTML=diff<1
+    ?'<span class="badge ok">기준본과 일치 ✔ (차이 '+diff.toFixed(2)+'원)</span>'
+    :'<span class="badge warn">기준본과 불일치 '+fmt(diff)+'원 — 데이터 확인 필요</span>';
+  el('k-base-amt').textContent=fmt(BASE_T.amt);
+  el('k-base-amt2').textContent=eok(BASE_T.amt)+' · '+D.sku.length.toLocaleString()+'개 품번';
+  el('k-base-prov').textContent=fmt(BASE_T.prov);
+  el('k-base-prov2').textContent=eok(BASE_T.prov);
+  el('k-base-rate').textContent=pct(-BASE_T.prov,BASE_T.amt);
+  drawBars('bars-base',BASE_T,null);
+  el('tbl-base').innerHTML=ageTable(BASE_T,null);
+}
+function drawBars(id,t,base){
+  var h='',bs=Object.keys(t.byBrand).sort(function(a,b){return t.byBrand[b].amt-t.byBrand[a].amt;});
+  bs.forEach(function(b){
+    var o=t.byBrand[b]; if(o.amt<=0&&o.prov===0)return;
+    var w1=o.amt?Math.min(100,-o.prov/o.amt*100):0;
+    var w0=base?(base.byBrand[b]&&base.byBrand[b].amt?Math.min(100,-base.byBrand[b].prov/base.byBrand[b].amt*100):0):w1;
+    h+='<div class="brow"><div class="nm">'+b+'</div><div class="btrack">'+
+       (base?'<div class="bfill base" style="width:'+w0+'%"></div><div class="bfill sim" style="width:'+w1+'%"></div>'
+            :'<div class="bfill" style="width:'+w1+'%;height:100%"></div>')+
+       '</div><div class="num"><b>'+fmt(o.prov)+'</b> · '+pct(-o.prov,o.amt)+'</div></div>';
+  });
+  el(id).innerHTML=h;
+}
+function ageTable(t,base){
+  var order=['0년차','1년차','2년차','3년차+','특례'];
+  var h='<table><tr><th>연차</th><th>기말원가</th>'+(base?'<th>기준 충당금</th><th>시뮬 충당금</th><th>Δ</th>':'<th>충당금</th><th>충당률</th>')+'</tr>';
+  order.forEach(function(a){
+    var o=t.byAge[a]; if(!o)return;
+    if(base){
+      var b0=base.byAge[a]||{prov:0};
+      h+='<tr><td>'+a+'</td><td>'+fmt(o.amt)+'</td><td>'+fmt(b0.prov)+'</td><td>'+fmt(o.prov)+'</td><td>'+fmt(o.prov-b0.prov)+'</td></tr>';
+    }else{
+      h+='<tr><td>'+a+'</td><td>'+fmt(o.amt)+'</td><td>'+fmt(o.prov)+'</td><td>'+pct(-o.prov,o.amt)+'</td></tr>';
+    }
+  });
+  return h+'</table>';
+}
+
+/* ── STEP2 ── */
+function buildSliders(){
+  var hs='',hd='';
+  for(var k=0;k<4;k++){
+    hs+='<div class="srow"><label>'+AGE_LB[k]+'</label><input type="range" min="50" max="150" value="100" step="1" '+
+        'id="s-s'+k+'" oninput="simInput()"><div class="val" id="s-sv'+k+'">100%</div></div>';
+    hd+='<div class="srow"><label>'+AGE_LB[k]+'</label><input type="range" min="-20" max="20" value="0" step="0.5" '+
+        'id="s-d'+k+'" oninput="simInput()"><div class="val" id="s-dv'+k+'">+0.0%p</div></div>';
+  }
+  el('sl-s').innerHTML=hs; el('sl-d').innerHTML=hd;
+  FEE0=P.수수료['계']; sim.fee=FEE0;
+  var f0=(FEE0*100);
+  el('sl-f').innerHTML='<div class="srow"><label>비용률</label><input type="range" min="0" max="30" step="0.01" value="'+f0.toFixed(2)+'" '+
+    'id="s-f" oninput="simInput()"><div class="val" id="s-fv">'+f0.toFixed(2)+'%</div></div>';
+}
+function simInput(){
+  for(var k=0;k<4;k++){
+    sim.sMult[k]=Number(el('s-s'+k).value)/100;
+    sim.dAdd[k]=Number(el('s-d'+k).value)/100;
+    el('s-sv'+k).textContent=el('s-s'+k).value+'%';
+    el('s-dv'+k).textContent=(Number(el('s-d'+k).value)>=0?'+':'')+Number(el('s-d'+k).value).toFixed(1)+'%p';
+  }
+  sim.fee=Number(el('s-f').value)/100;
+  el('s-fv').textContent=Number(el('s-f').value).toFixed(2)+'%';
+  renderSim();
+  if(el('applySim').checked)renderReal();
+}
+function resetSim(){
+  for(var k=0;k<4;k++){el('s-s'+k).value=100;el('s-d'+k).value=0;}
+  el('s-f').value=(FEE0*100).toFixed(2);
+  simInput();
+  sim.fee=FEE0; renderSim(); // 슬라이더 스냅 잔차 제거 — 정확히 원값으로
+}
+function isDefault(){
+  return sim.sMult.every(function(v){return v===1;})&&sim.dAdd.every(function(v){return v===0;})&&
+         Math.abs(sim.fee-FEE0)<0.00005;
+}
+function renderSim(){
+  var t=totals(sim);
+  var dlt=t.prov-BASE_T.prov;
+  el('k-sim-prov').textContent=fmt(t.prov);
+  el('k-sim-prov2').textContent=eok(t.prov);
+  el('k-sim-delta').innerHTML=(dlt<0?'<span class="neg">':'<span class="pos">')+(dlt>=0?'+':'')+fmt(dlt)+'</span>';
+  el('k-sim-delta2').textContent=(dlt>=0?'+':'')+eok(dlt)+' (충당 '+(dlt<0?'증가':'감소')+')';
+  el('k-sim-rate').textContent=pct(-t.prov,t.amt);
+  el('k-sim-rate2').textContent='기준 '+pct(-BASE_T.prov,BASE_T.amt)+' 대비';
+  var v;
+  if(isDefault()){v='조정 없음 — 기준값 그대로입니다. 슬라이더를 움직이면 어떤 가정이 충당금을 얼마나 흔드는지 즉시 보입니다.';}
+  else{
+    var parts=[];
+    for(var k=0;k<4;k++){
+      if(sim.sMult[k]!==1)parts.push(AGE_LB[k]+' 소진율 '+Math.round(sim.sMult[k]*100)+'%');
+      if(sim.dAdd[k]!==0)parts.push(AGE_LB[k]+' 할인 '+(sim.dAdd[k]>0?'+':'')+(sim.dAdd[k]*100).toFixed(1)+'%p');
+    }
+    if(Math.abs(sim.fee-FEE0)>=0.00005)parts.push('부대비용률 '+(sim.fee*100).toFixed(2)+'%');
+    v='<b>'+parts.join(', ')+'</b> 가정 시 충당금은 <b>'+eok(t.prov)+'</b>으로 기준 대비 <b>'+
+      (dlt>=0?'+':'')+eok(dlt)+'</b> '+(dlt<0?'늘어납니다':'줄어듭니다')+
+      ' (충당률 '+pct(-BASE_T.prov,BASE_T.amt)+' → '+pct(-t.prov,t.amt)+').';
+  }
+  el('verdict').innerHTML=v;
+  drawBars('bars-sim',t,BASE_T);
+  el('tbl-sim').innerHTML=ageTable(t,BASE_T);
+}
+
+/* ── STEP3 공통 ── */
+function cascadeTable(stp,tag,qty,amt,rec,aa){
+  var h='<table><tr><th>구간</th><th>시작잔량</th><th>판매율</th><th>판매수량</th><th>순회수단가</th><th>순회수액</th></tr>';
+  stp.forEach(function(s,i){
+    h+='<tr><td>'+SPAN_LB[i]+'</td>';
+    if(s.k===null){h+='<td colspan="5" style="text-align:center;color:var(--sub)">전개 종료 (3년차 초과)</td></tr>';return;}
+    var shown=(i===0)?'MIN(1, 소진율×겨울배수)×H2비중':null;
+    h+='<td>'+fmt(s.rem)+'</td><td>'+( (s.q/(s.rem||1))*100 ).toFixed(1)+'%</td><td>'+fmt(s.q)+'</td>'+
+       '<td>'+fmt(s.unit)+'</td><td>'+fmt(s.rev)+'</td></tr>';
+  });
+  h+='</table>';
+  h+='<div class="kpis" style="margin-top:14px">'+
+     '<div class="kpi"><div class="t">원가 총액</div><div class="v">'+fmt(amt)+'</div></div>'+
+     '<div class="kpi"><div class="t">4개 구간 순회수 합</div><div class="v">'+fmt(rec)+'</div><div class="s">'+pct(rec,amt)+' 회수</div></div>'+
+     '<div class="kpi hl"><div class="t">평가충당금</div><div class="v neg">'+fmt(aa)+'</div><div class="s">'+pct(-aa,amt)+' 손실</div></div></div>';
+  return h;
+}
+
+/* ── STEP3 실제 품번 ── */
+function setTab(t){
+  el('tab-real').className=t==='real'?'on':''; el('tab-virt').className=t==='virt'?'on':'';
+  el('pane-real').style.display=t==='real'?'':'none'; el('pane-virt').style.display=t==='virt'?'':'none';
+  if(t==='virt')renderVirt();
+}
+el('q').addEventListener('input',function(){
+  var q=this.value.trim().toUpperCase();
+  var box=el('qres');
+  if(q.length<2){box.style.display='none';return;}
+  var hits=[],n=0;
+  for(var i=0;i<D.sku.length&&n<20;i++){
+    var r=D.sku[i];
+    if(String(r[0]).toUpperCase().indexOf(q)>=0||String(r[1]).toUpperCase().indexOf(q)>=0){
+      hits.push('<div onclick="pickReal('+i+')"><span class="pn">'+r[0]+'</span><span class="nm">'+r[1]+'</span><span>'+fmt(r[7])+'원</span></div>');n++;
+    }
+  }
+  box.innerHTML=hits.join('')||'<div style="color:var(--sub)">검색 결과 없음</div>';
+  box.style.display='block';
+});
+document.addEventListener('click',function(e){if(!e.target.closest('.searchbox'))el('qres').style.display='none';});
+function pickReal(i){selReal=i;el('qres').style.display='none';el('q').value=D.sku[i][0];renderReal();}
+function renderReal(){
+  if(selReal===null){el('real-out').innerHTML='<div class="note">품번을 검색해 선택하면 기준과 동일한 3개년 전개를 보여줍니다.</div>';return;}
+  var r=D.sku[selReal];
+  var ov=el('applySim').checked?sim:null;
+  var res=calcSku(r[2],r[4],r[5],r[6],r[7],r[8],r[9],ov);
+  var age=(r[5]===99)?r[11]:AGE_LB[Math.min(r[5],3)];
+  var h='<div class="itemcard">'+
+    '<div class="g"><div class="t">품번</div><div class="v">'+r[0]+'</div></div>'+
+    '<div class="g"><div class="t">품명</div><div class="v">'+r[1]+'</div></div>'+
+    '<div class="g"><div class="t">그룹</div><div class="v">'+r[2]+'</div></div>'+
+    '<div class="g"><div class="t">판정</div><div class="v">'+age+(r[4]===4?' · 겨울':'')+'</div></div>'+
+    '<div class="g"><div class="t">기말수량</div><div class="v">'+fmt(r[6])+'</div></div>'+
+    '<div class="g"><div class="t">기말원가</div><div class="v">'+fmt(r[7])+'</div></div>'+
+    '<div class="g"><div class="t">TAG</div><div class="v">'+fmt(r[8])+'</div></div>'+
+    '<div class="g"><div class="t">로열티율</div><div class="v">'+(r[9]*100).toFixed(2)+'%</div></div></div>';
+  if(r[5]===99||r[5]>=3){
+    h+='<div class="verdict">'+(r[5]===99?'라이선스 종료·연도불가 특례':'3년차 이상')+' — 회수 전개 없이 <b>원가 100% 충당</b>합니다. 충당금 <b>'+fmt(res.aa)+'</b>원.</div>';
+  }
+  h+=cascadeTable(res.steps,r[8],r[6],Math.max(r[7],0),res.rec,res.aa);
+  var refDiff=Math.abs(res.aa-r[10]);
+  h+='<div class="note">'+(ov?'STEP 02 조정 반영 중 — 기준 충당금은 '+fmt(r[10])+'원':
+      (refDiff<1?'기준 충당금과 일치 ✔':'기준 대비 차이 '+fmt(refDiff)+'원'))+'</div>';
+  el('real-out').innerHTML=h;
+}
+
+/* ── STEP3 가상 ── */
+function virtSliders(){
+  var hs='',hd='';
+  for(var k=0;k<4;k++){
+    hs+='<div class="srow"><label>'+AGE_LB[k]+'</label><input type="range" min="0" max="100" step="1" id="v-s'+k+'" oninput="virtInput()">'+
+        '<div class="val" id="v-sv'+k+'"></div></div>';
+    hd+='<div class="srow"><label>'+AGE_LB[k]+'</label><input type="range" min="0" max="100" step="1" id="v-d'+k+'" oninput="virtInput()">'+
+        '<div class="val" id="v-dv'+k+'"></div></div>';
+  }
+  el('v-sl-s').innerHTML=hs; el('v-sl-d').innerHTML=hd;
+  el('v-sl-f').innerHTML='<div class="srow"><label>비용률</label><input type="range" min="0" max="40" step="0.5" id="v-f" oninput="virtInput()">'+
+    '<div class="val" id="v-fv"></div></div>';
+}
+function virtDefaults(){
+  if(!el('v-s0'))virtSliders();
+  var g=el('v-grp').value||BRANDS[0], win=Number(el('v-season').value)===4;
+  var wg=HIROGYE[g]?'A군':'그외';
+  for(var k=0;k<4;k++){
+    var s=Math.min(1,P.소진율[g][k]*(win?P.겨울배수[wg][k]:1));
+    var d=Math.min(1,Math.max(0,P.할인율[g][k]+(win?P.겨울가산[wg][k]:0)));
+    el('v-s'+k).value=Math.round(s*100);
+    el('v-d'+k).value=Math.round(d*100);
+  }
+  el('v-f').value=(P.수수료['계']*100).toFixed(1);
+  virtInput();
+}
+function virtInput(){
+  for(var k=0;k<4;k++){
+    vsim.s[k]=Number(el('v-s'+k).value)/100;
+    vsim.d[k]=Number(el('v-d'+k).value)/100;
+    el('v-sv'+k).textContent=el('v-s'+k).value+'%';
+    el('v-dv'+k).textContent=el('v-d'+k).value+'%';
+  }
+  vsim.fee=Number(el('v-f').value)/100;
+  el('v-fv').textContent=Number(el('v-f').value).toFixed(1)+'%';
+  renderVirt();
+}
+function renderVirt(){
+  if(!el('v-s0'))return;
+  var g=el('v-grp').value||BRANDS[0];
+  var age=Number(el('v-age').value), qty=Number(el('v-qty').value)||0;
+  var cost=Number(el('v-cost').value)||0, tag=Number(el('v-tag').value)||0;
+  var roy=(Number(el('v-roy').value)||0)/100;
+  var amt=qty*cost, rem=qty, rec=0, steps=[];
+  for(var j=0;j<4;j++){
+    if(age+j>3){steps.push({k:null,q:0,rev:0,rem:rem});continue;}
+    var k=Math.min(age+j,3);
+    var q=rem*Math.min(1,vsim.s[k]);
+    if(j===0)q*=P.H2비중[g][k];
+    var unit=tag*Math.max(0,1-vsim.d[k]-vsim.fee-roy);
+    var rev=q*unit;
+    rec+=rev;steps.push({k:k,q:q,rev:rev,unit:unit,rem:rem});rem-=q;
+  }
+  var aa=(age>=3)?-amt:-Math.max(0,amt-rec);
+  var h='<div class="verdict">'+g+' · '+AGE_LB[age]+' 상품 '+fmt(qty)+'장 (원가 '+eok(amt)+')을 위 조건으로 팔면 <b>'+
+    pct(rec,amt)+'</b>를 회수하고, 못 판 잔량과 할인 손실로 <b>'+eok(-aa)+'</b>('+pct(-aa,amt)+')이 충당 대상이 됩니다.'+
+    (age>=3?' <b>3년차 이상은 정책상 원가 100% 충당</b>입니다.':'')+'</div>';
+  h+=cascadeTable(steps,tag,qty,amt,rec,aa);
+  h+='<div class="note">26H2 구간은 반기라서 판매율에 그룹 하반기비중('+(P.H2비중[g][Math.min(age,3)]*100).toFixed(1)+'%)을 곱합니다. 판매율·할인율 기본값은 그룹 실측이며 슬라이더로 자유롭게 바꿔보세요.</div>';
+  el('virt-out').innerHTML=h;
+}
+
+boot(false);
+</script>
+</body>
+</html>
