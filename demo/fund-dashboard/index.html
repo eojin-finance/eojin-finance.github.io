@@ -1,0 +1,2557 @@
+
+<div id="demobar">
+  <b>샘플 데이터 데모</b>
+  <span>실제 사내 데이터가 아닌 생성된 값으로 동작합니다. 화면·계산·시나리오 로직은 실제 구현과 동일합니다.</span>
+  <a href="../../">← 포트폴리오</a>
+</div>
+<style>
+#demobar{position:sticky;top:0;z-index:99;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  background:#fff8e1;border-bottom:1px solid #f0dfa8;padding:9px 16px;font-size:12.5px;color:#6b5b21;
+  font-family:system-ui,-apple-system,'Malgun Gothic',sans-serif}
+#demobar b{background:#6b5b21;color:#fff8e1;padding:2px 8px;border-radius:10px;font-size:11.5px}
+#demobar a{margin-left:auto;color:#6b5b21;font-weight:700;text-decoration:none}
+</style>
+<!-- 자금 인텔리전스 (데모) — 통합 앱 (탭: #brief #cashsim #plsim #exec). 중간시트만 읽음 -->
+<meta charset="utf-8">
+<div id="app" class="viz-root">
+  <header class="topbar">
+    <div>
+      <h1>자금 인텔리전스 (데모)</h1>
+      <p id="syncInfo" class="muted">데이터 불러오는 중…</p>
+    </div>
+    <button id="btnRefresh" type="button"><span class="refresh-icon">⟳</span> 새로고침</button>
+  </header>
+
+  <nav class="tabbar" id="tabbar">
+    <a href="#brief" data-tab="brief" class="tb active">📊 브리핑</a>
+    <a href="#cashsim" data-tab="cashsim" class="tb">🎛 자금 시뮬레이터</a>
+    <a href="#plsim" data-tab="plsim" class="tb">📈 손익 시뮬레이터</a>
+    <a href="#intel" data-tab="intel" class="tb">🧭 인텔리전스</a>
+    <a href="#meeting" data-tab="meeting" class="tb">🎤 회의 모드</a>
+    <a href="#exec" data-tab="exec" class="tb">👑 임원 요약</a>
+  </nav>
+
+  <!-- ═══════════ 탭 1: 브리핑 ═══════════ -->
+  <section id="tab-brief" class="tab">
+    <div id="b_insights" class="insights"></div>
+    <div id="b_kpis" class="kpi-row"></div>
+    <div id="b_sections"></div>
+  </section>
+
+  <!-- ═══════════ 탭 2: 자금 시뮬레이터 ═══════════ -->
+  <section id="tab-cashsim" class="tab" hidden>
+    <div id="cs_verdict" class="verdict sev-info"><span class="v-tag">…</span><span class="v-text">계산 중</span></div>
+    <div id="cs_chips" class="delta-chips"></div>
+
+    <div id="cs_rescue" class="card" hidden>
+      <div class="card-head"><div><h3 id="cs_rescueTitle">🛟 갭 타개 옵션</h3><div class="sub">최저점 이전에 실행 가능한 레버 — 필요량과 비용을 같이 본다</div></div></div>
+      <div id="cs_rescueList" class="events"></div>
+    </div>
+
+    <div class="assume-bar">
+      <div class="row">
+        <span class="grp-label">기간</span>
+        <button data-csrange="pm3" class="chip active" type="button">± 3개월</button>
+        <button data-csrange="f6" class="chip" type="button">향후 6개월</button>
+        <button data-csrange="year" class="chip" type="button">올해</button>
+        <button data-csrange="all" class="chip" type="button">전체</button>
+        <span class="grp-label" style="margin-left:12px">세밀도</span>
+        <button data-csgran="auto" class="chip active" type="button">자동</button>
+        <button data-csgran="d" class="chip" type="button">일</button>
+        <button data-csgran="w" class="chip" type="button">주</button>
+        <button data-csgran="m" class="chip" type="button">월</button>
+        <span class="grp-label" style="margin-left:12px">안전선</span>
+        <input id="cs_safety" type="number" step="0.5" min="0" value="5" class="num-in"> <span class="muted">억원</span>
+      </div>
+      <div class="row">
+        <span class="grp-label">시나리오</span>
+        <button data-cspreset="best" class="chip" type="button">최상</button>
+        <button data-cspreset="good" class="chip" type="button">상</button>
+        <button data-cspreset="base" class="chip active" type="button">중(기준)</button>
+        <button data-cspreset="bad" class="chip" type="button">하</button>
+        <button data-cspreset="worst" class="chip" type="button">최악</button>
+        <span id="cs_badge" class="sim-badge" hidden>시뮬레이션 중 — 기준값 아님</span>
+        <select id="cs_savedSel" class="num-in" style="width:auto; margin-left:auto"><option value="">저장 시나리오…</option></select>
+        <button id="cs_save" class="chip" type="button">＋ 저장</button>
+        <button id="cs_del" class="chip" type="button">삭제</button>
+        <button id="cs_reset" class="chip" type="button">↺ 기준</button>
+      </div>
+      <div class="row">
+        <span class="grp-label">🎯 목표</span>
+        <span class="muted" style="font-size:12px">최저 잔액 ≥</span>
+        <input id="cs_goal" type="number" step="0.5" class="num-in" placeholder="10">
+        <span class="muted">억원</span>
+        <button id="cs_solve" class="chip" type="button">이 목표가 되려면?</button>
+        <span id="cs_goalOut" style="display:flex; gap:6px; flex-wrap:wrap"></span>
+      </div>
+      <div class="row sliders">
+        <label class="sl"><span>할인율 <b id="csv_disc">20%</b> <i class="base-note">기준 20</i></span>
+          <input type="range" id="css_disc" min="0" max="60" step="1" value="20"></label>
+        <label class="sl"><span>A본부 판매율 <b id="csv_hiro">70%</b> <i class="base-note">기준 70</i></span>
+          <input type="range" id="css_hiro" min="30" max="100" step="1" value="70"></label>
+        <label class="sl"><span>B본부 판매율 <b id="csv_kids">60%</b> <i class="base-note">기준 60</i></span>
+          <input type="range" id="css_kids" min="30" max="100" step="1" value="60"></label>
+        <label class="sl"><span>이자율 조정 <b id="csv_rate">+0%p</b> <i class="base-note">전 차입</i></span>
+          <input type="range" id="css_rate" min="-3" max="3" step="0.25" value="0"></label>
+        <label class="sl"><span>생산대금 팩토링 추가 <b id="csv_fact">+0%</b> <i class="base-note">4.5% 비용, 5개월 분할상환</i></span>
+          <input type="range" id="css_fact" min="-30" max="50" step="5" value="0"></label>
+        <label class="sl"><span>생산대금 지급 지연 <b id="csv_delay">0일</b> <i class="base-note">월말 근사</i></span>
+          <input type="range" id="css_delay" min="0" max="30" step="15" value="0"></label>
+        <label class="sl"><span>💰 투자/조달 유입 <b id="csv_inv">0억</b> <i class="base-note">지분 또는 신규차입</i></span>
+          <input type="range" id="css_inv" min="0" max="50" step="1" value="0"></label>
+        <label class="sl"><span>유입 시점 <b id="csv_invM">+2개월</b> <i class="base-note">해당 월 15일 가정</i></span>
+          <input type="range" id="css_invM" min="1" max="5" step="1" value="2"></label>
+      </div>
+    </div>
+
+    <div id="cs_kpis" class="kpi-row"></div>
+
+    <div class="card tall">
+      <div class="card-head">
+        <div><h3>일별 현금 잔액 — 기준(회색 점선) vs 시나리오(파랑)</h3>
+          <div class="sub">밴드 = 판매율 ±10%p · 붉은 영역 = 안전선 아래 · ˟ = 추정 · 주/월 세밀도는 구간 최저 잔액 기준</div></div>
+        <div class="view-toggle"><button type="button" class="on">차트</button><button type="button">표</button></div>
+      </div>
+      <div class="chart-wrap"><canvas id="cs_cvHero"></canvas></div>
+      <div class="data-table" id="cs_tbHero"></div>
+    </div>
+
+    <div class="cards2">
+      <div class="card">
+        <div class="card-head">
+          <div><h3>월별 유입 · 유출 (시나리오 반영)</h3><div class="sub">막대를 클릭하면 그 달 상세가 아래에 열림</div></div>
+          <div class="view-toggle"><button type="button" class="on">차트</button><button type="button">표</button></div>
+        </div>
+        <div class="chart-wrap"><canvas id="cs_cvMonthly"></canvas></div>
+        <div class="data-table" id="cs_tbMonthly"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h3>시나리오 비교</h3><div class="sub">기준 vs 현재 vs 저장본</div></div></div>
+        <div class="data-table show" id="cs_tbCompare"></div>
+        <div class="card-head" style="margin-top:12px"><div><h3>주의 이벤트</h3></div></div>
+        <div id="cs_events" class="events"></div>
+      </div>
+    </div>
+
+    <div class="card" id="cs_drill" hidden>
+      <div class="card-head">
+        <div><h3 id="cs_drillTitle">월 상세</h3><div class="sub">일별 흐름 + 유출 구성</div></div>
+        <button class="chip" type="button" id="cs_drillClose">닫기 ✕</button>
+      </div>
+      <div class="cards2">
+        <div><div class="chart-wrap" style="height:240px"><canvas id="cs_cvDrillDaily"></canvas></div></div>
+        <div><div class="chart-wrap" style="height:240px"><canvas id="cs_cvDrillOut"></canvas></div></div>
+      </div>
+      <div class="data-table show" id="cs_tbDrill" style="max-height:220px"></div>
+    </div>
+
+    <div class="cards2">
+      <div class="card">
+        <div class="card-head">
+          <div><h3>리스금융 팩토링 — 잔액 · 상환 스케줄</h3><div class="sub">선 = 월말 잔액 · 막대 = 당월 상환(원금25/26 + 이자) · 상환액은 잔액 곡선에 이미 반영됨</div></div>
+          <div class="view-toggle"><button type="button" class="on">차트</button><button type="button">표</button></div>
+        </div>
+        <div class="chart-wrap"><canvas id="cs_cvKR"></canvas></div>
+        <div class="data-table" id="cs_tbKR"></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><h3>발매 정산 — 가정이 바꾸는 금액</h3><div class="sub" id="cs_revSub">막대 = 기준 대비 차수별 정산 변화 (정가 × (1−할인율) × 판매율 × 0.97)</div></div>
+          <div class="view-toggle"><button type="button" class="on">차트</button><button type="button">표</button></div>
+        </div>
+        <div class="chart-wrap"><canvas id="cs_cvRev"></canvas></div>
+        <div class="data-table" id="cs_tbRev" style="max-height:340px"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><h3>조달 수단별 진짜 비용 (연환산) — 기회비용 비교</h3>
+          <div class="sub">팩토링 4.5%는 5개월짜리 — 연으로 환산하면 10.8%. 지분 희석 없는 조달 중 은행이 최저</div></div>
+      </div>
+      <div class="chart-wrap" style="height:210px"><canvas id="cs_cvFund"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 탭 3: 손익 시뮬레이터 ═══════════ -->
+  <section id="tab-plsim" class="tab" hidden>
+    <div id="pl_verdict" class="verdict sev-info"><span class="v-tag">…</span><span class="v-text">계산 중</span></div>
+    <div id="pl_chips" class="delta-chips"></div>
+
+    <div class="assume-bar">
+      <div class="row">
+        <span class="grp-label">관점</span>
+        <span id="pl_views"></span>
+        <span class="grp-label" style="margin-left:12px">기간</span>
+        <button data-plperiod="y" class="chip active" type="button">연간</button>
+        <button data-plperiod="h1" class="chip" type="button">상반기</button>
+        <button data-plperiod="h2" class="chip" type="button">하반기</button>
+        <button id="pl_reset" class="chip" type="button" style="margin-left:auto">↺ 기준</button>
+      </div>
+      <div class="row sliders">
+        <label class="sl"><span>매출 <b id="plv_sales">+0%</b></span><input type="range" id="pls_sales" min="-30" max="30" step="1" value="0"></label>
+        <label class="sl"><span>원가율 <b id="plv_cogs">+0%p</b></span><input type="range" id="pls_cogs" min="-10" max="10" step="0.5" value="0"></label>
+        <label class="sl"><span>변동비율 <b id="plv_var">+0%p</b></span><input type="range" id="pls_var" min="-5" max="5" step="0.5" value="0"></label>
+        <label class="sl"><span>고정비 <b id="plv_fix">+0%</b></span><input type="range" id="pls_fix" min="-20" max="20" step="1" value="0"></label>
+        <label class="sl"><span>준고정비 <b id="plv_semi">+0%</b></span><input type="range" id="pls_semi" min="-30" max="30" step="1" value="0"></label>
+      </div>
+    </div>
+
+    <div id="pl_kpis" class="kpi-row"></div>
+
+    <div class="cards2">
+      <div class="card">
+        <div class="card-head"><div><h3>손익 워터폴 — 매출에서 영업이익까지</h3><div class="sub" id="pl_wfSub">선택 기간 합계 · 시나리오 반영</div></div></div>
+        <div class="chart-wrap"><canvas id="pl_cvWF"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><h3>월별 영업이익 — 기준 vs 시나리오</h3><div class="sub">회색 = 기준 · 파랑 = 시나리오 · 0 아래 = 적자 달</div></div>
+          <div class="view-toggle"><button type="button" class="on">차트</button><button type="button">표</button></div>
+        </div>
+        <div class="chart-wrap"><canvas id="pl_cvOP"></canvas></div>
+        <div class="data-table" id="pl_tbOP"></div>
+      </div>
+    </div>
+    <div class="cards2">
+      <div class="card">
+        <div class="card-head"><div><h3>커버리지 — 공헌이익이 고정성 비용을 얼마나 덮나</h3><div class="sub">1.0배 아래면 벌어서 고정비를 못 덮는 달</div></div></div>
+        <div class="chart-wrap"><canvas id="pl_cvCov"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><h3>관점 비교 — 영업이익 (시나리오 동일 적용)</h3><div class="sub">회색 = 기준 · 파랑 = 시나리오 · 표 토글에 공헌이익·커버리지 상세</div></div>
+          <div class="view-toggle"><button type="button" class="on">차트</button><button type="button">표</button></div>
+        </div>
+        <div class="chart-wrap"><canvas id="pl_cvViews"></canvas></div>
+        <div class="data-table" id="pl_tbViews" style="max-height:340px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 탭 5: 인텔리전스 (RAW DB 분석) ═══════════ -->
+  <section id="tab-intel" class="tab" hidden>
+    <div id="in_verdict" class="verdict sev-info"><span class="v-tag">🧭</span><span class="v-text">…</span></div>
+    <div id="in_facts" class="insights"></div>
+    <div class="assume-bar" style="position:static">
+      <div class="row">
+        <span class="grp-label">기간</span>
+        <button data-inrange="all" class="chip active" type="button">전체</button>
+        <button data-inrange="12m" class="chip" type="button">최근 12개월</button>
+        <span class="muted" style="margin-left:10px">브랜드 추이 차트는 하단 범례를 클릭해 브랜드를 켜고 끌 수 있어요</span>
+      </div>
+    </div>
+    <div class="card tall">
+      <div class="card-head">
+        <div><h3>매출 유입 vs 상품대금 유출 — 운전자본 사이클</h3>
+          <div class="sub" id="in_cycleSub">파랑 = 총 현금유입 · 빨강 = 상품대금 유출(생산 현금지급+팩토링 상환 포함) · ˟ = 추정</div></div>
+        <div class="view-toggle"><button type="button" class="on">차트</button><button type="button">표</button></div>
+      </div>
+      <div class="chart-wrap"><canvas id="in_cvCycle"></canvas></div>
+      <div class="data-table" id="in_tbCycle"></div>
+    </div>
+    <div class="cards2">
+      <div class="card tall">
+        <div class="card-head">
+          <div><h3>브랜드별 월 매출 추이 (2024.01 ~ 2026.05)</h3><div class="sub">RAW DB 187만 건 · 가결산과 원 단위 일치 검증</div></div>
+          <div class="view-toggle"><button type="button" class="on">차트</button><button type="button">표</button></div>
+        </div>
+        <div class="chart-wrap"><canvas id="in_cvBrand"></canvas></div>
+        <div class="data-table" id="in_tbBrand"></div>
+      </div>
+      <div class="card tall">
+        <div class="card-head">
+          <div><h3>광고비율 추이 (광고비 ÷ 매출)</h3><div class="sub">주별 상관 |r| &lt; 0.14 — 광고 회계액으로 매출 설명 불가</div></div>
+          <div class="view-toggle"><button type="button" class="on">차트</button><button type="button">표</button></div>
+        </div>
+        <div class="chart-wrap"><canvas id="in_cvAd"></canvas></div>
+        <div class="data-table" id="in_tbAd"></div>
+      </div>
+    </div>
+    <div class="cards2">
+      <div class="card">
+        <div class="card-head">
+          <div><h3>이월재고 — 행사(파이널세일) 기획 후보</h3><div class="sub">품번연도별 기말재고 원가 (2026.05 마감) · 오래될수록 현금화 시급</div></div>
+          <div class="view-toggle"><button type="button" class="on">차트</button><button type="button">표</button></div>
+        </div>
+        <div class="chart-wrap"><canvas id="in_cvCarry"></canvas></div>
+        <div class="data-table" id="in_tbCarry"></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><h3>26년 상품 소진율 (판매 ÷ (판매+기말), ~5월)</h3><div class="sub">낮을수록 시즌 내 소진 압박 — 판매율 레버·행사 검토 대상</div></div>
+        </div>
+        <div class="chart-wrap" style="height:200px"><canvas id="in_cvSell"></canvas></div>
+        <div id="in_events" class="events" style="margin-top:10px"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><h3>발매 정산 — 예측 vs 실제 (자동 채점)</h3>
+          <div class="sub" id="in_settleSub">동기화마다 예측 스냅샷을 보존하고, 정산일이 지나면 당일 PG 입금과 대조합니다</div></div>
+        <div class="view-toggle"><button type="button" class="on">차트</button><button type="button">표</button></div>
+      </div>
+      <div class="chart-wrap" style="height:260px"><canvas id="in_cvSettle"></canvas></div>
+      <div class="data-table" id="in_tbSettle" style="max-height:320px"></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><h3>예측 변경 이력 — 무엇이, 왜 바뀌었나</h3>
+          <div class="sub">동기화마다 예상매출·생산대금·월별흐름 변경을 자동 감지 · 사유는 팝업으로 기록되어 여기 연결</div></div>
+        <button class="chip" type="button" id="in_chgBtn">사유 입력</button>
+      </div>
+      <div id="in_chgHead" class="insights" style="margin-bottom:8px"></div>
+      <div id="in_chgList" class="events"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 탭 6: 회의 모드 (발표용) ═══════════ -->
+  <section id="tab-meeting" class="tab" hidden>
+    <div class="mt-shell">
+      <div id="mt_stage"></div>
+      <div class="mt-nav">
+        <button id="mt_prev" class="chip" type="button">← 이전</button>
+        <span id="mt_dots" class="mt-dots"></span>
+        <button id="mt_next" class="chip" type="button">다음 →</button>
+      </div>
+      <p class="muted" style="text-align:center; margin-top:6px">키보드 ← → 로도 넘길 수 있어요 · 슬라이드 안 슬라이더는 실시간 시뮬레이션</p>
+    </div>
+  </section>
+
+  <!-- ═══════════ 탭 4: 임원 요약 ═══════════ -->
+  <section id="tab-exec" class="tab" hidden>
+    <div id="ex_verdict" class="verdict sev-info"><span class="v-tag">…</span><span class="v-text">계산 중</span></div>
+    <div id="ex_kpis" class="kpi-row exec-kpis"></div>
+    <div class="card">
+      <div class="card-head"><div><h3>현금 잔액 — 지난 3개월 실적 + 자금팀 추정 3개월</h3><div class="sub">점선 = 추정 · 붉은 선 = 안전선</div></div></div>
+      <div class="chart-wrap" style="height:260px"><canvas id="ex_cvHero"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h3>지금 결정이 필요한 것</h3></div></div>
+      <div id="ex_events" class="events"></div>
+    </div>
+    <div id="ex_pl" class="kpi-row"></div>
+  </section>
+
+  <div id="modal" class="modal" hidden>
+    <div class="modal-box">
+      <div class="modal-head">
+        <div><h3 id="modalTitle"></h3><div id="modalSub" class="sub muted"></div></div>
+        <button id="modalClose" class="chip" type="button">닫기 ✕</button>
+      </div>
+      <div class="chart-wrap" id="modalChartWrap" style="height:300px"><canvas id="modalCv"></canvas></div>
+      <div id="modalBody" class="events" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <footer class="foot muted">
+    <p>이 대시보드는 중간 연동 시트만 읽습니다 (원본 자금시트 접근 없음). 시뮬레이션 조작값은 이 브라우저에만 저장됩니다. 매일 06시 자동 동기화 + 새로고침 버튼.</p>
+    <p id="warnFoot"></p>
+  </footer>
+</div>
+
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .viz-root {
+    --surface:#fcfcfb; --page:#f9f9f7; --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
+    --s1:#2a78d6; --s2:#1baf7a; --s3:#eda100; --s4:#008300; --s5:#4a3aa7; --s6:#e34948; --s7:#e87ba4; --s8:#eb6834;
+    --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b; --good-text:#006300;
+    font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+    background: var(--page); color: var(--ink); min-height: 100vh;
+    padding: 16px clamp(10px, 3vw, 36px) 48px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .viz-root { --surface:#1a1a19; --page:#0d0d0d; --ink:#fff; --ink-2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+      --s1:#3987e5; --s2:#199e70; --s3:#c98500; --s4:#008300; --s5:#9085e9; --s6:#e66767; --s7:#d55181; --s8:#d95926; --good-text:#0ca30c; }
+  }
+  .muted { color: var(--muted); font-size: 12px; }
+  .topbar { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:10px; }
+  .topbar h1 { font-size:19px; font-weight:700; letter-spacing:-.01em; }
+  #btnRefresh { display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13px; font-weight:600;
+    color:var(--ink); background:var(--surface); border:1px solid var(--ring); border-radius:8px; padding:8px 14px; cursor:pointer; }
+  #btnRefresh:disabled { opacity:.55; cursor:wait; }
+  #btnRefresh.loading .refresh-icon { display:inline-block; animation:spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .tabbar { display:flex; gap:4px; border-bottom:1px solid var(--grid); margin-bottom:14px; overflow-x:auto; }
+  .tb { font-size:13.5px; font-weight:600; color:var(--muted); text-decoration:none; padding:9px 14px;
+    border-bottom:2.5px solid transparent; white-space:nowrap; }
+  .tb.active { color:var(--ink); border-bottom-color:var(--ink); }
+  .tab { min-width:0; }
+
+  .verdict { display:flex; align-items:baseline; gap:10px; padding:12px 16px; border-radius:10px;
+    background:var(--surface); border:1px solid var(--ring); border-left-width:4px; margin-bottom:8px; font-size:14.5px; line-height:1.55; }
+  .verdict .v-tag { font-weight:800; font-size:13px; white-space:nowrap; }
+  .verdict.sev-good { border-left-color:var(--good); } .verdict.sev-good .v-tag { color:var(--good-text); }
+  .verdict.sev-warning { border-left-color:var(--warn); }
+  .verdict.sev-serious { border-left-color:var(--serious); }
+  .verdict.sev-critical { border-left-color:var(--crit); } .verdict.sev-critical .v-tag { color:var(--crit); }
+  .verdict.sev-info { border-left-color:var(--axis); }
+
+  .delta-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; min-height:10px; }
+  .dchip { font-size:12px; background:var(--surface); border:1px solid var(--ring); border-radius:999px; padding:4px 10px; color:var(--ink-2); }
+  .dchip b.worse { color:var(--crit); } .dchip b.better { color:var(--good-text); }
+
+  .assume-bar { position:sticky; top:0; z-index:20; background:var(--page); border:1px solid var(--ring);
+    border-radius:12px; padding:10px 14px; margin-bottom:12px; display:flex; flex-direction:column; gap:8px; }
+  .assume-bar .row { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .grp-label { font-size:12px; font-weight:700; color:var(--ink-2); }
+  .chip { font:inherit; font-size:12.5px; color:var(--ink-2); background:var(--surface);
+    border:1px solid var(--ring); border-radius:999px; padding:5px 11px; cursor:pointer; }
+  .chip.active { color:var(--ink); font-weight:700; border-color:var(--ink); }
+  .chip.active::before { content:"✓ "; }
+  .num-in { font:inherit; font-size:12.5px; padding:4px 6px; border:1px solid var(--ring); border-radius:6px; background:var(--surface); color:var(--ink); width:64px; }
+  select.num-in { width:auto; max-width:160px; }
+  .sim-badge { font-size:11.5px; font-weight:700; color:var(--ink); background:var(--surface); border:1.5px solid var(--warn); border-radius:6px; padding:3px 8px; }
+  .row.sliders { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:8px 16px; }
+  .sl { display:flex; flex-direction:column; gap:3px; font-size:12px; color:var(--ink-2); min-width:0; }
+  .sl b { color:var(--ink); font-size:13px; }
+  .sl .base-note { font-style:normal; color:var(--muted); font-size:11px; margin-left:4px; }
+  .sl input[type=range] { width:100%; accent-color:var(--s1); cursor:pointer; }
+
+  .insights { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .insight { display:flex; align-items:baseline; gap:8px; background:var(--surface);
+    border:1px solid var(--ring); border-left-width:3px; border-radius:8px; padding:8px 12px; font-size:13px; }
+  .insight .tag { font-size:11px; font-weight:700; white-space:nowrap; color:var(--ink-2); }
+  .insight.sev-good { border-left-color:var(--good); } .insight.sev-good .tag { color:var(--good-text); }
+  .insight.sev-warning { border-left-color:var(--warn); }
+  .insight.sev-serious { border-left-color:var(--serious); }
+  .insight.sev-critical { border-left-color:var(--crit); } .insight.sev-critical .tag { color:var(--crit); }
+  .insight.sev-info { border-left-color:var(--axis); } .insight.sev-info .tag { color:var(--muted); }
+  .insight b { font-weight:700; }
+
+  .kpi-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(175px, 1fr)); gap:10px; margin-bottom:14px; }
+  .kpi { background:var(--surface); border:1px solid var(--ring); border-radius:10px; padding:13px 16px; }
+  .kpi .k-label { font-size:12px; color:var(--ink-2); margin-bottom:5px; }
+  .kpi .k-value { font-size:25px; font-weight:650; letter-spacing:-.01em; }
+  .kpi.hero .k-value { font-size:33px; }
+  .kpi .k-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+  .kpi .up { color:var(--good-text); font-weight:600; } .kpi .down { color:var(--crit); font-weight:600; }
+  .exec-kpis .kpi .k-value { font-size:30px; }
+
+  .sec-title { font-size:15px; font-weight:700; margin:24px 0 10px; }
+  .cards, .cards2 { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(460px, 100%), 1fr)); gap:12px; margin-bottom:12px; }
+  .card { background:var(--surface); border:1px solid var(--ring); border-radius:12px; padding:16px 16px 12px; margin-bottom:0; min-width:0; }
+  .tab > .card { margin-bottom:12px; }
+  .card-head { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:6px; }
+  .card-head h3 { font-size:13.5px; font-weight:700; }
+  .card-head .sub { font-size:12px; color:var(--muted); margin-top:2px; }
+  .view-toggle { display:flex; gap:2px; border:1px solid var(--ring); border-radius:6px; overflow:hidden; flex:none; }
+  .view-toggle button { font:inherit; font-size:11.5px; padding:3px 9px; border:0; background:transparent; color:var(--muted); cursor:pointer; }
+  .view-toggle button.on { background:var(--grid); color:var(--ink); font-weight:600; }
+  .chart-wrap { position:relative; height:280px; }
+  .card.tall .chart-wrap { height:360px; }
+  .data-table { display:none; max-height:320px; overflow:auto; }
+  .data-table.show { display:block; }
+  .card.show-table .chart-wrap { display:none; }
+  .card.show-table .data-table { display:block; }
+  table.dt { width:100%; border-collapse:collapse; font-size:12px; }
+  table.dt th, table.dt td { padding:5px 8px; border-bottom:1px solid var(--grid); text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  table.dt th:first-child, table.dt td:first-child { text-align:left; }
+  table.dt thead th { position:sticky; top:0; background:var(--surface); color:var(--ink-2); font-weight:600; z-index:1; }
+  .neg { color:var(--crit); }
+  .badge { display:inline-block; font-size:11px; font-weight:700; border-radius:4px; padding:1px 6px; border:1px solid var(--ring); }
+  .badge.d-crit { color:var(--crit); border-color:var(--crit); }
+  .badge.d-warn { color:var(--ink-2); border-color:var(--warn); }
+  .events { display:flex; flex-direction:column; gap:6px; }
+  .ev { display:flex; gap:8px; align-items:baseline; font-size:12.5px; padding:7px 10px; border:1px solid var(--ring); border-left-width:3px; border-radius:8px; }
+  .ev .tag { font-size:11px; font-weight:700; white-space:nowrap; color:var(--ink-2); }
+  .ev.sev-critical { border-left-color:var(--crit); } .ev.sev-critical .tag { color:var(--crit); }
+  .ev.sev-serious { border-left-color:var(--serious); }
+  .ev.sev-warning { border-left-color:var(--warn); }
+  .ev.sev-info { border-left-color:var(--axis); }
+  .ev.sev-good { border-left-color:var(--good); }
+  /* 상세 팝업(모달) */
+  .modal { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; padding:20px; }
+  .modal[hidden] { display:none; }
+  .modal-box { background:var(--surface); border:1px solid var(--ring); border-radius:16px; padding:20px 22px;
+    width:min(720px, 96vw); max-height:88vh; overflow:auto; box-shadow:0 18px 50px rgba(0,0,0,.25); }
+  .modal-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px; }
+  .modal-head h3 { font-size:16px; font-weight:800; }
+  .modal-head .sub { margin-top:3px; }
+  .clickable-hint { cursor:pointer; }
+
+  /* 회의 모드 */
+  .mt-shell { max-width:1080px; margin:0 auto; }
+  .mt-slide { background:var(--surface); border:1px solid var(--ring); border-radius:16px; padding:34px 38px; min-height:480px;
+    display:flex; flex-direction:column; gap:14px; }
+  .mt-kicker { font-size:14px; font-weight:700; color:var(--muted); letter-spacing:.02em; }
+  .mt-head { font-size:clamp(24px, 3.4vw, 38px); font-weight:800; letter-spacing:-.02em; line-height:1.25; }
+  .mt-head b { font-weight:800; }
+  .mt-head .bad { color:var(--crit); } .mt-head .good { color:var(--good-text); }
+  .mt-sub { font-size:15px; color:var(--ink-2); line-height:1.6; }
+  .mt-big { font-size:clamp(48px, 7vw, 84px); font-weight:750; letter-spacing:-.02em; }
+  .mt-big.bad { color:var(--crit); }
+  .mt-numbers { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:14px; margin-top:8px; }
+  .mt-num { border:1px solid var(--ring); border-left-width:4px; border-radius:12px; padding:18px 20px; }
+  .mt-num .n { font-size:clamp(28px,4vw,44px); font-weight:750; }
+  .mt-num .l { font-size:13.5px; color:var(--ink-2); margin-top:4px; line-height:1.5; }
+  .mt-num.sev-critical { border-left-color:var(--crit); } .mt-num.sev-critical .n { color:var(--crit); }
+  .mt-num.sev-serious { border-left-color:var(--serious); }
+  .mt-num.sev-good { border-left-color:var(--good); } .mt-num.sev-good .n { color:var(--good-text); }
+  .mt-chart { position:relative; height:min(42vh, 380px); }
+  .mt-slider { display:flex; align-items:center; gap:14px; background:var(--page); border:1px solid var(--ring); border-radius:12px; padding:12px 18px; }
+  .mt-slider .lbl { font-size:14px; font-weight:700; white-space:nowrap; }
+  .mt-slider .lbl b { font-size:18px; }
+  .mt-slider input { flex:1; accent-color:var(--s1); height:24px; cursor:pointer; }
+  .mt-actions { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:12px; }
+  .mt-act { border:1px solid var(--ring); border-radius:12px; padding:16px 18px; }
+  .mt-act .who { font-size:13px; font-weight:800; color:var(--ink-2); }
+  .mt-act .what { font-size:17px; font-weight:700; margin:4px 0; }
+  .mt-act .eff { font-size:22px; font-weight:750; color:var(--good-text); }
+  .mt-act .eff.neg { color:var(--crit); }
+  .mt-act .note { font-size:12px; color:var(--muted); margin-top:2px; }
+  .mt-nav { display:flex; align-items:center; justify-content:center; gap:16px; margin-top:14px; }
+  .mt-nav .chip { font-size:14px; padding:9px 18px; }
+  .mt-dots { display:flex; gap:7px; }
+  .mt-dot { width:9px; height:9px; border-radius:50%; background:var(--grid); cursor:pointer; }
+  .mt-dot.on { background:var(--ink); }
+  .mt-check { font-size:16.5px; line-height:2; font-weight:600; }
+  .foot { margin-top:26px; line-height:1.7; }
+  #app.reloading .tab { opacity:.55; transition:opacity .2s; }
+  @media (max-width: 640px) {
+    .viz-root { padding: 10px 10px 40px; }
+    .kpi .k-value { font-size:22px; }
+    .chart-wrap { height:240px; }
+    .assume-bar { position: static; } /* 모바일에선 고정바가 화면 60%를 점유 → 해제 */
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<script>
+'use strict';
+/* ═══════════════ 공용: 데이터 로드/정형화 ═══════════════ */
+var IS_LOCAL = !(window.google && window.google.script && google.script.run);
+var D = null;
+var TODAY = new Date(); TODAY.setHours(0,0,0,0);
+
+function rowsToObjs(tab){ if(!tab||!tab.header) return []; return (tab.rows||[]).map(function(r){ var o={}; tab.header.forEach(function(h,i){o[h]=r[i];}); return o; }); }
+function n(v){ var x = typeof v==='number' ? v : parseFloat(String(v).replace(/,/g,'')); return isNaN(x)?null:x; }
+function nz(v){ var x=n(v); return x===null?0:x; }
+function pDate(s){ if(!s) return null; var m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(s)); return m?new Date(+m[1],+m[2]-1,+m[3]):null; }
+function pMonth(s){ var m=/^(\d{4})[\/\-](\d{1,2})/.exec(String(s)); return m?{y:+m[1],m:+m[2]}:null; }
+/* 시트가 "2025/12"를 날짜("2025-12-01 09:00")로 자동 변환하는 경우 → 'yyyy/MM'로 정규화 */
+function normMonth(v){ var m=pMonth(String(v)); return m ? m.y+'/'+('0'+m.m).slice(-2) : String(v); }
+function dKey(dt){ return dt.getFullYear()*10000+(dt.getMonth()+1)*100+dt.getDate(); }
+function mLabel(dt){ return dt.getFullYear()+'/'+('0'+(dt.getMonth()+1)).slice(-2); }
+function addM(d,m){ return new Date(d.getFullYear(), d.getMonth()+m, d.getDate()); }
+function fmtEok(v){ if(v===null||v===undefined||isNaN(v)) return '–';
+  var a=Math.abs(v);
+  if(a>=1e8) return (v/1e8).toLocaleString('ko-KR',{maximumFractionDigits:1})+'억';
+  if(a>=1e4) return Math.round(v/1e4).toLocaleString('ko-KR')+'만';
+  return Math.round(v).toLocaleString('ko-KR')+'원'; }
+function fmtWon(v){ return (v===null||v===undefined||isNaN(v))?'–':Math.round(v).toLocaleString('ko-KR')+'원'; }
+function fmtMD(dt){ return dt ? (dt.getMonth()+1)+'/'+dt.getDate() : '–'; }
+function fmtYMD(dt){ return dt ? dt.getFullYear()+'-'+('0'+(dt.getMonth()+1)).slice(-2)+'-'+('0'+dt.getDate()).slice(-2) : '–'; }
+function fmtPct(v){ return (v===null||v===undefined||isNaN(v)) ? '–' : (Math.round(v*1000)/10)+'%'; }
+
+function loadData(useRefresh){
+  setLoading(true);
+  if(IS_LOCAL){
+    fetch('fixture.json').then(function(r){return r.json();}).then(onData)
+      .catch(function(e){ document.getElementById('syncInfo').textContent='로컬 픽스처 실패: '+e; setLoading(false); });
+    return;
+  }
+  var runner = google.script.run
+    .withSuccessHandler(function(json){ onData(JSON.parse(json)); })
+    .withFailureHandler(function(e){ document.getElementById('syncInfo').textContent='오류: '+(e&&e.message?e.message:e); setLoading(false); });
+  if(useRefresh) runner.refreshAndGet(); else runner.getDashboardData();
+}
+function setLoading(on){
+  document.getElementById('app').classList.toggle('reloading', !!on);
+  var b=document.getElementById('btnRefresh'); b.disabled=!!on; b.classList.toggle('loading', !!on);
+}
+
+function onData(raw){
+  var d = {};
+  d.raw = raw;
+  d.daily = rowsToObjs(raw.daily).map(function(r){
+    return { dt:pDate(r['날짜']), inn:nz(r['유입계']), out:nz(r['유출계']), bal:n(r['잔액']), actual:r['구분']==='실적',
+      cat:{ 경상비:nz(r['경상비']), 지급수수료:nz(r['지급수수료']), 광고비:nz(r['광고비']), 상품:nz(r['상품']), 기타:nz(r['기타유출']) } };
+  }).filter(function(r){ return r.dt && r.bal!==null; }).sort(function(a,b){return a.dt-b.dt;});
+  d.monthlyCash = rowsToObjs(raw.monthlyCash).filter(function(r){ return pMonth(r['월']); });
+  d.monthlyCash.forEach(function(r){ r['월']=normMonth(r['월']); });
+  d.pl = rowsToObjs(raw.pl);
+  d.prod = rowsToObjs(raw.prodMonthly).map(function(r){
+    var m=pMonth(r['지급월']); return m?{y:m.y,m:m.m,target:nz(r['지급대상액']),fact:nz(r['팩토링실행']),kibo:nz(r['기보팩토링']),cash:nz(r['현금지급']),flag:r['구분']}:null;
+  }).filter(Boolean);
+  d.prodMonthlyRaw = rowsToObjs(raw.prodMonthly);
+  d.prodMonthlyRaw.forEach(function(r){ r['지급월']=normMonth(r['지급월']); });
+  d.prodDetail = rowsToObjs(raw.prodDetail || {header:[],rows:[]});
+  d.prodDetail.forEach(function(r){ r['지급월']=normMonth(r['지급월']); });
+  d.rev = rowsToObjs(raw.revSchedule).map(function(r){
+    return { div:r['본부']||'', label:(r['브랜드']||'')+' '+(r['발매차수']||''), tagTotal:nz(r['정가합계']),
+      saleTotal:nz(r['예상판매가합계']), payDt:pDate(r['정산일자']), amt:nz(r['정산대금']) };
+  }).filter(function(r){ return r.payDt && r.amt; });
+  d.lc = rowsToObjs(raw.lc).map(function(r){ return {dt:pDate(r['결제예정일']), krw:nz(r['KRW']), usd:nz(r['USD']), vendor:r['업체'], no:r['LC번호']}; }).filter(function(r){return r.dt;});
+  d.loans = rowsToObjs(raw.loans).map(function(r){
+    return { lender:r['대출처'], acct:r['계좌번호'], kind:r['종류'], limit:nz(r['약정금액']), bal:nz(r['대출잔액']), rate:n(r['이율%']),
+      mInt: nz(r['월이자'])>0?nz(r['월이자']):nz(r['연이자'])/12, due:pDate(r['만기일']), payday:r['이자납입일'], note:r['비고']||'' };
+  }).filter(function(r){ return r.lender; });
+  d.kr = rowsToObjs(raw.koreaRental || {header:[],rows:[]}).map(function(r){
+    var m=pMonth(r['월']); return m?{y:m.y,m:m.m,label:normMonth(r['월']),bal:nz(r['월말잔액']),repay:nz(r['당월상환액']),
+      p25:nz(r['상환_25입고']),p26:nz(r['상환_26입고']),intr:nz(r['상환_이자']),exec:nz(r['실행원금'])}:null;
+  }).filter(Boolean);
+  d.cov = rowsToObjs(raw.coveragePL || {header:[],rows:[]});
+  d.settle = rowsToObjs(raw.settleTrack || {header:[],rows:[]});
+  d.changeLog = rowsToObjs(raw.changeLog || {header:[],rows:[]});
+  d.snaps = rowsToObjs(raw.forecastSnaps || {header:[],rows:[]});
+  d.insBrand = rowsToObjs(raw.insBrand || {header:[],rows:[]});
+  d.insBrand.forEach(function(r){ r['월']=normMonth(r['월']); });
+  d.insAd = rowsToObjs(raw.insAd || {header:[],rows:[]});
+  d.insAd.forEach(function(r){ r['월']=normMonth(r['월']); });
+  d.insSeason = rowsToObjs(raw.insSeason || {header:[],rows:[]});
+  d.insMeta = {};
+  rowsToObjs(raw.insMeta || {header:[],rows:[]}).forEach(function(r){ d.insMeta[r.key]=r.value; });
+  d.meta = {}; d.warnings = [];
+  rowsToObjs(raw.meta).forEach(function(r){ d.meta[r.key]=r.value; if(String(r.key).indexOf('warning')===0) d.warnings.push(r.value); });
+  if(!d.daily.length){
+    // 일별 데이터가 비면 앱 전체가 죽는 대신 안내 + 복구 수단(새로고침) 유지
+    D = null;
+    document.getElementById('syncInfo').textContent = '⚠ 일별현금흐름 데이터가 비어 있습니다 — 새로고침(동기화)을 실행하거나 중간시트 _META 상태를 확인하세요';
+    document.getElementById('warnFoot').textContent = (d.warnings||[]).join(' / ');
+    setLoading(false);
+    return;
+  }
+  var act = d.daily.filter(function(r){return r.actual;});
+  d.lastActual = act.length ? act[act.length-1] : d.daily[d.daily.length-1];
+  D = d;
+  document.getElementById('syncInfo').textContent = '마지막 동기화 '+(d.meta.last_sync||'–')+' · 실적 ~'+fmtMD(d.lastActual.dt)+' · 전일 마감 기준';
+  document.getElementById('warnFoot').textContent = d.warnings.length ? '데이터 참고: '+d.warnings.join(' / ') : '';
+  CashSim.baseMetrics = null;
+  Object.keys(TABS).forEach(function(k){ TABS[k].built = false; });
+  activateTab(currentTab(), true);
+  setLoading(false);
+  setTimeout(function(){ maybeChangePopup(false); }, 800);
+}
+
+/* PL(월별손익) 조회 */
+function plRow(sec, nameLike){
+  var key = nameLike.replace(/\s/g,'');
+  var row = D.pl.filter(function(r){ return r['섹션']===sec && String(r['과목']).replace(/\s/g,'').indexOf(key)===0; })[0];
+  if(!row) return null;
+  return ['1월','2월','3월','4월','5월','6월','7월E','8월E','9월E','10월E','11월E','12월E'].map(function(c){ return n(row[c]); });
+}
+/* 커버리지PL 조회: cov(관점, 항목) → 12개월 */
+function covRow(view, item){
+  var row = D.cov.filter(function(r){ return r['관점']===view && r['항목']===item; })[0];
+  if(!row) return null;
+  return ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'].map(function(c){ return nz(row[c]); });
+}
+function covViews(){
+  var vs=[]; D.cov.forEach(function(r){ if(vs.indexOf(r['관점'])<0) vs.push(r['관점']); });
+  var order=['전사','패션','A본부','B본부'];
+  return order.filter(function(v){return vs.indexOf(v)>=0;});
+}
+
+/* ═══════════════ 공용: 차트 헬퍼 ═══════════════ */
+function pal(){
+  var css=getComputedStyle(document.getElementById('app'));
+  function v(nm){ return css.getPropertyValue(nm).trim(); }
+  return { surface:v('--surface'), ink:v('--ink'), ink2:v('--ink-2'), muted:v('--muted'), grid:v('--grid'), axis:v('--axis'),
+    s:[v('--s1'),v('--s2'),v('--s3'),v('--s4'),v('--s5'),v('--s6'),v('--s7'),v('--s8')], crit:v('--crit'), warn:v('--warn') };
+}
+function hexA(hex,a){ var m=/^#([0-9a-f]{6})$/i.exec(hex); if(!m) return hex;
+  var v=parseInt(m[1],16); return 'rgba('+((v>>16)&255)+','+((v>>8)&255)+','+(v&255)+','+a+')'; }
+var crosshair = { id:'crosshair',
+  afterDatasetsDraw:function(c,args,opts){
+    if(!opts||!opts.on) return;
+    var act=c.tooltip&&c.tooltip.getActiveElements?c.tooltip.getActiveElements():[];
+    if(!act.length) return;
+    var x=act[0].element.x, ctx=c.ctx;
+    ctx.save(); ctx.strokeStyle=opts.color; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x,c.chartArea.top); ctx.lineTo(x,c.chartArea.bottom); ctx.stroke(); ctx.restore();
+  } };
+function baseOpts(P,o){
+  o=o||{};
+  var fmt = o.pct?function(v){return fmtPct(v);}: o.mult?function(v){return v+'배';} :function(v){return fmtEok(v);};
+  return {
+    responsive:true, maintainAspectRatio:false, animation:false,
+    interaction:{ mode:'index', intersect:false },
+    layout:{ padding:{top:6} },
+    scales:{
+      x:{ stacked:!!o.stacked, grid:{display:false}, border:{color:P.axis},
+        ticks:{color:P.muted,font:{size:11},maxRotation:0,autoSkip:true,maxTicksLimit:o.maxX||12} },
+      y:{ stacked:!!o.stacked, grid:{color:P.grid,drawTicks:false}, border:{display:false},
+        ticks:{color:P.muted,font:{size:11},callback:fmt,maxTicksLimit:6} }
+    },
+    plugins:{
+      crosshair:{ on:!!o.crosshair, color:P.axis },
+      legend:{ display:o.legend!==false, position:'bottom', align:'start',
+        labels:{color:P.ink2,usePointStyle:true,boxWidth:8,boxHeight:8,font:{size:11.5},padding:10,
+          filter:function(it){ return String(it.text).indexOf('_')!==0; }} },
+      tooltip:{ backgroundColor:P.ink, titleColor:P.surface, bodyColor:P.surface, padding:10, cornerRadius:8,
+        callbacks:{ label:function(ctx){
+          if(String(ctx.dataset.label).indexOf('_')===0) return null;
+          /* 가로 막대(indexAxis:'y')는 값이 parsed.x에 있음 */
+          var horiz = ctx.chart.options.indexAxis==='y';
+          var v = horiz ? ctx.parsed.x : ctx.parsed.y;
+          if(v===undefined) v = horiz ? ctx.parsed.y : ctx.parsed.x;
+          if(v && v.length===2) v = v[1]-v[0];
+          return ' '+ctx.dataset.label+' · '+(o.pct?fmtPct(v):o.mult?(Math.round(v*100)/100+'배'):fmtWon(v));
+        }} }
+    }
+  };
+}
+function dsBar(P,i,label,data,extra){
+  var b={ type:'bar', label:label, data:data, backgroundColor:P.s[i], maxBarThickness:20,
+    borderRadius:4, borderSkipped:'start', borderColor:P.surface, borderWidth:1 };
+  if(extra) Object.keys(extra).forEach(function(k){b[k]=extra[k];});
+  return b;
+}
+function dsLine(P,i,label,data,extra){
+  var l={ type:'line', label:label, data:data, borderColor:P.s[i], backgroundColor:P.s[i],
+    borderWidth:2, tension:.25, pointRadius:0, pointHoverRadius:5, pointBorderColor:P.surface, pointBorderWidth:2, fill:false, spanGaps:true };
+  if(extra) Object.keys(extra).forEach(function(k){l[k]=extra[k];});
+  return l;
+}
+function fillTable(el, cols, rows, fmts){
+  el.textContent='';
+  var t=document.createElement('table'); t.className='dt';
+  var th=document.createElement('thead'); var trh=document.createElement('tr');
+  cols.forEach(function(c){ var e=document.createElement('th'); e.textContent=c; trh.appendChild(e); });
+  th.appendChild(trh); t.appendChild(th);
+  var tb=document.createElement('tbody');
+  rows.forEach(function(r){
+    var tr=document.createElement('tr');
+    r.forEach(function(v,i){
+      var td=document.createElement('td');
+      var f=fmts&&fmts[i];
+      td.textContent = f==='won'?fmtWon(v) : f==='pct'?fmtPct(v) : (v===null||v===undefined?'–':String(v));
+      if(typeof v==='number'&&v<0) td.className='neg';
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+  t.appendChild(tb); el.appendChild(t);
+}
+function wireToggles(rootEl){
+  rootEl.querySelectorAll('.view-toggle').forEach(function(tg){
+    if(tg._wired) return; tg._wired=true;
+    var card=tg.closest('.card');
+    var btns=tg.querySelectorAll('button');
+    btns[0].onclick=function(){ btns[0].className='on'; btns[1].className=''; card.classList.remove('show-table'); };
+    btns[1].onclick=function(){ btns[1].className='on'; btns[0].className=''; card.classList.add('show-table'); };
+  });
+}
+function destroyCharts(reg){ Object.keys(reg).forEach(function(k){ try{reg[k].destroy();}catch(e){} delete reg[k]; }); }
+
+/* ─── 상세 팝업: 차트 빌더와 본문 빌더를 받아 연다 ─── */
+var modalChart=null;
+function openModal(title, sub, chartBuilder, bodyBuilder){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalSub').textContent=sub||'';
+  var body=document.getElementById('modalBody'); body.textContent='';
+  if(modalChart){ try{modalChart.destroy();}catch(e){} modalChart=null; }
+  document.getElementById('modalChartWrap').style.display = chartBuilder ? 'block' : 'none';
+  document.getElementById('modal').hidden=false;
+  if(chartBuilder) modalChart=chartBuilder(document.getElementById('modalCv'));
+  if(bodyBuilder) bodyBuilder(body);
+}
+function closeModal(){ document.getElementById('modal').hidden=true; if(modalChart){ try{modalChart.destroy();}catch(e){} modalChart=null; } }
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+
+/* 가로 막대 모달 차트 공통 */
+function modalHBars(cv, pairs, fmt){
+  var P=pal();
+  var o=baseOpts(P,{legend:false}); o.indexAxis='y';
+  var f = fmt==='pct' ? function(v){return fmtPct(v);} : function(v){return fmtEok(v);};
+  o.scales={ x:{grid:{color:P.grid,drawTicks:false},border:{display:false},ticks:{color:P.muted,font:{size:11},callback:f,maxTicksLimit:6}},
+    y:{grid:{display:false},border:{color:P.axis},ticks:{color:P.ink2,font:{size:12}}} };
+  o.interaction={mode:'nearest',intersect:false};
+  return new Chart(cv.getContext('2d'),{
+    data:{labels:pairs.map(function(p){return p[0];}),
+      datasets:[{type:'bar',label:'금액',data:pairs.map(function(p){return p[1];}),backgroundColor:P.s[0],
+        maxBarThickness:18,borderRadius:4,borderSkipped:'start',borderColor:P.surface,borderWidth:1}]},
+    options:o });
+}
+/* 생산대금: 특정 월의 업체별 분해 */
+function openProdDetail(monthKey){
+  var list=D.prodDetail.filter(function(r){ return r['지급월']===monthKey; });
+  if(!list.length){ openModal(monthKey+' 생산대금', '업체별 상세 데이터 없음 (요약 수치만 존재)', null, function(b){
+    var e=document.createElement('div'); e.className='ev sev-info';
+    e.textContent='이 달은 본부별 상세가 아직 소스에 없어요 — 지급대상액 요약만 반영된 예상 구간입니다.'; b.appendChild(e); }); return; }
+  var agg={};
+  list.forEach(function(r){ var k=r['업체']+' ('+String(r['본부']||'').replace('사업본부','')+')'; agg[k]=(agg[k]||0)+nz(r['금액']); });
+  var pairs=Object.keys(agg).map(function(k){return [k,agg[k]];}).sort(function(a,b){return b[1]-a[1];});
+  var total=pairs.reduce(function(a,p){return a+p[1];},0);
+  openModal(monthKey+' 생산대금 — 업체별 분해', '합계 '+fmtEok(total)+' · 상위 '+Math.min(12,pairs.length)+'개 업체 (입고월 분할지급 합산)',
+    function(cv){ return modalHBars(cv, pairs.slice(0,12)); });
+}
+/* 대출처: 계약별 상세 */
+function openLoanDetail(lender){
+  var list=D.loans.filter(function(l){ return l.lender===lender; });
+  if(!list.length) return;
+  var total=list.reduce(function(a,l){return a+l.bal;},0);
+  openModal(lender+' — 차입 상세', '잔액 합계 '+fmtEok(total)+' · '+list.length+'건', null, function(body){
+    list.sort(function(a,b){ return (a.due||0)-(b.due||0); }).forEach(function(l){
+      var e=document.createElement('div'); e.className='ev '+(l.due&&Math.round((l.due-TODAY)/86400000)<=90?'sev-serious':'sev-info');
+      var t=document.createElement('span'); t.className='tag';
+      t.textContent=l.due? ('만기 '+fmtYMD(l.due)+(Math.round((l.due-TODAY)/86400000)>=0?' (D-'+Math.round((l.due-TODAY)/86400000)+')':'')) : '만기 미정';
+      e.appendChild(t);
+      var p=document.createElement('span');
+      p.textContent=l.kind+' · 잔액 '+fmtEok(l.bal)+' · 이율 '+(l.rate!==null?l.rate+'%':'–')+' · 월이자 약 '+fmtEok(l.mInt)+(l.note?' · '+l.note:'');
+      e.appendChild(p);
+      body.appendChild(e);
+    });
+  });
+}
+/* 손익 워터폴: 고정비/준고정비 하위 계정 분해 */
+var PL_SUBITEMS = { '고정비':['인건비','임차료','지급수수료','경상연구비','소모품비','외주용역비','구독료','기타고정비'],
+                    '준고정비':['출장비','촬영비','광고비'] };
+function openPLDetail(itemLabel){
+  var subs=PL_SUBITEMS[itemLabel]; if(!subs) return;
+  var months=plMonths();
+  var pairs=subs.map(function(nm){
+    var row=covRow(PLSim.view, nm); if(!row) return null;
+    var s=0; months.forEach(function(i){ s+=row[i]||0; });
+    return [nm, s];
+  }).filter(Boolean).sort(function(a,b){return b[1]-a[1];});
+  var total=pairs.reduce(function(a,p){return a+p[1];},0);
+  openModal(PLSim.view+' '+itemLabel+' — 계정별 분해',
+    (PLSim.period==='y'?'연간':PLSim.period==='h1'?'상반기':'하반기')+' 합계 '+fmtEok(total)+' (기준값 · 시나리오 배율 적용 전)',
+    function(cv){ return modalHBars(cv, pairs); });
+}
+
+/* ═══════════════ 자금 시뮬레이션 코어 ═══════════════ */
+var DIV_BASE = { 'A사업본부':{d0:20,s0:70}, 'B사업본부':{d0:20,s0:60} };
+var CS_BASE = { disc:20, hiro:70, kids:60, rate:0, fact:0, delay:0, inv:0, invM:2 };
+var CS_PRESETS = {
+  best:  Object.assign({}, CS_BASE, { disc:10, hiro:85, kids:75, rate:-0.5 }),
+  good:  Object.assign({}, CS_BASE, { disc:15, hiro:80, kids:70, rate:-0.25 }),
+  base:  Object.assign({}, CS_BASE),
+  bad:   Object.assign({}, CS_BASE, { disc:25, hiro:60, kids:50, rate:0.5 }),
+  worst: Object.assign({}, CS_BASE, { disc:30, hiro:50, kids:40, rate:1.5 })
+};
+var FACT_ANNUAL = 0.108; // 팩토링 연환산 비용: 4.5% flat / 5개월 회전 ≈ 연 10.8%
+var FACT_COST = 0.045; // 리스금융 4.5% flat, 5개월 분할상환 (자금시트 상환모델 검증치)
+
+function cashSimulate(p){
+  var last = D.lastActual.dt;
+  var horizon = D.daily[D.daily.length-1].dt;
+  var deltas = {};
+  /* 지평선 밖 유출은 지평선 말일에 계상(보수적), 유입은 버림 — '공짜돈' 비대칭 방지 */
+  function add(dt, amt){
+    if(!dt||dt<=last||!amt) return;
+    if(dt>horizon){ if(amt<0) dt=horizon; else return; }
+    var k=dKey(dt); deltas[k]=(deltas[k]||0)+amt;
+  }
+
+  // 1) 발매 정산 (할인율·판매율)
+  var revSim = D.rev.map(function(r){
+    var b = DIV_BASE[r.div] || {d0:20,s0:70};
+    var s = r.div.indexOf('B본부')>=0 ? p.kids : p.hiro;
+    var f = ((100-p.disc)/(100-b.d0)) * (s/b.s0);
+    var amtSim = Math.round(r.amt*f);
+    if(r.payDt>last) add(r.payDt, amtSim-r.amt);
+    return { r:r, amtSim:amtSim, future:r.payDt>last };
+  });
+
+  // 2) 이자율 조정 (전 차입, 매월 1일)
+  var dRateMonthly = D.loans.reduce(function(a,l){ return a + l.bal*(p.rate/100)/12; },0);
+  if(dRateMonthly){
+    var c=new Date(last.getFullYear(), last.getMonth()+1, 1);
+    while(c<=horizon){ add(new Date(c), -dRateMonthly); c.setMonth(c.getMonth()+1); }
+  }
+
+  // 3) 팩토링 레버 (리스금융 모델: 5개월 균등상환 ×1.045)
+  //    +f%: 현금지급의 f%를 팩토링 전환 (당월 절감 → 5개월 상환)
+  //    −f%: 계획된 '팩토링실행'의 f%를 현금지급으로 전환 (당월 지출↑ → 향후 상환 절감, 계획액으로 캡)
+  var factCost = 0;
+  var scenCashByMonth = {}; // 시나리오상 그 달 실제 현금지급 (지연 레버가 이 값을 미룸)
+  D.prod.forEach(function(pr){
+    var mk = pr.y*100+pr.m;
+    var eom = new Date(pr.y, pr.m, 0);
+    var scenCash = pr.cash;
+    if(p.fact && eom>last){
+      if(p.fact>0 && pr.cash>0){
+        var X = pr.cash * (p.fact/100);
+        scenCash = pr.cash - X;
+        add(eom, +X); factCost += X*FACT_COST;
+        for(var k=1;k<=5;k++) add(new Date(pr.y, pr.m+k, 0), -X*(1+FACT_COST)/5);
+      } else if(p.fact<0 && pr.fact>0){
+        var Z = pr.fact * (-p.fact/100); // 계획 팩토링실행 기준, 자동으로 계획액 이하
+        scenCash = pr.cash + Z;
+        add(eom, -Z); factCost -= Z*FACT_COST;
+        for(var k2=1;k2<=5;k2++) add(new Date(pr.y, pr.m+k2, 0), +Z*(1+FACT_COST)/5);
+      }
+    }
+    scenCashByMonth[mk] = Math.max(0, scenCash);
+  });
+
+  // 3.5) 투자/조달 유입 (해당 월 15일)
+  var invSave=0;
+  if(p.inv>0){
+    var invDt=new Date(TODAY.getFullYear(), TODAY.getMonth()+p.invM, 15);
+    add(invDt, p.inv*1e8);
+    var krNow=(D.kr.filter(function(r){ return r.y===TODAY.getFullYear()&&r.m===TODAY.getMonth()+1; })[0]||{}).bal||0;
+    invSave = Math.min(p.inv*1e8, krNow) * FACT_ANNUAL; // 팩토링 상환 전환 시 연 절감
+  }
+
+  // 4) 생산대금 지연 — 시나리오상 실제 현금지급액 기준 (팩토링 레버 반영 후)
+  if(p.delay>0){
+    D.prod.forEach(function(pr){
+      var eom=new Date(pr.y, pr.m, 0);
+      if(eom<=last) return;
+      var c = scenCashByMonth[pr.y*100+pr.m] || 0;
+      if(!c) return;
+      add(eom, +c);
+      var sh=new Date(eom); sh.setDate(sh.getDate()+p.delay);
+      add(sh, -c);
+    });
+  }
+
+  var cum=0;
+  var path = D.daily.map(function(r){
+    if(r.dt>last) cum += (deltas[dKey(r.dt)]||0);
+    return { dt:r.dt, base:r.bal, sim:r.bal+cum, actual:r.actual, inn:r.inn, out:r.out, d:(r.dt>last?(deltas[dKey(r.dt)]||0):0), cat:r.cat };
+  });
+
+  var safety = (parseFloat(document.getElementById('cs_safety').value)||0)*1e8;
+  var fut = path.filter(function(r){return r.dt>last;});
+  var min=null,minDt=null,breach=0;
+  fut.forEach(function(r){ if(min===null||r.sim<min){min=r.sim;minDt=r.dt;} if(r.sim<safety) breach++; });
+  var revT=0, revB=0;
+  revSim.forEach(function(x){ if(x.future){ revT+=x.amtSim; revB+=x.r.amt; } });
+  return { path:path, revSim:revSim, safety:safety,
+    metrics:{ min:min, minDt:minDt, breach:breach, revTotal:revT, revDelta:revT-revB,
+      intDelta:dRateMonthly*12, factCost:factCost, invSave:invSave, endBal:fut.length?fut[fut.length-1].sim:null } };
+}
+
+/* ═══════════════ 손익 시뮬레이션 코어 ═══════════════ */
+var PL_BASE = { sales:0, cogs:0, vr:0, fix:0, semi:0 };
+function plSimulate(view, p){
+  var S0=covRow(view,'매출액'), C0=covRow(view,'매출원가'), V0=covRow(view,'변동비'),
+      F0=covRow(view,'고정비'), SG0=covRow(view,'준고정비'), DP0=covRow(view,'Dep.');
+  if(!S0) return null;
+  var out={ months:[] };
+  for(var i=0;i<12;i++){
+    var s0=S0[i]||0, c0=C0[i]||0, v0=V0[i]||0, f0=F0[i]||0, sg0=SG0[i]||0, dp=DP0[i]||0;
+    var s = s0*(1+p.sales/100);
+    var c, v;
+    if(s0>0){
+      c = s*Math.max(0, c0/s0 + p.cogs/100);
+      v = s*Math.max(0, v0/s0 + p.vr/100);
+    } else {
+      /* 매출 0(결측 포함)인 달: 비율 환산 불가 → 원가·변동비 절대값 유지 (소멸 방지) */
+      c = c0; v = v0;
+    }
+    var cm = s-c-v;
+    var f = f0*(1+p.fix/100), sg = sg0*(1+p.semi/100);
+    var fixedAll = f+sg+dp;
+    var op = cm-fixedAll;
+    out.months.push({ i:i, s:s, c:c, v:v, cm:cm, f:f, sg:sg, dp:dp, fixedAll:fixedAll, op:op,
+      opBase:(s0-c0-v0)-(f0+sg0+dp), cmBase:(s0-c0-v0), cov: fixedAll? cm/fixedAll : null });
+  }
+  return out;
+}
+function plAgg(sim, months){
+  var a={s:0,c:0,v:0,cm:0,f:0,sg:0,dp:0,fixedAll:0,op:0,opBase:0,cmBase:0};
+  months.forEach(function(i){ var m=sim.months[i];
+    a.s+=m.s; a.c+=m.c; a.v+=m.v; a.cm+=m.cm; a.f+=m.f; a.sg+=m.sg; a.dp+=m.dp; a.fixedAll+=m.fixedAll; a.op+=m.op; a.opBase+=m.opBase; a.cmBase+=m.cmBase; });
+  a.cov = a.fixedAll? a.cm/a.fixedAll : null;
+  a.cmr = a.s? a.cm/a.s : null;
+  a.bep = a.cmr? a.fixedAll/a.cmr : null;
+  return a;
+}
+
+/* ═══════════════ 탭 프레임워크 ═══════════════ */
+var TABS = {
+  brief:  { el:'tab-brief',  built:false, charts:{}, build:buildBrief },
+  cashsim:{ el:'tab-cashsim',built:false, charts:{}, build:buildCashSim },
+  plsim:  { el:'tab-plsim',  built:false, charts:{}, build:buildPLSim },
+  intel:  { el:'tab-intel',  built:false, charts:{}, build:buildIntel },
+  meeting:{ el:'tab-meeting',built:false, charts:{}, build:buildMeeting },
+  exec:   { el:'tab-exec',   built:false, charts:{}, build:buildExec }
+};
+/* GAS 샌드박스 iframe은 location.hash 조작이 막혀 있어 인메모리 라우팅 사용 */
+var ROUTE = null;
+function currentTab(){
+  if(ROUTE && TABS[ROUTE]) return ROUTE;
+  var h=''; try{ h=(location.hash||'').replace('#',''); }catch(e){}
+  if(TABS[h]) return h;
+  if(window.INITIAL_TAB && TABS[window.INITIAL_TAB]) return window.INITIAL_TAB;
+  return window.innerWidth<640 ? 'exec' : 'brief';
+}
+function activateTab(name, force){
+  ROUTE = name;
+  Object.keys(TABS).forEach(function(k){
+    document.getElementById(TABS[k].el).hidden = (k!==name);
+  });
+  document.querySelectorAll('.tb').forEach(function(a){ a.classList.toggle('active', a.getAttribute('data-tab')===name); });
+  if(D && (!TABS[name].built || force)){
+    destroyCharts(TABS[name].charts);
+    TABS[name].build();
+    TABS[name].built = true;
+  }
+}
+document.querySelectorAll('#tabbar .tb').forEach(function(a){
+  a.addEventListener('click', function(ev){
+    ev.preventDefault();
+    var t = a.getAttribute('data-tab');
+    try{ history.replaceState(null, '', '#'+t); }catch(e){}
+    activateTab(t, false);
+  });
+});
+window.addEventListener('hashchange', function(){
+  try{ var h=(location.hash||'').replace('#',''); if(TABS[h]){ ROUTE=h; activateTab(h,false); } }catch(e){}
+});
+
+/* ═══════════════ 탭 1: 브리핑 ═══════════════ */
+function buildBrief(){
+  var P=pal(), reg=TABS.brief.charts;
+  var root=document.getElementById('b_sections'); root.textContent='';
+  renderBriefInsights();
+  renderBriefKpis();
+
+  function section(title){ var h=document.createElement('h2'); h.className='sec-title'; h.textContent=title;
+    var g=document.createElement('div'); g.className='cards'; root.appendChild(h); root.appendChild(g); return g; }
+  function card(grid,title,sub,tall){
+    var c=document.createElement('div'); c.className='card'+(tall?' tall':'');
+    var head=document.createElement('div'); head.className='card-head';
+    var tw=document.createElement('div'); var h3=document.createElement('h3'); h3.textContent=title; tw.appendChild(h3);
+    if(sub){ var s=document.createElement('div'); s.className='sub'; s.textContent=sub; tw.appendChild(s); }
+    head.appendChild(tw);
+    var tg=document.createElement('div'); tg.className='view-toggle';
+    var b1=document.createElement('button'); b1.type='button'; b1.textContent='차트'; b1.className='on';
+    var b2=document.createElement('button'); b2.type='button'; b2.textContent='표';
+    tg.appendChild(b1); tg.appendChild(b2); head.appendChild(tg); c.appendChild(head);
+    var w=document.createElement('div'); w.className='chart-wrap'; var cv=document.createElement('canvas'); w.appendChild(cv); c.appendChild(w);
+    var tb=document.createElement('div'); tb.className='data-table'; c.appendChild(tb);
+    b1.onclick=function(){b1.className='on';b2.className='';c.classList.remove('show-table');};
+    b2.onclick=function(){b2.className='on';b1.className='';c.classList.add('show-table');};
+    grid.appendChild(c);
+    return {cv:cv, tb:tb};
+  }
+  function tbl(el,cols,labels,datasets,fmt){
+    fillTable(el, cols, labels.map(function(lb,i){ return [lb].concat(datasets.map(function(d){return d.data[i];})); }),
+      [null].concat(datasets.map(function(){return fmt||'won';})));
+  }
+
+  /* 현금 흐름 */
+  var s1=section('현금 흐름');
+  (function(){
+    var rows=D.daily.filter(function(r){ return r.dt>=addM(TODAY,-6); });
+    var labels=rows.map(function(r){ return fmtYMD(r.dt).slice(2); });
+    var act=rows.map(function(r){ return r.actual?r.bal:null; });
+    var est=rows.map(function(r,i){ return !r.actual?r.bal:(rows[i+1]&&!rows[i+1].actual?r.bal:null); });
+    var c=card(s1,'일별 현금 잔액','실선 = 실적 · 점선 = 자금팀 추정 (최근 6개월~)',true);
+    var dOpts=baseOpts(P,{crosshair:true,maxX:10});
+    dOpts.plugins.tooltip.callbacks.footer=function(items){
+      var i=items[0]&&items[0].dataIndex; if(i===undefined) return '';
+      var r=rows[i]; if(!r) return '';
+      return '유입 +'+fmtEok(r.inn)+' · 유출 −'+fmtEok(r.out)+(r.actual?'':' (추정)');
+    };
+    reg.daily=new Chart(c.cv.getContext('2d'),{ data:{labels:labels,datasets:[
+      dsLine(P,0,'잔액(실적)',act), dsLine(P,0,'잔액(추정)',est,{borderDash:[6,4]}) ]},
+      options:dOpts, plugins:[crosshair] });
+    tbl(c.tb,['날짜','실적','추정'],labels,[{data:act},{data:est}]);
+  })();
+  (function(){
+    var rows=D.monthlyCash;
+    var labels=rows.map(function(r){ return r['월']+(r['구분']==='실적'?'':r['구분']==='진행중'?' (진행)':' (예상)'); });
+    var inn=rows.map(function(r){return nz(r['유입계']);}), out=rows.map(function(r){return nz(r['유출계']);});
+    var net=rows.map(function(r){return nz(r['유입계'])-nz(r['유출계']);});
+    var c=card(s1,'월별 현금 유입 · 유출','순증감 선이 0 아래면 현금이 줄어든 달');
+    reg.mio=new Chart(c.cv.getContext('2d'),{ data:{labels:labels,datasets:[
+      dsBar(P,0,'유입',inn), dsBar(P,5,'유출',out), dsLine(P,3,'순증감',net,{pointRadius:3}) ]},
+      options:baseOpts(P,{maxX:13}), plugins:[crosshair] });
+    tbl(c.tb,['월','유입','유출','순증감'],labels,[{data:inn},{data:out},{data:net}]);
+  })();
+
+  /* 자금 스케줄 */
+  var s2=section('자금 스케줄 — 들어올 돈 vs 나갈 돈');
+  (function(){
+    var rows=D.prodMonthlyRaw.filter(function(r){ return nz(r['지급대상액'])!==0; });
+    var labels=rows.map(function(r){ return r['지급월']+(r['구분']==='예상'?' (예상)':''); });
+    var cash=rows.map(function(r){return nz(r['현금지급']);}), fac=rows.map(function(r){return nz(r['팩토링실행']);}), kb=rows.map(function(r){return nz(r['기보팩토링']);});
+    var c=card(s2,'생산대금 지급 스케줄 (매입채무)','막대를 클릭하면 그 달 업체별 분해 팝업 · 팩토링 = 지급 이연(리스금융 상환으로 전환)');
+    var po=baseOpts(P,{stacked:true,maxX:13});
+    po.onClick=function(ev,els,chart){ if(els.length) openProdDetail(String(chart.data.labels[els[0].index]).slice(0,7)); };
+    reg.prod=new Chart(c.cv.getContext('2d'),{ data:{labels:labels,datasets:[
+      dsBar(P,5,'현금지급',cash), dsBar(P,0,'팩토링실행',fac), dsBar(P,2,'기보팩토링',kb) ]},
+      options:po });
+    c.cv.classList.add('clickable-hint');
+    tbl(c.tb,['지급월','현금지급','팩토링','기보'],labels,[{data:cash},{data:fac},{data:kb}]);
+  })();
+  (function(){
+    if(!D.kr.length) return;
+    var labels=D.kr.map(function(r){return r.label;});
+    var c=card(s2,'리스금융 팩토링 잔액·상환','선 = 월말 잔액 · 막대 = 당월 상환 구성');
+    reg.kr=new Chart(c.cv.getContext('2d'),{ data:{labels:labels,datasets:[
+      dsBar(P,0,'상환(25입고분)',D.kr.map(function(r){return r.p25;})),
+      dsBar(P,1,'상환(26입고분)',D.kr.map(function(r){return r.p26;})),
+      dsBar(P,2,'이자',D.kr.map(function(r){return r.intr;})),
+      dsLine(P,5,'월말 잔액',D.kr.map(function(r){return r.bal;}),{pointRadius:2}) ]},
+      options:baseOpts(P,{stacked:true,maxX:12}) });
+    tbl(c.tb,['월','25입고','26입고','이자','잔액'],labels,
+      [{data:D.kr.map(function(r){return r.p25;})},{data:D.kr.map(function(r){return r.p26;})},{data:D.kr.map(function(r){return r.intr;})},{data:D.kr.map(function(r){return r.bal;})}]);
+  })();
+  (function(){
+    var by={}, divs=[];
+    D.rev.forEach(function(r){ var k=mLabel(r.payDt); if(!by[k])by[k]={}; var dv=r.div||'기타';
+      by[k][dv]=(by[k][dv]||0)+r.amt; if(divs.indexOf(dv)<0)divs.push(dv); });
+    divs.sort();
+    var keys=Object.keys(by).sort();
+    var c=card(s2,'발매 정산 입금 스케줄','발매차수별 정산대금 (PG 3% 차감 후)');
+    var ds=divs.map(function(dv,i){ return dsBar(P,i,dv,keys.map(function(k){return by[k][dv]||0;})); });
+    reg.rev=new Chart(c.cv.getContext('2d'),{ data:{labels:keys,datasets:ds}, options:baseOpts(P,{stacked:true}) });
+    tbl(c.tb,['월'].concat(divs),keys,ds);
+  })();
+  (function(){
+    var by={};
+    D.lc.forEach(function(r){ var k=mLabel(r.dt); by[k]=(by[k]||0)+r.krw; });
+    var keys=Object.keys(by).sort();
+    if(!keys.length) return;
+    var c=card(s2,'LC(수입신용장) 결제 예정','월 합계');
+    reg.lc=new Chart(c.cv.getContext('2d'),{ data:{labels:keys,datasets:[dsBar(P,0,'LC 결제액',keys.map(function(k){return by[k];}))]},
+      options:baseOpts(P,{legend:false,maxX:8}) });
+    fillTable(c.tb,['결제예정일','업체','KRW'],D.lc.map(function(r){return [fmtYMD(r.dt),r.vendor,r.krw];}),[null,null,'won']);
+  })();
+
+  /* 손익 */
+  var s3=section('손익 — 2026년 (1~6월 실적 · 7~12월 추정)');
+  var M12=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  (function(){
+    var sales=plRow('PL','Ⅰ.매출액')||[], op=plRow('PL','Ⅴ.영업이익')||[], eb=plRow('PL','⊕EBITDA')||[];
+    var covS=covRow('전사','매출액'), covOP=covRow('전사','영업이익');
+    if(covS){ sales=covS; op=covOP; } // 커버리지PL이 있으면 하반기 추정 포함본 사용
+    var c=card(s3,'매출액 · 영업이익','막대 = 매출 · 선 = 영업이익 (추정 포함)');
+    reg.plmain=new Chart(c.cv.getContext('2d'),{ data:{labels:M12,datasets:[
+      dsBar(P,0,'매출액',sales), dsLine(P,3,'영업이익',op,{pointRadius:3}) ]},
+      options:baseOpts(P) });
+    tbl(c.tb,['월','매출액','영업이익'],M12,[{data:sales},{data:op}]);
+  })();
+  (function(){
+    var chans=['자사몰','대형유통','위탁','오프라인'];
+    var c=card(s3,'채널별 매출 구성','상반기 실적 기준');
+    var ds=chans.map(function(ch,i){ return dsBar(P,i,ch,(plRow('채널매출',ch)||[]).slice(0,6)); });
+    reg.chan=new Chart(c.cv.getContext('2d'),{ data:{labels:M12.slice(0,6),datasets:ds}, options:baseOpts(P,{stacked:true}) });
+    tbl(c.tb,['월'].concat(chans),M12.slice(0,6),ds);
+  })();
+  (function(){
+    var cats=['① 인건비','② 판매·마케팅비','③ 물류비','④ 임차·시설비','⑤ 지급수수료(관리·용역)','⑥ 기타 일반관리비','⑦ 감가상각비'];
+    var short=['인건비','판매·마케팅','물류비','임차·시설','지급수수료','기타관리','감가상각'];
+    var c=card(s3,'판관비 구성 (7대 분류)','상반기 실적');
+    var ds=cats.map(function(ct,i){ return dsBar(P,i,short[i],(plRow('PL',ct)||[]).slice(0,6)); });
+    reg.sga=new Chart(c.cv.getContext('2d'),{ data:{labels:M12.slice(0,6),datasets:ds}, options:baseOpts(P,{stacked:true}) });
+    tbl(c.tb,['월'].concat(short),M12.slice(0,6),ds);
+  })();
+  (function(){
+    var brands=['AURORA','BLANC외','CIEL','DUNE','GRAIN','ECHO','FERN'];
+    var pairs=brands.map(function(b){ var row=plRow('브랜드매출',b)||[]; var s=0; for(var i=0;i<12;i++)s+=row[i]||0; return [b,s]; })
+      .sort(function(a,b){return b[1]-a[1];});
+    var c=card(s3,'브랜드별 매출 누적','2026 누적 실적');
+    var o=baseOpts(P,{legend:false}); o.indexAxis='y';
+    o.scales={ x:{grid:{color:P.grid,drawTicks:false},border:{display:false},ticks:{color:P.muted,font:{size:11},callback:function(v){return fmtEok(v);},maxTicksLimit:6}},
+      y:{grid:{display:false},border:{color:P.axis},ticks:{color:P.ink2,font:{size:11.5}}} };
+    o.interaction={mode:'nearest',intersect:false};
+    reg.brand=new Chart(c.cv.getContext('2d'),{ data:{labels:pairs.map(function(p){return p[0];}),
+      datasets:[dsBar(P,0,'매출액',pairs.map(function(p){return p[1];}))]}, options:o });
+    fillTable(c.tb,['브랜드','누적 매출'],pairs,[null,'won']);
+  })();
+
+  /* 차입금 */
+  var s4=section('차입금 현황');
+  (function(){
+    var agg={};
+    D.loans.forEach(function(l){ agg[l.lender]=(agg[l.lender]||0)+l.bal; });
+    var pairs=Object.keys(agg).map(function(k){return [k,agg[k]];}).sort(function(a,b){return b[1]-a[1];});
+    var c=card(s4,'대출처별 잔액','막대를 클릭하면 계약별 상세 팝업 · 리스금융 팩토링은 별도 카드');
+    var o=baseOpts(P,{legend:false}); o.indexAxis='y';
+    o.scales={ x:{grid:{color:P.grid,drawTicks:false},border:{display:false},ticks:{color:P.muted,font:{size:11},callback:function(v){return fmtEok(v);},maxTicksLimit:6}},
+      y:{grid:{display:false},border:{color:P.axis},ticks:{color:P.ink2,font:{size:11.5}}} };
+    o.interaction={mode:'nearest',intersect:false};
+    o.onClick=function(ev,els,chart){ if(els.length) openLoanDetail(chart.data.labels[els[0].index]); };
+    reg.loanb=new Chart(c.cv.getContext('2d'),{ data:{labels:pairs.map(function(p){return p[0];}),
+      datasets:[dsBar(P,0,'잔액',pairs.map(function(p){return p[1];}))]}, options:o });
+    c.cv.classList.add('clickable-hint');
+    fillTable(c.tb,['대출처','잔액'],pairs,[null,'won']);
+  })();
+  (function(){
+    var c=document.createElement('div'); c.className='card';
+    var head=document.createElement('div'); head.className='card-head';
+    var tw=document.createElement('div'); var h3=document.createElement('h3'); h3.textContent='차입 내역 (만기 빠른 순)'; tw.appendChild(h3);
+    head.appendChild(tw); c.appendChild(head);
+    var wrap=document.createElement('div'); wrap.className='data-table show'; wrap.style.maxHeight='340px';
+    var loans=D.loans.slice().sort(function(a,b){ return String(fmtYMD(a.due)||'9999').localeCompare(String(fmtYMD(b.due)||'9999')); });
+    var t=document.createElement('table'); t.className='dt';
+    var th=document.createElement('thead'); var trh=document.createElement('tr');
+    ['대출처','종류','잔액','이율','만기일','월이자','비고'].forEach(function(cc){ var e=document.createElement('th'); e.textContent=cc; trh.appendChild(e); });
+    th.appendChild(trh); t.appendChild(th);
+    var tb=document.createElement('tbody');
+    loans.forEach(function(l){
+      var tr=document.createElement('tr');
+      function td(txt){ var e=document.createElement('td'); e.textContent=txt; tr.appendChild(e); return e; }
+      td(l.lender); td(l.kind); td(fmtEok(l.bal)); td(l.rate!==null?l.rate+'%':'–');
+      var mtd=td(fmtYMD(l.due));
+      var dd=l.due?Math.round((l.due-TODAY)/86400000):null;
+      if(dd!==null&&dd>=0&&dd<=90){ var b=document.createElement('span'); b.className='badge '+(dd<=30?'d-crit':'d-warn'); b.textContent='D-'+dd;
+        mtd.appendChild(document.createTextNode(' ')); mtd.appendChild(b); }
+      td(fmtEok(l.mInt)); td(l.note);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); c.appendChild(wrap); s4.appendChild(c);
+  })();
+}
+
+function renderBriefInsights(){
+  var el=document.getElementById('b_insights'); el.textContent='';
+  var list=[];
+  var cur=D.lastActual;
+  var lim=addM(cur.dt,3);
+  var min=null,minD=null;
+  D.daily.forEach(function(r){ if(r.dt>cur.dt&&r.dt<=lim){ if(min===null||r.bal<min){min=r.bal;minD=r.dt;} } });
+  if(min!==null){
+    var sev=min<1e8?'critical':min<3e8?'serious':min<5e8?'warning':'good';
+    list.push({sev:sev,tag:{critical:'위험',serious:'경고',warning:'주의',good:'안정'}[sev],
+      parts:['향후 90일 내 잔액 최저점 ',{b:fmtEok(min)},' ('+fmtMD(minD)+')']});
+  }
+  var gaps=[];
+  D.monthlyCash.forEach(function(r){
+    if(r['구분']==='실적') return; var mo=pMonth(r['월']); if(!mo) return;
+    if(mo.y*100+mo.m < TODAY.getFullYear()*100+TODAY.getMonth()+1) return;
+    var net=nz(r['유입계'])-nz(r['유출계']); if(net<0) gaps.push(r['월']+' '+fmtEok(net));
+  });
+  if(gaps.length) list.push({sev:'warning',tag:'주의',parts:['유출이 유입보다 큰 달: ',{b:gaps.slice(0,4).join(' · ')}]});
+  var due=[],dueSum=0;
+  D.loans.forEach(function(l){ if(l.due&&l.due>=TODAY&&l.due<=addM(TODAY,3)){ due.push(l.lender+' '+fmtEok(l.bal)+' ('+fmtMD(l.due)+')'); dueSum+=l.bal; } });
+  if(due.length) list.push({sev:dueSum>=1e9?'serious':'warning',tag:dueSum>=1e9?'경고':'주의',
+    parts:['90일 내 만기 차입금 ',{b:fmtEok(dueSum)},' — '+due.join(', ')]});
+  if(D.kr.length){
+    var next3=D.kr.filter(function(r){ var d=new Date(r.y,r.m-1,1); return d>=new Date(TODAY.getFullYear(),TODAY.getMonth(),1)&&d<addM(TODAY,3); });
+    var rp=next3.reduce(function(a,r){return a+r.repay;},0);
+    if(rp>0) list.push({sev:'info',tag:'팩토링',parts:['리스금융 3개월 상환 예정 ',{b:fmtEok(rp)},' (현 잔액 '+fmtEok((D.kr.filter(function(r){return r.y===TODAY.getFullYear()&&r.m===TODAY.getMonth()+1;})[0]||{}).bal)+')']});
+  }
+  /* 팩토링 굴레 지표 */
+  var tgt=0, ex=0;
+  D.prod.forEach(function(pr){ if(pr.y===2026){ tgt+=pr.target; ex+=pr.fact; } });
+  if(tgt>0&&ex>0) list.push({sev:'serious',tag:'굴레',parts:['26년 생산대금 ',{b:fmtEok(tgt)},' 중 팩토링 ',{b:fmtEok(ex)+' ('+Math.round(ex/tgt*100)+'%)'},' — 상환이 다음 시즌과 겹치는 구조']});
+  var krInt=0; D.kr.forEach(function(r){ if(r.y===2026) krInt+=r.intr; });
+  var mInt2=D.loans.reduce(function(a,l){ return a+l.mInt; },0);
+  var fin=krInt+mInt2*12;
+  var opRow=covRow('전사','영업이익'); var opY=0; if(opRow) for(var oi=0;oi<12;oi++) opY+=opRow[oi]||0;
+  if(fin>0&&opY>0) list.push({sev:'warning',tag:'금융비용',parts:['연 금융비용 ',{b:fmtEok(fin)},' = 영업이익 '+fmtEok(opY)+'의 ',{b:Math.round(fin/opY*100)+'%'}]});
+  var t25=null,t26=null;
+  D.kr.forEach(function(r){ if(r.p25>0) t25=r.label; if(r.p26>0) t26=r.label; });
+  if(t26) list.push({sev:'info',tag:'상환 꼬리',parts:['25년 입고분 상환 '+(t25||'–')+'까지 · 26년 입고분 ',{b:t26+'까지'},' 이어짐']});
+  D.warnings.forEach(function(w){ list.push({sev:'info',tag:'데이터',parts:[w]}); });
+  list.forEach(function(it){
+    var div=document.createElement('div'); div.className='insight sev-'+it.sev;
+    var tag=document.createElement('span'); tag.className='tag';
+    tag.textContent={good:'✓',warning:'△',serious:'⚠',critical:'⚠',info:'ⓘ'}[it.sev]+' '+it.tag;
+    div.appendChild(tag);
+    var p=document.createElement('p');
+    it.parts.forEach(function(part){
+      if(typeof part==='string') p.appendChild(document.createTextNode(part));
+      else { var b=document.createElement('b'); b.textContent=part.b; p.appendChild(b); }
+    });
+    div.appendChild(p); el.appendChild(div);
+  });
+}
+function renderBriefKpis(){
+  var el=document.getElementById('b_kpis'); el.textContent='';
+  var cur=D.lastActual;
+  function balAt(days){
+    var t=new Date(cur.dt); t.setDate(t.getDate()+days); var best=null;
+    D.daily.forEach(function(r){ if(r.dt>cur.dt&&r.dt<=t) best=r; });
+    return best?best.bal:null;
+  }
+  var b30=balAt(30);
+  var min90=null,min90d=null,lim=addM(cur.dt,3);
+  D.daily.forEach(function(r){ if(r.dt>cur.dt&&r.dt<=lim&&(min90===null||r.bal<min90)){min90=r.bal;min90d=r.dt;} });
+  var loanT=0,mInt=0;
+  D.loans.forEach(function(l){ loanT+=l.bal; mInt+=l.mInt; });
+  var krBal=(D.kr.filter(function(r){return r.y===TODAY.getFullYear()&&r.m===TODAY.getMonth()+1;})[0]||{}).bal||0;
+  var sales=covRow('전사','매출액')||plRow('PL','Ⅰ.매출액')||[];
+  var op=covRow('전사','영업이익')||plRow('PL','Ⅴ.영업이익')||[];
+  var ys=0,yo=0; for(var i=0;i<6;i++){ ys+=sales[i]||0; yo+=op[i]||0; }
+  function tile(label,value,sub,hero,cls){
+    var k=document.createElement('div'); k.className='kpi'+(hero?' hero':'');
+    var l=document.createElement('div'); l.className='k-label'; l.textContent=label;
+    var v=document.createElement('div'); v.className='k-value'; v.textContent=value;
+    k.appendChild(l); k.appendChild(v);
+    if(sub){ var s=document.createElement('div'); s.className='k-sub'+(cls?' '+cls:''); s.textContent=sub; k.appendChild(s); }
+    el.appendChild(k);
+  }
+  tile('현금 잔액 (전일)', fmtEok(cur.bal), fmtYMD(cur.dt)+' 마감', true);
+  var d30=b30!==null?b30-cur.bal:null;
+  tile('30일 후 예상', fmtEok(b30), d30===null?'':(d30>=0?'▲ ':'▼ ')+fmtEok(Math.abs(d30))+' vs 현재', false, d30!==null&&d30<0?'down':'up');
+  tile('90일 내 최저', fmtEok(min90), min90d?fmtMD(min90d)+' 예상':'', false, min90!==null&&min90<3e8?'down':'');
+  tile('총 차입 + 팩토링', fmtEok(loanT+krBal), '대출 '+fmtEok(loanT)+' · 팩토링 '+fmtEok(krBal));
+  tile('월 이자 부담 (약)', fmtEok(mInt), '연 '+fmtEok(mInt*12)+' (팩토링 수수료 별도)');
+  tile('26년 상반기 매출/영업이익', fmtEok(ys), '영업이익 '+fmtEok(yo)+' ('+fmtPct(ys?yo/ys:null)+')');
+}
+
+/* ═══════════════ 탭 2: 자금 시뮬레이터 ═══════════════ */
+var CashSim = { params:Object.assign({},CS_BASE), range:'pm3', gran:'auto', baseMetrics:null, saved:{}, drillKey:null };
+function csIsBase(){ var p=CashSim.params; return Object.keys(CS_BASE).every(function(k){return p[k]===CS_BASE[k];}); }
+function csBaseline(){ if(!CashSim.baseMetrics) CashSim.baseMetrics=cashSimulate(CS_BASE).metrics; return CashSim.baseMetrics; }
+
+function buildCashSim(){
+  var P=pal(), reg=TABS.cashsim.charts;
+  wireToggles(document.getElementById('tab-cashsim'));
+  reg.hero=new Chart(document.getElementById('cs_cvHero').getContext('2d'),{
+    type:'line', data:{labels:[],datasets:[
+      { label:'기준', data:[], borderColor:P.muted, borderDash:[5,4], borderWidth:1.5, pointRadius:0, tension:.2, fill:false },
+      { label:'시나리오', data:[], borderColor:P.s[0], borderWidth:2, pointRadius:0, pointHoverRadius:5, pointBorderColor:P.surface, pointBorderWidth:2, tension:.2, fill:false },
+      { label:'_hi', data:[], borderWidth:0, pointRadius:0, fill:false },
+      { label:'_lo', data:[], borderWidth:0, pointRadius:0, backgroundColor:hexA(P.s[0],.12), fill:'-1' } ]},
+    options:(function(){ var o=baseOpts(P,{crosshair:true,maxX:11}); o.plugins.annotation={annotations:{}}; return o; })(),
+    plugins:[crosshair]
+  });
+  reg.monthly=new Chart(document.getElementById('cs_cvMonthly').getContext('2d'),{
+    data:{labels:[],datasets:[ dsBar(P,0,'유입',[]), dsBar(P,5,'유출',[]), dsLine(P,3,'순증감',[],{pointRadius:3}) ]},
+    options:(function(){ var o=baseOpts(P,{maxX:13});
+      o.onClick=function(ev,els,chart){ if(els.length){ var k=String(chart.data.labels[els[0].index]).slice(0,7); csOpenDrill(k); } };
+      return o; })()
+  });
+  if(D.kr.length){
+    reg.kr=new Chart(document.getElementById('cs_cvKR').getContext('2d'),{
+      data:{labels:D.kr.map(function(r){return r.label;}),datasets:[
+        dsBar(P,0,'상환(25입고)',D.kr.map(function(r){return r.p25;})),
+        dsBar(P,1,'상환(26입고)',D.kr.map(function(r){return r.p26;})),
+        dsBar(P,2,'이자',D.kr.map(function(r){return r.intr;})),
+        dsLine(P,5,'월말 잔액',D.kr.map(function(r){return r.bal;}),{pointRadius:2}) ]},
+      options:baseOpts(P,{stacked:true,maxX:12})
+    });
+    fillTable(document.getElementById('cs_tbKR'),['월','25입고','26입고','이자','당월계','잔액'],
+      D.kr.map(function(r){return [r.label,r.p25,r.p26,r.intr,r.repay,r.bal];}),[null,'won','won','won','won','won']);
+  }
+  /* 발매 정산 차이 차트 (데이터는 csRevTable에서 갱신) */
+  (function(){
+    var o=baseOpts(P,{legend:false}); o.indexAxis='y';
+    o.scales={ x:{grid:{color:P.grid,drawTicks:false},border:{display:false},ticks:{color:P.muted,font:{size:11},callback:function(v){return fmtEok(v);},maxTicksLimit:6}},
+      y:{grid:{display:false},border:{color:P.axis},ticks:{color:P.ink2,font:{size:11.5}}} };
+    o.interaction={mode:'nearest',intersect:false};
+    reg.rev=new Chart(document.getElementById('cs_cvRev').getContext('2d'),{
+      data:{labels:[],datasets:[{type:'bar',label:'금액',data:[],backgroundColor:[],maxBarThickness:16,borderRadius:4,borderSkipped:'start',borderColor:P.surface,borderWidth:1}]},
+      options:o });
+  })();
+  /* 조달 수단별 연환산 비용 (정적) */
+  (function(){
+    var bank=0, bankBal=0;
+    D.loans.forEach(function(l){ if(/은행|공단|진흥/.test(l.lender) && l.rate!==null){ bank+=l.bal*l.rate; bankBal+=l.bal; } });
+    var items=[
+      ['투자 유치 (이자 0 · 지분 희석)', 0],
+      ['은행권 가중평균', bankBal? bank/bankBal/100 : 0.045],
+      ['관계사 차입 (포컴퍼니)', 0.085],
+      ['리스금융 팩토링 → 연환산', FACT_ANNUAL],
+      ['롯데카드 차입', 0.1588]
+    ];
+    var o=baseOpts(P,{pct:true,legend:false}); o.indexAxis='y';
+    o.scales={ x:{grid:{color:P.grid,drawTicks:false},border:{display:false},ticks:{color:P.muted,font:{size:11},callback:function(v){return fmtPct(v);},maxTicksLimit:6}},
+      y:{grid:{display:false},border:{color:P.axis},ticks:{color:P.ink2,font:{size:12}}} };
+    o.interaction={mode:'nearest',intersect:false};
+    reg.fund=new Chart(document.getElementById('cs_cvFund').getContext('2d'),{
+      data:{labels:items.map(function(i){return i[0];}),
+        datasets:[{type:'bar',label:'연환산 비용',data:items.map(function(i){return i[1];}),
+          backgroundColor:items.map(function(i){ return i[1]>=0.10 ? P.s[5] : P.s[0]; }),
+          maxBarThickness:18,borderRadius:4,borderSkipped:'start',borderColor:P.surface,borderWidth:1}]},
+      options:o });
+  })();
+  csSyncSliders(); csLoadSaved(); csRecalc();
+}
+var csRaf=false;
+function csRequest(){ if(csRaf) return; csRaf=true; requestAnimationFrame(function(){ csRaf=false; csRecalc(); }); }
+
+function csRangeBounds(){
+  var min=D.daily[0].dt, max=D.daily[D.daily.length-1].dt, from,to;
+  if(CashSim.range==='pm3'){ from=addM(TODAY,-3); to=addM(TODAY,3); }
+  else if(CashSim.range==='f6'){ from=new Date(TODAY); to=addM(TODAY,6); }
+  else if(CashSim.range==='year'){ from=new Date(TODAY.getFullYear(),0,1); to=new Date(TODAY.getFullYear(),11,31); }
+  else { from=min; to=max; }
+  if(from<min)from=min; if(to>max)to=max;
+  return {from:from,to:to};
+}
+function csGran(b){ if(CashSim.gran!=='auto') return CashSim.gran;
+  var days=(b.to-b.from)/86400000; return days<=95?'d':days<=370?'w':'m'; }
+function weekKey(dt){ var d=new Date(dt); d.setDate(d.getDate()-((d.getDay()+6)%7)); return fmtMD(d)+'주'; }
+function csBucketize(rows,gran){
+  if(gran==='d') return rows.map(function(r){ return {label:fmtMD(r.dt),base:r.base,sim:r.sim,lo:r.lo,hi:r.hi,actual:r.actual}; });
+  /* 주/월 버킷은 구간 '최저' 잔액 — 리스크 뷰에서 일중 트로프가 숨는 것 방지 (KPI·판정과 일관) */
+  var out=[],cur=null,key=null;
+  function mn(a,b){ return a===undefined?b:Math.min(a,b); }
+  rows.forEach(function(r){
+    var k=gran==='w'?weekKey(r.dt):mLabel(r.dt);
+    if(k!==key){ if(cur)out.push(cur); key=k; cur={label:k,actual:r.actual}; }
+    cur.base=mn(cur.base,r.base); cur.sim=mn(cur.sim,r.sim); cur.lo=mn(cur.lo,r.lo); cur.hi=mn(cur.hi,r.hi);
+    if(!r.actual)cur.actual=false;
+  });
+  if(cur)out.push(cur);
+  return out;
+}
+
+function csRecalc(){
+  if(!D || !TABS.cashsim.charts.hero) return;
+  var P=pal(), reg=TABS.cashsim.charts;
+  var p=CashSim.params;
+  var res=cashSimulate(p);
+  var lo=cashSimulate(Object.assign({},p,{hiro:Math.max(30,p.hiro-10),kids:Math.max(30,p.kids-10)}));
+  var hi=cashSimulate(Object.assign({},p,{hiro:Math.min(100,p.hiro+10),kids:Math.min(100,p.kids+10)}));
+  res.path.forEach(function(r,i){ r.lo=lo.path[i].sim; r.hi=hi.path[i].sim; });
+  CashSim.lastRes=res;
+
+  var B=csRangeBounds();
+  var rows=res.path.filter(function(r){return r.dt>=B.from&&r.dt<=B.to;});
+  var bks=csBucketize(rows, csGran(B));
+  var h=reg.hero;
+  h.data.labels=bks.map(function(b){return b.label+(b.actual?'':'˟');});
+  h.data.datasets[0].data=bks.map(function(b){return b.base;});
+  h.data.datasets[1].data=bks.map(function(b){return b.sim;});
+  h.data.datasets[2].data=bks.map(function(b){return b.actual?null:b.hi;});
+  h.data.datasets[3].data=bks.map(function(b){return b.actual?null:b.lo;});
+  var todayIdx=-1; for(var i=0;i<bks.length;i++){ if(!bks[i].actual){todayIdx=i;break;} }
+  var ann={ safety:{type:'line',yMin:res.safety,yMax:res.safety,borderColor:P.crit,borderWidth:1,borderDash:[3,3],
+      label:{display:true,content:'안전선 '+fmtEok(res.safety),position:'start',backgroundColor:'transparent',color:P.crit,font:{size:10}}},
+    zone:{type:'box',yMax:res.safety,backgroundColor:hexA(P.crit,.05),borderWidth:0} }; /* yMin 생략 = 차트 바닥까지 (축 왜곡 방지) */
+  if(todayIdx>0) ann.today={type:'line',xMin:todayIdx-0.5,xMax:todayIdx-0.5,borderColor:P.axis,borderWidth:1,
+    label:{display:true,content:'오늘',position:'end',backgroundColor:'transparent',color:P.muted,font:{size:10}}};
+  h.options.plugins.annotation.annotations=ann;
+  h.update('none');
+  fillTable(document.getElementById('cs_tbHero'),['구간','기준','시나리오','차이'],
+    bks.map(function(b){return [b.label+(b.actual?'':' (추정)'),b.base,b.sim,b.sim-b.base];}),[null,'won','won','won']);
+
+  var mMap={};
+  res.path.forEach(function(r){
+    var k=mLabel(r.dt);
+    if(!mMap[k]) mMap[k]={inn:0,out:0,dIn:0,dOut:0,actual:r.actual};
+    mMap[k].inn+=r.inn; mMap[k].out+=r.out;
+    if(r.d>0)mMap[k].dIn+=r.d; else mMap[k].dOut+=-r.d;
+    if(!r.actual)mMap[k].actual=false;
+  });
+  var keys=Object.keys(mMap).sort().filter(function(k){
+    var mm=pMonth(k); var e=new Date(mm.y,mm.m,0), s=new Date(mm.y,mm.m-1,1);
+    return e>=B.from&&s<=B.to;
+  });
+  var mc=reg.monthly;
+  var mIn=keys.map(function(k){return mMap[k].inn+mMap[k].dIn;});
+  var mOut=keys.map(function(k){return mMap[k].out+mMap[k].dOut;});
+  mc.data.labels=keys.map(function(k){return k+(mMap[k].actual?'':'˟');});
+  mc.data.datasets[0].data=mIn; mc.data.datasets[1].data=mOut;
+  mc.data.datasets[2].data=keys.map(function(k,i){return mIn[i]-mOut[i];});
+  mc.update('none');
+  fillTable(document.getElementById('cs_tbMonthly'),['월','유입','유출','순증감'],
+    keys.map(function(k,i){return [k,mIn[i],mOut[i],mIn[i]-mOut[i]];}),[null,'won','won','won']);
+
+  csKpis(res); csVerdict(res); csChips(res); csRescue(res); csCompare(res); csEvents(res); csRevTable(res);
+  document.getElementById('cs_badge').hidden = csIsBase();
+  document.querySelectorAll('[data-cspreset]').forEach(function(b){
+    var pr=CS_PRESETS[b.getAttribute('data-cspreset')];
+    b.classList.toggle('active', Object.keys(CS_BASE).every(function(k){return pr[k]===CashSim.params[k];}));
+  });
+  if(CashSim.drillKey) csRenderDrill(CashSim.drillKey);
+}
+function csKpis(res){
+  var el=document.getElementById('cs_kpis'); el.textContent='';
+  var m=res.metrics, cur=D.lastActual;
+  var mk=mLabel(TODAY), mNet=0;
+  res.path.forEach(function(r){ if(mLabel(r.dt)===mk) mNet+=r.inn-r.out+r.d; });
+  function tile(label,value,sub,cls){
+    var k=document.createElement('div'); k.className='kpi';
+    var l=document.createElement('div'); l.className='k-label'; l.textContent=label;
+    var v=document.createElement('div'); v.className='k-value'; v.textContent=value;
+    k.appendChild(l); k.appendChild(v);
+    if(sub){ var s=document.createElement('div'); s.className='k-sub'+(cls?' '+cls:''); s.textContent=sub; k.appendChild(s); }
+    el.appendChild(k);
+  }
+  tile('현재 잔액 (실적 '+fmtMD(cur.dt)+')', fmtEok(cur.bal), '실적 마감 기준');
+  var dd=m.minDt?Math.round((m.minDt-TODAY)/86400000):null;
+  tile('시나리오 최저 잔액', fmtEok(m.min), m.minDt?fmtMD(m.minDt)+' (D-'+dd+') · 안전선 '+(m.min>=res.safety?'위':'아래'):'', m.min!==null&&m.min<res.safety?'down':'up');
+  tile('안전선 하회 일수', m.breach+'일', '전체 추정 구간', m.breach>0?'down':'up');
+  tile('이번 달 순현금흐름', (mNet>=0?'+':'')+fmtEok(mNet), mk+' 시나리오 기준', mNet>=0?'up':'down');
+}
+function csVerdict(res){
+  var m=res.metrics;
+  var el=document.getElementById('cs_verdict');
+  var tag=el.querySelector('.v-tag'), tx=el.querySelector('.v-text');
+  var sev,tt,msg;
+  if(m.min===null){ sev='info'; tt='ⓘ'; msg='추정 데이터 없음'; }
+  else if(m.min<0){ sev='critical'; tt='⚠ 위험';
+    msg='이 가정이면 '+fmtMD(m.minDt)+'에 잔액 '+fmtEok(m.min)+' — 자금 부족. 팩토링 확대·지급 협의·단기 조달 검토 필요.'; }
+  else if(m.min<res.safety){ sev='serious'; tt='⚠ 경고';
+    msg='최저 잔액 '+fmtEok(m.min)+' ('+fmtMD(m.minDt)+') — 안전선 대비 '+fmtEok(res.safety-m.min)+' 부족, 하회 '+m.breach+'일. 해당 주간 유출 일정 조정 검토.'; }
+  else if(m.min<res.safety*1.2){ sev='warning'; tt='△ 주의';
+    msg='최저 잔액 '+fmtEok(m.min)+' ('+fmtMD(m.minDt)+') — 안전선은 지키지만 버퍼 '+fmtEok(m.min-res.safety)+'.'; }
+  else { sev='good'; tt='✓ 안정'; msg='이 가정에서 안전선 하회 없음. 최저 '+fmtEok(m.min)+' ('+fmtMD(m.minDt)+').'; }
+  if(CashSim.params.inv>0 && m.invSave>0 && (sev==='good'||sev==='warning'))
+    msg += ' 유치한 '+CashSim.params.inv+'억으로 팩토링을 상환하면 연 ~'+fmtEok(m.invSave)+' 이자가 사라지고, 그만큼 다음 시즌 상환 부담이 줄어드는 선순환이 시작됩니다.';
+  el.className='verdict sev-'+sev; tag.textContent=tt; tx.textContent=msg;
+}
+function csChips(res){
+  var el=document.getElementById('cs_chips'); el.textContent='';
+  if(csIsBase()) return;
+  var b=csBaseline(), m=res.metrics;
+  function chip(label,delta,fmt,invert){
+    if(delta===null||isNaN(delta)||Math.abs(delta)<1) return;
+    var worse=invert?delta>0:delta<0;
+    var d=document.createElement('span'); d.className='dchip';
+    d.appendChild(document.createTextNode(label+' '));
+    var bb=document.createElement('b'); bb.className=worse?'worse':'better';
+    bb.textContent=(delta>0?'▲ ':'▼ ')+fmt(Math.abs(delta));
+    d.appendChild(bb); el.appendChild(d);
+  }
+  chip('기준 대비 최저잔액', m.min-b.min, fmtEok, false);
+  chip('하회일수', m.breach-b.breach, function(v){return v+'일';}, true);
+  chip('정산유입', m.revDelta, fmtEok, false);
+  chip('연이자', m.intDelta, fmtEok, true);
+  chip('팩토링 수수료', m.factCost, fmtEok, true);
+  if(CashSim.params.inv>0 && m.invSave>0){
+    var d=document.createElement('span'); d.className='dchip';
+    d.appendChild(document.createTextNode('💰 투자금으로 팩토링 상환 시 이자 절감 '));
+    var bb=document.createElement('b'); bb.className='better'; bb.textContent='연 ~'+fmtEok(m.invSave);
+    d.appendChild(bb); el.appendChild(d);
+  }
+}
+/* 🎯 목표 역산 (Goal Seek): "최저 잔액 ≥ X억"을 만드는 레버별 최소 변경값 */
+document.getElementById('cs_solve').addEventListener('click', function(){
+  var out=document.getElementById('cs_goalOut'); out.textContent='';
+  var t=(parseFloat(document.getElementById('cs_goal').value)||0)*1e8;
+  if(!t||!D) return;
+  var p0=Object.assign({}, CashSim.params);
+  function minWith(k,v){ var p=Object.assign({},p0); p[k]=v; return cashSimulate(p).metrics.min; }
+  function chip(txt, apply){
+    var b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=txt;
+    if(apply){ b.style.borderColor='var(--s1)'; b.onclick=function(){ apply(); csSyncSliders(); csRequest(); }; }
+    else { b.disabled=true; b.style.opacity=.55; }
+    out.appendChild(b);
+  }
+  var cur=cashSimulate(p0).metrics.min;
+  if(cur!==null && cur>=t){ chip('✓ 현재 가정으로 이미 달성 ('+fmtEok(cur)+')', null); return; }
+  /* 오름 레버: 값을 올리면 최저잔액 상승 */
+  [ {k:'hiro', hi:100, name:function(v){return 'A본부 판매율 '+Math.ceil(v)+'%';}},
+    {k:'kids', hi:100, name:function(v){return 'B본부 판매율 '+Math.ceil(v)+'%';}},
+    {k:'fact', hi:50, name:function(v){return '팩토링 +'+Math.ceil(v)+'%p (비용 주의)';}} ]
+  .forEach(function(dv){
+    if(minWith(dv.k, dv.hi) < t){ chip(dv.name(dv.hi)+'로도 불가', null); return; }
+    var a=p0[dv.k], b=dv.hi;
+    for(var i=0;i<16;i++){ var m=(a+b)/2; if(minWith(dv.k,m)>=t) b=m; else a=m; }
+    var v=Math.ceil(b);
+    chip('👉 '+dv.name(v), function(){ CashSim.params[dv.k]=v; });
+  });
+  /* 내림 레버: 할인율 낮추면 상승 */
+  (function(){
+    if(minWith('disc',0) < t){ chip('할인율 0%로도 불가', null); return; }
+    var a=0, b=p0.disc;
+    for(var i=0;i<16;i++){ var m=(a+b)/2; if(minWith('disc',m)>=t) a=m; else b=m; }
+    var v=Math.floor(a);
+    chip('👉 할인율 '+v+'% 이하', function(){ CashSim.params.disc=v; });
+  })();
+  /* 지연: 이산값 */
+  (function(){
+    if(minWith('delay',15)>=t) chip('👉 지급 15일 지연 협의', function(){ CashSim.params.delay=15; });
+    else if(minWith('delay',30)>=t) chip('👉 지급 30일 지연 협의', function(){ CashSim.params.delay=30; });
+    else chip('지연 30일로도 불가', null);
+  })();
+  /* 투자/조달: 필요액 역산 (최저점 이전 유입, 검증 포함) */
+  (function(){
+    var m0=cashSimulate(p0).metrics;
+    if(m0.min===null||!m0.minDt) return;
+    var mm=(m0.minDt.getFullYear()-TODAY.getFullYear())*12 + (m0.minDt.getMonth()-TODAY.getMonth());
+    var invM=Math.max(1, Math.min(5, mm - (m0.minDt.getDate()<15 ? 1 : 0)));
+    var need=Math.ceil((t-m0.min)/1e8);
+    var ok=false;
+    for(var tries=0; tries<8 && need<=50; tries++){
+      var p=Object.assign({},p0,{inv:need, invM:invM});
+      if(cashSimulate(p).metrics.min>=t){ ok=true; break; }
+      need++;
+    }
+    if(ok) chip('👉 💰 투자/조달 '+need+'억 (+'+invM+'개월 내 유입)', function(){ CashSim.params.inv=need; CashSim.params.invM=invM; });
+    else chip('투자/조달로 불가 (최저점이 너무 가깝거나 50억 초과)', null);
+  })();
+});
+
+/* 타개 옵션: 안전선 갭 발생 시 레버별 필요량·비용 자동 계산 */
+function csRescue(res){
+  var card=document.getElementById('cs_rescue');
+  var m=res.metrics;
+  if(m.min===null || m.min>=res.safety){ card.hidden=true; return; }
+  card.hidden=false;
+  var gap=res.safety-m.min;
+  document.getElementById('cs_rescueTitle').textContent='🛟 갭 타개 옵션 — 최저점('+fmtMD(m.minDt)+')까지 '+fmtEok(gap)+' 부족';
+  var list=document.getElementById('cs_rescueList'); list.textContent='';
+  var p=CashSim.params;
+  var eff=((100-p.disc)/100)*(p.hiro/100)*0.97;
+  var tagNeed=eff>0? gap/eff : null;
+  /* ② 팩토링: 근사식 대신 시뮬레이션으로 실검증 (상환 재유출 포함) */
+  var factNeed=null, factBest=null;
+  for(var fp=Math.max(5,p.fact+5); fp<=50; fp+=5){
+    var fm=cashSimulate(Object.assign({},p,{fact:fp})).metrics;
+    if(factBest===null||fm.min>factBest) factBest=fm.min;
+    if(fm.min>=res.safety){ factNeed=fp; break; }
+  }
+  var d30=cashSimulate(Object.assign({},p,{delay:30}));
+  var imp=d30.metrics.min-m.min;
+  var evs=[
+    {sev:'warning',tag:'① 매출로',txt:'최저점 이전 입금되는 발매 정산 +'+fmtEok(gap)+' 필요 — 현재 가정(할인 '+p.disc+'%·판매율 '+p.hiro+'%) 기준 정가 '+fmtEok(tagNeed)+' 물량. 판매율·행사로도 동일 효과 (인텔리전스 탭의 이월재고 참고)'},
+    factNeed!==null
+      ?{sev:'warning',tag:'② 팩토링으로',txt:'팩토링 슬라이더 +'+factNeed+'%까지 올리면 해소 (시뮬 검증, 상환 재유출 반영) — 비용 발생 + 굴레 심화 주의'}
+      :{sev:'warning',tag:'② 팩토링으로',txt:'팩토링 +50%로도 부분 해소만 가능 (최저 '+fmtEok(factBest)+') — 다른 레버와 병행 필요'},
+    {sev:'warning',tag:'③ 지급협의로',txt:'생산대금 30일 지연 협의 시 최저잔액 '+(imp>=0?'+':'')+fmtEok(imp)+' 개선'+((m.min+imp>=res.safety)?' → 갭 해소':' (부분 해소)')+' — 위 팩토링 슬라이더로 직접 실험 가능'},
+    {sev:'warning',tag:'④ 투자/조달로',txt:'최저점('+fmtMD(m.minDt)+') 이전에 '+Math.ceil(gap/1e8)+'억 유입 시 갭 해소 — 유치금으로 팩토링(연 10.8%)을 상환하면 이자 절감 선순환. 위 💰 슬라이더로 시점·금액 실험'}
+  ].filter(Boolean);
+  evs.forEach(function(e){
+    var d2=document.createElement('div'); d2.className='ev sev-'+e.sev;
+    var t=document.createElement('span'); t.className='tag'; t.textContent=e.tag; d2.appendChild(t);
+    var sp=document.createElement('span'); sp.textContent=e.txt; d2.appendChild(sp);
+    list.appendChild(d2);
+  });
+}
+function csCompare(res){
+  var defs=[ ['최저 잔액',function(m){return fmtEok(m.min);}], ['최저일',function(m){return m.minDt?fmtMD(m.minDt):'–';}],
+    ['안전선 하회',function(m){return m.breach+'일';}], ['향후 정산유입',function(m){return fmtEok(m.revTotal);}],
+    ['기말 잔액',function(m){return fmtEok(m.endBal);}] ];
+  var cols=['지표','기준','현재'], sets=[csBaseline(),res.metrics];
+  var selName=document.getElementById('cs_savedSel').value;
+  if(selName && CashSim.saved[selName]){
+    cols.push(selName); sets.push(cashSimulate(CashSim.saved[selName]).metrics);
+  }
+  fillTable(document.getElementById('cs_tbCompare'), cols, defs.map(function(d){ return [d[0]].concat(sets.map(function(m){return d[1](m);})); }), null);
+}
+function csEvents(res){
+  var el=document.getElementById('cs_events'); el.textContent='';
+  var evs=[];
+  var h90=addM(TODAY,3);
+  D.loans.forEach(function(l){
+    if(l.due&&l.due>=TODAY&&l.due<=h90)
+      evs.push({sev:l.bal>=1e9?'serious':'warning',tag:'만기 D-'+Math.round((l.due-TODAY)/86400000),
+        txt:l.lender+' '+fmtEok(l.bal)+' ('+fmtMD(l.due)+') — 연장/상환 결정'});
+  });
+  res.path.forEach(function(r){
+    if(r.dt>D.lastActual.dt&&r.dt<=h90&&(r.out+Math.max(0,-r.d))>=5e8)
+      evs.push({sev:'info',tag:fmtMD(r.dt),txt:'대규모 지출일 — 유출 '+fmtEok(r.out+Math.max(0,-r.d))});
+  });
+  var lcS=0; D.lc.forEach(function(r){ if(r.dt>=TODAY&&r.dt<=h90) lcS+=r.krw; });
+  if(lcS>0) evs.push({sev:'info',tag:'LC',txt:'90일 내 LC 결제 '+fmtEok(lcS)});
+  if(!evs.length) evs.push({sev:'good',tag:'✓',txt:'90일 내 주의 이벤트 없음'});
+  evs.slice(0,8).forEach(function(e){
+    var d=document.createElement('div'); d.className='ev sev-'+e.sev;
+    var t=document.createElement('span'); t.className='tag'; t.textContent=e.tag; d.appendChild(t);
+    var p=document.createElement('span'); p.textContent=e.txt; d.appendChild(p);
+    el.appendChild(d);
+  });
+}
+function csRevTable(res){
+  var P=pal(), reg=TABS.cashsim.charts;
+  var fut=res.revSim.filter(function(x){return x.future;});
+  /* 차트: 가정이 바꾸는 금액 (차이가 없으면 예정 정산 타임라인) */
+  if(reg.rev){
+    var diffs=fut.map(function(x){ return { label:(x.r.div.replace('사업본부','')+' '+x.r.label).trim(), d:x.amtSim-x.r.amt, base:x.r.amt, payDt:x.r.payDt }; });
+    var anyDiff=diffs.some(function(x){ return Math.abs(x.d)>=1e5; });
+    var view = anyDiff
+      ? diffs.slice().sort(function(a,b){ return Math.abs(b.d)-Math.abs(a.d); }).slice(0,10)
+      : diffs.slice(0,10);
+    reg.rev.data.labels=view.map(function(x){ return x.label+' ('+fmtMD(x.payDt)+')'; });
+    reg.rev.data.datasets[0].label = anyDiff ? '기준 대비 변화' : '예정 정산액';
+    reg.rev.data.datasets[0].data = view.map(function(x){ return anyDiff ? x.d : x.base; });
+    reg.rev.data.datasets[0].backgroundColor = view.map(function(x){ return anyDiff ? (x.d>=0?P.s[3]:P.crit) : P.s[0]; });
+    reg.rev.update('none');
+    document.getElementById('cs_revSub').textContent = anyDiff
+      ? '기준 대비 차수별 정산 변화 상위 — 초록 = 늘어남 · 빨강 = 줄어듦'
+      : '지금은 기준 가정 그대로 — 슬라이더를 움직이면 차수별 변화가 여기 나타남 (아래는 예정 정산액)';
+  }
+  var rows=fut.map(function(x){
+    return [x.r.div.replace('사업본부','')+' '+x.r.label, fmtYMD(x.r.payDt), x.r.amt, x.amtSim, x.amtSim-x.r.amt];
+  });
+  var a=0,b=0; rows.forEach(function(r){a+=r[2];b+=r[3];});
+  rows.push(['합계','',a,b,b-a]);
+  fillTable(document.getElementById('cs_tbRev'),['발매','정산일','기준','시나리오','차이'],rows,[null,null,'won','won','won']);
+}
+/* 드릴다운 */
+function csOpenDrill(monthKey){
+  CashSim.drillKey=monthKey.replace('˟','').trim().slice(0,7);
+  document.getElementById('cs_drill').hidden=false;
+  csRenderDrill(CashSim.drillKey);
+  document.getElementById('cs_drill').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+document.getElementById('cs_drillClose').addEventListener('click',function(){
+  CashSim.drillKey=null; document.getElementById('cs_drill').hidden=true;
+});
+function csRenderDrill(key){
+  var P=pal(), reg=TABS.cashsim.charts;
+  var res=CashSim.lastRes; if(!res) return;
+  var rows=res.path.filter(function(r){return mLabel(r.dt)===key;});
+  if(!rows.length) return;
+  document.getElementById('cs_drillTitle').textContent=key+' 상세 — 일별 흐름과 유출 구성';
+  var labels=rows.map(function(r){return r.dt.getDate()+'';});
+  if(reg.drillD) reg.drillD.destroy();
+  reg.drillD=new Chart(document.getElementById('cs_cvDrillDaily').getContext('2d'),{
+    data:{labels:labels,datasets:[
+      dsBar(P,0,'유입',rows.map(function(r){return r.inn+Math.max(0,r.d);})),
+      dsBar(P,5,'유출',rows.map(function(r){return r.out+Math.max(0,-r.d);})),
+      dsLine(P,3,'잔액(시나리오)',rows.map(function(r){return r.sim;}),{pointRadius:0}) ]},
+    options:baseOpts(P,{maxX:16})
+  });
+  var cats=['경상비','지급수수료','광고비','상품','기타'];
+  var sums=cats.map(function(c){ return rows.reduce(function(a,r){return a+r.cat[c];},0); });
+  if(reg.drillO) reg.drillO.destroy();
+  var o=baseOpts(P,{stacked:true,legend:true}); o.indexAxis='y';
+  o.interaction={mode:'nearest',intersect:false};
+  o.scales={ x:{stacked:true,grid:{color:P.grid,drawTicks:false},border:{display:false},ticks:{color:P.muted,font:{size:11},callback:function(v){return fmtEok(v);},maxTicksLimit:6}},
+    y:{stacked:true,grid:{display:false},border:{color:P.axis},ticks:{color:P.ink2,font:{size:11.5}}} };
+  reg.drillO=new Chart(document.getElementById('cs_cvDrillOut').getContext('2d'),{
+    data:{labels:['유출 구성'],datasets:cats.map(function(c,i){return dsBar(P,i,c,[sums[i]]);})}, options:o });
+  var big=rows.filter(function(r){return r.inn>=1e7||r.out>=1e7;}).map(function(r){
+    return [fmtMD(r.dt)+(r.actual?'':' (추정)'), r.inn, r.out, r.cat.상품, r.cat.경상비, r.sim];
+  });
+  fillTable(document.getElementById('cs_tbDrill'),['일자','유입','유출','ㄴ상품','ㄴ경상비','잔액'],big,[null,'won','won','won','won','won']);
+}
+/* 시나리오 저장 (여러 개) */
+function csLoadSaved(){
+  try{ CashSim.saved=JSON.parse(localStorage.getItem('fundSim.scenarios')||'{}'); }catch(e){ CashSim.saved={}; }
+  var sel=document.getElementById('cs_savedSel');
+  sel.textContent='';
+  var o0=document.createElement('option'); o0.value=''; o0.textContent='저장 시나리오…'; sel.appendChild(o0);
+  Object.keys(CashSim.saved).forEach(function(k){
+    var o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o);
+  });
+}
+document.getElementById('cs_save').addEventListener('click',function(){
+  var base='시나리오 (할인'+CashSim.params.disc+'·히'+CashSim.params.hiro+'·키'+CashSim.params.kids+(CashSim.params.inv?'·투자'+CashSim.params.inv:'')+')';
+  var name=base, n=2;
+  while(CashSim.saved[name]){ name=base+' #'+n; n++; } /* 삭제 후 재저장 시 덮어쓰기 방지 */
+  CashSim.saved[name]=Object.assign({},CashSim.params);
+  try{ localStorage.setItem('fundSim.scenarios',JSON.stringify(CashSim.saved)); }catch(e){}
+  csLoadSaved(); document.getElementById('cs_savedSel').value=name; csRecalc();
+});
+document.getElementById('cs_del').addEventListener('click',function(){
+  var k=document.getElementById('cs_savedSel').value; if(!k) return;
+  delete CashSim.saved[k];
+  try{ localStorage.setItem('fundSim.scenarios',JSON.stringify(CashSim.saved)); }catch(e){}
+  csLoadSaved(); csRecalc();
+});
+document.getElementById('cs_savedSel').addEventListener('change',function(){
+  var k=this.value;
+  if(k&&CashSim.saved[k]){ CashSim.params=Object.assign({},CashSim.saved[k]); csSyncSliders(); }
+  csRecalc();
+});
+var CS_SLIDERS = [['css_disc','disc','csv_disc','%'],['css_hiro','hiro','csv_hiro','%'],['css_kids','kids','csv_kids','%'],
+ ['css_rate','rate','csv_rate','%p'],['css_fact','fact','csv_fact','%'],['css_delay','delay','csv_delay','일'],
+ ['css_inv','inv','csv_inv','억'],['css_invM','invM','csv_invM','개월']];
+function csSliderLabel(k,v,suf){ return (k==='rate'||k==='fact'||k==='invM'?(v>=0?'+':''):'')+v+suf; }
+function csSyncSliders(){
+  var p=CashSim.params;
+  CS_SLIDERS.forEach(function(c){
+    document.getElementById(c[0]).value=p[c[1]];
+    document.getElementById(c[2]).textContent=csSliderLabel(c[1], p[c[1]], c[3]);
+  });
+}
+CS_SLIDERS.forEach(function(c){
+  document.getElementById(c[0]).addEventListener('input',function(e){
+    CashSim.params[c[1]]=parseFloat(e.target.value);
+    document.getElementById(c[2]).textContent=csSliderLabel(c[1], CashSim.params[c[1]], c[3]);
+    csRequest();
+  });
+});
+document.querySelectorAll('[data-cspreset]').forEach(function(b){
+  b.addEventListener('click',function(){ CashSim.params=Object.assign({},CS_PRESETS[b.getAttribute('data-cspreset')]); csSyncSliders(); csRequest(); });
+});
+document.getElementById('cs_reset').addEventListener('click',function(){ CashSim.params=Object.assign({},CS_BASE); csSyncSliders(); csRequest(); });
+document.getElementById('cs_safety').addEventListener('input',function(){
+  try{ localStorage.setItem('fundSim.safety',this.value); }catch(e){}
+  CashSim.baseMetrics=null; csRequest();
+});
+document.querySelectorAll('[data-csrange]').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('[data-csrange]').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active'); CashSim.range=b.getAttribute('data-csrange'); csRequest();
+  });
+});
+document.querySelectorAll('[data-csgran]').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('[data-csgran]').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active'); CashSim.gran=b.getAttribute('data-csgran'); csRequest();
+  });
+});
+
+/* ═══════════════ 탭 3: 손익 시뮬레이터 ═══════════════ */
+var PLSim = { params:Object.assign({},PL_BASE), view:'전사', period:'y' };
+function plIsBase(){ var p=PLSim.params; return Object.keys(PL_BASE).every(function(k){return p[k]===PL_BASE[k];}); }
+function plMonths(){ return PLSim.period==='h1'?[0,1,2,3,4,5]:PLSim.period==='h2'?[6,7,8,9,10,11]:[0,1,2,3,4,5,6,7,8,9,10,11]; }
+
+function buildPLSim(){
+  var P=pal(), reg=TABS.plsim.charts;
+  wireToggles(document.getElementById('tab-plsim'));
+  var vs=covViews();
+  var wrap=document.getElementById('pl_views'); wrap.textContent='';
+  if(!vs.length){
+    document.getElementById('pl_verdict').querySelector('.v-text').textContent='커버리지PL 데이터가 아직 없습니다 — 대시보드 새로고침(동기화)을 한 번 실행해 주세요.';
+    return;
+  }
+  if(vs.indexOf(PLSim.view)<0) PLSim.view=vs[0];
+  vs.forEach(function(v){
+    var b=document.createElement('button'); b.type='button'; b.className='chip'+(v===PLSim.view?' active':''); b.textContent=v;
+    b.addEventListener('click',function(){
+      PLSim.view=v;
+      wrap.querySelectorAll('.chip').forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active'); plRecalc();
+    });
+    wrap.appendChild(b);
+  });
+  reg.wf=new Chart(document.getElementById('pl_cvWF').getContext('2d'),{
+    type:'bar', data:{labels:[],datasets:[{label:'_wf',data:[],backgroundColor:[],maxBarThickness:34,borderRadius:4,borderSkipped:false,borderColor:P.surface,borderWidth:1}]},
+    options:(function(){ var o=baseOpts(P,{legend:false});
+      o.plugins.tooltip.callbacks.label=function(ctx){ var v=ctx.raw; var d=v[1]-v[0]; return ' '+fmtWon(d); };
+      o.plugins.tooltip.callbacks.footer=function(items){
+        var lbl=items[0]&&items[0].label;
+        return PL_SUBITEMS[lbl] ? '클릭하면 계정별 분해' : '';
+      };
+      o.onClick=function(ev,els,chart){ if(els.length) openPLDetail(chart.data.labels[els[0].index]); };
+      return o; })()
+  });
+  document.getElementById('pl_cvWF').classList.add('clickable-hint');
+  reg.op=new Chart(document.getElementById('pl_cvOP').getContext('2d'),{
+    data:{labels:[],datasets:[
+      dsBar(P,0,'영업이익(시나리오)',[]),
+      dsLine(P,3,'기준',[],{borderDash:[5,4],borderWidth:1.5,pointRadius:0}) ]},
+    options:baseOpts(P)
+  });
+  reg.views=new Chart(document.getElementById('pl_cvViews').getContext('2d'),{
+    data:{ labels:[], datasets:[
+      { type:'bar', label:'기준', data:[], backgroundColor:hexA(P.muted,.45), maxBarThickness:20, borderRadius:4, borderSkipped:'start', borderColor:P.surface, borderWidth:1 },
+      { type:'bar', label:'시나리오', data:[], backgroundColor:P.s[0], maxBarThickness:20, borderRadius:4, borderSkipped:'start', borderColor:P.surface, borderWidth:1 } ]},
+    options:baseOpts(P)
+  });
+  reg.cov=new Chart(document.getElementById('pl_cvCov').getContext('2d'),{
+    data:{labels:[],datasets:[ dsLine(P,0,'커버리지(공헌이익÷고정성비용)',[],{pointRadius:3}) ]},
+    options:(function(){ var o=baseOpts(P,{mult:true,legend:false});
+      o.plugins.annotation={annotations:{one:{type:'line',yMin:1,yMax:1,borderColor:pal().crit,borderWidth:1,borderDash:[3,3],
+        label:{display:true,content:'1.0배 = 손익분기',position:'start',backgroundColor:'transparent',color:pal().crit,font:{size:10}}}}};
+      return o; })()
+  });
+  plSyncSliders(); plRecalc();
+}
+var plRaf=false;
+function plRequest(){ if(plRaf) return; plRaf=true; requestAnimationFrame(function(){ plRaf=false; plRecalc(); }); }
+
+function plRecalc(){
+  var reg=TABS.plsim.charts; if(!reg.wf) return;
+  var P=pal();
+  var sim=plSimulate(PLSim.view, PLSim.params); if(!sim) return;
+  var base=plSimulate(PLSim.view, PL_BASE);
+  var months=plMonths();
+  var a=plAgg(sim,months), ab=plAgg(base,months);
+
+  /* 워터폴: 매출 → −원가 → −변동비 → 공헌이익 → −고정 → −준고정 → −Dep → 영업이익 */
+  var steps=[ ['매출',a.s,'pos'], ['매출원가',-a.c,'neg'], ['변동비',-a.v,'neg'], ['공헌이익',a.cm,'sub'],
+    ['고정비',-a.f,'neg'], ['준고정비',-a.sg,'neg'], ['감가상각',-a.dp,'neg'], ['영업이익',a.op,'tot'] ];
+  var run=0, bars=[], colors=[];
+  steps.forEach(function(s){
+    if(s[2]==='sub'||s[2]==='tot'){ bars.push([0,s[1]]); colors.push(s[2]==='tot'?(s[1]>=0?P.s[3]:P.crit):P.s[0]); run=s[1]; }
+    else if(s[2]==='pos'){ bars.push([0,s[1]]); colors.push(P.s[0]); run=s[1]; }
+    else { bars.push([run+s[1],run]); colors.push(P.s[5]); run=run+s[1]; }
+  });
+  reg.wf.data.labels=steps.map(function(s){return s[0];});
+  reg.wf.data.datasets[0].data=bars;
+  reg.wf.data.datasets[0].backgroundColor=colors;
+  reg.wf.update('none');
+  document.getElementById('pl_wfSub').textContent=(PLSim.period==='y'?'연간':PLSim.period==='h1'?'상반기':'하반기')+' 합계 · '+PLSim.view+' · 시나리오 반영';
+
+  var labels=months.map(function(i){return (i+1)+'월'+(i>=6?'˟':'');});
+  reg.op.data.labels=labels;
+  reg.op.data.datasets[0].data=months.map(function(i){return sim.months[i].op;});
+  reg.op.data.datasets[1].data=months.map(function(i){return base.months[i].op;});
+  reg.op.update('none');
+  fillTable(document.getElementById('pl_tbOP'),['월','기준','시나리오','차이'],
+    months.map(function(i){return [(i+1)+'월',base.months[i].op,sim.months[i].op,sim.months[i].op-base.months[i].op];}),[null,'won','won','won']);
+
+  reg.cov.data.labels=labels;
+  reg.cov.data.datasets[0].data=months.map(function(i){var m=sim.months[i];return m.cov===null?null:Math.round(m.cov*100)/100;});
+  reg.cov.update('none');
+
+  /* KPI */
+  var el=document.getElementById('pl_kpis'); el.textContent='';
+  function tile(label,value,sub,cls){
+    var k=document.createElement('div'); k.className='kpi';
+    var l=document.createElement('div'); l.className='k-label'; l.textContent=label;
+    var v=document.createElement('div'); v.className='k-value'; v.textContent=value;
+    k.appendChild(l); k.appendChild(v);
+    if(sub){ var s=document.createElement('div'); s.className='k-sub'+(cls?' '+cls:''); s.textContent=sub; k.appendChild(s); }
+    el.appendChild(k);
+  }
+  var dOp=a.op-ab.op;
+  tile('영업이익 ('+(PLSim.period==='y'?'연간':PLSim.period==='h1'?'상반기':'하반기')+')', fmtEok(a.op),
+    (dOp>=0?'▲ ':'▼ ')+fmtEok(Math.abs(dOp))+' vs 기준', dOp>=0?'up':'down');
+  tile('공헌이익', fmtEok(a.cm), '공헌이익률 '+fmtPct(a.s?a.cm/a.s:null));
+  tile('커버리지', a.cov?Math.round(a.cov*100)/100+'배':'–', '공헌이익 ÷ 고정성비용 '+fmtEok(a.fixedAll));
+  tile('손익분기 매출 (월평균)', a.bep?fmtEok(a.bep/months.length):'–', '안전마진 '+fmtPct(a.s?(a.s-a.bep)/a.s:null));
+
+  /* 판정 */
+  var lossM=months.filter(function(i){return sim.months[i].op<0;}).map(function(i){return (i+1)+'월';});
+  var vEl=document.getElementById('pl_verdict');
+  var sev = a.op<0?'critical' : lossM.length>=4?'serious' : lossM.length>=1?'warning':'good';
+  var tt={critical:'⚠ 위험',serious:'⚠ 경고',warning:'△ 주의',good:'✓ 안정'}[sev];
+  var msg = PLSim.view+' 기준 영업이익 '+fmtEok(a.op)+' (기준 대비 '+(dOp>=0?'+':'')+fmtEok(dOp)+')';
+  msg += lossM.length ? ' — 적자 달: '+lossM.join('·')+'. 커버리지 1.0배 미만 달은 공헌이익으로 고정비를 못 덮습니다.' : ' — 전 기간 흑자.';
+  vEl.className='verdict sev-'+sev;
+  vEl.querySelector('.v-tag').textContent=tt;
+  vEl.querySelector('.v-text').textContent=msg;
+
+  /* 델타 칩 */
+  var ch=document.getElementById('pl_chips'); ch.textContent='';
+  if(!plIsBase()){
+    var badge=document.createElement('span'); badge.className='sim-badge'; badge.textContent='시뮬레이션 중 — 기준값 아님'; ch.appendChild(badge);
+    [['영업이익',dOp,false],['공헌이익',a.cm-ab.cm,false]].forEach(function(cc){
+      if(Math.abs(cc[1])<1) return;
+      var d=document.createElement('span'); d.className='dchip';
+      d.appendChild(document.createTextNode(cc[0]+' '));
+      var bb=document.createElement('b'); bb.className=(cc[1]<0)?'worse':'better';
+      bb.textContent=(cc[1]>0?'▲ ':'▼ ')+fmtEok(Math.abs(cc[1]));
+      d.appendChild(bb); ch.appendChild(d);
+    });
+  }
+
+  /* 관점 비교: 차트(영업이익 기준 vs 시나리오) + 표(상세) */
+  var vLabels=[], vBase=[], vSim=[];
+  var rows=covViews().map(function(v){
+    var s=plSimulate(v, PLSim.params); if(!s) return null;
+    var b2=plSimulate(v, PL_BASE);
+    var ag=plAgg(s,months), agb=plAgg(b2,months);
+    if(v!=='전사'){ vLabels.push(v); vBase.push(agb.op); vSim.push(ag.op); }
+    return [v, ag.s, ag.cm, fmtPct(ag.s?ag.cm/ag.s:null), ag.cov?Math.round(ag.cov*100)/100+'배':'–', ag.op];
+  }).filter(Boolean);
+  if(reg.views){
+    reg.views.data.labels=vLabels;
+    reg.views.data.datasets[0].data=vBase;
+    reg.views.data.datasets[1].data=vSim;
+    reg.views.update('none');
+  }
+  fillTable(document.getElementById('pl_tbViews'),['관점','매출','공헌이익','공헌이익률','커버리지','영업이익'],rows,[null,'won','won',null,null,'won']);
+}
+function plSyncSliders(){
+  var p=PLSim.params;
+  [['pls_sales','sales','plv_sales','%'],['pls_cogs','cogs','plv_cogs','%p'],['pls_var','vr','plv_var','%p'],
+   ['pls_fix','fix','plv_fix','%'],['pls_semi','semi','plv_semi','%']].forEach(function(c){
+    document.getElementById(c[0]).value=p[c[1]];
+    document.getElementById(c[2]).textContent=(p[c[1]]>=0?'+':'')+p[c[1]]+c[3];
+  });
+}
+[['pls_sales','sales','plv_sales','%'],['pls_cogs','cogs','plv_cogs','%p'],['pls_var','vr','plv_var','%p'],
+ ['pls_fix','fix','plv_fix','%'],['pls_semi','semi','plv_semi','%']].forEach(function(c){
+  document.getElementById(c[0]).addEventListener('input',function(e){
+    PLSim.params[c[1]]=parseFloat(e.target.value);
+    document.getElementById(c[2]).textContent=(PLSim.params[c[1]]>=0?'+':'')+PLSim.params[c[1]]+c[3];
+    plRequest();
+  });
+});
+document.querySelectorAll('[data-plperiod]').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('[data-plperiod]').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active'); PLSim.period=b.getAttribute('data-plperiod'); plRequest();
+  });
+});
+document.getElementById('pl_reset').addEventListener('click',function(){ PLSim.params=Object.assign({},PL_BASE); plSyncSliders(); plRequest(); });
+document.getElementById('in_chgBtn').addEventListener('click', function(){ if(D) maybeChangePopup(true); });
+document.querySelectorAll('[data-inrange]').forEach(function(b){
+  b.addEventListener('click',function(){
+    if(!D) return;
+    document.querySelectorAll('[data-inrange]').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active'); Intel.range=b.getAttribute('data-inrange');
+    destroyCharts(TABS.intel.charts); buildIntel(); TABS.intel.built=true;
+  });
+});
+
+/* ═══════════════ 예측 변경 사유 입력 팝업 ═══════════════ */
+var CHG_SERIES = { '정산':'발매 정산', '생산현금':'생산대금(현금)', '생산팩토링':'팩토링실행', '월유입':'월 유입', '월유출':'월 유출', '월말잔액':'월말 잔액', '대형유통입금':'대형유통 입금', '최저잔액':'최저 잔액' };
+var CHG_DEPTS = ['A사업본부','B사업본부','C사업본부','재무팀','기타','미상'];
+function chgDesc(r){
+  var s = CHG_SERIES[r['시리즈']] || r['시리즈'];
+  var item = String(r['항목']||'').split('|').join(' ').trim();
+  var t = r['변경유형'];
+  if(t==='일정이동') return s+' · '+item+' — 일정 '+r['변경전']+' → '+r['변경후'];
+  var d = nz(r['차이']);
+  var body = s+' · '+item+' — '+ (t==='신규'?'신규 ':'') + (t==='삭제'?'삭제 (기존 '+fmtEok(nz(r['변경전']))+')' :
+    fmtEok(nz(r['변경전']))+' → '+fmtEok(nz(r['변경후']))+' ('+(d>=0?'+':'')+fmtEok(d)+')');
+  return body;
+}
+function maybeChangePopup(force){
+  if(!D || !D.changeLog.length) return;
+  var pend = D.changeLog.filter(function(r){ return r['상태']==='미입력'; });
+  if(!pend.length) return;
+  var maxId = pend.map(function(r){ return String(r['변경ID']); }).sort().slice(-1)[0];
+  if(!force){ try{ if(localStorage.getItem('fundChange.dismissed')===maxId) return; }catch(e){} }
+  var show = pend.slice(-12);
+  openModal('📋 예측 변경 감지 — 사유를 남겨주세요',
+    '동기화에서 예측 변경 '+pend.length+'건이 감지됐습니다. 사유·담당을 기록하면 변경 이력 인사이트에 연결됩니다. (모르면 비워두고 나중에 입력 가능)',
+    null,
+    function(body){
+      var refs=[];
+      /* 일괄 적용 행 */
+      var bulk=document.createElement('div'); bulk.className='ev sev-info'; bulk.style.flexWrap='wrap';
+      var bi=document.createElement('input'); bi.type='text'; bi.placeholder='일괄 사유 (예: 판매율 하향 반영)'; bi.className='num-in'; bi.style.width='260px';
+      var bs=document.createElement('select'); bs.className='num-in';
+      CHG_DEPTS.forEach(function(dp){ var o=document.createElement('option'); o.value=dp; o.textContent=dp; bs.appendChild(o); });
+      var bb=document.createElement('button'); bb.type='button'; bb.className='chip'; bb.textContent='전체 적용';
+      bb.onclick=function(){ refs.forEach(function(rf){ if(!rf.reason.value) rf.reason.value=bi.value; rf.dept.value=bs.value; }); };
+      bulk.appendChild(bi); bulk.appendChild(bs); bulk.appendChild(bb);
+      body.appendChild(bulk);
+      /* 항목별 행 */
+      show.forEach(function(r){
+        var ev=document.createElement('div'); ev.className='ev sev-'+(r['변경유형']==='일정이동'?'warning':'serious'); ev.style.flexWrap='wrap';
+        var tag=document.createElement('span'); tag.className='tag'; tag.textContent=r['변경유형']; ev.appendChild(tag);
+        var p=document.createElement('span'); p.style.flex='1 1 100%'; p.textContent=chgDesc(r); ev.appendChild(p);
+        var ri=document.createElement('input'); ri.type='text'; ri.placeholder='사유'; ri.className='num-in'; ri.style.width='240px'; ev.appendChild(ri);
+        var rs=document.createElement('select'); rs.className='num-in';
+        CHG_DEPTS.forEach(function(dp){ var o=document.createElement('option'); o.value=dp; o.textContent=dp; rs.appendChild(o); });
+        ev.appendChild(rs);
+        refs.push({ id:String(r['변경ID']), reason:ri, dept:rs, row:r });
+        body.appendChild(ev);
+      });
+      /* 버튼 행 */
+      var btns=document.createElement('div'); btns.style.cssText='display:flex; gap:8px; margin-top:10px; justify-content:flex-end';
+      var later=document.createElement('button'); later.type='button'; later.className='chip'; later.textContent='나중에';
+      later.onclick=function(){ try{ localStorage.setItem('fundChange.dismissed', maxId); }catch(e){} closeModal(); };
+      var save=document.createElement('button'); save.type='button'; save.className='chip'; save.style.borderColor='var(--s1)'; save.textContent='저장';
+      save.onclick=function(){
+        var payload=refs.filter(function(rf){ return rf.reason.value.trim(); })
+          .map(function(rf){ return { id:rf.id, reason:rf.reason.value.trim(), dept:rf.dept.value }; });
+        if(!payload.length){ later.onclick(); return; }
+        save.disabled=true; save.textContent='저장 중…';
+        function done(){
+          payload.forEach(function(e){
+            var row=D.changeLog.filter(function(r){ return String(r['변경ID'])===e.id; })[0];
+            if(row){ row['사유']=e.reason; row['담당본부']=e.dept; row['상태']='입력완료'; }
+          });
+          try{ localStorage.setItem('fundChange.dismissed', maxId); }catch(e){}
+          closeModal();
+          if(TABS.intel.built){ destroyCharts(TABS.intel.charts); buildIntel(); }
+        }
+        if(IS_LOCAL){ setTimeout(done, 300); return; }
+        google.script.run.withSuccessHandler(done)
+          .withFailureHandler(function(err){ save.disabled=false; save.textContent='저장 (재시도)'; alert('저장 실패: '+(err&&err.message?err.message:err)); })
+          .saveChangeReasons(JSON.stringify(payload));
+      };
+      btns.appendChild(later); btns.appendChild(save);
+      body.appendChild(btns);
+    });
+}
+
+/* ═══════════════ 탭 5: 인텔리전스 ═══════════════ */
+var Intel = { range:'all' };
+function inMonthsFilter(m){ /* 'yyyy/MM' 문자열 */
+  if(Intel.range!=='12m') return true;
+  var mo=pMonth(m); if(!mo) return false;
+  var cutoff=addM(TODAY,-12);
+  return new Date(mo.y, mo.m-1, 1) >= new Date(cutoff.getFullYear(), cutoff.getMonth(), 1);
+}
+function buildIntel(){
+  var P=pal(), reg=TABS.intel.charts;
+  wireToggles(document.getElementById('tab-intel'));
+
+  /* 운전자본 사이클: 총유입 vs 상품대금 유출 + 시차 상관 */
+  (function(){
+    var mc=D.monthlyCash.filter(function(r){ return inMonthsFilter(r['월']); });
+    if(!mc.length) return;
+    var labels=mc.map(function(r){ return r['월']+(r['구분']==='실적'?'':'˟'); });
+    var inn=mc.map(function(r){ return nz(r['유입계']); });
+    var goods=mc.map(function(r){ return nz(r['상품']); });
+    reg.cycle=new Chart(document.getElementById('in_cvCycle').getContext('2d'),{
+      data:{labels:labels,datasets:[
+        dsBar(P,0,'총 현금유입',inn),
+        dsBar(P,5,'상품대금 유출',goods),
+        dsLine(P,3,'차액(유입−상품)',mc.map(function(r,i){return inn[i]-goods[i];}),{pointRadius:2}) ]},
+      options:baseOpts(P,{maxX:13,crosshair:true}), plugins:[crosshair]
+    });
+    fillTable(document.getElementById('in_tbCycle'),['월','총유입','상품대금 유출','차액'],
+      mc.map(function(r,i){ return [r['월'], inn[i], goods[i], inn[i]-goods[i]]; }),[null,'won','won','won']);
+    /* 시차 상관 (실적월만): 상품유출[t] vs 유입[t+k] */
+    var act=D.monthlyCash.filter(function(r){ return r['구분']==='실적'; });
+    var gx=act.map(function(r){ return nz(r['상품']); });
+    var iy=act.map(function(r){ return nz(r['유입계']); });
+    function pear(xs,ys){ var nn=xs.length; if(nn<8) return null;
+      var mx=0,my=0; xs.forEach(function(v){mx+=v;}); ys.forEach(function(v){my+=v;}); mx/=nn; my/=nn;
+      var num=0,dx=0,dy=0;
+      for(var i=0;i<nn;i++){ num+=(xs[i]-mx)*(ys[i]-my); dx+=(xs[i]-mx)*(xs[i]-mx); dy+=(ys[i]-my)*(ys[i]-my); }
+      return (dx&&dy)? num/Math.sqrt(dx*dy) : null; }
+    var parts=[];
+    for(var k=0;k<=3;k++){
+      var r=pear(gx.slice(0,gx.length-k), iy.slice(k));
+      if(r!==null) parts.push('+'+k+'개월 r='+(Math.round(r*100)/100));
+    }
+    document.getElementById('in_cycleSub').textContent =
+      '상품대금 지출 → k개월 뒤 유입 상관 (실적 '+act.length+'개월): '+parts.join(' · ')+' — 옷값을 쓴 만큼 몇 달 뒤 매출로 돌아오는 구조인지 확인';
+  })();
+  var vEl=document.getElementById('in_verdict');
+  if(!D.insBrand.length){
+    vEl.querySelector('.v-text').textContent='인사이트 데이터(INS_ 탭)가 아직 없습니다 — 로컬 분석 엔진 실행 후 채워집니다.';
+    return;
+  }
+  vEl.className='verdict sev-info';
+  vEl.querySelector('.v-tag').textContent='🧭 데이터 결론';
+  vEl.querySelector('.v-text').textContent =
+    (D.insMeta.adCorr_verdict||'') + ' · 발매일 매출은 평시의 ' + String(D.insMeta.drop_lift||'').replace(/^.*평시의 /,'') + ' — 현금 확보의 레버는 광고 증액보다 발매 일정·판매율·행사 기획.';
+
+  /* 팩트 칩 */
+  var facts=document.getElementById('in_facts'); facts.textContent='';
+  [ ['info','기간', D.insMeta.data_range||''],
+    ['warning','주의', D.insMeta.ad_outlier||''] ].forEach(function(f){
+    if(!f[2]) return;
+    var div=document.createElement('div'); div.className='insight sev-'+f[0];
+    var tag=document.createElement('span'); tag.className='tag'; tag.textContent='ⓘ '+f[1]; div.appendChild(tag);
+    var p=document.createElement('p'); p.textContent=f[2]; div.appendChild(p);
+    facts.appendChild(div);
+  });
+
+  /* 카드1: 브랜드별 월 매출 */
+  var months=[], brands={}, totals={};
+  D.insBrand.filter(function(r){ return inMonthsFilter(r['월']); }).forEach(function(r){
+    var m=r['월'], b=r['브랜드']||'기타', v=nz(r['매출']);
+    if(months.indexOf(m)<0) months.push(m);
+    (brands[b]=brands[b]||{})[m]=v;
+    totals[b]=(totals[b]||0)+v;
+  });
+  months.sort();
+  var top=Object.keys(totals).sort(function(a,b){return totals[b]-totals[a];});
+  var main=top.slice(0,5), rest=top.slice(5);
+  var ds=main.map(function(b,i){ return dsLine(P,i,b,months.map(function(m){return brands[b][m]!==undefined?brands[b][m]:null;})); });
+  if(rest.length){
+    ds.push(dsLine(P,5,'기타',months.map(function(m){
+      var s=0,has=false; rest.forEach(function(b){ if(brands[b][m]!==undefined){s+=brands[b][m];has=true;} });
+      return has?s:null;
+    })));
+  }
+  reg.brand=new Chart(document.getElementById('in_cvBrand').getContext('2d'),{
+    data:{labels:months.map(function(m){return m.slice(2);}),datasets:ds},
+    options:baseOpts(P,{crosshair:true,maxX:12}), plugins:[crosshair]
+  });
+  fillTable(document.getElementById('in_tbBrand'),['월'].concat(main.concat(rest.length?['기타']:[])),
+    months.map(function(m,i){ return [m].concat(ds.map(function(d){return d.data[i];})); }),
+    [null].concat(ds.map(function(){return 'won';})));
+
+  /* 카드2: 광고비율 */
+  var adM=D.insAd.filter(function(r){ return inMonthsFilter(r['월']); }).map(function(r){ return {m:r['월'], ad:nz(r['광고비']), s:nz(r['매출'])}; });
+  reg.ad=new Chart(document.getElementById('in_cvAd').getContext('2d'),{
+    data:{labels:adM.map(function(r){return r.m.slice(2);}),datasets:[
+      dsLine(P,2,'광고비 ÷ 매출',adM.map(function(r){return r.s? r.ad/r.s : null;}),{pointRadius:2}) ]},
+    options:baseOpts(P,{pct:true,legend:false,crosshair:true,maxX:12}), plugins:[crosshair]
+  });
+  fillTable(document.getElementById('in_tbAd'),['월','광고비','매출','비율'],
+    adM.map(function(r){return [r.m, r.ad, r.s, r.s?fmtPct(r.ad/r.s):'–'];}),[null,'won','won',null]);
+
+  /* 카드3: 이월재고 (연도별×본부 기말금액) */
+  var byYear={}, bus=[];
+  D.insSeason.forEach(function(r){
+    var y=String(r['품번연도']), bu=r['본부'];
+    if(!/^\d\d$/.test(y)||!bu||bu==='(미지정)') return;
+    (byYear[y]=byYear[y]||{})[bu]=(byYear[y][bu]||0)+nz(r['기말금액']);
+    if(bus.indexOf(bu)<0) bus.push(bu);
+  });
+  bus.sort();
+  var years=Object.keys(byYear).sort();
+  var o=baseOpts(P,{stacked:true}); o.indexAxis='y';
+  o.interaction={mode:'nearest',intersect:false};
+  o.scales={ x:{stacked:true,grid:{color:P.grid,drawTicks:false},border:{display:false},ticks:{color:P.muted,font:{size:11},callback:function(v){return fmtEok(v);},maxTicksLimit:6}},
+    y:{stacked:true,grid:{display:false},border:{color:P.axis},ticks:{color:P.ink2,font:{size:11.5}}} };
+  reg.carry=new Chart(document.getElementById('in_cvCarry').getContext('2d'),{
+    data:{labels:years.map(function(y){return '20'+y+'년 상품';}),
+      datasets:bus.map(function(bu,i){ return dsBar(P,i,bu,years.map(function(y){return byYear[y][bu]||0;})); })},
+    options:o
+  });
+  fillTable(document.getElementById('in_tbCarry'),['연도'].concat(bus),
+    years.map(function(y){ return ['20'+y].concat(bus.map(function(bu){return byYear[y][bu]||0;})); }),
+    [null].concat(bus.map(function(){return 'won';})));
+
+  /* 카드4: 26시즌 소진율 + 행사 후보 */
+  var sell=[];
+  D.insSeason.forEach(function(r){
+    if(String(r['품번연도'])!=='26'||!r['본부']||r['본부']==='(미지정)') return;
+    var sold=nz(r['판매수량']), end=nz(r['기말수량']);
+    if(sold+end>0) sell.push([r['본부'], sold/(sold+end)]);
+  });
+  sell.sort(function(a,b){return a[1]-b[1];});
+  var o2=baseOpts(P,{pct:true,legend:false}); o2.indexAxis='y';
+  o2.scales={ x:{grid:{color:P.grid,drawTicks:false},border:{display:false},ticks:{color:P.muted,font:{size:11},callback:function(v){return fmtPct(v);},maxTicksLimit:6},max:1},
+    y:{grid:{display:false},border:{color:P.axis},ticks:{color:P.ink2,font:{size:11.5}}} };
+  o2.interaction={mode:'nearest',intersect:false};
+  reg.sell=new Chart(document.getElementById('in_cvSell').getContext('2d'),{
+    data:{labels:sell.map(function(s){return s[0];}),datasets:[dsBar(P,0,'소진율',sell.map(function(s){return s[1];}))]},
+    options:o2
+  });
+
+  /* 정산 예측 vs 실제 */
+  (function(){
+    var st=D.settle||[];
+    var el=document.getElementById('in_tbSettle');
+    var sub=document.getElementById('in_settleSub');
+    if(!st.length){
+      sub.textContent='정산추적 데이터가 아직 없습니다 — 다음 동기화(새로고침) 때 자동 생성됩니다.';
+      el.textContent=''; return;
+    }
+    var done=st.filter(function(r){ return r['상태']==='완료'; });
+    if(done.length){
+      var sf=0,sa=0; done.forEach(function(r){ sf+=nz(r['예상정산']); sa+=nz(r['실제입금(당일PG배분)']); });
+      var rate=sf? Math.round(sa/sf*1000)/10 : null;
+      sub.textContent='완료 '+done.length+'건 · 종합 달성률 '+(rate!==null?rate+'%':'–')+' — 이 수치가 쌓일수록 시뮬레이터의 판매율 기준 가정을 데이터로 보정할 수 있습니다';
+    } else {
+      var next=st.filter(function(r){ return r['상태']==='예정'; })[0];
+      sub.textContent='아직 완료된 정산이 없습니다 — 첫 자동 채점: '+(next?next['정산일자']:'다음 정산일')+' 이후. 예측 스냅샷은 오늘부터 적재 중';
+    }
+    fillTable(el, ['본부','차수','정산일','예상 정산','실제 입금','달성률'],
+      st.map(function(r){
+        return [ String(r['본부']||'').replace('사업본부',''), r['발매차수'], String(r['정산일자']||'').slice(0,10),
+          nz(r['예상정산']), r['상태']==='완료'? nz(r['실제입금(당일PG배분)']) : null,
+          r['상태']==='완료'? (r['달성률%']+'%') : '예정' ];
+      }), [null,null,null,'won','won',null]);
+    /* 차트: 완료건 최근 + 다가올 정산 (예상 = 회색점선 느낌의 무채색, 실제 = 파랑) */
+    var show = done.slice(-4).concat(st.filter(function(r){ return r['상태']==='예정'; }).slice(0,8));
+    reg.settle=new Chart(document.getElementById('in_cvSettle').getContext('2d'),{
+      data:{ labels: show.map(function(r){ return String(r['본부']||'').replace('사업본부','')+' '+r['발매차수']+' ('+String(r['정산일자']||'').slice(5,10).replace('-','/')+')'; }),
+        datasets:[
+          { type:'bar', label:'예상', data:show.map(function(r){ return nz(r['예상정산']); }),
+            backgroundColor:hexA(P.muted,.45), maxBarThickness:14, borderRadius:4, borderSkipped:'start', borderColor:P.surface, borderWidth:1 },
+          { type:'bar', label:'실제', data:show.map(function(r){ return r['상태']==='완료'? nz(r['실제입금(당일PG배분)']) : null; }),
+            backgroundColor:P.s[0], maxBarThickness:14, borderRadius:4, borderSkipped:'start', borderColor:P.surface, borderWidth:1 } ]},
+      options:baseOpts(P,{maxX:12})
+    });
+  })();
+
+  /* 예측 변경 이력 카드 */
+  (function(){
+    var list=document.getElementById('in_chgList'); if(!list) return;
+    list.textContent='';
+    var head=document.getElementById('in_chgHead'); head.textContent='';
+    function chip(sev, tag, txt){
+      var div=document.createElement('div'); div.className='insight sev-'+sev;
+      var t=document.createElement('span'); t.className='tag'; t.textContent=tag; div.appendChild(t);
+      var p=document.createElement('p'); p.textContent=txt; div.appendChild(p);
+      head.appendChild(div);
+    }
+    /* 헤드라인: 스냅샷 2개 비교 (최저잔액·저점일) */
+    var mins=D.snaps.filter(function(r){ return r['시리즈']==='최저잔액'; });
+    var dts=[]; mins.forEach(function(r){ var d0=String(r['스냅샷일']).slice(0,10); if(dts.indexOf(d0)<0) dts.push(d0); });
+    dts.sort();
+    if(dts.length>=2){
+      var a=mins.filter(function(r){ return String(r['스냅샷일']).slice(0,10)===dts[0]; })[0];
+      var b=mins.filter(function(r){ return String(r['스냅샷일']).slice(0,10)===dts[1]; })[0];
+      var v1=nz(a['금액']), v2=nz(b['금액']), diff=v2-v1;
+      var txt=dts[0].slice(5)+' 대비 최저잔액 '+fmtEok(v1)+' → '+fmtEok(v2)+' ('+(diff>=0?'+':'')+fmtEok(diff)+')';
+      if(a['보조']!==b['보조']) txt+=' · 저점일 '+String(a['보조']).slice(5)+' → '+String(b['보조']).slice(5);
+      chip(diff<0?'serious':(diff>0?'good':'info'), diff<0?'악화':'변화', txt);
+    } else if(dts.length===1){
+      chip('info','대기','예측 스냅샷 적재 시작('+dts[0]+') — 다음 동기화부터 전일 대비 변화가 여기 표시됩니다');
+    }
+    /* 변경 목록: 최근 감지분, 영향 큰 순 */
+    var logs=D.changeLog.slice(-40);
+    if(!logs.length){
+      var e0=document.createElement('div'); e0.className='ev sev-good';
+      var t0=document.createElement('span'); t0.className='tag'; t0.textContent='✓'; e0.appendChild(t0);
+      var p0=document.createElement('span'); p0.textContent='감지된 예측 변경 없음 (감지는 다음 동기화부터 누적)'; e0.appendChild(p0);
+      list.appendChild(e0); return;
+    }
+    logs.sort(function(x,y){ return Math.abs(nz(y['차이']))-Math.abs(nz(x['차이'])); });
+    logs.slice(0,10).forEach(function(r){
+      var ev2=document.createElement('div'); ev2.className='ev sev-'+(nz(r['차이'])<0?'serious':(r['변경유형']==='일정이동'?'warning':'info'));
+      var t=document.createElement('span'); t.className='tag'; t.textContent=r['변경유형']+' · '+String(r['감지일시']).slice(5,10); ev2.appendChild(t);
+      var p=document.createElement('span');
+      p.textContent=chgDesc(r)+(r['상태']==='입력완료' ? ' — 사유: '+r['사유']+' ('+r['담당본부']+')' : ' — 사유 미입력');
+      ev2.appendChild(p);
+      list.appendChild(ev2);
+    });
+  })();
+
+  var ev=document.getElementById('in_events'); ev.textContent='';
+  var carrySum=0, carryProv=0;
+  D.insSeason.forEach(function(r){
+    var y=parseInt(r['품번연도'],10);
+    if(y>=20&&y<=25){ carrySum+=nz(r['기말금액']); carryProv+=nz(r['충당금']); }
+  });
+  var evs=[
+    {sev:'serious',tag:'행사 후보',txt:'20~25년 이월재고 원가 '+fmtEok(carrySum)+' 잔존 (충당 '+fmtEok(carryProv)+') — 파이널세일/아울렛으로 현금화하면 자금 갭 방어 레버가 됨'},
+    {sev:'info',tag:'발매 리프트',txt:D.insMeta.drop_lift||''},
+    {sev:'info',tag:'광고',txt:'광고비율은 매출의 1~3% 수준에서 등락 — 증액-매출 직접 상관은 미검증(캠페인 데이터 필요)'}
+  ];
+  evs.forEach(function(e){
+    if(!e.txt) return;
+    var d2=document.createElement('div'); d2.className='ev sev-'+e.sev;
+    var t=document.createElement('span'); t.className='tag'; t.textContent=e.tag; d2.appendChild(t);
+    var p=document.createElement('span'); p.textContent=e.txt; d2.appendChild(p);
+    ev.appendChild(d2);
+  });
+}
+
+/* ═══════════════ 탭 6: 회의 모드 (발표) ═══════════════ */
+var Meeting = { step:0, liveHiro:50 };
+
+function mtChart(canvas, sets, safety, reg, key){
+  var P=pal();
+  var o=baseOpts(P,{crosshair:true,maxX:9});
+  o.plugins.annotation={annotations:{
+    safety:{type:'line',yMin:safety,yMax:safety,borderColor:P.crit,borderWidth:1.5,borderDash:[4,3],
+      label:{display:true,content:'안전선 '+fmtEok(safety),position:'start',backgroundColor:'transparent',color:P.crit,font:{size:12,weight:'bold'}}},
+    zone:{type:'box',yMax:safety,backgroundColor:hexA(P.crit,.06),borderWidth:0}
+  }};
+  o.plugins.legend.labels.font={size:13};
+  if(reg[key]) reg[key].destroy();
+  reg[key]=new Chart(canvas.getContext('2d'),{ type:'line', data:sets, options:o, plugins:[crosshair] });
+  return reg[key];
+}
+function mtPathSets(list){ /* list: [{res,label,color,dash,width}] → 미래 위주 라벨/데이터 */
+  var P=pal();
+  var from=addM(TODAY,-1), to=addM(TODAY,7);
+  var base=list[0].res.path.filter(function(r){ return r.dt>=from && r.dt<=to; });
+  var labels=base.map(function(r){ return fmtMD(r.dt); });
+  return { labels:labels, datasets:list.map(function(it){
+    var rows=it.res.path.filter(function(r){ return r.dt>=from && r.dt<=to; });
+    return { label:it.label, data:rows.map(function(r){ return r.sim; }),
+      borderColor:it.color, backgroundColor:it.color, borderWidth:it.width||2.5,
+      borderDash:it.dash||[], pointRadius:0, pointHoverRadius:5, pointBorderColor:P.surface, pointBorderWidth:2, tension:.2, fill:false };
+  })};
+}
+function mtImpacts(){
+  var b=cashSimulate(CS_BASE).metrics.min;
+  function d(p){ return cashSimulate(Object.assign({},CS_BASE,p)).metrics.min - b; }
+  return [
+    { who:'A사업본부', what:'발매 판매율 +5%p (70→75)', eff:d({hiro:75}), note:'차수별 물량·가격 운영으로' },
+    { who:'B사업본부', what:'발매 판매율 +5%p (60→65)', eff:d({kids:65}), note:'CIEL·DUNE 차수 운영' },
+    { who:'전사 MD', what:'평균 할인율 −5%p (20→15)', eff:d({disc:15}), note:'정가 판매 비중 확대' },
+    { who:'C사업본부', what:'이월재고 행사 기획', eff:null, note:'20~25년 이월 원가 약 69억 — 현금화 규모는 기획에 따라' },
+    { who:'재무팀', what:'생산대금 15일 지급 협의', eff:d({delay:15}), note:'무비용 · 협상 필요' },
+    { who:'재무팀', what:'팩토링 +10%p (최후 수단)', eff:d({fact:10}), note:'비용 발생 + 굴레 심화 주의' }
+  ];
+}
+function buildMeeting(){
+  Meeting.base=cashSimulate(CS_BASE);
+  Meeting.good=cashSimulate(CS_PRESETS.good);
+  mtRender();
+}
+function mtRender(){
+  var reg=TABS.meeting.charts;
+  destroyCharts(reg);
+  var stage=document.getElementById('mt_stage'); stage.textContent='';
+  var P=pal();
+  var base=Meeting.base, good=Meeting.good;
+  var safety=(parseFloat(document.getElementById('cs_safety').value)||5)*1e8;
+  var cur=D.lastActual;
+  var loanT=0,mInt=0; D.loans.forEach(function(l){ loanT+=l.bal; mInt+=l.mInt; });
+  var krBal=(D.kr.filter(function(r){ return r.y===TODAY.getFullYear()&&r.m===TODAY.getMonth()+1; })[0]||{}).bal||0;
+  var krInt=0; D.kr.forEach(function(r){ if(r.y===2026) krInt+=r.intr; });
+  var fin=krInt+mInt*12;
+  var opRow=covRow('전사','영업이익'); var opY=0; if(opRow) for(var i=0;i<12;i++) opY+=opRow[i]||0;
+  var tgt=0,ex=0; D.prod.forEach(function(pr){ if(pr.y===2026){tgt+=pr.target;ex+=pr.fact;} });
+  var t26=null; D.kr.forEach(function(r){ if(r.p26>0) t26=r.label; });
+
+  var slide=document.createElement('div'); slide.className='mt-slide'; stage.appendChild(slide);
+  function kicker(t){ var e=document.createElement('div'); e.className='mt-kicker'; e.textContent=t; slide.appendChild(e); }
+  function head(html){ var e=document.createElement('div'); e.className='mt-head'; slide.appendChild(e); html(e); return e; }
+  function sub(t){ var e=document.createElement('div'); e.className='mt-sub'; e.textContent=t; slide.appendChild(e); }
+  function bigNum(t,cls){ var e=document.createElement('div'); e.className='mt-big'+(cls?' '+cls:''); e.textContent=t; slide.appendChild(e); }
+  function numRow(items){ var w=document.createElement('div'); w.className='mt-numbers';
+    items.forEach(function(it){ var c=document.createElement('div'); c.className='mt-num sev-'+it.sev;
+      var n=document.createElement('div'); n.className='n'; n.textContent=it.n; c.appendChild(n);
+      var l=document.createElement('div'); l.className='l'; l.textContent=it.l; c.appendChild(l);
+      w.appendChild(c); }); slide.appendChild(w); }
+  function chartBox(){ var w=document.createElement('div'); w.className='mt-chart'; var cv=document.createElement('canvas'); w.appendChild(cv); slide.appendChild(w); return cv; }
+  function txt(el, parts){ parts.forEach(function(p){
+    if(typeof p==='string'){ el.appendChild(document.createTextNode(p)); }
+    else { var b=document.createElement('b'); if(p.cls) b.className=p.cls; b.textContent=p.t; el.appendChild(b); } }); }
+
+  var s=Meeting.step;
+  if(s===0){
+    kicker('1 / 6 · 현재');
+    head(function(e){ txt(e,['지금 통장에는 ',{t:fmtEok(cur.bal)},' 이 있습니다.']); });
+    sub('하지만 이 돈만 보면 안 됩니다 — 뒤에 갚아야 할 돈이 있습니다. ('+fmtYMD(cur.dt)+' 실적 마감 기준)');
+    numRow([
+      { n:fmtEok(cur.bal), l:'현금 잔액', sev:'good' },
+      { n:fmtEok(loanT+krBal), l:'차입 '+fmtEok(loanT)+' + 생산대금 팩토링 '+fmtEok(krBal), sev:'serious' },
+      (fin>0&&opY>0)
+        ? { n:fmtEok(fin), l:'연 금융비용 — 우리가 번 영업이익('+fmtEok(opY)+')의 '+Math.round(fin/opY*100)+'%가 이자로 나갑니다', sev:'critical' }
+        : { n:fmtEok(fin), l:'연 금융비용 (영업이익 데이터 동기화 후 비율 표시)', sev:'serious' }
+    ]);
+  }
+  else if(s===1){
+    kicker('2 / 6 · 이대로 가면');
+    var m=base.metrics;
+    if(m.min!==null&&m.min<0) head(function(e){ txt(e,['가정을 하나도 안 바꿔도, ',{t:fmtMD(m.minDt),cls:'bad'},' 통장은 ',{t:fmtEok(m.min),cls:'bad'},' 이 됩니다.']); });
+    else if(m.min!==null&&m.min<safety) head(function(e){ txt(e,['이대로면 ',{t:fmtMD(m.minDt),cls:'bad'},' 최저 ',{t:fmtEok(m.min),cls:'bad'},' — 안전선 아래로 내려갑니다.']); });
+    else head(function(e){ txt(e,['이대로면 최저 잔액 ',{t:fmtEok(m.min)},' ('+fmtMD(m.minDt)+') 입니다.']); });
+    sub('자금팀 추정을 그대로 반영한 기준 시나리오입니다. 점선 아래 붉은 영역이 "위험 구간"입니다.');
+    mtChart(chartBox(), mtPathSets([{res:base,label:'기준 시나리오',color:P.s[0]}]), safety, reg, 'c1');
+  }
+  else if(s===2){
+    kicker('3 / 6 · 판매가 나빠지면 — 직접 움직여 보세요');
+    var h=head(function(e){});
+    var box=chartBox();
+    var sw=document.createElement('div'); sw.className='mt-slider';
+    var lb=document.createElement('span'); lb.className='lbl'; sw.appendChild(lb);
+    var inp=document.createElement('input'); inp.type='range'; inp.min=40; inp.max=85; inp.step=1; inp.value=Meeting.liveHiro;
+    sw.appendChild(inp); slide.appendChild(sw);
+    function render(v){
+      Meeting.liveHiro=v;
+      var sim=cashSimulate(Object.assign({},CS_BASE,{hiro:v,kids:Math.max(30,v-10)}));
+      var m=sim.metrics;
+      h.textContent='';
+      txt(h,['판매율이 ',{t:v+'%'},' 이면 → 최저 ',{t:fmtEok(m.min),cls:(m.min<safety?'bad':'good')},
+        m.breach?' · 안전선 아래 '+m.breach+'일':' · 안전선 사수']);
+      lb.textContent='A본부 판매율 '+v+'%';
+      var sets=mtPathSets([
+        {res:base,label:'기준(판매율 70%)',color:P.muted,dash:[5,4],width:1.5},
+        {res:sim,label:'조정 시나리오',color:(m.min<safety?P.crit:P.s[0])}
+      ]);
+      if(reg.c2){ reg.c2.data.labels=sets.labels; reg.c2.data.datasets[0].data=sets.datasets[0].data;
+        reg.c2.data.datasets[1].data=sets.datasets[1].data;
+        reg.c2.data.datasets[1].borderColor=reg.c2.data.datasets[1].backgroundColor=(m.min<safety?P.crit:P.s[0]);
+        reg.c2.update('none'); }
+      else mtChart(box, sets, safety, reg, 'c2');
+    }
+    inp.addEventListener('input', function(e){ render(parseInt(e.target.value,10)); });
+    render(Meeting.liveHiro);
+    sub('슬라이더를 왼쪽으로 당길수록 — 판매율이 빠질수록 — 곡선이 무너지는 시점이 앞으로 당겨집니다.');
+  }
+  else if(s===3){
+    kicker('4 / 6 · 왜 이렇게 됐나');
+    head(function(e){ txt(e,['봄에 산 옷값을, ',{t:'내년 여름까지',cls:'bad'},' 갚고 있습니다.']); });
+    sub('생산대금을 리스금융 팩토링으로 미루고, 그 상환이 다음 시즌 옷값과 겹치는 구조가 반복되고 있습니다.');
+    numRow([
+      (tgt>0)
+        ? { n:Math.round(ex/tgt*100)+'%', l:'26년 생산대금 '+fmtEok(tgt)+' 중 팩토링으로 미룬 비율', sev:'serious' }
+        : { n:'–', l:'생산대금 데이터 동기화 필요', sev:'serious' },
+      { n:(t26||'–')+'까지', l:'올해 산 옷값의 상환이 끝나는 시점', sev:'critical' },
+      { n:fmtEok(krInt), l:'올해 팩토링 이자만 이만큼 — 완전히 사라질 수 있는 비용', sev:'serious' }
+    ]);
+  }
+  else if(s===4){
+    kicker('5 / 6 · 각 본부가 할 일');
+    head(function(e){ txt(e,['각 본부가 ',{t:'이만큼'},' 움직이면, 곡선이 삽니다.']); });
+    sub('아래 숫자는 시뮬레이션 실계산값입니다 — "최저 잔액이 얼마나 좋아지는가".');
+    var w=document.createElement('div'); w.className='mt-actions';
+    mtImpacts().forEach(function(it){
+      var c=document.createElement('div'); c.className='mt-act';
+      var a=document.createElement('div'); a.className='who'; a.textContent=it.who; c.appendChild(a);
+      var b=document.createElement('div'); b.className='what'; b.textContent=it.what; c.appendChild(b);
+      var e=document.createElement('div'); e.className='eff';
+      e.textContent = it.eff===null ? '기획에 따라' : ('최저잔액 '+(it.eff>=0?'+':'')+fmtEok(it.eff));
+      c.appendChild(e);
+      var n=document.createElement('div'); n.className='note'; n.textContent=it.note; c.appendChild(n);
+      w.appendChild(c);
+    });
+    slide.appendChild(w);
+  }
+  else {
+    kicker('6 / 6 · 그 결과');
+    var gm=good.metrics;
+    head(function(e){ txt(e,['이걸 해내면 — 최저 잔액 ',{t:fmtEok(gm.min),cls:'good'},(gm.min>=safety?' · 안전선 사수':'')+' 입니다.']); });
+    mtChart(chartBox(), mtPathSets([
+      {res:base,label:'이대로 가면',color:P.muted,dash:[5,4],width:1.5},
+      {res:good,label:'실행하면 (판매율 +10%p·할인 −5%p)',color:P.s[3]}
+    ]), safety, reg, 'c3');
+    var ck=document.createElement('div'); ck.className='mt-check';
+    ['☐ A본부·B본부: 발매 판매율 +5%p 실행안을 다음 주까지',
+     '☐ 패션·MD: 이월재고(원가 69억) 행사 대상과 시점 확정',
+     '☐ 재무: 생산대금 지급 일정 협의 + 팩토링 축소 로드맵'].forEach(function(t){
+      var l=document.createElement('div'); l.textContent=t; ck.appendChild(l);
+    });
+    slide.appendChild(ck);
+  }
+
+  /* dots + nav */
+  var dots=document.getElementById('mt_dots'); dots.textContent='';
+  for(var di=0; di<6; di++){
+    (function(idx){ var dd=document.createElement('span'); dd.className='mt-dot'+(idx===Meeting.step?' on':'');
+      dd.onclick=function(){ Meeting.step=idx; mtRender(); }; dots.appendChild(dd); })(di);
+  }
+  document.getElementById('mt_prev').disabled = Meeting.step===0;
+  document.getElementById('mt_next').disabled = Meeting.step===5;
+}
+document.getElementById('mt_prev').addEventListener('click', function(){ if(!D) return; if(Meeting.step>0){ Meeting.step--; mtRender(); } });
+document.getElementById('mt_next').addEventListener('click', function(){ if(!D) return; if(Meeting.step<5){ Meeting.step++; mtRender(); } });
+document.addEventListener('keydown', function(e){
+  if(document.getElementById('tab-meeting').hidden || !D) return;
+  if(/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return; /* 슬라이더 조작 중 화살표로 덱이 넘어가는 것 방지 */
+  if(e.key==='ArrowRight' && Meeting.step<5){ Meeting.step++; mtRender(); }
+  if(e.key==='ArrowLeft' && Meeting.step>0){ Meeting.step--; mtRender(); }
+});
+
+/* ═══════════════ 탭 4: 임원 요약 ═══════════════ */
+function buildExec(){
+  var P=pal(), reg=TABS.exec.charts;
+  var res=cashSimulate(CS_BASE);
+  var m=res.metrics, cur=D.lastActual;
+
+  var vEl=document.getElementById('ex_verdict');
+  var sev = m.min===null?'info' : m.min<0?'critical' : m.min<res.safety?'serious' : m.min<res.safety*1.2?'warning':'good';
+  var tt={critical:'⚠ 위험',serious:'⚠ 경고',warning:'△ 주의',good:'✓ 안정',info:'ⓘ'}[sev];
+  vEl.className='verdict sev-'+sev;
+  vEl.querySelector('.v-tag').textContent=tt;
+  vEl.querySelector('.v-text').textContent = m.min===null?'데이터 없음':
+    '현금 '+fmtEok(cur.bal)+' · 향후 90일+ 최저 '+fmtEok(m.min)+' ('+fmtMD(m.minDt)+')'+(m.breach?' · 안전선 하회 '+m.breach+'일':' · 안전선 하회 없음');
+
+  var el=document.getElementById('ex_kpis'); el.textContent='';
+  function tile(label,value,sub,cls){
+    var k=document.createElement('div'); k.className='kpi';
+    var l=document.createElement('div'); l.className='k-label'; l.textContent=label;
+    var v=document.createElement('div'); v.className='k-value'; v.textContent=value;
+    k.appendChild(l); k.appendChild(v);
+    if(sub){ var s=document.createElement('div'); s.className='k-sub'+(cls?' '+cls:''); s.textContent=sub; k.appendChild(s); }
+    el.appendChild(k);
+  }
+  var loanT=0,mi=0; D.loans.forEach(function(l){loanT+=l.bal;mi+=l.mInt;});
+  var krBal=(D.kr.filter(function(r){return r.y===TODAY.getFullYear()&&r.m===TODAY.getMonth()+1;})[0]||{}).bal||0;
+  tile('현금 잔액', fmtEok(cur.bal), fmtYMD(cur.dt)+' 마감');
+  tile('90일+ 최저 예상', fmtEok(m.min), m.minDt?fmtMD(m.minDt):'', m.min!==null&&m.min<res.safety?'down':'');
+  tile('총 차입 + 팩토링', fmtEok(loanT+krBal), '월 이자 약 '+fmtEok(mi));
+
+  var from=addM(TODAY,-3), to=addM(TODAY,3);
+  var rows=res.path.filter(function(r){return r.dt>=from&&r.dt<=to;});
+  var labels=rows.map(function(r){return fmtMD(r.dt);});
+  reg.hero=new Chart(document.getElementById('ex_cvHero').getContext('2d'),{
+    type:'line', data:{labels:labels,datasets:[
+      dsLine(P,0,'실적',rows.map(function(r){return r.actual?r.base:null;})),
+      dsLine(P,0,'추정',rows.map(function(r,i){return !r.actual?r.base:(rows[i+1]&&!rows[i+1].actual?r.base:null);}),{borderDash:[6,4]}) ]},
+    options:(function(){ var o=baseOpts(P,{crosshair:true,maxX:7});
+      o.plugins.annotation={annotations:{safety:{type:'line',yMin:res.safety,yMax:res.safety,borderColor:P.crit,borderWidth:1,borderDash:[3,3]}}};
+      return o; })(),
+    plugins:[crosshair]
+  });
+
+  var el2=document.getElementById('ex_events'); el2.textContent='';
+  var evs=[];
+  D.loans.forEach(function(l){
+    if(l.due&&l.due>=TODAY&&l.due<=addM(TODAY,3))
+      evs.push({sev:l.bal>=1e9?'serious':'warning',tag:'D-'+Math.round((l.due-TODAY)/86400000),txt:l.lender+' 차입 '+fmtEok(l.bal)+' 만기 ('+fmtMD(l.due)+') — 연장/상환 결정 필요'});
+  });
+  var gaps=[];
+  D.monthlyCash.forEach(function(r){
+    if(r['구분']==='실적') return; var mo=pMonth(r['월']); if(!mo) return;
+    var net=nz(r['유입계'])-nz(r['유출계']);
+    if(net<-3e8) gaps.push(r['월']);
+  });
+  if(gaps.length) evs.push({sev:'warning',tag:'자금',txt:'유출 초과가 큰 달: '+gaps.slice(0,3).join(', ')+' — 해당 월 유동성 준비 필요'});
+  if(!evs.length) evs.push({sev:'good',tag:'✓',txt:'당장 결정이 필요한 이벤트 없음'});
+  evs.slice(0,5).forEach(function(e){
+    var d=document.createElement('div'); d.className='ev sev-'+e.sev;
+    var t=document.createElement('span'); t.className='tag'; t.textContent=e.tag; d.appendChild(t);
+    var p=document.createElement('span'); p.textContent=e.txt; d.appendChild(p);
+    el2.appendChild(d);
+  });
+
+  var el3=document.getElementById('ex_pl'); el3.textContent='';
+  var sales=covRow('전사','매출액')||plRow('PL','Ⅰ.매출액')||[];
+  var op=covRow('전사','영업이익')||plRow('PL','Ⅴ.영업이익')||[];
+  var ys=0,yo=0,fs=0,fo=0;
+  for(var i=0;i<6;i++){ ys+=sales[i]||0; yo+=op[i]||0; }
+  for(var j=6;j<12;j++){ fs+=sales[j]||0; fo+=op[j]||0; }
+  function t3(label,value,sub){ var k=document.createElement('div'); k.className='kpi';
+    var l=document.createElement('div'); l.className='k-label'; l.textContent=label;
+    var v=document.createElement('div'); v.className='k-value'; v.textContent=value;
+    k.appendChild(l); k.appendChild(v);
+    if(sub){ var s=document.createElement('div'); s.className='k-sub'; s.textContent=sub; k.appendChild(s); }
+    el3.appendChild(k); }
+  t3('상반기 매출 (실적)', fmtEok(ys), '영업이익 '+fmtEok(yo));
+  t3('하반기 매출 (계획)', fmtEok(fs), '영업이익 '+fmtEok(fo));
+}
+
+/* ═══════════════ 부트스트랩 ═══════════════ */
+document.getElementById('btnRefresh').addEventListener('click',function(){ loadData(true); });
+try{ var sv=localStorage.getItem('fundSim.safety'); if(sv) document.getElementById('cs_safety').value=sv; }catch(e){}
+if(window.matchMedia){
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){
+    if(D){ Object.keys(TABS).forEach(function(k){ destroyCharts(TABS[k].charts); TABS[k].built=false; }); activateTab(currentTab(), true); }
+  });
+}
+loadData(false);
+</script>
