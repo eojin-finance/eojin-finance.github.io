@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ko"><head><script>window.google=window.google||{};google.script=google.script||{};google.script.run={withSuccessHandler:function(){return this},withFailureHandler:function(){return this}};google.script.host={close:function(){}};</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>법인카드 개편 안내 (데모) — 이어진 포트폴리오</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--ink:#191F28;--sub:#4E5968;--mut:#8B95A1;--line:#E9ECEF;--blue:#3182F6;--bg:#F2F4F6;--soft:#F7F8FA;--ease:cubic-bezier(.22,1,.36,1)}
+html,body{font-family:'Pretendard Variable','Pretendard','Apple SD Gothic Neo','맑은 고딕',sans-serif;background:var(--bg);color:var(--ink);word-break:keep-all;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px 96px}
+.tabpanel{display:none}
+.tabpanel.on{display:block;animation:tp .32s var(--ease)}
+@keyframes tp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-top:1px solid var(--line);display:flex}
+.tabbar .inner{display:flex;width:100%;max-width:560px;margin:0 auto;padding:7px 6px calc(7px + env(safe-area-inset-bottom))}
+.tabbar button{flex:1;border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 1px;font-family:inherit;font-size:10px;font-weight:700;color:var(--mut);cursor:pointer;transition:.15s var(--ease);white-space:nowrap}
+.tabbar button .ti{font-size:18px;line-height:1;filter:grayscale(.5);opacity:.65;transition:.15s}
+.tl{display:flex;flex-direction:column;gap:10px}
+.tlr{background:#fff;border-radius:18px;padding:15px 17px;display:flex;gap:13px;align-items:flex-start;box-shadow:0 3px 12px rgba(20,30,50,.05)}
+.tld{flex:none;background:var(--soft);color:var(--sub);font-size:12px;font-weight:800;padding:6px 11px;border-radius:999px;margin-top:1px;white-space:nowrap}
+.tld.on2{background:rgba(49,130,246,.12);color:var(--blue)}
+.tlr b{font-size:14px;font-weight:800;letter-spacing:-.01em}
+.tlr p{font-size:12.5px;color:var(--sub);font-weight:500;line-height:1.55;margin-top:3px}
+.kt.ev .kt-n{background:#E7F0FF;color:#1B64DA}
+.pfex{margin-top:12px;display:flex;flex-direction:column;gap:7px}
+.pfex-col{border-radius:13px;padding:11px 13px}
+.pfex-col.bad{background:#FFF5F5;border:1px solid #FFD4D4}
+.pfex-col.good{background:#F1FAF4;border:1px solid #C9EAD3}
+.pfex-lab{font-size:11.5px;font-weight:800;margin-bottom:7px}
+.pfex-col.bad .pfex-lab{color:#C22A2A}
+.pfex-col.good .pfex-lab{color:#1B7A3D}
+.pfex-r{background:#fff;border-radius:10px;padding:8px 11px;margin-bottom:6px;box-shadow:0 1px 3px rgba(20,30,50,.06)}
+.pfex-r:last-of-type{margin-bottom:0}
+.pfex-r b{display:block;font-size:12.5px;font-weight:800;letter-spacing:-.01em}
+.pfex-r span{display:block;font-size:11.5px;color:var(--sub);font-weight:500;margin-top:1px}
+.pfex-r em{display:block;font-size:10.5px;color:#C22A2A;font-weight:700;font-style:normal;margin-top:3px}
+.pfex-ar{text-align:center;font-size:11px;font-weight:800;color:var(--mut);padding:1px 0}
+.pfex-img{width:100%;border-radius:10px;border:1px solid var(--line);display:block;background:#fff}
+.pfex-ok{display:block;font-size:10.5px;color:#1B7A3D;font-weight:700;font-style:normal;margin-top:7px}
+.pfex-no{display:block;font-size:10.5px;color:#C22A2A;font-weight:700;font-style:normal;margin-top:7px}
+.pfex-no b{font-size:10.5px}
+.tabbar button.on{color:var(--blue)}
+.tabbar button.on .ti{filter:none;opacity:1;transform:translateY(-1px)}
+.appbar{position:sticky;top:0;z-index:20;background:rgba(242,244,246,.86);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);padding:14px 4px 10px;display:flex;align-items:center;justify-content:space-between}
+.appbar b{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.appbar span{font-size:12px;color:var(--mut);font-weight:600}
+.hero{background:linear-gradient(150deg,#3182F6,#1B64DA);border-radius:24px;padding:26px 22px;color:#fff;margin-top:6px;box-shadow:0 14px 34px rgba(27,100,218,.25)}
+.hero .hk{display:inline-block;font-size:12px;font-weight:700;background:rgba(255,255,255,.2);padding:5px 12px;border-radius:999px;margin-bottom:12px}
+.hero h1{font-size:24px;font-weight:800;line-height:1.25;letter-spacing:-.02em}
+.hero p{font-size:14px;color:rgba(255,255,255,.9);margin-top:10px;line-height:1.6}
+.sec{margin-top:30px}
+.sec>h2{font-size:19px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.sec>.sd{font-size:13px;color:var(--mut);font-weight:500;margin-bottom:14px}
+.was{background:#fff;border-radius:18px;padding:8px 18px;box-shadow:0 4px 14px rgba(20,30,50,.05)}
+.was ul{list-style:none}
+.was li{font-size:13px;color:var(--sub);font-weight:500;line-height:1.6;padding:11px 0 11px 24px;position:relative;border-bottom:1px solid var(--line)}
+.was li:last-child{border-bottom:none}
+.was li:before{content:'';position:absolute;left:4px;top:19px;width:7px;height:7px;border-radius:50%;background:#CBD5E1}
+.was li b{color:var(--ink);font-weight:700}
+.chg{display:flex;flex-direction:column;gap:10px}
+.chg .c{background:#fff;border-radius:18px;padding:16px 18px;display:flex;gap:13px;align-items:flex-start;box-shadow:0 4px 14px rgba(20,30,50,.05)}
+.chg .ci{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-size:19px;flex:none}
+.chg b{font-size:14.5px;font-weight:800;letter-spacing:-.01em}
+.chg p{font-size:12.5px;color:var(--sub);line-height:1.55;margin-top:3px;font-weight:500}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:none;background:#fff;color:var(--sub);font-size:13.5px;font-weight:700;padding:10px 16px;border-radius:999px;cursor:pointer;box-shadow:0 2px 8px rgba(20,30,50,.06);transition:.22s var(--ease);font-family:inherit}
+.chip.on{color:#fff;transform:scale(1.04)}
+.chips.tm .chip{padding:8px 14px;font-size:12.5px}
+#teamRow{margin-top:10px;display:none}
+#cardsBox{margin-top:14px;display:none}
+.cardlist{display:flex;flex-direction:column;gap:9px;animation:up .4s var(--ease)}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1}}
+.crow{background:#fff;border-radius:16px;box-shadow:0 3px 10px rgba(20,30,50,.05);overflow:hidden}
+.crow-h{display:flex;gap:12px;align-items:center;padding:13px 15px;cursor:pointer}
+.crow-h .car{margin-left:auto;color:var(--mut);font-size:17px;transform:rotate(90deg);transition:.25s var(--ease);flex:none}
+.crow.open .crow-h .car{transform:rotate(-90deg)}
+.cico{width:44px;height:29px;border-radius:6px;flex:none;box-shadow:0 2px 5px rgba(0,0,0,.2);position:relative;overflow:hidden}
+.cico:after{content:'';position:absolute;left:0;right:0;top:6px;height:5px;background:rgba(255,255,255,.5)}
+.crow b{font-size:14px;font-weight:800;letter-spacing:-.01em;display:block}
+.crow-h p{font-size:12px;color:var(--mut);font-weight:500;line-height:1.45;margin-top:2px}
+.crow-d{max-height:0;overflow:hidden;transition:max-height .35s var(--ease);padding:0 15px;background:var(--soft)}
+.crow.open .crow-d{max-height:340px;padding:12px 15px 14px}
+.crow-d .dl{font-size:10.5px;font-weight:800;color:var(--mut);margin:8px 0 3px}
+.crow-d .dl:first-child{margin-top:0}
+.crow-d .dv{font-size:12.5px;color:var(--sub);font-weight:500;line-height:1.55}
+.sform{display:inline-block;margin-top:11px;background:rgba(49,130,246,.1);border:none;font-size:12.5px;font-weight:700;color:var(--blue);padding:9px 14px;border-radius:10px;cursor:pointer;font-family:inherit}
+.fpv{position:fixed;inset:0;background:rgba(15,23,42,.5);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.fpv.open{display:flex}
+.fpvbox{background:#fff;border-radius:24px 24px 0 0;max-width:560px;width:100%;max-height:88vh;overflow:auto;padding:24px 20px 34px;position:relative;animation:fup .35s var(--ease)}
+@keyframes fup{from{opacity:0;transform:translateY(40px)}to{opacity:1}}
+.fpvx{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;border:none;background:var(--soft);color:var(--ink);font-size:14px;cursor:pointer;z-index:2}
+.fpvtt{font-size:18px;font-weight:800;letter-spacing:-.01em;padding-right:40px}
+.fpvsub{font-size:12px;color:var(--mut);margin:5px 0 16px;font-weight:500}
+.fpvbody{border-top:1px solid var(--line);padding-top:16px;overflow-x:auto}
+.grouplab{font-size:12px;font-weight:800;color:var(--mut);margin:14px 2px 8px}
+.grouplab:first-child{margin-top:0}
+.acc{background:#fff;border-radius:18px;margin-bottom:10px;overflow:hidden;box-shadow:0 3px 12px rgba(20,30,50,.05)}
+.acc-h{width:100%;border:none;background:none;display:flex;align-items:center;gap:12px;padding:16px 17px;cursor:pointer;font-family:inherit;text-align:left}
+.acc-emo{font-size:21px;flex:none}
+.acc-q{font-size:14.5px;font-weight:750;letter-spacing:-.01em;color:var(--ink);flex:1}
+.acc-ar{color:var(--mut);font-size:19px;transform:rotate(90deg);transition:.25s var(--ease)}
+.acc.open .acc-ar{transform:rotate(-90deg)}
+.acc-b{max-height:0;overflow:hidden;transition:max-height .35s var(--ease);padding:0 17px}
+.acc.open .acc-b{max-height:1400px;padding-bottom:17px}
+.acc-card{display:inline-block;background:rgba(49,130,246,.1);color:var(--blue);font-size:12.5px;font-weight:800;padding:6px 12px;border-radius:999px;margin-bottom:9px}
+.acc-d{font-size:13px;color:var(--sub);font-weight:500;line-height:1.6}
+.acc-s{list-style:none;margin-top:9px;display:flex;flex-direction:column;gap:6px}
+.acc-s li{font-size:12.5px;color:var(--sub);font-weight:500;line-height:1.5;padding-left:16px;position:relative}
+.acc-s li:before{content:'';position:absolute;left:2px;top:7px;width:5px;height:5px;border-radius:50%;background:var(--blue)}
+.ktr{background:#fff;border-radius:18px;padding:6px 17px;margin-bottom:12px;box-shadow:0 3px 12px rgba(20,30,50,.05)}
+.ktr-row{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+.ktr-row:last-child{border-bottom:none}
+.ktr-emo{font-size:19px;flex:none;margin-top:1px}
+.ktr-row b{font-size:14px;font-weight:800;letter-spacing:-.01em}
+.ktr-row p{font-size:12.5px;color:var(--sub);font-weight:500;line-height:1.55;margin-top:2px}
+.ktr-row p b{font-size:12.5px;color:var(--ink)}
+.kt{background:#fff;border-radius:18px;padding:16px 17px;display:flex;gap:13px;margin-bottom:10px;box-shadow:0 3px 12px rgba(20,30,50,.05)}
+.kt-n{width:30px;height:30px;border-radius:50%;background:#FEE500;color:#191F28;font-weight:900;font-size:14px;display:grid;place-items:center;flex:none}
+.kt-t{font-size:14px;font-weight:800;letter-spacing:-.01em}
+.kt-d{font-size:12.5px;color:var(--sub);font-weight:500;line-height:1.55;margin-top:3px}
+.note{background:#FFF8E7;border:1px solid #F5E5B8;border-radius:14px;padding:13px 15px;font-size:12.5px;color:#8a6d1a;font-weight:600;line-height:1.55;margin-top:12px}
+.draft{background:#FFF4E5;border:1px solid #FFD8A8;border-radius:16px;padding:14px 16px;margin:8px 0 2px}
+.draft b{font-size:13.5px;font-weight:800;color:#B45309;letter-spacing:-.01em}
+.draft p{font-size:12.5px;color:#92610a;font-weight:600;line-height:1.55;margin-top:5px}
+.draft p b{font-size:12.5px;color:#B45309}
+.foot{margin-top:36px;text-align:center;font-size:12px;color:var(--mut);font-weight:600;line-height:1.7}
+
+.tabbar button.on{color:var(--blue);background:rgba(49,130,246,.1);border-radius:12px}
+.tabbar button.on .ti{filter:none;opacity:1}
+
+/* 메뉴 타일 그리드 */
+.menugrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.mg{position:relative;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%);border:1px solid rgba(255,255,255,.7);border-radius:18px;padding:14px 15px 13px;cursor:pointer;text-align:left;font-family:inherit;box-shadow:0 4px 16px rgba(20,30,50,.07);transition:transform .18s var(--ease),box-shadow .2s}
+.mg:hover{box-shadow:0 8px 22px rgba(49,130,246,.16)}
+.mg:active{transform:scale(.96)}
+.mg .me{font-size:23px;line-height:1}
+.mg b{display:block;font-size:14.5px;font-weight:800;letter-spacing:-.01em;margin-top:7px;color:var(--ink)}
+.mg span.md{display:block;font-size:11.5px;color:var(--mut);font-weight:600;margin-top:3px;line-height:1.45}
+.mg .ma{position:absolute;right:13px;top:13px;color:#B7C2CE;font-weight:800;font-size:14px}
+</style>
+<style id="liquidglass">
+/* ── Liquid Glass ── */
+body{background:linear-gradient(180deg,#EDF1F7 0%,#E9EEF5 60%,#EDF0F6 100%)}
+.lgblob{position:fixed;border-radius:50%;filter:blur(70px);opacity:.6;z-index:-1;pointer-events:none}
+.lgb1{width:440px;height:440px;left:-130px;top:-90px;background:radial-gradient(circle at 30% 30%,#B7D5FF,#DCE9FF 65%,rgba(220,233,255,0));animation:lgf1 16s ease-in-out infinite alternate}
+.lgb2{width:400px;height:400px;right:-150px;top:32%;background:radial-gradient(circle at 60% 40%,#C7EFE4,#E7F6F2 65%,rgba(231,246,242,0));animation:lgf2 21s ease-in-out infinite alternate}
+.lgb3{width:320px;height:320px;left:18%;bottom:-130px;background:radial-gradient(circle at 50% 50%,#FFE3C9,#FFF3E8 65%,rgba(255,243,232,0));animation:lgf1 26s ease-in-out infinite alternate-reverse}
+@keyframes lgf1{from{transform:translate(0,0) scale(1)}to{transform:translate(70px,50px) scale(1.18)}}
+@keyframes lgf2{from{transform:translate(0,0) scale(1)}to{transform:translate(-60px,-70px) scale(1.12)}}
+/* 유리 크롬: 앱바 · 상단 탭 · 하단 독 */
+.appbar{background:rgba(243,246,250,.9);-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);border-bottom:none;box-shadow:none;padding-bottom:6px}
+.tabbar{left:50%;right:auto;transform:translateX(-50%);width:min(600px,calc(100% - 20px));bottom:10px;border:1px solid rgba(255,255,255,.65);border-radius:26px;background:rgba(255,255,255,.48);-webkit-backdrop-filter:blur(26px) saturate(185%);backdrop-filter:blur(26px) saturate(185%);box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 14px 36px rgba(20,30,50,.18)}
+.tabbar .inner{padding:6px 6px calc(6px + env(safe-area-inset-bottom)*.5)}
+.tabbar button{transition:transform .18s var(--ease),background .2s;border-radius:14px}
+.tabbar button:active{transform:scale(.88)}
+.tabbar button.on{background:rgba(49,130,246,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+/* 히어로: 유리 광택 스윕 + 포인터 글로우 */
+.hero{position:relative;overflow:hidden}
+.hero>*{position:relative;z-index:2}
+.hero::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.22) 50%,transparent 58%);background-size:260% 100%;animation:lgsheen 7s var(--ease) infinite}
+@keyframes lgsheen{0%{background-position:130% 0}55%{background-position:-130% 0}100%{background-position:-130% 0}}
+.hero::after{content:'';position:absolute;inset:0;z-index:1;background:radial-gradient(190px circle at var(--mx,78%) var(--my,12%),rgba(255,255,255,.22),transparent 60%);pointer-events:none}
+/* 카드·아코디언 살짝 유리화 + 스프링 */
+.acc,.sm,.tlr,.kt,.c{background:rgba(255,255,255,.78);-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%);border:1px solid rgba(255,255,255,.6)}
+.acc-h{transition:transform .18s var(--ease)}
+.acc-h:active{transform:scale(.985)}
+.sform:active{transform:scale(.96)}
+/* 탭바 상단 이동 */
+.tabbar{position:sticky;top:48px;bottom:auto;left:auto;right:auto;transform:none;width:100%;margin:6px 0 2px;z-index:18;border-radius:20px;box-shadow:inset 0 1px 1px rgba(255,255,255,.9),inset 0 -1px 1px rgba(20,30,50,.05),0 6px 18px rgba(20,30,50,.12)}
+.wrap{padding-bottom:44px}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+.appbar,.tabbar{background:rgba(255,255,255,.97)}
+.acc,.sm,.tlr,.kt,.c{background:#fff}
+}
+</style>
+<style id="lg2">
+/* P2: blur는 크롬 2곳만, 투과율 상향 */
+.appbar{background:rgba(243,246,250,.6);-webkit-backdrop-filter:blur(24px) saturate(180%) brightness(1.05);backdrop-filter:blur(24px) saturate(180%) brightness(1.05);border-bottom:1px solid rgba(255,255,255,.5);box-shadow:none;padding:14px 4px 10px}
+.acc,.sm,.tlr,.kt,.c{background:rgba(255,255,255,.86);-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid rgba(255,255,255,.6)}
+/* P3: 블롭 선명화 + 모션 배려 */
+.lgblob{filter:blur(48px);opacity:.8;will-change:transform;transform:translateZ(0)}
+.lgb1{background:radial-gradient(circle at 30% 30%,#9CC4FF,#DCE9FF 65%,rgba(220,233,255,0))}
+.lgb2{background:radial-gradient(circle at 60% 40%,#A9E4D4,#E7F6F2 65%,rgba(231,246,242,0))}
+@media (prefers-reduced-motion:reduce){.lgblob{animation:none}.hero::before{animation:none}}
+/* P4: 독 유리 두께 + safe-area */
+.tabbar{bottom:calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.34);border:1px solid rgba(255,255,255,.45);box-shadow:inset 0 1px 1px rgba(255,255,255,.9),inset 0 -1px 1px rgba(20,30,50,.05),0 1px 2px rgba(20,30,50,.08),0 14px 36px rgba(20,30,50,.16)}
+.tabbar .inner{padding:6px}
+.tabbar button{font-size:11px;letter-spacing:-.02em;padding:6px 0}
+.tabbar button .ti{font-size:19px}
+.wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+/* P5: 메뉴 타일 — 토스 홈 그리드 문법 */
+.mgtitle{font-size:15px;font-weight:800;letter-spacing:-.01em;margin:20px 2px -4px}
+.mg{background:rgba(255,255,255,.8);-webkit-backdrop-filter:none;backdrop-filter:none;padding:16px 16px 15px}
+.mg b{font-size:15.5px}
+.mg .me{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;font-size:21px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 2px 6px rgba(20,30,50,.08)}
+.menugrid .mg:nth-child(1) .me{background:rgba(49,130,246,.14)}
+.menugrid .mg:nth-child(2) .me{background:rgba(13,148,136,.14)}
+.menugrid .mg:nth-child(3) .me{background:rgba(168,85,247,.12)}
+.menugrid .mg:nth-child(4) .me{background:rgba(224,121,26,.12)}
+.menugrid .mg:nth-child(5) .me{background:rgba(254,229,0,.4)}
+.mg[style*='grid-column']{background:linear-gradient(135deg,rgba(254,229,0,.2),rgba(255,255,255,.85))}
+.mg .ma{color:var(--blue);font-size:16px;top:50%;transform:translateY(-50%)}
+.menugrid .mg.vc{background:linear-gradient(135deg,rgba(124,58,237,.16),rgba(255,255,255,.88))}
+.menugrid .mg.vc .me{background:rgba(124,58,237,.18)}
+.menugrid .mg.vc b{color:#5B21B6}
+.menugrid .mg.vc .ma{color:#7C3AED}
+.menugrid .mg.vc::before{display:block;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.6) 50%,transparent 58%);background-size:260% 100%;animation:lgsheen 7s var(--ease) infinite;animation-delay:2.2s}
+/* P7: 배너 유리 편입 + 히어로 압축 */
+.draft{background:rgba(255,244,229,.8);border:1px solid rgba(255,216,168,.7);box-shadow:inset 0 1px 0 rgba(255,255,255,.6);padding:11px 14px}
+.draft summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.draft summary::-webkit-details-marker{display:none}
+.draft .dr-ar{color:#C08A3E;font-weight:800;transition:.2s}
+.draft[open] .dr-ar{transform:rotate(180deg)}
+.draft p{margin-top:8px}
+.hero{padding:20px}
+.hero h1{font-size:22px}
+.hero p{font-size:13px;margin-top:8px}
+/* P8: 인라인 탭 이동 링크 */
+.golink{border:none;background:none;color:var(--blue);font-weight:700;font-size:inherit;font-family:inherit;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px}
+#orgRow{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-right:-16px;padding-right:16px}
+#orgRow::-webkit-scrollbar{display:none}
+#orgRow .chip{flex:none;white-space:nowrap}
+/* P9: 터치 타깃 + 모달 스크롤 체이닝 차단 */
+.fpvx{width:44px;height:44px;top:12px;right:12px;font-size:16px}
+.chip{padding:12px 18px;min-height:44px}
+.chips.tm .chip{padding:10px 16px;min-height:40px}
+.fpvbox,#fpvbody{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+.appbar{background:#F2F4F6}.tabbar{background:rgba(255,255,255,.97)}.draft{background:#FFF4E5}
+}
+</style>
+
+<style id="lg3">
+/* 유리 액센트 v3 */
+/* 양식 미리보기 모달: 뒤 화면이 유리 뒤로 잠기는 느낌 */
+.fpv{background:rgba(15,23,42,.42);-webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%)}
+/* 내 카드 탭: 카드 로우를 유리 카드처럼 */
+.crow{background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.65);box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 3px 12px rgba(20,30,50,.07)}
+/* 일정 타임라인 날짜 알약 */
+.tld{background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.tld.on2{background:linear-gradient(150deg,rgba(64,140,255,.22),rgba(49,130,246,.1));border-color:rgba(120,170,255,.5);color:var(--blue);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+/* 증빙 스텝 번호·택시 서비스 번호 원 */
+.kt-n{box-shadow:inset 0 1px 1px rgba(255,255,255,.75),0 2px 6px rgba(20,30,50,.1)}
+/* 상황별 가이드 카드 배지 */
+.acc-card{background:linear-gradient(150deg,rgba(64,140,255,.18),rgba(49,130,246,.08));border:1px solid rgba(120,170,255,.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+/* 상단 탭바 활성 버튼: 유리 그라디언트 필 */
+.tabbar button.on{background:linear-gradient(160deg,rgba(64,140,255,.22),rgba(49,130,246,.1));box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 2px 8px rgba(49,130,246,.15)}
+/* 택시 서비스 풀폭 타일: 히어로처럼 광택 스윕 */
+.mg[style*='grid-column']{overflow:hidden}
+.mg[style*='grid-column']::before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.5) 50%,transparent 58%);background-size:260% 100%;animation:lgsheen 7s var(--ease) infinite;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.mg[style*='grid-column']::before{animation:none}}
+.appbar{top:8px;margin:8px 0 0;padding:11px 16px 10px;border-radius:18px;border:1px solid rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.5);box-shadow:inset 0 1px 1px rgba(255,255,255,.9),0 6px 18px rgba(20,30,50,.1)}
+.tabbar{top:64px}
+</style>
+<style id="lg4">
+.draft.ok2{background:rgba(232,248,238,.85);border-color:rgba(150,215,175,.8)}
+.draft.ok2 b{color:#1B7A3D}
+.draft.ok2 p{color:#2C6E45}
+.draft.ok2 .dr-ar{color:#3E9E68}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.draft.ok2{background:#E8F8EE}}
+</style>
+<style id="lg5">
+.sm{background:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.6);border-radius:18px;padding:15px 16px;display:flex;gap:12px;margin-bottom:10px;box-shadow:0 4px 14px rgba(20,30,50,.05);align-items:flex-start}
+.sm-e{font-size:22px;flex:none;margin-top:1px;line-height:1}
+.sm b{font-size:14.5px;font-weight:800;letter-spacing:-.01em}
+.sm p{font-size:12.5px;color:var(--sub);font-weight:500;line-height:1.62;margin-top:4px}
+.sm p b{font-size:12.5px}
+.crow:not(.open) .crow-d{display:none}
+/* 카드 상세 리디자인 */
+.crow-d{background:linear-gradient(180deg,#FBFCFE,#F5F7FA);border-top:1px solid #EEF1F5;padding:14px 16px 16px}
+.dlim{display:flex;width:fit-content;align-items:center;gap:6px;font-size:12px;font-weight:800;color:#0B6E63;background:rgba(13,148,136,.09);border:1px solid rgba(13,148,136,.22);border-radius:11px;padding:8px 12px;margin:0 0 12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.dl{display:table;font-size:10.5px;font-weight:800;color:#1B64DA;background:rgba(49,130,246,.1);border-radius:999px;padding:4px 11px;margin:12px 0 7px;letter-spacing:0}
+.crow-d .dl:first-child{margin-top:0}
+.dv{font-size:12.5px;line-height:1.68;color:var(--sub);font-weight:500;word-break:keep-all}
+.dv b{color:var(--ink)}
+.crow{border-radius:18px}
+.crow-h b{font-size:14.5px;letter-spacing:-.01em}
+.crow-h p{font-size:11.5px;color:var(--mut);font-weight:600;margin-top:2px}
+.cico{width:40px;height:26px;border-radius:7px;flex:none;box-shadow:inset 0 1px 1px rgba(255,255,255,.45),0 2px 6px rgba(20,30,50,.18)}
+</style>
+<style id="lg6">
+/* 타일 인터랙션 */
+.menugrid .mg{transition:transform .22s var(--ease),box-shadow .22s var(--ease),border-color .22s}
+.menugrid .mg .me,.menugrid .mg .ma{transition:transform .25s var(--ease)}
+.menugrid .mg::after{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(170px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.6),transparent 66%);opacity:0;transition:opacity .25s var(--ease);pointer-events:none;z-index:0}
+.menugrid .mg:hover::after{opacity:1}
+.menugrid .mg>*:not(.ma){position:relative;z-index:1}
+.menugrid .mg .ma{z-index:2}
+.menugrid .mg:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.95);box-shadow:0 14px 30px rgba(49,130,246,.16),inset 0 1px 0 rgba(255,255,255,.9)}
+.menugrid .mg:hover .me{transform:scale(1.09) rotate(-4deg)}
+.menugrid .mg:hover .ma{transform:translate(4px,-50%)}
+.menugrid .mg:active{transform:translateY(1px) scale(.985);box-shadow:inset 0 3px 10px rgba(20,30,50,.14),0 1px 3px rgba(20,30,50,.06)}
+.menugrid .mg.vc:hover{box-shadow:0 14px 30px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.9)}
+.menugrid .mg[style*='grid-column']:hover{box-shadow:0 14px 30px rgba(224,180,26,.22),inset 0 1px 0 rgba(255,255,255,.9)}
+/* 아코디언·카드도 살짝 반응 */
+.acc{transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+.acc:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(20,30,50,.09)}
+.acc-h:active{transform:scale(.99)}
+.crow{transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+.crow:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(20,30,50,.09)}
+.tabbar button:hover{background:rgba(49,130,246,.08)}
+@media (hover:none){.menugrid .mg:hover{transform:none;box-shadow:0 4px 16px rgba(20,30,50,.07)}.acc:hover,.crow:hover{transform:none}}
+.menugrid .mg[style*='grid-column'],.menugrid .mg.vc{background:rgba(255,255,255,.82)}
+.menugrid .mg.vc b{color:var(--ink)}
+.menugrid .mg.vc .ma{color:var(--blue)}
+.menugrid .mg:nth-child(5) .me,.menugrid .mg.vc .me{background:rgba(49,130,246,.14)}
+.menugrid .mg.vc:hover,.menugrid .mg[style*='grid-column']:hover{box-shadow:0 14px 30px rgba(49,130,246,.16),inset 0 1px 0 rgba(255,255,255,.9)}
+.menugrid .mg[style*='grid-column']::before,.menugrid .mg.vc::before{background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.45) 50%,transparent 58%);background-size:260% 100%}
+</style>
+<style id="lg7">
+/* 클릭 가능한 요소 공통 인터랙션 */
+.tabbar button,.chip,.acc-h,.crow-h,.sform,.golink,.fpvx,.draft summary,.tld,.mgtitle{transition:transform .18s var(--ease),box-shadow .18s var(--ease),background .18s var(--ease),color .18s}
+.tabbar button:hover{background:rgba(49,130,246,.1);transform:translateY(-1px)}
+.tabbar button:active{transform:scale(.9)}
+.chip:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(20,30,50,.12)}
+.chip:active{transform:scale(.95)}
+.acc-h:hover{background:rgba(49,130,246,.05)}
+.acc-h:hover .acc-ar{transform:translateX(3px)}
+.acc-h .acc-ar{transition:transform .2s var(--ease)}
+.acc-h:active{transform:scale(.99)}
+.crow-h:hover{background:rgba(49,130,246,.05)}
+.crow-h:active{transform:scale(.99)}
+.sform:hover{background:#EAF2FD;border-color:#93C5FD;transform:translateY(-2px);box-shadow:0 6px 16px rgba(49,130,246,.18)}
+.sform:active{transform:scale(.95)}
+.golink:hover{color:#0F4FB5;text-decoration-thickness:2px}
+.fpvx:hover{background:#E9ECEF;transform:rotate(90deg)}
+.fpvx:active{transform:rotate(90deg) scale(.9)}
+.draft summary:hover{opacity:.82}
+.draft summary:active{transform:scale(.99)}
+a.tlink:hover,.lk:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(20,30,50,.1)}
+@media (hover:none){.tabbar button:hover,.chip:hover,.sform:hover,.acc-h:hover,.crow-h:hover{transform:none;box-shadow:none}}
+</style>
+<style id="deckcss">
+#deckBtnWrap{margin:14px 0 4px}
+.deckbtn{width:100%;border:none;border-radius:16px;padding:15px;font-family:inherit;font-size:14.5px;font-weight:800;color:#fff;background:linear-gradient(150deg,#3182F6,#1B64DA);box-shadow:0 8px 22px rgba(49,130,246,.32);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.18s var(--ease)}
+.deckbtn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(49,130,246,.4)}
+.deckbtn:active{transform:scale(.97)}
+.deck{position:fixed;inset:0;z-index:80;display:none;background:rgba(10,16,28,.72);-webkit-backdrop-filter:blur(20px) saturate(140%);backdrop-filter:blur(20px) saturate(140%);align-items:center;justify-content:center;padding:16px}
+.deck.open{display:flex;animation:dkin .3s var(--ease)}
+@keyframes dkin{from{opacity:0}to{opacity:1}}
+.dkbox{width:100%;max-width:620px;height:min(88vh,760px);background:rgba(255,255,255,.97);border-radius:26px;box-shadow:0 30px 80px rgba(0,0,0,.4);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.dkhead{padding:16px 18px 10px;display:flex;align-items:center;gap:10px;flex:none}
+.dkorg{font-size:12px;font-weight:800;color:var(--blue);background:rgba(49,130,246,.1);border-radius:999px;padding:6px 12px}
+.dkx{margin-left:auto;width:38px;height:38px;border:none;border-radius:50%;background:var(--soft);font-size:15px;cursor:pointer;font-family:inherit;transition:.2s var(--ease)}
+.dkx:hover{background:#E9ECEF;transform:rotate(90deg)}
+.dkbar{height:4px;background:var(--line);border-radius:99px;margin:0 18px;flex:none;overflow:hidden}
+.dkbar i{display:block;height:100%;background:linear-gradient(90deg,#3182F6,#1B64DA);border-radius:99px;transition:width .35s var(--ease)}
+.dkbody{flex:1;overflow-y:auto;padding:16px 20px 8px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.dkslide{animation:dks .34s var(--ease)}
+@keyframes dks{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.dkemo{font-size:36px;line-height:1}
+.dkh{font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1.3;margin-top:10px}
+.dksub{font-size:13px;color:var(--sub);font-weight:600;line-height:1.65;margin-top:8px}
+.dkl{margin-top:14px}
+.dkl .r{display:flex;gap:10px;background:var(--soft);border-radius:14px;padding:12px 14px;margin-bottom:8px;align-items:flex-start}
+.dkl .r .e{font-size:19px;flex:none;line-height:1.2}
+.dkl .r b{font-size:13.5px;font-weight:800;display:block}
+.dkl .r p{font-size:12.5px;color:var(--sub);font-weight:500;line-height:1.6;margin-top:3px}
+.dkl .r.hi{background:rgba(49,130,246,.08)}
+.dkl .r.warn{background:rgba(255,244,229,.9)}
+.dkgl{font-size:11.5px;font-weight:800;color:var(--mut);margin:14px 2px 7px;display:flex;align-items:center;gap:6px}
+.dkgl:first-child{margin-top:0}
+.dkgl em{font-style:normal;font-size:10.5px;font-weight:800;color:var(--blue);background:rgba(49,130,246,.1);border-radius:999px;padding:2px 8px}
+.dkcard{display:flex;gap:11px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.dkcard .ci2{width:38px;height:25px;border-radius:6px;flex:none;box-shadow:inset 0 1px 1px rgba(255,255,255,.45)}
+.dkcard b{font-size:13.5px;font-weight:800;display:block}
+.dkcard span{font-size:11.5px;color:var(--mut);font-weight:600}
+.dkcard .vb{margin-left:auto;font-size:10px;font-weight:800;border-radius:999px;padding:4px 9px;flex:none}
+.vb.v{background:rgba(49,130,246,.12);color:var(--blued,#1B64DA)}
+.vb.p{background:rgba(107,114,128,.12);color:#4B5563}
+.dknav{flex:none;display:flex;gap:8px;align-items:center;padding:12px 18px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:rgba(255,255,255,.97)}
+.dkdots{display:flex;gap:5px;flex:1;justify-content:center}
+.dkdots i{width:6px;height:6px;border-radius:50%;background:var(--line);transition:.25s var(--ease)}
+.dkdots i.on{background:var(--blue);width:18px;border-radius:99px}
+.dknav button{border:none;border-radius:12px;padding:11px 16px;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;transition:.15s var(--ease)}
+.dknav .prev{background:var(--soft);color:var(--sub)}
+.dknav .next{background:var(--blue);color:#fff}
+.dknav button:active{transform:scale(.95)}
+.dknav button:disabled{opacity:.35}
+@media(max-width:520px){.dkbox{height:92vh;border-radius:20px}.dkh{font-size:19px}}
+</style>
+<style id="hctacss">
+.hcta{width:100%;margin-top:16px;border:1px solid rgba(255,255,255,.7);border-radius:20px;padding:16px 17px;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:13px;text-align:left;background:linear-gradient(140deg,rgba(49,130,246,.14),rgba(255,255,255,.9));box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 6px 18px rgba(49,130,246,.14);position:relative;overflow:hidden;transition:.2s var(--ease)}
+.hcta::before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.55) 50%,transparent 58%);background-size:260% 100%;animation:lgsheen 6s var(--ease) infinite;pointer-events:none}
+.hcta:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(49,130,246,.22)}
+.hcta:active{transform:scale(.985)}
+.hce{font-size:26px;flex:none;z-index:1}
+.hct{flex:1;min-width:0;z-index:1}
+.hct b{display:block;font-size:15px;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
+.hct span{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-top:3px}
+.hca{margin-left:auto;color:var(--blue);font-weight:800;font-size:17px;z-index:1}
+/* 브리핑 조직 선택기 */
+.dkpick{margin-top:16px}
+.dkpick .pl{font-size:12px;font-weight:800;color:var(--mut);margin:0 2px 8px}
+.dkpick .pw{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.dkpick button{border:1px solid var(--line);background:#fff;font-family:inherit;font-size:13.5px;font-weight:800;color:var(--ink);border-radius:12px;padding:11px 15px;cursor:pointer;transition:.15s var(--ease)}
+.dkpick button:hover{background:#EAF2FD;border-color:#93C5FD;color:var(--blued);transform:translateY(-2px)}
+.dkpick button:active{transform:scale(.95)}
+.dkpick button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+</style>
+<style id="lzimg">
+img[data-img]:not(.ld){display:block;width:100%;min-height:180px;background:linear-gradient(100deg,#EEF1F5 30%,#F7F9FC 50%,#EEF1F5 70%);background-size:200% 100%;animation:shim 1.2s linear infinite;border-radius:10px}
+@keyframes shim{from{background-position:200% 0}to{background-position:-200% 0}}
+/* 팀 칩은 보조 색 */
+#teamRow .chip{font-size:12.5px}
+#teamRow .chip.on{background:rgba(49,130,246,.10) !important;color:#1B64DA !important;box-shadow:inset 0 0 0 1.5px rgba(49,130,246,.3);font-weight:800}
+#teamRow .chip:not(.on){background:rgba(255,255,255,.8);color:var(--sub)}
+</style>
+</head><body>
+<div id="demobar">
+  <b>데모</b>
+  <span>실제 사내 공지를 가상 조직·가상 정책 수치로 바꾼 버전입니다. 구성·설명 방식은 실제와 동일합니다.</span>
+  <a href="../../">← 포트폴리오</a>
+</div>
+<style>
+#demobar{position:sticky;top:0;z-index:9999;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  background:#fff8e1;border-bottom:1px solid #f0dfa8;padding:9px 16px;font-size:12.5px;color:#6b5b21;
+  font-family:system-ui,-apple-system,'Malgun Gothic',sans-serif}
+#demobar b{background:#6b5b21;color:#fff8e1;padding:2px 8px;border-radius:10px;font-size:11.5px}
+#demobar a{margin-left:auto;color:#6b5b21;font-weight:700;text-decoration:none}
+</style>
+
+<div class="wrap">
+<div class="appbar"><b>💳 법인카드 개편 안내</b><span>샘플기업 재무회계팀</span></div>
+
+<details class="draft ok2"><summary><b>✅ 8월 3일(월) 시행 예정 — 택시 서비스·온라인 샘플결제부터 시범 도입</b><span class="dr-ar">▾</span></summary><p>8월 3일(월) <b>기존 카드 일괄 회수·재분배</b>와 함께 시범 도입을 시작할 예정입니다. 카드별 담당자 지정은 각 본부장님·팀장님께 개별 안내드립니다. 카드를 직접 쓰지 않는 분도 택시·소모품·증빙 방식이 함께 바뀌니 한 번 읽어봐 주세요. <b>세부 운영 기준은 시범 운영 결과에 따라 조정될 수 있습니다.</b></p></details>
+
+<div class="tabpanel on" data-tab="change">
+<div class="hero"><span class="hk">8월 3일(월) 시행 예정 · 시범 도입</span>
+<h1>법인카드,<br>팀 중심으로 바뀝니다</h1>
+<p>구매할 때마다 결재 올리고 기다리는 대신, 팀 카드로 바로 결제하세요. 궁금한 것부터 아래 메뉴에서 바로 확인하세요.</p></div>
+
+<button type="button" class="hcta" id="hctaGo">
+<span class="hce">🎞️</span><span class="hct"><b>우리 조직은 뭐가 어떻게 바뀌나요?</b><span>본부·팀 고르면 1분 브리핑으로 보여드려요</span></span><span class="hca">›</span></button>
+<div class="mgtitle">궁금한 것부터 바로 확인하세요</div>
+<div class="menugrid">
+<button type="button" class="mg" data-go2="sched"><span class="me">🗓️</span><span class="ma">›</span><b>도입 일정</b><span class="md">언제부터, 어떻게 바뀌나</span></button>
+<button type="button" class="mg" data-go2="mycard"><span class="me">💳</span><span class="ma">›</span><b>내 팀 카드</b><span class="md">본부·팀 선택하고 확인</span></button>
+<button type="button" class="mg" data-go2="guide"><span class="me">📋</span><span class="ma">›</span><b>상황별 가이드</b><span class="md">"이럴 땐 뭘 쓰죠?"</span></button>
+<button type="button" class="mg" data-go2="proof"><span class="me">🧾</span><span class="ma">›</span><b>증빙 정리</b><span class="md">결제하고 이렇게 남겨요</span></button>
+<button type="button" class="mg" data-go2="kakao" style="grid-column:1/-1"><span class="me">🚕</span><span class="ma">›</span><b>택시 서비스 이용 방법</b><span class="md">야근·외근 택시 — 호출부터 자동결제·증빙까지</span></button>
+<a class="mg vc" href="#" target="_blank" style="grid-column:1/-1;display:block;text-decoration:none;color:inherit"><span class="me">💳</span><span class="ma">›</span><b>온라인 전용카드 이용 가이드</b><span class="md">카드번호 확인 · 결제 흐름 · 증빙 · 한도 품의 (별도 페이지)</span></a>
+</div>
+
+<div class="sec"><h2>지금까지는 이랬어요</h2><div class="sd">기존 카드 운영 방식</div>
+<div class="was"><ul>
+<li>구매할 게 있으면 <b>건별로 결재를 올리고, 경영지원본부가 대신 구매</b> — 결제까지 기다려야 했어요</li>
+<li>카드 한 장에 <b>식대·교통·샘플·접대가 섞여</b> 있어 무엇에 쓰는 카드인지 애매했어요</li>
+<li><b>온라인 결제는 재무·피플 공용 카드</b>에서만 가능해 요청이 몰렸어요</li>
+<li>야근 택시는 <b>개인 결제 후 영수증 제출</b>로 정산했어요</li>
+</ul></div></div>
+
+<div class="sec"><h2>앞으로는 이렇게 바뀌어요</h2><div class="sd">핵심만 3가지</div>
+<div class="chg">
+<div class="c"><div class="ci" style="background:rgba(49,130,246,.12)">💳</div><div><b>구매는 팀 카드로 직접</b><p>대행 구매를 기다리는 대신, 우리 팀 카드로 바로 결제하고 지출결의도 우리 팀이 작성합니다.</p></div></div>
+<div class="c"><div class="ci" style="background:rgba(13,148,136,.12)">🛡️</div><div><b>한도 안에서는 자유롭게</b><p>팀별 예산만큼 카드 한도가 미리 설정돼 있어요. 한도 안에서는 건별 승인 없이 바로 쓰시면 됩니다. 한도를 넘는 결제는 카드에서 자동으로 거절돼요. 남은 한도는 <b>카드 시트에서 확인</b>할 수 있습니다(결제 금액을 적으면 자동 계산). <b>결제가 거절되면</b> 카드번호를 다시 넣지 마시고 잔여 한도부터 확인해 주세요.</p></div></div>
+<div class="c"><div class="ci" style="background:rgba(224,121,26,.12)">🚕</div><div><b>야근 택시는 택시 서비스</b><p>개인 결제·영수증 제출 없이 회사 택시 서비스로 호출하면 끝. 증빙이 자동으로 남습니다.</p></div></div>
+</div></div>
+
+<div class="sec"><h2>한도는 이렇게 정했어요</h2><div class="sd">데이터 기반 + 유연한 증액 구조</div>
+<div class="sm"><span class="sm-e">📊</span><div><b>지난 1년 반 사용 데이터로 산정</b><p>최근 18개월 실제 사용액을 분석해, 평상시 평균 사용액 기준으로 기본 분기 한도를 정했습니다 — <b>샘플구매 카드 분기 120만원 · 본부 [온라인] 물품구매 카드 분기 50만원</b> (본부 [온라인] 물품구매 카드는 <b>아직 시행 전</b>이라 당분간 현행 유지하며, <b>시행 시 다시 안내드립니다</b>. 팀에서 이미 쓰고 있는 <b>매장운영·팀운영비 물품구매 카드와는 다른 카드</b>입니다).</p></div></div>
+<div class="sm"><span class="sm-e">🎯</span><div><b>부족하면 품의로 유연하게 증액</b><p>현업 인터뷰 의견을 반영해, 런칭·시즌처럼 더 필요한 시기에는 <b>예산 품의 승인 시 샘플구매 카드는 분기 최대 450만원까지 증액</b>됩니다. 분기가 끝나면 기본 한도로 리셋 — 필요할 때 유연하게, 평상시엔 예산이 자동으로 지켜지는 구조예요. <b>분기는 1~3월 / 4~6월 / 7~9월 / 10~12월</b> 기준입니다. <b>카드별 세부 한도는 담당자에게 개별 안내드립니다.</b></p></div></div>
+</div>
+</div>
+
+<div class="tabpanel" data-tab="mycard">
+<div class="sec" style="margin-top:22px"><h2>내 팀 카드 찾기</h2><div class="sd">본부 → 팀을 선택하세요</div>
+<div class="chips" id="orgRow"></div>
+<div class="chips tm" id="teamRow"></div>
+<div id="deckBtnWrap"></div>
+<div id="cardsBox"></div>
+</div></div>
+
+<div class="tabpanel" data-tab="guide">
+<div class="sec" style="margin-top:22px"><h2>상황별 가이드</h2><div class="sd">"이럴 땐 뭘 쓰죠?" — 눌러서 확인</div>
+<div class="acc" data-acc><button class="acc-h" type="button"><span class="acc-emo">🛍️</span><span class="acc-q">온라인으로 샘플을 사야 해요</span><span class="acc-ar">›</span></button><div class="acc-b"><div class="acc-card">팀 [온라인] 샘플구매 카드</div><p class="acc-d">온라인 샘플·견본 구매는 팀 온라인 전용카드로 결제합니다.</p><ul class="acc-s"><li><b>카드번호는 카드 담당자만</b> 볼 수 있어요 — 담당자가 아니면 <b>팀 담당자(기본: 팀장님)에게 결제를 요청</b>하세요</li><li>모든 샘플카드에 <b>기본 분기 한도가 미리 배부</b>돼 있어 별도 신청 없이 바로 사용</li><li>카드번호로 온라인 결제 → 지출결의 작성</li><li>런칭·시즌 등으로 부족하면 <b>소모품·샘플 예산 품의</b>로 증액 (분기 종료 시 기본 한도로 리셋)</li></ul><button type="button" class="sform" data-form-preview="budget">📄 소모품·샘플 예산 품의서 미리보기 ↗</button> <a class="sform" href="#" target="_blank" style="text-decoration:none">💳 온라인 전용카드 이용 가이드 ↗</a></div></div><div class="acc" data-acc><button class="acc-h" type="button"><span class="acc-emo">🏃</span><span class="acc-q">오프라인·긴급으로 샘플을 사야 해요</span><span class="acc-ar">›</span></button><div class="acc-b"><div class="acc-card">재무팀 보관 실물카드 대여</div><p class="acc-d">매장·시장 등 현장 구매는 실물카드를 빌려서 사용합니다.</p><ul class="acc-s"><li><b>카드 발급·불출 신청서</b> 작성 → 승인 후 재무팀에서 실물카드 수령</li><li><b>사용 후 바로 반납</b> — 며칠 써야 하면 신청서에 사용 기간을 적어주세요. <b>영수증은 보관 후 지출결의서 작성</b></li><li>급한 건은 재무회계팀에 먼저 연락 주세요</li></ul><button type="button" class="sform" data-form-preview="grant">📄 카드 발급·불출 신청서 미리보기 ↗</button></div></div><div class="acc" data-acc><button class="acc-h" type="button"><span class="acc-emo">✏️</span><span class="acc-q">소모품·문구·비품이 필요해요</span><span class="acc-ar">›</span></button><div class="acc-b"><div class="acc-card">무엇을 사느냐에 따라 경로가 달라요</div><p class="acc-d">아래 3가지 중 어디에 해당하는지만 확인하시면 됩니다.</p><div style="background:rgba(224,121,26,.08);border:1px solid rgba(224,121,26,.22);border-radius:12px;padding:12px 14px 14px;margin:10px 0 14px;font-size:13px;line-height:1.75;word-break:keep-all;overflow:visible"><span style="background:rgba(224,121,26,.14);color:#B45309;border-radius:7px;padding:2px 8px;font-size:11px;font-weight:800">⏳ 대기 중 · 현행 유지</span> <b>본부 [온라인] 물품구매 카드(아래 ②)는 아직 시행 전</b>입니다 — 당분간은 기존 방식 그대로 요청해 주시고, <b>시행 시점이 정해지면 다시 안내드리겠습니다.</b></div><ul class="acc-s"><li><b>① 우리 팀에서 쓰는 현장 소모품</b> — 매장 소모품·고객 간식, 물류 포장재 등<br>→ <b>팀 카드로 직접 구매</b>합니다 (매장팀: 매장운영 카드 / 물류·CX팀: 팀운영비 물품구매 카드). 이 카드들은 <b>실물카드라 매장·현장에서도 바로 결제</b>할 수 있어요.</li><li><b>② 사무실에서 쓰는 문구·소모품</b> — 볼펜·파일·포스트잇 등<br>→ <b>본부 [온라인] 물품구매 카드</b>로 구매합니다. 카드번호는 <b>본부 담당자</b>가 관리하니 담당자에게 요청하세요. 이 카드는 <b>아직 시행 전</b>이라 당분간은 <b>기존 방식(경영지원본부 대행 구매) 그대로</b> 요청해 주세요. <b>시행 시점이 정해지면 다시 안내드리겠습니다.</b></li><li><b>③ 전사에서 함께 쓰는 비품·다과</b> — 휴지·물티슈·손세정제·다과·명함, 모니터·키보드 같은 전자기기<br>→ <b>피플팀(총무)이 일괄 구매</b>합니다. <b>임의로 사지 마시고</b> 필요하면 피플팀에 요청하세요 (전자기기 등 금액이 큰 건은 <b>품의</b> 후 구매).</li></ul><p class="acc-d" style="margin-top:10px"><b>이건 소모품이 아니에요</b></p><ul class="acc-s"><li><b>촬영 소품·물품</b>은 <b>촬영품의 예산</b>으로 별도 결제 — 소모품 카드 한도와 무관합니다</li><li><b>②의 본부 물품구매 카드는 온라인 전용카드라 매장에서는 결제 불가</b>입니다 — 현장에서 바로 사야 하면 재무회계팀에 사전 협의해 주세요 (①의 매장운영·팀운영비 물품구매 카드는 <b>실물카드라 현장 결제 가능</b>)</li></ul></div></div><div class="acc" data-acc><button class="acc-h" type="button"><span class="acc-emo">🚕</span><span class="acc-q">야근·외근 택시를 타야 해요</span><span class="acc-ar">›</span></button><div class="acc-b"><div class="acc-card">회사 택시 서비스 (카드 아님)</div><p class="acc-d">야근·외근 택시는 개인 카드가 아니라 회사 택시 서비스로 이용합니다.</p><ul class="acc-s"><li><b>외근택시</b>: 업무 외근 이동(시간 제한 없음) / <b>야근택시</b>: 22~06시 귀가</li><li>호출 시 '업무' 선택 + 이용 사유 입력(필수) → 자동으로 회사 결제</li><li>별도 지출결의·영수증 제출이 필요 없습니다 — <button type="button" class="golink" data-go2="kakao">택시 서비스 탭에서 보기 ›</button></li></ul></div></div><div class="acc" data-acc><button class="acc-h" type="button"><span class="acc-emo">✈️</span><span class="acc-q">출장·외부 행사가 있어요</span><span class="acc-ar">›</span></button><div class="acc-b"><div class="acc-card">출장품의 → 보유 카드로 직접 결제</div><p class="acc-d">출장 경비(항공권·숙박 등)는 출장품의 승인 후 쓰던 카드로 직접 결제합니다.</p><ul class="acc-s"><li><b>출장품의</b> 작성(해외결제 사용 여부·필요 금액 포함) → 승인되면 <b>보유 중인 팀 카드에 한도가 세팅</b>됩니다</li><li>항공권·숙박 등을 <b>그 카드로 직접 결제</b> — 대행 요청 없이 바로</li><li>카드가 없는 경우에도 별도 신청서 없이 <b>출장품의 하나로 예비카드 불출까지 함께</b> 처리됩니다</li><li>팝업·행사 경비는 전사 공통 '출장·팝업진행비' 카드 — 사전 품의 건만</li></ul></div></div><div class="acc" data-acc><button class="acc-h" type="button"><span class="acc-emo">💻</span><span class="acc-q">업무 SaaS·구독 결제가 필요해요</span><span class="acc-ar">›</span></button><div class="acc-b"><div class="acc-card">재무 SaaS결제 카드로 일원화</div><p class="acc-d">팀에서 직접 결제하지 않습니다. 재무회계팀에 등록을 요청하세요.</p><ul class="acc-s"><li>새 구독 필요 시 재무회계팀에 요청 → SaaS결제 카드로 등록</li><li>AI 툴(ChatGPT 등)은 DX팀 AI구독전용 카드로</li><li>기존 팀 카드에 걸린 자동결제는 재무회계팀이 순차 이관합니다 — 팀에서 따로 하실 일은 없어요</li></ul></div></div><div class="acc" data-acc><button class="acc-h" type="button"><span class="acc-emo">🍽️</span><span class="acc-q">회식비·식대보조금·티타임비를 쓰려면</span><span class="acc-ar">›</span></button><div class="acc-b"><div class="acc-card">팀운영비 카드</div><p class="acc-d">회식비·식대보조금·티타임비는 팀운영비 카드로, 담당자가 결제·증빙을 관리합니다.</p><ul class="acc-s"><li>팀 담당자에게 요청해 결제</li><li>증빙은 담당자가 일괄 관리 — 개인 정산이 줄어듭니다</li></ul></div></div><div class="acc" data-acc><button class="acc-h" type="button"><span class="acc-emo">↩️</span><span class="acc-q">산 물건을 반품·취소했어요</span><span class="acc-ar">›</span></button><div class="acc-b"><div class="acc-card">취소분은 빼고 정산</div><p class="acc-d">반품·부분 환불이 생기면 이렇게 처리해 주세요.</p><ul class="acc-s"><li><b>환불은 반드시 결제한 카드로(카드 취소) 받아주세요.</b> 포인트·적립금·예치금·개인 계좌 환불은 안 됩니다 — 쇼핑몰이 포인트 환불만 된다고 하면 재무회계팀에 먼저 문의해 주세요</li><li><b>지출결의 올리기 전</b>이면 — 취소된 건은 빼고 작성하세요</li><li><b>이미 올렸다면</b> — 그 문서에 <b>댓글로 취소 내용을 남겨주세요</b> (품목·취소 금액·취소일). 재무팀이 확인해 처리합니다</li><li><b>부분 환불</b>이면 — 결제 영수증과 취소 영수증을 함께 첨부하고, 내용란에 "○○ 반품 환불 포함"이라고 적어주세요</li><li>취소 금액은 <b>카드사 취소 처리가 끝나면 한도에서 다시 살아납니다</b> (보통 며칠 걸려요)</li></ul></div></div><div class="acc" data-acc><button class="acc-h" type="button"><span class="acc-emo">🚨</span><span class="acc-q">카드를 잃어버렸어요 · 번호가 샌 것 같아요</span><span class="acc-ar">›</span></button><div class="acc-b"><div class="acc-card">즉시 재무회계팀에 연락</div><p class="acc-d">늦을수록 피해가 커집니다. 먼저 연락 주세요.</p><ul class="acc-s"><li>빌린 <b>실물카드를 잃어버렸거나</b>, 카드번호가 외부에 노출된 것 같으면(캡처 공유·메신저 전송·PC 분실 등) <b>즉시 재무회계팀</b>으로</li><li><b>내가 하지 않은 결제·승인 문자</b>를 발견해도 바로 알려주세요 — 카드 정지 후 재발급합니다</li><li><b>야간·주말·휴일에도 재무회계팀 이어진 매니저에게 바로 연락</b> 주세요 — 카드사 신고·정지는 재무팀이 처리합니다. <b>직접 카드사에 신고하지 마세요</b></li></ul></div></div><div class="acc" data-acc><button class="acc-h" type="button"><span class="acc-emo">🔄</span><span class="acc-q">담당자가 바뀌어요 · 퇴사해요</span><span class="acc-ar">›</span></button><div class="acc-b"><div class="acc-card">권한 회수 + 카드번호 재발급</div><p class="acc-d">번호만 알면 결제되기 때문에 재발급이 원칙입니다.</p><ul class="acc-s"><li>퇴사·부서이동이 확정되면 <b>재무회계팀에 알려주세요</b> — 시트 접근 권한 회수 + 카드번호 재발급(기존 번호 폐기)</li><li><b>아직 안 올린 지출결의는 퇴사 전에 반드시 작성</b>해 주세요 (인계 불가)</li></ul></div></div><div class="acc" data-acc><button class="acc-h" type="button"><span class="acc-emo">📈</span><span class="acc-q">한도가 부족해요</span><span class="acc-ar">›</span></button><div class="acc-b"><div class="acc-card">카드 종류에 따라 양식이 달라요</div><p class="acc-d">사업 사유가 있으면 한도를 늘릴 수 있습니다. <b>샘플·소모품 카드와 그 외 카드의 양식이 다르니 아래를 확인하세요.</b></p><ul class="acc-s"><li><b>샘플·소모품 카드</b> → 아마란스 <b>「소모품·샘플 예산 품의」</b> 작성 → 결재 완료 후 재무팀이 한도를 반영합니다 (기본 분기 한도 — 샘플구매 120만원 · 본부 물품구매 50만원 / 샘플구매 카드는 <b>분기 최대 450만원까지</b> 증액 · 분기 종료 시 기본 한도로 리셋)<br>※ 본부 [온라인] 물품구매(소모품) 카드는 <b>아직 시행 전</b>이라 지금은 품의 대상이 아닙니다 (시행 시 다시 안내드립니다).</li><li><b>그 외 카드</b>: <b>법인카드 한도 조정 신청서</b> 작성 → 결재 후 조정</li></ul><button type="button" class="sform" data-form-preview="budget">📄 소모품·샘플 예산 품의서 미리보기 ↗</button> <button type="button" class="sform" data-form-preview="limit">📄 법인카드 한도 조정 신청서 미리보기 ↗</button></div></div>
+</div></div>
+
+<div class="tabpanel" data-tab="kakao">
+<div class="sec" style="margin-top:22px"><h2>택시 서비스 이용 방법</h2><div class="sd">야근·외근 택시는 이렇게</div>
+<div class="ktr">
+<div class="ktr-row"><span class="ktr-emo">🚕</span><div><b>외근택시</b> — 업무 외근 이동<p>시간대·출발·도착 제한 없음 (업무 목적이면 이용 가능)</p></div></div>
+<div class="ktr-row"><span class="ktr-emo">🌙</span><div><b>야근택시</b> — 야근 후 귀가<p>매일 <b>22:00~06:00</b> 이용 가능 (시간대만 통제 · 출발지 제한 없음)</p></div></div>
+<div class="ktr-row"><span class="ktr-emo">✅</span><div><b>공통</b><p>호출 시 이용 사유 입력 필수 · 회사 자동결제(개인 정산 없음)</p></div></div>
+</div><div class="kt"><div class="kt-n">1</div><div><div class="kt-t">초대 수락</div><p class="kt-d">피플팀이 그룹(외근택시/야근택시)에 등록하면 택시 서비스 앱 알림·문자로 초대가 옵니다. 수락하면 준비 끝.</p></div></div><div class="kt"><div class="kt-n">2</div><div><div class="kt-t">호출할 때 '업무' 선택</div><p class="kt-d">택시 호출 화면에서 결제 수단을 <b>업무(샘플기업)</b>로 선택하고, 상황에 맞는 그룹(외근/야근)으로 호출합니다.</p></div></div><div class="kt"><div class="kt-n">3</div><div><div class="kt-t">이용 사유 입력</div><p class="kt-d">호출 시 <b>이용 사유 입력이 필수</b>입니다. 예: "거래처 미팅 이동", "야근 후 귀가"처럼 간단히 적어주세요.</p></div></div><div class="kt"><div class="kt-n">4</div><div><div class="kt-t">자동결제 · 증빙 끝</div><p class="kt-d">회사 카드로 자동 결제되고 출발지·시간이 기록되므로, 영수증 제출·개인 정산이 필요 없습니다.</p></div></div>
+</div></div>
+
+<div class="tabpanel" data-tab="sched">
+<div class="sec" style="margin-top:22px"><h2>도입 일정</h2><div class="sd">단계적으로 시작해요</div>
+<div class="tl">
+<div class="tlr"><span class="tld">7월 말</span><div><b>카드별 담당자 지정</b><p>각 본부장님·팀장님께 <b>담당자 지정 요청을 개별적으로</b> 드립니다. 팀 운영 카드는 기본적으로 팀장님이 담당해요.</p></div></div>
+<div class="tlr"><span class="tld on2">8월 3일 (월)</span><div><b>기존 카드 일괄 회수·재분배 + 시범 도입 시작</b><p>담당자가 확정되는 대로 <b>기존 카드를 일괄 회수하고 새 체계로 재분배</b>합니다. 같은 날 회사 <b>택시 서비스</b>(외근·야근 택시)와 <b>온라인 샘플결제</b>(온라인 전용카드) 시범 운영이 시작됩니다.</p></div></div>
+<div class="tlr"><span class="tld">이후</span><div><b>본부 [온라인] 물품구매(소모품) 카드 도입 — 시기 미정</b><p>허용 물품·한도 기준을 피플팀과 확정한 뒤 도입합니다. 당분간은 <b>기존 방식(경영지원본부 대행 구매 · 다과/휴지 등은 피플팀) 그대로</b> 요청해 주시고, <b>시행 시점이 정해지면 다시 안내드리겠습니다.</b></p></div></div>
+<div class="tlr"><span class="tld">단계적</span><div><b>나머지 카드 순차 전환</b><p>한 번에 바꾸지 않고, 시범 운영 상황을 보며 점진적으로 안내드립니다.</p></div></div>
+</div>
+<div class="note">📌 회수·재분배 과정에서 결제가 급한 건은 재무회계팀에 먼저 연락 주세요 — 우선 처리해 드립니다.</div>
+</div></div>
+
+<div class="tabpanel" data-tab="proof">
+<div class="sec" style="margin-top:22px"><h2>증빙 정리</h2><div class="sd">결제했으면 이렇게 남겨주세요</div>
+<div class="kt ev"><div class="kt-n">1</div><div><div class="kt-t">공통 원칙</div><p class="kt-d">법인카드 결제 건은 아마란스 <b>'법인카드 사용내역서'</b>로 정산합니다(카드 내역 자동조회). 용도·내용은 <b>날짜·목적이 보이게</b> 구체적으로 적어주세요. <b>거래처는 카드 내역에서 자동으로 채워지니</b> 그대로 두시면 되고, <b>거래처코드가 비어 있을 때만</b> 재무회계팀에 알려주시면 등록해 드립니다. 지출결의는 <b>결제일 다음 달 5일까지</b> 올려주세요(마감 안내 메일을 보내드립니다).</p></div></div>
+<div class="kt ev"><div class="kt-n">2</div><div><div class="kt-t">온라인 샘플결제 (온라인 전용카드)</div><p class="kt-d">결제할 때 <b>일반결제(카드 직접 입력) → 카드사 A</b>를 선택하고 <b>본인 이메일을 입력</b>하면 결제 영수증이 메일로 옵니다. <b>이 영수증을 정리해 첨부</b>하시면 됩니다. (메일 영수증이 없는 쇼핑몰이면 품목·금액·주문번호가 보이는 주문내역+결제내역을 캡처)</p></div></div>
+<div class="kt ev"><div class="kt-n">3</div><div style="min-width:0;flex:1"><div class="kt-t">오픈마켓 등 오픈마켓 구매 ⚠️</div><p class="kt-d">여러 스토어 상품을 한 번에 결제하면 카드 내역에는 거래처가 <b>"오픈마켓파이낸셜 · OO 외 8건"</b>처럼 묶여 실제 판매자가 안 보입니다. 세무상 <b>실제 거래처별로 전표를 입력</b>해야 하므로, <b>스토어(판매자)별 영수증을 각각 발급받아 첨부</b>해 주세요.</p>
+<div class="pfex">
+<div class="pfex-col bad"><div class="pfex-lab">❌ 묶음 결제의 '통합 영수증' — 판매자가 "포함 총 N건"으로 묶여요</div>
+<div class="pfex-img" style="display:flex;align-items:center;justify-content:center;min-height:130px;border:1px dashed #cbd5e1;border-radius:8px;background:#f8fafc;color:#64748b;font-size:12px;text-align:center;padding:12px">실제 증빙 사진은 데모에서 제외했습니다<br><span style="font-size:11px">(원본: 묶음결제 통합 영수증 예시)</span></div>
+<em class="pfex-no">판매자 정보(빨간 박스)가 "OO 포함 총 2건"으로만 나와 <b>실제 판매자별 상호·사업자번호를 알 수 없습니다</b> → 이 영수증만 첨부하면 실거래처 전표 입력이 불가해요.</em></div>
+<div class="pfex-ar">▼ 주문내역 → 영수증 조회에서 상품(판매자)별로 다시 발급</div>
+<div class="pfex-col good"><div class="pfex-lab">✅ 상품별 영수증 — 판매자 정보에 실판매자가 나와요</div>
+<div class="pfex-img" style="display:flex;align-items:center;justify-content:center;min-height:130px;border:1px dashed #cbd5e1;border-radius:8px;background:#f8fafc;color:#64748b;font-size:12px;text-align:center;padding:12px">실제 증빙 사진은 데모에서 제외했습니다<br><span style="font-size:11px">(원본: 판매자별 영수증 예시)</span></div>
+<em class="pfex-ok">이렇게 <b>판매자 정보(빨간 박스)가 있는 상품별 영수증</b>을 판매자별로 각각 발급받아 첨부해 주세요. 승인번호는 하나여도 괜찮습니다.</em></div>
+</div>
+</div></div>
+<div class="kt ev"><div class="kt-n">4</div><div><div class="kt-t">영수증 대신 이걸 첨부하세요</div><p class="kt-d"><b>티타임비·식대·여비교통비·접대비</b>는 영수증 첨부 생략 가능 (단, <b>식대 중 편의점·마트 결제 건은 영수증 필수</b>). 식비·교통비는 <b>사용 인원 전원의 Flex 근무기록 캡처</b>를 첨부해 주세요. 단, <b>택시 서비스로 이용한 택시는 이용 기록이 자동 저장되므로 Flex 첨부도 필요 없습니다.</b></p></div></div>
+<div class="kt ev"><div class="kt-n">5</div><div><div class="kt-t">오프라인 실물카드</div><p class="kt-d">카드 매출전표(영수증)를 보관했다가 지출결의서에 첨부합니다.</p></div></div>
+<div class="kt ev"><div class="kt-n">6</div><div><div class="kt-t">택시 서비스</div><p class="kt-d">별도 증빙 제출이 필요 없습니다 — 이용 내역이 자동으로 기록됩니다.</p></div></div>
+</div></div>
+
+<div class="foot">카드별 담당자·세부 한도는 재무회계팀 이어진 매니저에게 문의해 주세요.</div>
+</div>
+<div class="deck" id="deck"><div class="dkbox">
+<div class="dkhead"><span class="dkorg" id="dkorg">본부 · 팀</span><button type="button" class="dkx" id="dkx">✕</button></div>
+<div class="dkbar"><i id="dkbar"></i></div>
+<div class="dkbody" id="dkbody"></div>
+<div class="dknav"><button type="button" class="prev" id="dkprev">‹ 이전</button><div class="dkdots" id="dkdots"></div><button type="button" class="next" id="dknext">다음 ›</button></div>
+</div></div>
+<nav class="tabbar"><div class="inner">
+<button class="on" data-go="change"><span class="ti">🏠</span>홈</button>
+<button data-go="sched"><span class="ti">🗓️</span>일정</button>
+<button data-go="mycard"><span class="ti">💳</span>내 카드</button>
+<button data-go="guide"><span class="ti">📋</span>가이드</button>
+<button data-go="proof"><span class="ti">🧾</span>증빙</button>
+<button data-go="kakao"><span class="ti">🚕</span>택시 서비스</button>
+</div></nav>
+<script type="text/template" id="formprev-budget"><div class="formPaper" style="font-family:'돋움체',Dotum,'맑은 고딕',sans-serif;color:#111;max-width:800px;margin:0 auto;">
+<!-- 결재 라인 -->
+<table style="border-collapse:collapse;width:100%;margin:0 0 6px;">
+<tbody><tr><td style="border:1px solid #000;padding:10px 12px;">
+<p style="margin:0 0 8px;font-weight:700;font-size:13px;">결재 라인</p>
+<p style="margin:0 0 4px;font-size:12px;"><b>기안자 → 팀장 → 본부장 → 경영지원본부 본부장 → 대표이사</b></p>
+<p style="margin:0;font-size:11px;color:#e00;font-weight:700;">※ 기안자 외 결재자 전결 체크 필수</p>
+</td></tr></tbody></table>
+
+<!-- 운영 방식 -->
+<table style="width:100%;border-collapse:collapse;margin:4px 0 0;border-top:2px solid #666;font-size:12px;">
+<tbody>
+<tr><td style="padding:7px 10px;border:1px solid #e1e1e1;background:#ebebeb;font-weight:700;color:#111;">■ 카드 한도 운영 방식</td></tr>
+<tr><td style="padding:9px 12px;border:1px solid #e1e1e1;line-height:1.8;">
+① 모든 샘플구매 카드에는 <b>기본 분기 한도</b>가 전 카드 동일하게 상시 배부됩니다.<br>
+② 런칭·시즌 등으로 추가 예산이 필요하면 <b>분기 중 언제든</b> 이 품의를 상신합니다 — <b>분기 중 증액·감액 모두 이 품의서 하나로</b> 처리합니다. 단, 증액 후 분기 예산에는 <b>상한</b>이 있습니다.<br>
+③ 결재가 완료되면 재무팀이 카드 한도를 <b>'증액 후 분기 예산'</b>으로 변경합니다. 승인 전에는 기본 한도를 초과하는 결제가 되지 않습니다.<br>
+④ <b>분기가 끝나면 기본 한도로 자동 리셋</b>됩니다.</td></tr>
+</tbody></table>
+
+<!-- 한도 증액 요청 -->
+<table style="width:100%;border-collapse:collapse;table-layout:fixed;margin:10px 0 0;font-size:12px;">
+<colgroup><col style="width:34%"><col style="width:66%"></colgroup>
+<tbody>
+<tr><td colspan="2" style="padding:6px 8px;border:1px solid #e1e1e1;background:#e3eaf3;font-weight:700;color:#11304f;">▶ 한도 증액 요청 <span style="color:#11304f;font-weight:400;">— 얼마에서, 얼마를 증액해, 이 분기 예산 얼마</span></td></tr>
+<tr><td style="padding:7px 10px;border:1px solid #e1e1e1;background:#fafafa;font-weight:700;color:#333;">대상 분기 <span style="color:#c00;">*</span></td>
+<td style="padding:7px 10px;border:1px solid #e1e1e1;color:#888;">― 선택 ― ▾ <span style="color:#bbb;font-size:11px;">(1분기~4분기)</span></td></tr>
+<tr><td style="padding:7px 10px;border:1px solid #e1e1e1;background:#fafafa;font-weight:700;color:#333;">대상 카드 <span style="color:#c00;">*</span><br><span style="color:#999;font-weight:400;font-size:11px;">용도명 · 카드 끝4자리</span></td>
+<td style="padding:7px 10px;border:1px solid #e1e1e1;">&nbsp;</td></tr>
+<tr><td style="padding:7px 10px;border:1px solid #e1e1e1;background:#fafafa;font-weight:700;color:#333;">현재 분기 한도(원) <span style="color:#c00;">*</span><br><span style="color:#999;font-weight:400;font-size:11px;">숫자만 · 기본 한도면 그대로 기재</span></td>
+<td style="padding:7px 10px;border:1px solid #e1e1e1;">&nbsp;</td></tr>
+<tr><td style="padding:7px 10px;border:1px solid #e1e1e1;background:#fafafa;font-weight:700;color:#333;">증액 요청액(원) <span style="color:#c00;">*</span><br><span style="color:#999;font-weight:400;font-size:11px;">감액이면 음수로 입력</span></td>
+<td style="padding:7px 10px;border:1px solid #e1e1e1;">&nbsp;</td></tr>
+<tr><td style="padding:7px 10px;border:1px solid #e1e1e1;background:#fafafa;font-weight:700;color:#333;">증액 후 분기 예산(원)</td>
+<td style="padding:7px 10px;border:1px solid #e1e1e1;background:#fbf6d8;font-weight:700;">자동 합계 <span style="color:#999;font-weight:400;font-size:11px;">= 현재 한도 + 증액 요청액</span></td></tr>
+</tbody></table>
+
+<!-- 품의 사유 -->
+<table style="width:100%;border-collapse:collapse;margin:12px 0 0;font-size:12px;">
+<tbody>
+<tr><td colspan="2" style="padding:7px 10px;border:1px solid #e1e1e1;background:#ebebeb;font-weight:700;color:#111;">품의 사유 / 기대효과 <span style="color:#999;font-weight:400;">— 항목별로 작성</span></td></tr>
+<tr><td style="padding:7px 10px;border:1px solid #e1e1e1;background:#fafafa;font-weight:700;color:#333;width:180px;vertical-align:top;">사유 유형 <span style="color:#c00;">*</span></td>
+<td style="padding:7px 10px;border:1px solid #e1e1e1;color:#888;">― 선택 ― ▾ <span style="color:#bbb;font-size:11px;">(새 시즌 샘플 발주 / 신규 브랜드 런칭(초도 샘플) / 레퍼런스(타사) 샘플 조사 / 기타)</span></td></tr>
+<tr><td style="padding:7px 10px;border:1px solid #e1e1e1;background:#fafafa;font-weight:700;color:#333;vertical-align:top;">지출 배경·목적 <span style="color:#c00;">*</span><br><span style="color:#999;font-weight:400;font-size:11px;">무엇을·왜 (예: 26FW 신상 출시 대비 레퍼런스 샘플 구매)</span></td>
+<td style="padding:7px 10px;border:1px solid #e1e1e1;">&nbsp;</td></tr>
+<tr><td style="padding:7px 10px;border:1px solid #e1e1e1;background:#fafafa;font-weight:700;color:#333;vertical-align:top;">시즌·집행 일정<br><span style="color:#999;font-weight:400;font-size:11px;">언제·어느 시즌 (예: 8월 발주 · 26FW 기획 일정)</span></td>
+<td style="padding:7px 10px;border:1px solid #e1e1e1;">&nbsp;</td></tr>
+<tr><td style="padding:7px 10px;border:1px solid #e1e1e1;background:#fafafa;font-weight:700;color:#333;vertical-align:top;">전분기 대비 증감 사유<br><span style="color:#999;font-weight:400;font-size:11px;">늘었다면 이유 (예: 신규 브랜드 런칭 초도 샘플로 일시 증액)</span></td>
+<td style="padding:7px 10px;border:1px solid #e1e1e1;">&nbsp;</td></tr>
+<tr><td style="padding:7px 10px;border:1px solid #e1e1e1;background:#fafafa;font-weight:700;color:#333;vertical-align:top;">기대 효과<br><span style="color:#999;font-weight:400;font-size:11px;">기대하는 효과 (예: 시즌 기획 일정 내 샘플 확보)</span></td>
+<td style="padding:7px 10px;border:1px solid #e1e1e1;">&nbsp;</td></tr>
+</tbody></table>
+
+<!-- 첨부파일 -->
+<table style="width:100%;border-collapse:collapse;border-top:2px solid #666;margin:12px 0 0;font-size:12px;">
+<tbody>
+<tr><td colspan="2" style="padding:7px 10px;border:1px solid #e1e1e1;background:#ebebeb;font-weight:700;color:#111;">■ 첨부파일</td></tr>
+<tr><td style="padding:7px 10px;border:1px solid #e1e1e1;background:#fafafa;font-weight:700;text-align:right;color:#333;width:100px;vertical-align:top;">권장 첨부</td>
+<td style="padding:7px 10px;border:1px solid #e1e1e1;line-height:1.6;">
+· <b>예상 구매 목록 / 장바구니 캡처</b> <span style="color:#999;">— 금액 근거 (신규 브랜드 런칭 초도 샘플은 필수)</span><br>
+· <b>시즌 출시 · 발주 일정표</b> <span style="color:#999;">— 지출 시기 근거</span><br>
+· <b>전분기 실집행 내역</b> <span style="color:#999;">— 증감 사유 근거 (있으면)</span></td></tr>
+<tr><td style="padding:7px 10px;border:1px solid #e1e1e1;background:#fafafa;font-weight:700;text-align:right;color:#333;vertical-align:top;">첨부파일 목록</td>
+<td style="padding:7px 10px;border:1px solid #e1e1e1;">&nbsp;</td></tr>
+</tbody></table>
+</div>
+</script><script type="text/template" id="formprev-grant"><div class="formPaper" style="font-family:'맑은 고딕',Malgun Gothic,dotum,sans-serif;color:#111;max-width:820px;margin:0 auto;font-size:12px;">
+<!-- 결재라인 -->
+<table style="width:100%;border-collapse:collapse;margin:0 0 14px;border:1px solid #e6e6e6;border-top:2px solid #666;">
+<tbody>
+<tr><td style="background:#fafafa;border-bottom:1px solid #e6e6e6;padding:8px 12px;font-weight:700;font-size:12px;">결재라인</td></tr>
+<tr><td style="padding:9px 12px;line-height:1.6;">기안자 → 팀장 → 본부장 → 재무회계팀 담당자(합의)<br><span style="font-size:11px;color:#555;">수신참조: 재무회계팀 · 경영지원본부장</span></td></tr>
+</tbody></table>
+
+<!-- 안내 -->
+<table style="width:100%;border-collapse:collapse;margin:0 0 14px;border:1px solid #e6e6e6;border-top:2px solid #666;">
+<tbody>
+<tr><td style="background:#fafafa;border-bottom:1px solid #e6e6e6;padding:8px 12px;font-weight:700;">■ 안내 — 이 신청서 하나로 <u>발급 · 재발급 · 실물카드 불출 · 반납</u>을 처리합니다</td></tr>
+<tr><td style="padding:9px 12px;line-height:1.7;">
+· <b>발급/재발급</b> : 신규 조직·충원, 분실·훼손, 유효기간 만료 등으로 카드가 필요할 때<br>
+· <b>실물카드 불출</b> : 재무팀 보관 공용 실물카드를 잠시 빌리는 것 <span style="color:#999;font-size:11px;">— 오프라인 샘플 구매, 출장·팝업, 온라인 결제가 불가한 현장 결제 시</span><br>
+· 이 카드는 <b>온라인에서만</b> 결제할 수 있어요. 오프라인 결제가 필요하면 불출로 신청하세요.<br>
+· 한도 설정·조정은 이 문서가 아니라 <b>소모품·샘플 예산 품의</b> · <b>법인카드 한도 조정 신청서</b>로 진행합니다.</td></tr>
+</tbody></table>
+
+<!-- 신청 정보 -->
+<table style="width:100%;border-collapse:collapse;table-layout:fixed;margin:0 0 14px;border:1px solid #e6e6e6;border-top:2px solid #666;">
+<colgroup><col style="width:150px"><col></colgroup>
+<tbody>
+<tr><td colspan="2" style="background:#fafafa;border-bottom:1px solid #e6e6e6;padding:8px 12px;font-weight:700;">■ 신청 정보</td></tr>
+<tr><td style="border-right:1px solid #e6e6e6;border-bottom:1px solid #e6e6e6;padding:9px 11px;background:#fafafa;text-align:center;color:#505050;font-weight:700;">신청 유형 <span style="color:#c00;">*</span></td>
+<td style="border-bottom:1px solid #e6e6e6;padding:9px 11px;">☐ 신규 발급 &nbsp;&nbsp; ☐ 재발급 &nbsp;&nbsp; ☐ 실물카드 불출 &nbsp;&nbsp; ☐ 반납</td></tr>
+<tr><td style="border-right:1px solid #e6e6e6;border-bottom:1px solid #e6e6e6;padding:9px 11px;background:#fafafa;text-align:center;color:#505050;font-weight:700;">신청 사유 <span style="color:#c00;">*</span><br><span style="color:#999;font-weight:400;font-size:11px;">(발급·재발급·반납 시)</span></td>
+<td style="border-bottom:1px solid #e6e6e6;padding:9px 11px;">☐ 신규·충원 &nbsp; ☐ 분실 &nbsp; ☐ 훼손·마그네틱 불량 &nbsp; ☐ 유효기간 만료 &nbsp; ☐ 기타 <span style="color:#999;font-size:11px;">기타 선택 시 아래 사용 계획에 사유 기재</span></td></tr>
+<tr><td style="border-right:1px solid #e6e6e6;padding:9px 11px;background:#fafafa;text-align:center;color:#505050;font-weight:700;">카드번호 (뒷 4자리)<br><span style="color:#999;font-weight:400;font-size:11px;">(재발급·반납 시 기재 / 신규·불출은 공란)</span></td>
+<td style="padding:9px 11px;">&nbsp;</td></tr>
+</tbody></table>
+
+<!-- 사용 계획 -->
+<table style="width:100%;border-collapse:collapse;table-layout:fixed;margin:0 0 14px;border:1px solid #e6e6e6;border-top:2px solid #666;">
+<colgroup><col style="width:150px"><col style="width:32%"><col style="width:120px"><col></colgroup>
+<tbody>
+<tr><td colspan="4" style="background:#fafafa;border-bottom:1px solid #e6e6e6;padding:8px 12px;font-weight:700;">■ 사용 계획</td></tr>
+<tr><td style="border-right:1px solid #e6e6e6;border-bottom:1px solid #e6e6e6;padding:9px 11px;background:#fafafa;text-align:center;color:#505050;font-weight:700;">사용 목적 · 품목 · 결제처 <span style="color:#c00;">*</span></td>
+<td colspan="3" style="border-bottom:1px solid #e6e6e6;padding:9px 11px;">&nbsp;</td></tr>
+<tr><td style="border-right:1px solid #e6e6e6;border-bottom:1px solid #e6e6e6;padding:9px 11px;background:#fafafa;text-align:center;color:#505050;font-weight:700;">예상금액(원)</td>
+<td style="border-right:1px solid #e6e6e6;border-bottom:1px solid #e6e6e6;padding:9px 11px;">&nbsp;</td>
+<td style="border-right:1px solid #e6e6e6;border-bottom:1px solid #e6e6e6;padding:9px 11px;background:#fafafa;text-align:center;color:#505050;font-weight:700;">사용 기간<br><span style="color:#999;font-weight:400;font-size:11px;">(예: 2026.07.10~07.14 · 상시)</span></td>
+<td style="border-bottom:1px solid #e6e6e6;padding:9px 11px;">&nbsp;</td></tr>
+<tr><td style="border-right:1px solid #e6e6e6;border-bottom:1px solid #e6e6e6;padding:9px 11px;background:#fafafa;text-align:center;color:#505050;font-weight:700;">카드 용도명 · 계정과목<br><span style="color:#999;font-weight:400;font-size:11px;">(발급 시 / 예: 샘플구매 · 견본비)</span></td>
+<td style="border-right:1px solid #e6e6e6;border-bottom:1px solid #e6e6e6;padding:9px 11px;">&nbsp;</td>
+<td style="border-right:1px solid #e6e6e6;border-bottom:1px solid #e6e6e6;padding:9px 11px;background:#fafafa;text-align:center;color:#505050;font-weight:700;">실물 / 온라인<br><span style="color:#999;font-weight:400;font-size:11px;">(발급 시)</span></td>
+<td style="border-bottom:1px solid #e6e6e6;padding:9px 11px;color:#888;">― ▾</td></tr>
+<tr><td style="border-right:1px solid #e6e6e6;padding:9px 11px;background:#fafafa;text-align:center;color:#505050;font-weight:700;">담당자 · 증빙 책임자 <span style="color:#c00;">*</span><br><span style="color:#999;font-weight:400;font-size:11px;">(1카드 1책임자)</span></td>
+<td colspan="3" style="padding:9px 11px;">&nbsp;</td></tr>
+</tbody></table>
+
+<!-- 불출 정보 -->
+<table style="width:100%;border-collapse:collapse;table-layout:fixed;margin:0 0 14px;border:1px solid #e6e6e6;border-top:2px solid #666;">
+<colgroup><col style="width:150px"><col style="width:32%"><col style="width:120px"><col></colgroup>
+<tbody>
+<tr><td colspan="4" style="background:#fafafa;border-bottom:1px solid #e6e6e6;padding:8px 12px;font-weight:700;">■ 불출 정보 <span style="color:#999;font-weight:400;font-size:11px;">(실물카드 불출 신청 시만 작성)</span></td></tr>
+<tr><td style="border-right:1px solid #e6e6e6;border-bottom:1px solid #e6e6e6;padding:9px 11px;background:#fafafa;text-align:center;color:#505050;font-weight:700;">불출 희망일</td>
+<td style="border-right:1px solid #e6e6e6;border-bottom:1px solid #e6e6e6;padding:9px 11px;">&nbsp;</td>
+<td style="border-right:1px solid #e6e6e6;border-bottom:1px solid #e6e6e6;padding:9px 11px;background:#fafafa;text-align:center;color:#505050;font-weight:700;">반납 예정일 <span style="color:#c00;">*</span></td>
+<td style="border-bottom:1px solid #e6e6e6;padding:9px 11px;">&nbsp;</td></tr>
+<tr><td colspan="4" style="padding:9px 11px;color:#666;">· 당일 또는 익일 반납이 원칙입니다. 사용 후 <b>매출전표(영수증) 제출까지</b> 완료해야 불출이 종결됩니다.</td></tr>
+</tbody></table>
+
+<!-- 서약 -->
+<table style="width:100%;border-collapse:collapse;margin:0 0 14px;border:1px solid #e6e6e6;border-top:2px solid #666;">
+<tbody>
+<tr><td style="background:#fafafa;border-bottom:1px solid #e6e6e6;padding:8px 12px;font-weight:700;">서약</td></tr>
+<tr><td style="padding:14px 16px;line-height:1.7;">본인은 상기 카드를 수령하였을 때, 법인카드 사용 규정에 따라 사적인 용도로 사용하지 않고 업무수행 시에만 사용할 것임을 약속합니다.<br><br>개인적인 용도 사용으로 인하여 발생하는 손실은 전적으로 본인의 귀책사유에 해당하며 즉시 전액 변상할 것을 서약합니다.<br><br>
+<div style="text-align:right;">20&nbsp;&nbsp;&nbsp; 년 &nbsp;&nbsp; 월 &nbsp;&nbsp; 일 &nbsp;&nbsp;&nbsp;&nbsp; 신청자 : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (서명)</div></td></tr>
+</tbody></table>
+
+<!-- 유의사항 -->
+<table style="width:100%;border-collapse:collapse;margin:0;border:1px solid #e6e6e6;border-top:2px solid #666;">
+<tbody>
+<tr><td style="background:#fafafa;border-bottom:1px solid #e6e6e6;padding:8px 12px;font-weight:700;">유의사항</td></tr>
+<tr><td style="padding:10px 12px;line-height:1.7;">
+1. 발급된 법인카드는 뒷면 서명란에 회사명을 반드시 적어주세요.<br>
+2. 법인카드 분실 시, 본인이 직접 분실신고를 하지 마시고 경영지원본부에 즉시 알려주시길 바랍니다.<br>
+3. 이 카드는 온라인에서만 결제할 수 있습니다. 오프라인 결제가 필요한 경우 이 신청서의 '실물카드 불출'로 신청하세요.<br>
+4. 불출카드는 반납 예정일까지 재무팀에 반납하고, 매출전표(영수증) 등 증빙 제출까지 완료해야 합니다.</td></tr>
+</tbody></table>
+</div>
+</script><script type="text/template" id="formprev-limit"><div class="formPaper" style="font-family:'맑은 고딕',Malgun Gothic,dotum,sans-serif;color:#111;max-width:820px;margin:0 auto;font-size:12px;">
+<!-- 결재라인 -->
+<table style="width:100%;border-collapse:collapse;margin:0 0 14px;border:1px solid #e6e6e6;border-top:2px solid #666;">
+<tbody>
+<tr><td style="background:#fafafa;border-bottom:1px solid #e6e6e6;padding:8px 12px;font-weight:700;">결재라인</td></tr>
+<tr><td style="padding:9px 12px;line-height:1.6;">기안자 → 팀장 → 본부장 → 재무회계팀 담당자(합의)<br><span style="font-size:11px;color:#555;">수신참조: 재무회계팀 · 경영지원본부장</span></td></tr>
+</tbody></table>
+
+<!-- 한도 조정 내역 -->
+<table style="width:100%;border-collapse:collapse;table-layout:fixed;margin:0 0 14px;border:1px solid #e1e1e1;border-top:2px solid #666;">
+<colgroup><col style="width:135px"><col style="width:30%"><col style="width:135px"><col></colgroup>
+<tbody>
+<tr><td colspan="4" style="background:#ebebeb;border-bottom:1px solid #e1e1e1;padding:8px 12px;font-weight:700;color:#111;">■ 한도 조정 내역</td></tr>
+<tr><td style="border-right:1px solid #e1e1e1;border-bottom:1px solid #e1e1e1;padding:9px 11px;background:#fafafa;font-weight:700;color:#333;"><b>대상 카드·용도</b><span style="color:#c00;">*</span><br><span style="color:#999;font-weight:400;font-size:11px;">(샘플구매·소모품·광고 등)</span></td>
+<td style="border-right:1px solid #e1e1e1;border-bottom:1px solid #e1e1e1;padding:9px 11px;">&nbsp;</td>
+<td style="border-right:1px solid #e1e1e1;border-bottom:1px solid #e1e1e1;padding:9px 11px;background:#fafafa;font-weight:700;color:#333;"><b>카드 끝4</b><span style="color:#c00;">*</span></td>
+<td style="border-bottom:1px solid #e1e1e1;padding:9px 11px;">&nbsp;</td></tr>
+<tr><td style="border-right:1px solid #e1e1e1;border-bottom:1px solid #e1e1e1;padding:9px 11px;background:#fafafa;font-weight:700;color:#333;"><b>조정 유형</b><span style="color:#c00;">*</span></td>
+<td style="border-right:1px solid #e1e1e1;border-bottom:1px solid #e1e1e1;padding:9px 11px;color:#888;">― 선택 ― ▾ <span style="color:#bbb;font-size:11px;">(영구 증액 / 일시 증액 / 감액)</span></td>
+<td style="border-right:1px solid #e1e1e1;border-bottom:1px solid #e1e1e1;padding:9px 11px;background:#fafafa;font-weight:700;color:#333;"><b>적용 기간</b><br><span style="color:#999;font-weight:400;font-size:11px;">(일시 증액 시·종료 후 원복)</span></td>
+<td style="border-bottom:1px solid #e1e1e1;padding:9px 11px;">&nbsp;</td></tr>
+<tr><td style="border-right:1px solid #e1e1e1;border-bottom:1px solid #e1e1e1;padding:9px 11px;background:#fafafa;font-weight:700;color:#333;"><b>조정 금액</b><span style="color:#c00;">*</span><br><span style="color:#999;font-weight:400;font-size:11px;">(증감분 · 만원)</span></td>
+<td colspan="3" style="border-bottom:1px solid #e1e1e1;padding:9px 11px;">&nbsp;</td></tr>
+<tr><td style="border-right:1px solid #e1e1e1;padding:9px 11px;background:#fafafa;font-weight:700;color:#333;"><b>근거</b><br><span style="color:#999;font-weight:400;font-size:11px;">(소모품·샘플 예산 품의 번호 등 · 있으면)</span></td>
+<td colspan="3" style="padding:9px 11px;">&nbsp;</td></tr>
+</tbody></table>
+
+<!-- 신청 사유 -->
+<table style="width:100%;border-collapse:collapse;table-layout:fixed;margin:0;border:1px solid #e1e1e1;border-top:2px solid #666;">
+<colgroup><col style="width:150px"><col></colgroup>
+<tbody>
+<tr><td colspan="2" style="background:#ebebeb;border-bottom:1px solid #e1e1e1;padding:8px 12px;font-weight:700;color:#111;">■ 신청 사유 / 근거</td></tr>
+<tr><td style="border-right:1px solid #e1e1e1;border-bottom:1px solid #e1e1e1;padding:9px 11px;background:#fafafa;font-weight:700;color:#333;"><b>조정 사유</b><span style="color:#c00;">*</span><br><span style="color:#999;font-weight:400;font-size:11px;">(왜 조정이 필요한지)</span></td>
+<td style="border-bottom:1px solid #e1e1e1;padding:9px 11px;">&nbsp;</td></tr>
+<tr><td style="border-right:1px solid #e1e1e1;padding:9px 11px;background:#fafafa;font-weight:700;color:#333;"><b>수정 예상 지출</b><br><span style="color:#999;font-weight:400;font-size:11px;">(조정 후 한도의 근거)</span></td>
+<td style="padding:9px 11px;">&nbsp;</td></tr>
+</tbody></table>
+</div>
+</script>
+<div id="fpv" class="fpv"><div class="fpvbox"><button class="fpvx" type="button">&#10005;</button><div class="fpvtt" id="fpvtt"></div><div class="fpvsub">아마란스 기안 양식 미리보기 · 확정 전이며 일부 변경될 수 있습니다</div><div class="fpvbody" id="fpvbody"></div></div></div>
+<script>
+var DATA = {"orgs": [{"key": "mgmt", "name": "경영지원본부", "color": "#475569", "common": [], "teams": [{"n": "재무회계팀", "cards": [{"n": "팀운영비", "u": "회식비, 식대보조금, 티타임비", "col": "#334155", "cat": "운영비", "rule": "팀 일상 운영비만 사용합니다. 회식비·식대보조금·티타임비 등 반복성 비용은 담당자 1명이 증빙을 관리합니다.", "s": "팀 단위로 자주 발생하는 운영성 지출", "why": "개인 보유 카드에 흩어진 운영비를 팀 카드로 묶어 책임자와 증빙 흐름을 명확히 합니다."}, {"n": "광고전용", "u": "광고·마케팅 집행", "col": "#0D9488", "cat": "마케팅", "rule": "온라인 광고·캠페인 집행 전용입니다. 매체별 집행 내역과 승인 근거를 함께 보관합니다.", "s": "온라인 광고, 매체비, 캠페인 비용", "why": "광고성 지출을 별도 카드로 분리해 캠페인별 사용액 추적이 쉬워집니다."}, {"n": "SaaS결제", "u": "업무 SaaS·구독 소프트웨어", "col": "#7C3AED", "cat": "구독·자동결제", "rule": "정기 SaaS와 자동결제는 재무팀 카드로 일원화합니다. 신규 등록·해지는 재무팀에 공유합니다. 단, AI툴(ChatGPT·Claude·미드저니 등) 구독은 DX팀 'AI구독전용' 카드로 결제합니다. (SaaS에 내장된 AI 애드온은 본 구독을 따라 재무팀 카드)", "s": "월간·연간 구독, 협업툴, 디자인툴", "why": "여러 카드에 흩어져 있던 자동결제를 재무팀 카드로 통합해 누락과 중복 결제를 줄입니다. AI툴 구독만 DX 카드로 분리해 관리합니다."}]}, {"n": "피플팀", "cards": [{"n": "팀운영비", "u": "회식비, 식대보조금, 티타임비", "col": "#334155", "cat": "운영비", "rule": "팀 일상 운영비만 사용합니다. 회식비·식대보조금·티타임비 등 반복성 비용은 담당자 1명이 증빙을 관리합니다.", "s": "팀 단위로 자주 발생하는 운영성 지출", "why": "개인 보유 카드에 흩어진 운영비를 팀 카드로 묶어 책임자와 증빙 흐름을 명확히 합니다."}, {"n": "전사 총무·중앙구매(물품)", "u": "전사 공통 물품·비품", "col": "#DB2777", "cat": "총무·중앙구매", "rule": "전사 공통 물품·비품과 BS 2층 필요 물품, 경조사 화환·교육·명함 등 전사 총무·중앙구매성 지출 카드입니다. 본부 팀 소모품(일괄 한도)과 성격이 달라 별도로 관리하며 재무·피플팀이 중앙에서 운용합니다.", "s": "공통 소모품, 다과, 경조사 화환, 교육, 명함", "why": "피플팀 대행 결제를 전사 총무·중앙구매 중심으로 정리해 구매 범위와 책임을 분명히 하고, 본부 소모품 카드(일괄 한도)와 구분합니다."}, {"n": "택시 서비스·퀵 결제 카드", "u": "택시 서비스·퀵 자동결제 연결 전용", "col": "#D97706", "cat": "출장·교통", "rule": "택시 서비스(야근·외근 택시)와 퀵서비스 자동결제를 연결하는 카드입니다. 출장 경비(항공권·숙박)는 이 카드가 아니라 출장품의 승인 후 보유 중인 팀 카드에 한도를 세팅해 현업이 직접 결제합니다.", "s": "택시 서비스 택시, 퀵서비스 등 자동결제 연결", "why": "택시·퀵 결제를 한 카드로 모아 관리하고, 출장 경비는 출장품의 기반으로 보유 카드에서 직접 결제하도록 정리했습니다(피플 협의 반영)."}, {"n": "기타", "u": "협의가 필요한 예비 지출", "col": "#4F46E5", "cat": "예비·협의", "rule": "운영 원칙으로 분류하기 어려운 예비 항목입니다. 재무팀·해당 책임자 협의 후 사용합니다.", "s": "분류 확정 전 임시 운용", "why": "정식 용도 확정 전까지 예외성 카드로 관리하고, 장기 사용 시 별도 기준을 정합니다."}]}]}, {"key": "oper", "name": "운영본부", "color": "#2563EB", "common": [], "teams": [{"n": "물류팀", "cards": [{"n": "팀운영비(물품구매)", "u": "운영·현장 물품구매", "col": "#334155", "cat": "운영비·구매", "rule": "팀운영비와 물품구매를 함께 쓰는 카드입니다. 시설 수리·운영 재료 등 현장성 비용에 한정합니다.", "s": "물류·현장 회식, 시설 수리, 운영 재료", "why": "현장 운영에 필요한 물품구매까지 한 카드로 묶어 운영 편의성을 확보합니다."}, {"n": "팀운영비(물품구매)", "u": "운영·현장 물품구매", "col": "#334155", "cat": "운영비·구매", "rule": "팀운영비와 물품구매를 함께 쓰는 카드입니다. 시설 수리·운영 재료 등 현장성 비용에 한정합니다.", "s": "물류·현장 회식, 시설 수리, 운영 재료", "why": "현장 운영에 필요한 물품구매까지 한 카드로 묶어 운영 편의성을 확보합니다."}]}, {"n": "DX팀", "cards": [{"n": "팀운영비", "u": "회식비, 식대보조금, 티타임비", "col": "#334155", "cat": "운영비", "rule": "팀 일상 운영비만 사용합니다. 회식비·식대보조금·티타임비 등 반복성 비용은 담당자 1명이 증빙을 관리합니다.", "s": "팀 단위로 자주 발생하는 운영성 지출", "why": "개인 보유 카드에 흩어진 운영비를 팀 카드로 묶어 책임자와 증빙 흐름을 명확히 합니다."}, {"n": "AI구독전용", "u": "ChatGPT, Claude, Midjourney 등 AI툴 구독료·사용료", "col": "#7C3AED", "cat": "구독·자동결제", "rule": "AI툴 구독 결제 전용 카드입니다. 일반 SaaS·협업툴은 재무팀 SaaS결제 카드로 분리하고, 신규 등록·해지는 DX팀 담당자와 재무팀에 공유합니다.", "s": "DX팀이 AI툴 계정·구독 현황을 취합하고, 신규 등록·해지 요청을 관리합니다.", "why": "개인·부서별로 흩어진 AI툴 결제를 DX팀 카드로 일원화해 구독 현황, 비용, 해지·갱신 책임자를 한 곳에서 관리합니다."}]}, {"n": "CX팀", "cards": [{"n": "팀운영비(물품구매)", "u": "운영·현장 물품구매", "col": "#334155", "cat": "운영비·구매", "rule": "팀운영비와 물품구매를 함께 쓰는 카드입니다. 시설 수리·운영 재료 등 현장성 비용에 한정합니다.", "s": "물류·현장 회식, 시설 수리, 운영 재료", "why": "현장 운영에 필요한 물품구매까지 한 카드로 묶어 운영 편의성을 확보합니다."}]}, {"n": "디자인팀", "cards": [{"n": "[온라인] 샘플구매", "u": "온라인 샘플·견본 구매", "col": "#DB2777", "cat": "구매·샘플", "rule": "온라인 샘플구매 전용 온라인 전용카드입니다. 기본 분기 한도가 상시 배부돼 있어 별도 신청 없이 바로 사용하고, 런칭·시즌 등으로 부족하면 소모품·샘플 예산 품의 승인 시 즉시 증액됩니다(분기 종료 시 기본 한도로 리셋). 오프라인 샘플구매는 카드 발급·불출 신청서 승인 후 재무팀 보관 실물카드를 받아 진행하고, 영수증은 보관 후 지출결의서를 작성합니다.", "s": "디자인팀 시즌 레퍼런스, 원단, 완제품 샘플 등 온라인 샘플 결제 전반.", "why": "기존에는 품의 → 카드결제 신청서 → 재무팀 담당자가 대신 결제하는 흐름이었습니다. 이제 팀 온라인 전용카드로 직접 결제해 대기 없이 진행합니다. 기본 한도 + 품의 증액 구조라 결재가 곧 한도 — 예산이 자동으로 통제됩니다."}, {"n": "팀운영비(촬영공용)", "u": "촬영 공용 운영비", "col": "#334155", "cat": "촬영·팀운영", "rule": "촬영공용 카드입니다. 야근 식대·티타임·촬영진행비를 같이 쓰되 팀 책임자가 용도별 증빙을 분리해 관리합니다.", "s": "촬영 식대, 티타임, 진행비가 함께 발생하는 상황. 단순 티타임비만 반복되면 팀운영비 회수·전환 후보로 봅니다.", "why": "촬영 현장에서 함께 결제되는 비용을 한 카드로 묶어 카드 수를 줄입니다."}]}, {"n": "MD팀", "cards": [{"n": "팀운영비", "u": "회식비, 식대보조금, 티타임비", "col": "#334155", "cat": "운영비", "rule": "팀 일상 운영비만 사용합니다. 회식비·식대보조금·티타임비 등 반복성 비용은 담당자 1명이 증빙을 관리합니다.", "s": "팀 단위로 자주 발생하는 운영성 지출", "why": "개인 보유 카드에 흩어진 운영비를 팀 카드로 묶어 책임자와 증빙 흐름을 명확히 합니다."}]}]}, {"key": "hiro", "name": "A사업본부", "color": "#C2620A", "common": [{"n": "[온라인] 물품구매(문구·소모품)", "u": "온라인 문구·소모품 구매", "col": "#DB2777", "cat": "구매·소모품", "rule": "소모품·문구 구매 전용 온라인 전용카드입니다. 전 본부 동일한 기본 분기 한도가 배부되며, 부족하면 소모품·샘플 예산 품의로 증액할 수 있습니다. 촬영 관련 물품은 촬영품의 예산으로 별도 결제하고, 매장 사업성 지출(집기·F&B 원부자재·팝업 등)은 매장운영 카드로 분리합니다. 오프라인 구매는 불가하며, 긴급한 경우 재무팀과 사전 협의해 주세요.", "s": "문구류·팀 소모품 등 온라인 구매에 사용합니다. 촬영 관련 물품은 촬영품의 예산으로 별도 결제합니다.", "why": "건별 결재 후 대행 구매하던 물품 결제를 본부 온라인 전용카드 직접 결제로 바꾸고, 소모품·물품은 전 본부 일괄 동일 한도로 단순화합니다."}], "teams": [{"n": "디자인팀", "cards": [{"n": "[온라인] 샘플구매", "u": "온라인 샘플·견본 구매", "col": "#DB2777", "cat": "구매·샘플", "rule": "온라인 샘플구매 전용 온라인 전용카드입니다. 기본 분기 한도가 상시 배부돼 있어 별도 신청 없이 바로 사용하고, 런칭·시즌 등으로 부족하면 소모품·샘플 예산 품의 승인 시 즉시 증액됩니다(분기 종료 시 기본 한도로 리셋). 오프라인 샘플구매는 카드 발급·불출 신청서 승인 후 재무팀 보관 실물카드를 받아 진행하고, 영수증은 보관 후 지출결의서를 작성합니다.", "s": "디자인팀 시즌 레퍼런스, 원단, 완제품 샘플 등 온라인 샘플 결제 전반.", "why": "기존에는 품의 → 카드결제 신청서 → 재무팀 담당자가 대신 결제하는 흐름이었습니다. 이제 팀 온라인 전용카드로 직접 결제해 대기 없이 진행합니다. 기본 한도 + 품의 증액 구조라 결재가 곧 한도 — 예산이 자동으로 통제됩니다."}, {"n": "팀운영비(촬영공용)", "u": "촬영 공용 운영비", "col": "#334155", "cat": "촬영·팀운영", "rule": "촬영공용 카드입니다. 야근 식대·티타임·촬영진행비를 같이 쓰되 팀 책임자가 용도별 증빙을 분리해 관리합니다.", "s": "촬영 식대, 티타임, 진행비가 함께 발생하는 상황. 단순 티타임비만 반복되면 팀운영비 회수·전환 후보로 봅니다.", "why": "촬영 현장에서 함께 결제되는 비용을 한 카드로 묶어 카드 수를 줄입니다."}]}, {"n": "매장운영팀", "cards": [{"n": "매장운영 카드", "u": "직영 매장 운영 물품 구매", "col": "#EA580C", "cat": "매장운영", "rule": "직영 매장(A본부 올데이A본부 피자 · B본부 CIEL 젤라또) 운영에 필요한 물품을 이 카드로 구매합니다. 담당자가 결제·증빙을 관리합니다.", "s": "매장 식자재·집기, 배송 포장재 등 매장 운영 물품", "why": "매장 운영 결제를 전용 카드 한 장으로 모아 관리합니다."}]}, {"n": "생산운영팀", "cards": [{"n": "팀운영비", "u": "회식비, 식대보조금, 티타임비", "col": "#334155", "cat": "운영비", "rule": "팀 일상 운영비만 사용합니다. 회식비·식대보조금·티타임비 등 반복성 비용은 담당자 1명이 증빙을 관리합니다.", "s": "팀 단위로 자주 발생하는 운영성 지출", "why": "개인 보유 카드에 흩어진 운영비를 팀 카드로 묶어 책임자와 증빙 흐름을 명확히 합니다."}, {"n": "팀운영비(촬영공용)", "u": "촬영 공용 운영비", "col": "#334155", "cat": "촬영·팀운영", "rule": "촬영공용 카드입니다. 야근 식대·티타임·촬영진행비를 같이 쓰되 팀 책임자가 용도별 증빙을 분리해 관리합니다.", "s": "촬영 식대, 티타임, 진행비가 함께 발생하는 상황. 단순 티타임비만 반복되면 팀운영비 회수·전환 후보로 봅니다.", "why": "촬영 현장에서 함께 결제되는 비용을 한 카드로 묶어 카드 수를 줄입니다."}]}]}, {"key": "fashion", "name": "C사업본부", "color": "#7C3AED", "common": [{"n": "[온라인] 물품구매(문구·소모품)", "u": "온라인 문구·소모품 구매", "col": "#DB2777", "cat": "구매·소모품", "rule": "소모품·문구 구매 전용 온라인 전용카드입니다. 전 본부 동일한 기본 분기 한도가 배부되며, 부족하면 소모품·샘플 예산 품의로 증액할 수 있습니다. 촬영 관련 물품은 촬영품의 예산으로 별도 결제하고, 매장 사업성 지출(집기·F&B 원부자재·팝업 등)은 매장운영 카드로 분리합니다. 오프라인 구매는 불가하며, 긴급한 경우 재무팀과 사전 협의해 주세요.", "s": "문구류·팀 소모품 등 온라인 구매에 사용합니다. 촬영 관련 물품은 촬영품의 예산으로 별도 결제합니다.", "why": "건별 결재 후 대행 구매하던 물품 결제를 본부 온라인 전용카드 직접 결제로 바꾸고, 소모품·물품은 전 본부 일괄 동일 한도로 단순화합니다."}], "teams": [{"n": "디자인1팀", "cards": [{"n": "[온라인] 샘플구매", "u": "온라인 샘플·견본 구매", "col": "#DB2777", "cat": "구매·샘플", "rule": "온라인 샘플구매 전용 온라인 전용카드입니다. 기본 분기 한도가 상시 배부돼 있어 별도 신청 없이 바로 사용하고, 런칭·시즌 등으로 부족하면 소모품·샘플 예산 품의 승인 시 즉시 증액됩니다(분기 종료 시 기본 한도로 리셋). 오프라인 샘플구매는 카드 발급·불출 신청서 승인 후 재무팀 보관 실물카드를 받아 진행하고, 영수증은 보관 후 지출결의서를 작성합니다.", "s": "디자인팀 시즌 레퍼런스, 원단, 완제품 샘플 등 온라인 샘플 결제 전반.", "why": "기존에는 품의 → 카드결제 신청서 → 재무팀 담당자가 대신 결제하는 흐름이었습니다. 이제 팀 온라인 전용카드로 직접 결제해 대기 없이 진행합니다. 기본 한도 + 품의 증액 구조라 결재가 곧 한도 — 예산이 자동으로 통제됩니다."}, {"n": "팀운영비(촬영공용)", "u": "촬영 공용 운영비", "col": "#334155", "cat": "촬영·팀운영", "rule": "촬영공용 카드입니다. 야근 식대·티타임·촬영진행비를 같이 쓰되 팀 책임자가 용도별 증빙을 분리해 관리합니다.", "s": "촬영 식대, 티타임, 진행비가 함께 발생하는 상황. 단순 티타임비만 반복되면 팀운영비 회수·전환 후보로 봅니다.", "why": "촬영 현장에서 함께 결제되는 비용을 한 카드로 묶어 카드 수를 줄입니다."}]}, {"n": "영업팀", "cards": [{"n": "팀운영비", "u": "회식비, 식대보조금, 티타임비", "col": "#334155", "cat": "운영비", "rule": "팀 일상 운영비만 사용합니다. 회식비·식대보조금·티타임비 등 반복성 비용은 담당자 1명이 증빙을 관리합니다.", "s": "팀 단위로 자주 발생하는 운영성 지출", "why": "개인 보유 카드에 흩어진 운영비를 팀 카드로 묶어 책임자와 증빙 흐름을 명확히 합니다."}, {"n": "하이패스 전용", "u": "차량 하이패스 통행료", "col": "#0D9488", "cat": "교통·퀵", "rule": "하이패스 통행료 전용입니다. 차량·영업 이동 외 용도로 사용하지 않습니다.", "s": "영업 차량 고속도로 이용", "why": "하이패스는 현행처럼 별도 전용 카드로 유지합니다."}]}, {"n": "엘레쎄팀", "cards": [{"n": "[온라인] 샘플구매", "u": "온라인 샘플·견본 구매", "col": "#DB2777", "cat": "구매·샘플", "rule": "온라인 샘플구매 전용 온라인 전용카드입니다. 기본 분기 한도가 상시 배부돼 있어 별도 신청 없이 바로 사용하고, 런칭·시즌 등으로 부족하면 소모품·샘플 예산 품의 승인 시 즉시 증액됩니다(분기 종료 시 기본 한도로 리셋). 오프라인 샘플구매는 카드 발급·불출 신청서 승인 후 재무팀 보관 실물카드를 받아 진행하고, 영수증은 보관 후 지출결의서를 작성합니다.", "s": "디자인팀 시즌 레퍼런스, 원단, 완제품 샘플 등 온라인 샘플 결제 전반.", "why": "기존에는 품의 → 카드결제 신청서 → 재무팀 담당자가 대신 결제하는 흐름이었습니다. 이제 팀 온라인 전용카드로 직접 결제해 대기 없이 진행합니다. 기본 한도 + 품의 증액 구조라 결재가 곧 한도 — 예산이 자동으로 통제됩니다."}, {"n": "팀운영비(촬영공용)", "u": "촬영 공용 운영비", "col": "#334155", "cat": "촬영·팀운영", "rule": "촬영공용 카드입니다. 야근 식대·티타임·촬영진행비를 같이 쓰되 팀 책임자가 용도별 증빙을 분리해 관리합니다.", "s": "촬영 식대, 티타임, 진행비가 함께 발생하는 상황. 단순 티타임비만 반복되면 팀운영비 회수·전환 후보로 봅니다.", "why": "촬영 현장에서 함께 결제되는 비용을 한 카드로 묶어 카드 수를 줄입니다."}]}, {"n": "OH디자인팀", "cards": [{"n": "[온라인] 샘플구매", "u": "온라인 샘플·견본 구매", "col": "#DB2777", "cat": "구매·샘플", "rule": "온라인 샘플구매 전용 온라인 전용카드입니다. 기본 분기 한도가 상시 배부돼 있어 별도 신청 없이 바로 사용하고, 런칭·시즌 등으로 부족하면 소모품·샘플 예산 품의 승인 시 즉시 증액됩니다(분기 종료 시 기본 한도로 리셋). 오프라인 샘플구매는 카드 발급·불출 신청서 승인 후 재무팀 보관 실물카드를 받아 진행하고, 영수증은 보관 후 지출결의서를 작성합니다.", "s": "디자인팀 시즌 레퍼런스, 원단, 완제품 샘플 등 온라인 샘플 결제 전반.", "why": "기존에는 품의 → 카드결제 신청서 → 재무팀 담당자가 대신 결제하는 흐름이었습니다. 이제 팀 온라인 전용카드로 직접 결제해 대기 없이 진행합니다. 기본 한도 + 품의 증액 구조라 결재가 곧 한도 — 예산이 자동으로 통제됩니다."}, {"n": "팀운영비(촬영공용)", "u": "촬영 공용 운영비", "col": "#334155", "cat": "촬영·팀운영", "rule": "촬영공용 카드입니다. 야근 식대·티타임·촬영진행비를 같이 쓰되 팀 책임자가 용도별 증빙을 분리해 관리합니다.", "s": "촬영 식대, 티타임, 진행비가 함께 발생하는 상황. 단순 티타임비만 반복되면 팀운영비 회수·전환 후보로 봅니다.", "why": "촬영 현장에서 함께 결제되는 비용을 한 카드로 묶어 카드 수를 줄입니다."}]}, {"n": "기획팀", "cards": [{"n": "팀운영비", "u": "회식비, 식대보조금, 티타임비", "col": "#334155", "cat": "운영비", "rule": "팀 일상 운영비만 사용합니다. 회식비·식대보조금·티타임비 등 반복성 비용은 담당자 1명이 증빙을 관리합니다.", "s": "팀 단위로 자주 발생하는 운영성 지출", "why": "개인 보유 카드에 흩어진 운영비를 팀 카드로 묶어 책임자와 증빙 흐름을 명확히 합니다."}]}, {"n": "생산1팀", "cards": [{"n": "팀운영비", "u": "회식비, 식대보조금, 티타임비", "col": "#334155", "cat": "운영비", "rule": "팀 일상 운영비만 사용합니다. 회식비·식대보조금·티타임비 등 반복성 비용은 담당자 1명이 증빙을 관리합니다.", "s": "팀 단위로 자주 발생하는 운영성 지출", "why": "개인 보유 카드에 흩어진 운영비를 팀 카드로 묶어 책임자와 증빙 흐름을 명확히 합니다."}]}, {"n": "생산2팀", "cards": [{"n": "팀운영비", "u": "회식비, 식대보조금, 티타임비", "col": "#334155", "cat": "운영비", "rule": "팀 일상 운영비만 사용합니다. 회식비·식대보조금·티타임비 등 반복성 비용은 담당자 1명이 증빙을 관리합니다.", "s": "팀 단위로 자주 발생하는 운영성 지출", "why": "개인 보유 카드에 흩어진 운영비를 팀 카드로 묶어 책임자와 증빙 흐름을 명확히 합니다."}]}]}, {"key": "kids", "name": "B사업본부", "color": "#DB2777", "common": [{"n": "[온라인] 물품구매(문구·소모품)", "u": "온라인 문구·소모품 구매", "col": "#DB2777", "cat": "구매·소모품", "rule": "소모품·문구 구매 전용 온라인 전용카드입니다. 전 본부 동일한 기본 분기 한도가 배부되며, 부족하면 소모품·샘플 예산 품의로 증액할 수 있습니다. 촬영 관련 물품은 촬영품의 예산으로 별도 결제하고, 매장 사업성 지출(집기·F&B 원부자재·팝업 등)은 매장운영 카드로 분리합니다. 오프라인 구매는 불가하며, 긴급한 경우 재무팀과 사전 협의해 주세요.", "s": "문구류·팀 소모품 등 온라인 구매에 사용합니다. 촬영 관련 물품은 촬영품의 예산으로 별도 결제합니다.", "why": "건별 결재 후 대행 구매하던 물품 결제를 본부 온라인 전용카드 직접 결제로 바꾸고, 소모품·물품은 전 본부 일괄 동일 한도로 단순화합니다."}], "teams": [{"n": "웹마케팅팀", "cards": [{"n": "팀운영비(촬영공용)", "u": "촬영 공용 운영비", "col": "#334155", "cat": "촬영·팀운영", "rule": "촬영공용 카드입니다. 야근 식대·티타임·촬영진행비를 같이 쓰되 팀 책임자가 용도별 증빙을 분리해 관리합니다.", "s": "촬영 식대, 티타임, 진행비가 함께 발생하는 상황. 단순 티타임비만 반복되면 팀운영비 회수·전환 후보로 봅니다.", "why": "촬영 현장에서 함께 결제되는 비용을 한 카드로 묶어 카드 수를 줄입니다."}]}, {"n": "디자인팀", "cards": [{"n": "[온라인] 샘플구매", "u": "온라인 샘플·견본 구매", "col": "#DB2777", "cat": "구매·샘플", "rule": "온라인 샘플구매 전용 온라인 전용카드입니다. 기본 분기 한도가 상시 배부돼 있어 별도 신청 없이 바로 사용하고, 런칭·시즌 등으로 부족하면 소모품·샘플 예산 품의 승인 시 즉시 증액됩니다(분기 종료 시 기본 한도로 리셋). 오프라인 샘플구매는 카드 발급·불출 신청서 승인 후 재무팀 보관 실물카드를 받아 진행하고, 영수증은 보관 후 지출결의서를 작성합니다.", "s": "디자인팀 시즌 레퍼런스, 원단, 완제품 샘플 등 온라인 샘플 결제 전반.", "why": "기존에는 품의 → 카드결제 신청서 → 재무팀 담당자가 대신 결제하는 흐름이었습니다. 이제 팀 온라인 전용카드로 직접 결제해 대기 없이 진행합니다. 기본 한도 + 품의 증액 구조라 결재가 곧 한도 — 예산이 자동으로 통제됩니다."}, {"n": "팀운영비(촬영공용)", "u": "촬영 공용 운영비", "col": "#334155", "cat": "촬영·팀운영", "rule": "촬영공용 카드입니다. 야근 식대·티타임·촬영진행비를 같이 쓰되 팀 책임자가 용도별 증빙을 분리해 관리합니다.", "s": "촬영 식대, 티타임, 진행비가 함께 발생하는 상황. 단순 티타임비만 반복되면 팀운영비 회수·전환 후보로 봅니다.", "why": "촬영 현장에서 함께 결제되는 비용을 한 카드로 묶어 카드 수를 줄입니다."}]}, {"n": "생산팀", "cards": [{"n": "팀운영비", "u": "회식비, 식대보조금, 티타임비", "col": "#334155", "cat": "운영비", "rule": "팀 일상 운영비만 사용합니다. 회식비·식대보조금·티타임비 등 반복성 비용은 담당자 1명이 증빙을 관리합니다.", "s": "팀 단위로 자주 발생하는 운영성 지출", "why": "개인 보유 카드에 흩어진 운영비를 팀 카드로 묶어 책임자와 증빙 흐름을 명확히 합니다."}]}, {"n": "매장운영팀", "cards": [{"n": "매장운영 카드", "u": "직영 매장 운영 물품 구매", "col": "#EA580C", "cat": "매장운영", "rule": "직영 매장(A본부 올데이A본부 피자 · B본부 CIEL 젤라또) 운영에 필요한 물품을 이 카드로 구매합니다. 담당자가 결제·증빙을 관리합니다.", "s": "매장 식자재·집기, 배송 포장재 등 매장 운영 물품", "why": "매장 운영 결제를 전용 카드 한 장으로 모아 관리합니다."}]}]}], "allCommon": [{"n": "출장·팝업진행비", "u": "출장·팝업 예비 지출", "col": "#DC2626", "cat": "출장·팝업", "rule": "팀 지출은 담당자가 지정된 팀운영카드가 기본입니다. 팝업·출장성 대형 프로젝트로 추가 인원에게 카드 배분이 필요할 때만, 카드 발급·불출 신청서로 예비카드를 발급해 사용하고 종료 후 반납합니다.", "s": "팝업스토어, 출장성 대형 프로젝트", "why": "상시 보유 카드를 늘리지 않고, 담당자 지정 팀운영카드를 기본으로 쓰되 추가 배분이 필요한 프로젝트에만 예비카드를 발급합니다."}]};
+var orgRow=document.getElementById('orgRow'),teamRow=document.getElementById('teamRow'),box=document.getElementById('cardsBox');
+var curOrg=null;
+function chip(label,color,on){var b=document.createElement('button');b.className='chip'+(on?' on':'');b.textContent=label;if(on&&color)b.style.background=color;return b}
+function cardRow(c){var d='';var lim='';var nm=(c.n||'');var online=nm.indexOf('[온라인]')>=0;if(online&&nm.indexOf('샘플구매')>=0)lim='기본 분기 120만원 · 품의 승인 시 분기 최대 450만원';else if(online&&(nm.indexOf('물품구매')>=0||nm.indexOf('소모품')>=0))lim='기본 분기 50만원 · 부족하면 품의로 증액 <b style="color:#B45309">(아직 시행 전 — 시행 시 다시 안내)</b>';if(lim)d+='<div class="dlim">💳 한도 · '+lim+'</div>';
+ if(c.rule)d+='<div class="dl">사용 규칙</div><div class="dv">'+c.rule+'</div>';
+ if(c.s)d+='<div class="dl">이런 지출에 씁니다</div><div class="dv">'+c.s+'</div>';
+ if(c.why)d+='<div class="dl">왜 바뀌었나요</div><div class="dv">'+c.why+'</div>';
+ if(!d)d='<div class="dv">상세 안내는 재무회계팀에 문의해 주세요.</div>';
+ return '<div class="crow"><div class="crow-h"><span class="cico" style="background:linear-gradient(135deg,'+c.col+','+shade(c.col)+')"></span><div><b>'+c.n+'</b><p>'+(c.u||c.cat)+'</p></div><span class="car">›</span></div><div class="crow-d">'+d+'</div></div>'}
+function shade(h){h=h.replace('#','');var r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);function d(x){return('0'+Math.round(x*0.72).toString(16)).slice(-2)}return '#'+d(r)+d(g)+d(b)}
+function renderOrgs(){orgRow.innerHTML='';DATA.orgs.forEach(function(o,i){var b=chip(o.name,o.color,curOrg===i);b.onclick=function(){curOrg=i;renderOrgs();renderTeams()};orgRow.appendChild(b)})}
+function renderTeams(){var o=DATA.orgs[curOrg];teamRow.style.display='flex';teamRow.innerHTML='';box.style.display='none';
+ var all=chip('본부 전체',o.color,true);all.onclick=function(){[].forEach.call(teamRow.children,function(x,k){x.classList.toggle('on',k===0);x.style.background=''});selTeam(-1)};teamRow.appendChild(all);
+ o.teams.forEach(function(t,j){var b=chip(t.n,o.color,false);b.onclick=function(){[].forEach.call(teamRow.children,function(x,k){x.classList.toggle('on',k===j+1);x.style.background=(k===j+1)?o.color:''});selTeam(j)};teamRow.appendChild(b)});
+ selTeam(-1)}
+function selTeam(j){var o=DATA.orgs[curOrg];box.style.display='block';var h='<div class="cardlist">';
+ if(j<0){h+='<div class="grouplab">본부 공통</div>';if(o.common.length)o.common.forEach(function(c){h+=cardRow(c)});else h+='<p style="font-size:12px;color:var(--mut);font-weight:600;padding:2px">본부 공통 카드 없음</p>';
+  o.teams.forEach(function(t){h+='<div class="grouplab">'+t.n+'</div>';if(t.cards.length)t.cards.forEach(function(c){h+=cardRow(c)});else h+='<p style="font-size:12px;color:var(--mut);font-weight:600;padding:2px">팀 배치 카드 없음</p>'});
+ }else{var t=o.teams[j];h+='<div class="grouplab">'+t.n+'</div>';if(t.cards.length)t.cards.forEach(function(c){h+=cardRow(c)});else h+='<p style="font-size:12px;color:var(--mut);font-weight:600;padding:2px">팀 배치 카드 없음</p>';
+  if(o.common.length){h+='<div class="grouplab">본부 공통 (같이 사용)</div>';o.common.forEach(function(c){h+=cardRow(c)})}}
+ if(DATA.allCommon.length){h+='<div class="grouplab">전사 공통</div>';DATA.allCommon.forEach(function(c){h+=cardRow(c)})}
+ h+='</div>';box.innerHTML=h}
+renderOrgs();
+function goTab(t){if(t==='proof'&&window.ensureProofImgs)window.ensureProofImgs();document.querySelectorAll('.tabpanel').forEach(function(p){p.classList.toggle('on',p.getAttribute('data-tab')===t)});document.querySelectorAll('.tabbar button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-go')===t)});var ab=document.querySelector('.appbar span');if(ab)ab.textContent={change:'홈',sched:'도입 일정',mycard:'내 팀 카드',guide:'상황별 가이드',proof:'증빙 정리',kakao:'택시 서비스'}[t]||'샘플기업 재무회계팀';window.scrollTo(0,0);}
+document.querySelectorAll('.tabbar button').forEach(function(b){b.onclick=function(){goTab(b.getAttribute('data-go'))}});
+document.querySelectorAll('[data-acc] .acc-h').forEach(function(b){b.onclick=function(){b.parentElement.classList.toggle('open')}});
+box.addEventListener('click',function(e){var h=e.target.closest?e.target.closest('.crow-h'):null;if(h)h.parentElement.classList.toggle('open')});
+var ov=document.getElementById('fpv'),fb=document.getElementById('fpvbody'),ft=document.getElementById('fpvtt');
+document.addEventListener('click',function(e){
+ var b=e.target.closest?e.target.closest('[data-form-preview]'):null;
+ if(b){var t=document.getElementById('formprev-'+b.getAttribute('data-form-preview'));if(!t)return;fb.innerHTML=t.innerHTML;ft.textContent=b.textContent.replace('📄 ','').replace(' 미리보기 ↗','');ov.classList.add('open');document.body.style.overflow='hidden';return;}
+ if(e.target===ov||(e.target.closest&&e.target.closest('.fpvx'))){ov.classList.remove('open');fb.innerHTML='';document.body.style.overflow='';}
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('open')){ov.classList.remove('open');fb.innerHTML='';document.body.style.overflow='';}});
+(function(){['lgb1','lgb2','lgb3'].forEach(function(c){var d=document.createElement('div');d.className='lgblob '+c;document.body.appendChild(d)});
+document.querySelectorAll('.hero').forEach(function(h){h.addEventListener('pointermove',function(e){var r=h.getBoundingClientRect();h.style.setProperty('--mx',(e.clientX-r.left)+'px');h.style.setProperty('--my',(e.clientY-r.top)+'px')},{passive:true})});})();
+document.querySelectorAll('[data-go2]').forEach(function(b){b.onclick=function(){goTab(b.getAttribute('data-go2'))}});
+var nv=document.querySelector('.tabbar'),ap=document.querySelector('.appbar');if(nv&&ap)ap.parentElement.insertBefore(nv,ap.nextSibling);
+document.querySelectorAll('.menugrid .mg').forEach(function(el){el.addEventListener('pointermove',function(e){var r=el.getBoundingClientRect();el.style.setProperty('--mx',(e.clientX-r.left)+'px');el.style.setProperty('--my',(e.clientY-r.top)+'px')},{passive:true})});
+
+(function(){
+var DK=null,IDX=0,SL=[];
+function getDATA(){var s=[].slice.call(document.scripts).filter(function(x){return x.textContent.indexOf('var DATA =')>=0})[0];
+ if(!s)return null;var m=s.textContent.match(/var DATA\s*=\s*(\{[\s\S]*?\});/);try{return JSON.parse(m[1])}catch(e){return null}}
+function sel(){var o=document.querySelector('#orgRow .chip.on'),tm=document.querySelector('#teamRow .chip.on');
+ return{org:o?o.textContent.trim():'',team:tm?tm.textContent.trim():''}}
+function shade(h){h=(h||'#3182F6').replace('#','');var r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);
+ function d(x){return('0'+Math.round(x*0.72).toString(16)).slice(-2)}return '#'+d(r)+d(g)+d(b)}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function cardRow2(c){var v=(c.n||'').indexOf('[온라인]')===0;
+ return '<div class="dkcard"><span class="ci2" style="background:linear-gradient(135deg,'+(c.col||'#3182F6')+','+shade(c.col)+')"></span><div><b>'+esc(c.n)+'</b><span>'+esc(c.u||c.cat||'')+'</span></div><span class="vb '+(v?'v':'p')+'">'+(v?'가상':'실물')+'</span></div>'}
+function build(D,s){
+ var org=null;D.orgs.forEach(function(o){if(o.name===s.org)org=o});
+ if(!org)return[];
+ var teamName=s.team,teamCards=[],commonCards=(org.common||[]).slice();
+ if(teamName&&teamName!=='본부 전체'){org.teams.forEach(function(tm){if(tm.n===teamName)teamCards=teamCards.concat(tm.cards||[])})}
+ else{org.teams.forEach(function(tm){teamCards=teamCards.concat(tm.cards||[])})}
+ var cards=teamCards.concat(commonCards);
+ var teamLabel=(teamName&&teamName!=='본부 전체')?teamName:'본부 내 팀 카드 전체';
+ var names=cards.map(function(c){return c.n||''}).join(' ');
+ var hasSample=names.indexOf('샘플구매')>=0,hasGoods=names.indexOf('물품구매')>=0,hasOps=names.indexOf('팀운영비')>=0,hasStore=names.indexOf('매장운영')>=0;
+ var who=esc(s.org)+(teamName&&teamName!=='본부 전체'?' '+esc(teamName):'');
+ var S=[];
+ S.push({e:'👋',h:who+',<br>이렇게 바뀝니다',sub:'8월 3일(월) 시행 예정 · 우리 조직 기준으로 정리했어요. 1분이면 다 봅니다.',
+  list:[['💳','우리 팀 카드 '+teamCards.length+'장'+(commonCards.length?' + 본부 공통 '+commonCards.length+'장':''),(hasSample?'샘플구매 ':'')+(hasGoods?'물품구매 ':'')+(hasOps?'팀운영비 ':'')+(hasStore?'매장운영 ':'')+'등 · 본부 공통 카드는 본부 안에서 함께 씁니다'],['🚕','택시 서비스','야근·외근 택시는 전 직원 공통'],['🧾','증빙','메일 영수증만 챙기면 끝']]});
+ S.push({e:'😮‍💨',h:'지금까지는<br>이랬어요',sub:'우리 팀이 겪던 불편',
+  list:[['⏳','건별 결재 후 대행 구매','살 게 있으면 결재 올리고 경영지원본부가 대신 구매 — 결제까지 기다려야 했어요'],['🔀','카드 한 장에 여러 용도','식대·교통·샘플·접대가 섞여 무슨 카드인지 애매했어요'],['🚕','택시는 개인 결제 후 정산','야근 택시 타고 영수증 제출해야 했죠']]});
+ S.push({e:'💳',h:'우리 조직 카드는<br>이렇게 배치돼요',sub:'8월 3일 회수·재분배 후 기준입니다',
+  groups:[{label:teamLabel,items:teamCards},{label:'본부 공통 (본부 안에서 함께 사용)',items:commonCards}]});
+ if(hasSample)S.push({e:'🛍️',h:'온라인 샘플구매는<br>팀 온라인 전용카드로',sub:'대행 요청 없이 팀에서 바로 결제합니다',
+  list:[['1️⃣','카드 시트에서 번호 확인','담당자만 접근 가능한 시트에 번호·유효기간·CVC가 있어요'],['2️⃣','일반결제 → 카드사 A','간편결제 말고 카드 직접 입력으로 결제'],['3️⃣','이메일 입력 → 영수증 수신','결제창에 이메일 넣으면 영수증이 메일로 와요'],['💰','한도','기본 분기 한도가 상시 배부 · 부족하면 예산 품의로 증액']]});
+ if(hasGoods)S.push({e:'✏️',h:'문구·소모품은<br>본부 물품구매 카드로<br><span style="font-size:.6em;opacity:.75">(아직 준비 중)</span>',sub:'⏳ 아직 시행 전 — 당분간 현행 유지하며, 시행 시점이 정해지면 다시 안내드립니다',
+  list:[['🖊️','당분간은 지금 그대로','볼펜·파일 등 사무용품은 기존대로 경영지원본부 대행 구매로 요청 (다과·휴지 등 전사 공통은 피플팀) · 도입되면 본부 카드로 직접 구매'],['🎬','촬영 물품은 별도','촬영 소품·물품은 촬영품의 예산으로 결제 — 이 카드 한도와 무관'],['🏪','도입되면 — 온라인 전용','본부 물품구매 카드는 온라인에서만 결제돼요. 매장·현장에서 바로 사야 하는 건 지금도 팀 실물카드(매장운영·팀운영비)로 결제하시면 됩니다']]});
+ if(hasOps||hasStore)S.push({e:'🍽️',h:'회식·다과는<br>팀운영비 카드로',sub:'담당자가 결제·증빙을 관리합니다',
+  list:[['👥','회식비·식대보조금·티타임비','팀 담당자에게 요청해 결제'],['🧾','증빙','담당자가 일괄 관리 — 개인 정산이 줄어요']]});
+ S.push({e:'🚕',h:'야근·외근 택시는<br>회사 택시 서비스',sub:'카드를 안 쓰는 분도 해당돼요',
+  list:[['📲','초대 수락','피플팀이 그룹에 등록하면 앱 알림·문자로 초대가 옵니다'],['🚖','호출 시 업무 선택','결제 수단을 업무(샘플기업)로 + 이용 사유 입력(필수)'],['✅','증빙 자동','영수증 제출·개인 정산 없음. Flex 첨부도 불필요']]});
+ S.push({e:'🧾',h:'증빙,<br>이것만 기억하세요',sub:'3가지만 지키면 반려될 일이 없어요',
+  list:[['📧','메일 영수증','결제할 때 이메일 입력 → 받은 영수증 정리해 첨부'],['🏪','판매자별로','오픈마켓 묶음결제는 스토어별 영수증을 각각 발급'],['📝','용도는 구체적으로','날짜·목적이 보이게 · 거래처는 카드 내역에서 자동으로 채워져요']]});
+ S.push({e:'📅',h:'우리가<br>할 일',sub:'순서대로만 하면 됩니다',
+  list:[['1️⃣','카드 담당자 지정 (7월 말)','본부장님·팀장님께 개별 요청드립니다 — 팀 카드는 팀장님이 기본'],['2️⃣','8월 3일(월) 카드 회수·재분배','담당자에게 새 카드/카드번호를 전달드려요'],['3️⃣','결제할 때 이메일 꼭 입력','영수증이 메일로 와야 증빙이 편해요']]});
+ S.push({e:'🙌',h:'준비 끝!',sub:'더 자세한 내용은 아래에서 확인하세요',
+  list:[['💳','온라인 전용카드 이용 가이드','카드번호 확인 · 결제 흐름 · 증빙 · 한도 품의 (별도 페이지)'],['📄','이 안내 페이지','상황별 가이드 · 증빙 · 택시 서비스 탭'],['💬','문의·의견','재무회계팀 이어진 매니저 · 가이드 페이지 의견 탭']]});
+ return S}
+function render(){
+ var s=SL[IDX],h='<div class="dkslide"><div class="dkemo">'+s.e+'</div><div class="dkh">'+s.h+'</div><div class="dksub">'+esc(s.sub)+'</div>';
+ if(s.cards){h+='<div class="dkl">';s.cards.forEach(function(c){h+=cardRow2(c)});if(!s.cards.length)h+='<div class="dksub">배치된 카드가 없습니다</div>';h+='</div>'}
+ if(s.groups){h+='<div class="dkl">';s.groups.forEach(function(g){if(!g.items||!g.items.length)return;
+  h+='<div class="dkgl">'+esc(g.label)+' <em>'+g.items.length+'장</em></div>';g.items.forEach(function(c){h+=cardRow2(c)})});h+='</div>'}
+ if(s.list){h+='<div class="dkl">';s.list.forEach(function(r){h+='<div class="r"><span class="e">'+r[0]+'</span><div><b>'+r[1]+'</b><p>'+esc(r[2])+'</p></div></div>'});h+='</div>'}
+ if(s.warn)h+='<div class="dkl"><div class="r warn"><span class="e">📌</span><div><p>'+esc(s.warn)+'</p></div></div></div>';
+ h+='</div>';
+ document.getElementById('dkbody').innerHTML=h;
+ document.getElementById('dkbody').scrollTop=0;
+ document.getElementById('dkbar').style.width=((IDX+1)/SL.length*100)+'%';
+ var d='';for(var i=0;i<SL.length;i++)d+='<i class="'+(i===IDX?'on':'')+'"></i>';
+ document.getElementById('dkdots').innerHTML=d;
+ document.getElementById('dkprev').disabled=(IDX===0);
+ document.getElementById('dknext').textContent=(IDX===SL.length-1?'닫기':'다음 ›');
+}
+function open2(){var D=getDATA();if(!D)return;var s=sel();SL=build(D,s);if(!SL.length)return;
+ IDX=0;document.getElementById('dkorg').textContent=s.org+(s.team&&s.team!=='본부 전체'?' · '+s.team:' · 전체');
+ render();document.getElementById('deck').classList.add('open');document.body.style.overflow='hidden'}
+function close2(){document.getElementById('deck').classList.remove('open');document.body.style.overflow=''}
+document.getElementById('dkx').onclick=close2;
+document.getElementById('deck').addEventListener('click',function(e){if(e.target.id==='deck')close2()});
+document.getElementById('dkprev').onclick=function(){if(IDX>0){IDX--;render()}};
+document.getElementById('dknext').onclick=function(){if(IDX<SL.length-1){IDX++;render()}else close2()};
+document.addEventListener('keydown',function(e){if(!document.getElementById('deck').classList.contains('open'))return;
+ if(e.key==='Escape')close2();if(e.key==='ArrowRight'){if(IDX<SL.length-1){IDX++;render()}}if(e.key==='ArrowLeft'){if(IDX>0){IDX--;render()}}});
+var tx=0;document.getElementById('dkbody').addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.getElementById('dkbody').addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-tx;
+ if(dx<-60&&IDX<SL.length-1){IDX++;render()}else if(dx>60&&IDX>0){IDX--;render()}},{passive:true});
+
+function pick(){
+ var D=getDATA();if(!D)return;
+ document.getElementById('dkorg').textContent='어느 조직으로 볼까요?';
+ document.getElementById('dkbar').style.width='0%';
+ document.getElementById('dkdots').innerHTML='';
+ document.getElementById('dkprev').disabled=true;
+ document.getElementById('dknext').disabled=true;
+ var h='<div class="dkslide"><div class="dkemo">🎞️</div><div class="dkh">우리 조직 브리핑</div><div class="dksub">본부를 고르면 그 조직 기준으로 정리해 보여드려요. 팀까지 고르면 더 짧아집니다.</div><div class="dkpick"><div class="pl">본부</div><div class="pw" id="pkOrg"></div><div id="pkTeamWrap" style="display:none"><div class="pl">팀 (선택)</div><div class="pw" id="pkTeam"></div></div></div></div>';
+ var body=document.getElementById('dkbody');body.innerHTML=h;body.scrollTop=0;
+ var ow=document.getElementById('pkOrg'),tw=document.getElementById('pkTeamWrap'),tb=document.getElementById('pkTeam');
+ D.orgs.forEach(function(o){var b=document.createElement('button');b.type='button';b.textContent=o.name;
+  b.onclick=function(){
+   [].forEach.call(ow.children,function(x){x.classList.toggle('on',x===b)});
+   tw.style.display='';tb.innerHTML='';
+   var all=document.createElement('button');all.type='button';all.textContent='본부 전체';
+   all.onclick=function(){start(o.name,'본부 전체')};tb.appendChild(all);
+   (o.teams||[]).forEach(function(tm){var t2=document.createElement('button');t2.type='button';t2.textContent=tm.n;
+    t2.onclick=function(){start(o.name,tm.n)};tb.appendChild(t2)});
+   tw.scrollIntoView({behavior:'smooth',block:'nearest'});
+  };ow.appendChild(b)});
+ document.getElementById('deck').classList.add('open');document.body.style.overflow='hidden';
+}
+function start(org,team){var D=getDATA();if(!D)return;
+ SL=build(D,{org:org,team:team});if(!SL.length)return;
+ IDX=0;document.getElementById('dkorg').textContent=org+(team&&team!=='본부 전체'?' · '+team:' · 전체');
+ document.getElementById('dknext').disabled=false;render()}
+var hb=document.getElementById('hctaGo');if(hb)hb.onclick=pick;
+var box=document.getElementById('cardsBox'),wrap=document.getElementById('deckBtnWrap');
+new MutationObserver(function(){
+ if(box.innerHTML.trim()&&box.style.display!=='none'){
+  if(!wrap.innerHTML)wrap.innerHTML='<button type="button" class="deckbtn" id="deckGo">🎞️ 우리 조직 브리핑 보기 (1분)</button>';
+  var b=document.getElementById('deckGo');if(b)b.onclick=open2;
+ }else wrap.innerHTML='';
+}).observe(box,{childList:true,subtree:true,attributes:true});
+})();
+
+(function(){var done=false;
+window.ensureProofImgs=function(){if(done)return;done=true;
+ var els=document.querySelectorAll('img[data-img]');if(!els.length)return;
+ google.script.run.withSuccessHandler(function(o){
+  document.querySelectorAll('img[data-img]').forEach(function(el){el.src=o[el.getAttribute('data-img')];el.classList.add('ld')});
+ }).withFailureHandler(function(){done=false}).getProofImgs();
+};})();
+</script>
+</body></html>
