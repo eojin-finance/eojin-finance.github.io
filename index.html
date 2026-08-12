@@ -12,14 +12,18 @@
     /* 8px 스케일 */
     --s1: 8px; --s2: 16px; --s3: 24px; --s4: 32px; --s5: 48px; --s6: 64px;
     --bg:       #ffffff;
-    --plane:    #f7f8f9;
+    --plane:    #f6f8fa;
     --ink:      #16191d;
     --ink-2:    #5a6169;
     --ink-3:    #8b929a;
     --line:     #e3e6e9;
     --line-2:   #eef0f2;
     --primary:  #12507e;
-    --primary-w:#eaf1f7;
+    --primary-s:#1a6aa8;   /* 밝은 단계 — 링크·마커 */
+    --primary-w:#e8f0f7;   /* 아주 연한 배경 */
+    --band:     #0f2c46;   /* 상단 밴드 */
+    --band-ink: #f2f6f9;
+    --band-sub: #9db8cc;
     --radius: 8px;
     --sans: -apple-system, "Segoe UI", "Malgun Gothic", system-ui, sans-serif;
     --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
@@ -28,49 +32,57 @@
     :root:where(:not([data-theme="light"])) {
       color-scheme: dark;
       --bg: #14171a; --plane: #0e1113; --ink: #e8eaec; --ink-2: #a2a9b0; --ink-3: #767d85;
-      --line: #272c31; --line-2: #1e2226; --primary: #6aa9d8; --primary-w: #172630;
+      --line: #272c31; --line-2: #1e2226; --primary: #7cb6e2; --primary-s: #8cc0e8;
+      --primary-w: #16242f; --band: #0b1d2d; --band-ink: #e9eef2; --band-sub: #86a3b8;
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
     --bg: #14171a; --plane: #0e1113; --ink: #e8eaec; --ink-2: #a2a9b0; --ink-3: #767d85;
-    --line: #272c31; --line-2: #1e2226; --primary: #6aa9d8; --primary-w: #172630;
+    --line: #272c31; --line-2: #1e2226; --primary: #7cb6e2; --primary-s: #8cc0e8;
+    --primary-w: #16242f; --band: #0b1d2d; --band-ink: #e9eef2; --band-sub: #86a3b8;
   }
 
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans);
          font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-  .wrap { max-width: 960px; margin: 0 auto; padding: var(--s5) var(--s3) var(--s6); }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 var(--s3) var(--s6); }
   .num { font-variant-numeric: tabular-nums; }
 
-  /* ── 헤더 ── */
-  header { padding-bottom: var(--s3); border-bottom: 1px solid var(--line); }
-  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
-             color: var(--primary); margin: 0 0 var(--s1); }
-  h1 { font-size: 26px; font-weight: 700; letter-spacing: -.02em; line-height: 1.25; margin: 0; }
-  .role { font-size: 14px; color: var(--ink-2); margin: 6px 0 var(--s3); }
-  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--s1) var(--s3); }
+  /* ── 상단 밴드 (전체 폭) ── */
+  .band { background: var(--band); color: var(--band-ink); }
+  .band .inner { max-width: 960px; margin: 0 auto; padding: var(--s5) var(--s3) var(--s4); }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+             color: var(--band-sub); margin: 0 0 var(--s1); }
+  h1 { font-size: 28px; font-weight: 700; letter-spacing: -.02em; line-height: 1.25; margin: 0; color: #fff; }
+  .role { font-size: 14px; color: var(--band-sub); margin: 8px 0 var(--s3); }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--s1) var(--s3);
+           padding-top: var(--s2); border-top: 1px solid rgba(255,255,255,.14); }
   .facts div { font-size: 13px; }
-  .facts dt { color: var(--ink-3); font-size: 12px; margin-bottom: 2px; }
-  .facts dd { margin: 0; color: var(--ink); }
-  .facts a { color: var(--primary); text-decoration: none; }
-  .facts a:hover { text-decoration: underline; }
+  .facts dt { color: var(--band-sub); font-size: 12px; margin-bottom: 2px; }
+  .facts dd { margin: 0; color: var(--band-ink); }
+  .facts a { color: #a9d2f0; text-decoration: none; border-bottom: 1px solid rgba(169,210,240,.4); }
+  .facts a:hover { border-bottom-color: currentColor; }
 
-  /* ── KPI ── */
+  /* ── KPI (밴드 아래 걸치는 흰 판) ── */
   .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-          gap: var(--s3); padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
+          gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius);
+          overflow: hidden; margin-top: calc(-1 * var(--s3)); box-shadow: 0 1px 2px rgba(15,44,70,.06); }
+  .kpi { background: var(--bg); padding: var(--s2) var(--s3); }
   .kpi dt { font-size: 12px; color: var(--ink-2); margin-bottom: 6px; }
   .kpi .val { font-size: 30px; font-weight: 650; letter-spacing: -.025em; line-height: 1.1;
-              font-variant-numeric: tabular-nums; }
+              font-variant-numeric: tabular-nums; color: var(--primary); }
   .kpi .val small { font-size: 14px; font-weight: 500; color: var(--ink-2); letter-spacing: 0; }
   .kpi .sub { font-size: 12px; color: var(--ink-3); margin-top: 4px; }
 
   /* ── 섹션 ── */
   section { padding-top: var(--s5); }
-  h2 { font-size: 17px; font-weight: 600; letter-spacing: -.01em; margin: 0; }
+  h2 { font-size: 17px; font-weight: 600; letter-spacing: -.01em; margin: 0;
+       display: flex; align-items: center; gap: var(--s1); }
+  h2::before { content: ''; width: 3px; height: 15px; background: var(--primary-s); border-radius: 2px; }
   .shead { display: flex; align-items: baseline; gap: var(--s2); flex-wrap: wrap;
-           padding-bottom: var(--s2); border-bottom: 1px solid var(--line); margin-bottom: var(--s3); }
+           padding-bottom: var(--s2); border-bottom: 2px solid var(--line); margin-bottom: var(--s3); }
   .shead p { margin: 0; font-size: 13px; color: var(--ink-2); }
   /* 한글은 ch 단위가 실제보다 좁게 잡혀 em 기준으로 둔다 */
   .lede { font-size: 14px; color: var(--ink-2); margin: 0 0 var(--s2); max-width: 46em; }
@@ -91,11 +103,11 @@
              padding-top: var(--s2); border-top: 1px solid var(--line-2); }
   .metrics div { font-size: 13px; }
   .metrics .m { display: block; font-size: 12px; color: var(--ink-3); }
-  .metrics .v { font-weight: 600; font-variant-numeric: tabular-nums; }
-  .go { display: inline-flex; align-items: baseline; gap: 6px; margin-top: var(--s2);
+  .metrics .v { font-weight: 650; font-variant-numeric: tabular-nums; color: var(--primary); font-size: 14px; }
+  .go { display: inline-flex; align-items: center; gap: 6px; margin-top: var(--s2);
         font-size: 13px; font-weight: 600; color: var(--primary); text-decoration: none;
-        border-bottom: 1px solid transparent; }
-  .go:hover { border-bottom-color: currentColor; }
+        border: 1px solid var(--primary); border-radius: 6px; padding: 6px 12px; background: var(--bg); }
+  .go:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
   .go:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 2px; }
 
   /* ── 표 ── */
@@ -108,10 +120,13 @@
   td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
   tbody tr:hover { background: var(--plane); }
   .grp td { font-weight: 600; font-size: 12px; color: var(--primary); background: var(--primary-w);
-            border-bottom: 1px solid var(--line); letter-spacing: .02em; }
+            border-bottom: 1px solid var(--line); letter-spacing: .02em;
+            box-shadow: inset 3px 0 0 var(--primary-s); }
+  tbody tr.grp:hover td { background: var(--primary-w); }
   td .sub { display: block; color: var(--ink-3); font-size: 12px; margin-top: 2px; }
-  td a { color: var(--primary); text-decoration: none; font-weight: 600; white-space: nowrap; }
-  td a:hover { text-decoration: underline; }
+  td a { color: var(--primary); text-decoration: none; font-weight: 600; white-space: nowrap;
+         border: 1px solid var(--line); border-radius: 6px; padding: 4px 9px; display: inline-block; }
+  td a:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
 
   /* ── 원칙 3열 ── */
   .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--s3); }
@@ -144,9 +159,8 @@
 </style>
 </head>
 <body>
-<main class="wrap">
-
-  <header>
+<div class="band">
+  <div class="inner">
     <p class="eyebrow">Finance &amp; Accounting</p>
     <h1>이어진 — 재무회계 포트폴리오</h1>
     <p class="role">월결산 · 매출/정산 대사 · 재고평가 · 결산 프로세스 자동화</p>
@@ -155,7 +169,10 @@
       <div><dt>소속·직책</dt><dd>재무회계팀 매니저 — 패션 브랜드 4개 운영 이커머스</dd></div>
       <div><dt>연락처</dt><dd><a href="mailto:lee-ding@naver.com">lee-ding@naver.com</a></dd></div>
     </dl>
-  </header>
+  </div>
+</div>
+
+<main class="wrap">
 
   <dl class="kpis">
     <div class="kpi"><dt>월 대사 채널</dt><div class="val">26<small> 개</small></div>
