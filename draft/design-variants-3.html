@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UI 시안 3차 — A+D 조합</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="../assets/tokens.css">
+<style>
+  :root { --ios: #0A84FF; --gray6: #F2F2F7; --gray5: #E5E5EA; --gray4: #D1D1D6; --label2: #6E6E73; --sep: rgba(60,60,67,.18); --dk2: #1D1D1F; --dksub: #A1A1A6; --spring: cubic-bezier(.34,1.56,.64,1); }
+  body { font-family: "Pretendard Variable", var(--font-sans); background: var(--bg); letter-spacing: -0.01em; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  .bar { position: sticky; top: 0; z-index: 50; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); border-bottom: 1px solid var(--line); box-shadow: var(--shadow-2); }
+  .bar .in { max-width: 1120px; margin: 0 auto; padding: var(--sp-3) var(--sp-4); display: flex; gap: var(--sp-3); align-items: center; flex-wrap: wrap; }
+  .bar .t { font-size: var(--fs-14); font-weight: var(--fw-semibold); margin-right: var(--sp-2); }
+  .seg { display: flex; gap: 2px; background: var(--surface-2); padding: 3px; border-radius: var(--r-2); }
+  .seg button { height: 32px; padding: 0 var(--sp-3); border: 0; border-radius: 6px; background: transparent; color: var(--ink-2); font-size: var(--fs-13); font-weight: var(--fw-medium); cursor: pointer; transition: background var(--dur-1) var(--ease-std); }
+  .seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); font-weight: var(--fw-semibold); }
+  .bar .pick { margin-left: auto; font-size: var(--fs-13); color: var(--ink-2); display: flex; gap: var(--sp-2); align-items: center; } .bar .pick b { color: var(--brand-ink); }
+  .btn { height: 32px; padding: 0 var(--sp-3); border-radius: var(--r-2); border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: var(--fs-13); font-weight: var(--fw-medium); cursor: pointer; }
+  .btn.p { background: var(--brand); color: var(--on-brand); border-color: transparent; } .btn.p.done { background: var(--pos); }
+  .about { max-width: 1120px; margin: var(--sp-6) auto 0; padding: 0 var(--sp-4); }
+  .about .card { padding: var(--sp-4) var(--sp-5); display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2) var(--sp-6); }
+  .about h2 { font-size: var(--fs-16); grid-column: 1 / -1; display: flex; gap: var(--sp-2); align-items: center; }
+  .about h2 .rec { font-size: var(--fs-11); color: var(--pos-ink); background: var(--pos-soft); border-radius: var(--r-1); padding: 2px 6px; font-weight: var(--fw-semibold); }
+  .about p { font-size: var(--fs-13); color: var(--ink-2); } .about p b { color: var(--ink); font-weight: var(--fw-semibold); }
+  @media (max-width: 720px) { .about .card { grid-template-columns: 1fr; } }
+  .stage { max-width: 1120px; margin: var(--sp-4) auto var(--sp-12); padding: 0 var(--sp-4); }
+  .frame { border: 1px solid var(--line); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-3); background: #fff; color: var(--dk2); }
+  .v { display: none; } .v.on { display: block; animation: in var(--dur-2) var(--ease-out); }
+  @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .v h1, .v h2, .v h3, .v p { margin: 0; } .v a { color: inherit; text-decoration: none; }
+  .v img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .thumb { aspect-ratio: 16/10; overflow: hidden; background: var(--gray6); }
+
+  /* ── 공통 A 조각: 글라스 앱바 · 중앙 히어로 · 숫자 스트립 · 섹션 헤드 ── */
+  .appbar { position: sticky; top: 0; z-index: 5; background: rgba(255,255,255,.72); backdrop-filter: blur(20px) saturate(1.8); border-bottom: 1px solid var(--sep); }
+  .appbar .in { max-width: 980px; margin: 0 auto; height: 48px; display: flex; align-items: center; gap: var(--sp-6); padding: 0 var(--sp-5); font-size: var(--fs-12); }
+  .appbar .n { font-weight: var(--fw-semibold); font-size: var(--fs-14); margin-right: auto; }
+  .appbar a { opacity: .8; } .appbar a.cta { background: var(--ios); color: #fff; border-radius: 999px; padding: 4px 12px; opacity: 1; }
+  .hero { text-align: center; padding: 88px var(--sp-6) 48px; max-width: 760px; margin: 0 auto; }
+  .hero .eb { font-size: var(--fs-14); color: var(--label2); font-weight: var(--fw-medium); }
+  .hero h1 { font-size: 56px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.07; margin-top: var(--sp-3); }
+  .hero p { font-size: var(--fs-22); color: var(--label2); line-height: 1.4; margin-top: var(--sp-5); }
+  .hero .links { margin-top: var(--sp-6); display: flex; gap: var(--sp-6); justify-content: center; font-size: var(--fs-16); }
+  .hero .links a { color: var(--ios); } .hero .links a::after { content: ' ›'; }
+  .stats { display: flex; justify-content: center; gap: 56px; padding: var(--sp-8) 0; border-top: 1px solid var(--sep); border-bottom: 1px solid var(--sep); margin: 0 var(--sp-6); }
+  .stats b { display: block; font-size: 40px; font-weight: 600; letter-spacing: -0.03em; } .stats span { font-size: var(--fs-13); color: var(--label2); }
+  .sh { max-width: 980px; margin: 0 auto; padding: 72px var(--sp-6) 0; text-align: center; }
+  .sh h2 { font-size: 40px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; }
+  .sh .sub { font-size: var(--fs-18); color: var(--label2); margin-top: var(--sp-3); max-width: 34em; margin-left: auto; margin-right: auto; }
+  .sh.left { text-align: left; } .sh.left .sub { margin-left: 0; }
+  .foot { padding: 72px 0 40px; font-size: var(--fs-12); color: var(--label2); text-align: center; }
+
+  /* ── 공통 D 조각: 가로 스냅 트랙 · 스토리 카드 · 점 ── */
+  .track { display: flex; gap: var(--sp-4); overflow-x: auto; scroll-snap-type: x mandatory; padding: var(--sp-5) calc((100% - 980px) / 2 + var(--sp-6)); scrollbar-width: none; }
+  .track::-webkit-scrollbar { display: none; }
+  .cardx { flex: 0 0 380px; scroll-snap-align: start; border-radius: 22px; overflow: hidden; background: var(--gray6); box-shadow: 0 10px 30px -18px rgba(0,0,0,.35); transition: transform var(--dur-2) var(--ease-out); }
+  .cardx:hover { transform: translateY(-4px); }
+  .cardx .b { padding: var(--sp-4) var(--sp-5) var(--sp-5); }
+  .cardx .eb { font-size: var(--fs-11); text-transform: uppercase; letter-spacing: .06em; color: var(--ios); font-weight: 700; }
+  .cardx h3 { font-size: var(--fs-18); font-weight: 600; margin-top: 4px; } .cardx p { font-size: var(--fs-13); color: var(--label2); margin-top: var(--sp-1); }
+  .cardx.text { background: var(--dk2); color: #fff; padding: var(--sp-6); display: flex; flex-direction: column; justify-content: flex-end; min-height: 300px; }
+  .cardx.text .eb { color: #5AC8FA; } .cardx.text h3 { font-size: var(--fs-22); } .cardx.text p { color: var(--dksub); }
+  .cardx.text .k { display: flex; gap: var(--sp-5); margin-top: var(--sp-4); } .cardx.text .k b { display: block; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; } .cardx.text .k span { font-size: var(--fs-11); color: var(--dksub); }
+  .cardx.big { flex-basis: 640px; } .cardx.big .thumb { aspect-ratio: 16/9; }
+  .cardx .pf { font-size: var(--fs-12); color: var(--dk2); margin-top: var(--sp-2); } .cardx .pf b { color: var(--ios); }
+  .dots { display: flex; gap: 6px; justify-content: center; margin-top: 0; } .dots i { width: 6px; height: 6px; border-radius: 999px; background: var(--gray4); } .dots i.on { background: var(--dk2); }
+  .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); max-width: 980px; margin: var(--sp-8) auto 0; padding: 0 var(--sp-6); text-align: left; }
+  .three div { background: var(--gray6); border-radius: 20px; padding: var(--sp-6); }
+  .three b { display: block; font-size: var(--fs-18); font-weight: 600; margin-bottom: var(--sp-2); } .three p { font-size: var(--fs-14); color: var(--label2); }
+
+  /* ── 안별 차이 ── */
+  /* 2: 대형 미디어 히어로 */
+  .v2 .hero { padding-bottom: var(--sp-6); }
+  .v2 .media { max-width: 980px; margin: 0 auto; padding: 0 var(--sp-6); }
+  .v2 .media a { display: block; border-radius: 24px; overflow: hidden; box-shadow: 0 30px 80px -40px rgba(0,0,0,.45); } .v2 .media .thumb { aspect-ratio: 16/9; }
+  .v2 .media .cap { font-size: var(--fs-13); color: var(--label2); text-align: center; margin-top: var(--sp-3); }
+  .v2 .cardx { flex-basis: 300px; }
+  /* 3: 챕터 스토리 */
+  .v3 .chap { position: relative; padding-top: 64px; }
+  .v3 .chap .no { max-width: 980px; margin: 0 auto; padding: 0 var(--sp-6); font-size: 64px; font-weight: 700; letter-spacing: -0.05em; color: var(--gray5); line-height: 1; }
+  .v3 .sh { padding-top: var(--sp-2); text-align: left; } .v3 .sh .sub { margin-left: 0; }
+  .v3 .chap + .chap { border-top: 1px solid var(--sep); }
+  .v3 .prog { position: sticky; top: 56px; float: right; margin-right: var(--sp-5); display: flex; flex-direction: column; gap: 8px; z-index: 4; }
+  .v3 .prog i { width: 8px; height: 8px; border-radius: 999px; background: var(--gray4); } .v3 .prog i.on { background: var(--dk2); }
+  /* 4: 세그먼트 + 트랙 */
+  .v4 .segc { display: inline-flex; background: var(--gray6); padding: 3px; border-radius: 10px; margin: var(--sp-6) auto 0; }
+  .v4 .segc button { border: 0; background: transparent; padding: 7px 16px; border-radius: 8px; font-size: var(--fs-14); font-weight: 500; color: var(--label2); cursor: pointer; transition: background var(--dur-1) var(--ease-std), color var(--dur-1) var(--ease-std); }
+  .v4 .segc button.on { background: #fff; color: var(--dk2); box-shadow: var(--shadow-1); font-weight: 600; }
+  .v4 .pane { display: none; } .v4 .pane.on { display: block; animation: in var(--dur-2) var(--ease-out); }
+  /* 5: 스플릿 sticky */
+  .v5 .split { max-width: 980px; margin: 0 auto; padding: 72px var(--sp-6) 0; display: grid; grid-template-columns: 1fr 1.2fr; gap: var(--sp-8); align-items: start; }
+  .v5 .split .txt { position: sticky; top: 72px; }
+  .v5 .split .txt h2 { font-size: 40px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; } .v5 .split .txt p { font-size: var(--fs-18); color: var(--label2); margin-top: var(--sp-3); }
+  .v5 .split .txt .k { display: flex; gap: var(--sp-6); margin-top: var(--sp-5); } .v5 .split .txt .k b { display: block; font-size: 28px; font-weight: 700; } .v5 .split .txt .k span { font-size: var(--fs-12); color: var(--label2); }
+  .v5 .split .flow { display: flex; flex-direction: column; gap: var(--sp-4); }
+  .v5 .split .flow .cardx { flex-basis: auto; }
+  @media (max-width: 860px) {
+    .hero h1 { font-size: 36px; } .stats { flex-wrap: wrap; gap: var(--sp-6); } .sh h2 { font-size: 28px; } .three { grid-template-columns: 1fr; }
+    .track { padding: var(--sp-4) var(--sp-6); } .cardx, .cardx.big, .v2 .cardx { flex-basis: 300px; }
+    .v5 .split { grid-template-columns: 1fr; } .v5 .split .txt { position: static; } .v3 .prog { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in">
+  <span class="t">UI 시안 3차 · A+D</span>
+  <div class="seg" id="seg"><button data-v="1">1 기본 조합</button><button data-v="2">2 대형 미디어</button><button data-v="3">3 챕터 스토리</button><button data-v="4">4 세그먼트</button><button data-v="5">5 스플릿</button></div>
+  <div class="pick">선택: <b id="picked">없음</b> <button class="btn p" id="pickBtn">이걸로</button> <button class="btn" id="copyBtn">선택 복사</button></div>
+</div></div>
+<div class="about"><div class="card" id="about"></div></div>
+
+<div class="stage"><div class="frame">
+
+<!-- 공통 히어로 템플릿은 JS로 복제 -->
+<template id="tplHero">
+  <div class="appbar"><div class="in"><span class="n">이어진</span><a href="#">대표 프로젝트</a><a href="#">데모</a><a href="#">일하는 방식</a><a href="#">FAQ</a><a class="cta" href="mailto:lee-ding@naver.com">연락하기</a></div></div>
+  <div class="hero"><div class="eb">재무회계 · 패션 이커머스</div><h1>차이는 규명하고,<br>반복은 기계에 넘깁니다.</h1>
+    <p>월결산과 매출·원가 대사를 맡아, 차이를 원인별로 분류하고 기준을 문서로 고정한 뒤 반복 확인만 자동화했습니다.</p>
+    <div class="links"><a href="#">대표 프로젝트 보기</a><a href="#">데모 6개 열기</a></div></div>
+  <div class="stats"><div><b>18회</b><span>월결산</span></div><div><b>34채널</b><span>원 단위 정산 대사</span></div><div><b>원 단위</b><span>충당금 확정본 재현</span></div><div><b>6+7</b><span>동작하는 데모</span></div></div>
+</template>
+<template id="tplProj">
+  <div class="cardx text"><div class="eb">01 · 결산</div><h3>월 가결산 손익</h3><p>판관비 7대 분류, 지급수수료 판매성·관리성 분해, 비경상 손익을 걷어낸 정상 손익 한 장.</p><div class="k"><div><b>7</b><span>대 분류</span></div><div><b>18</b><span>회 결산</span></div></div></div>
+  <a class="cardx" href="../demo/nrv-simulator/"><div class="thumb"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div><div class="b"><div class="eb">02 · 재고</div><h3>평가충당금 로직 재설계</h3><p>판단 15항목 · 7라운드 교차검증 · 이전 확정본 원 단위 재현</p></div></a>
+  <div class="cardx text"><div class="eb">03 · 정산</div><h3>위탁 34채널 건별 대사</h3><p>정산서 입금액 = ERP 실판매 − 수수료 − 반품 ± 상시차이</p><div class="k"><div><b>34</b><span>채널</span></div><div><b>4</b><span>상시차이 유형</span></div></div></div>
+  <a class="cardx" href="../demo/fund-cycle/"><div class="thumb"><img src="../assets/shots/fund-cycle.jpg" alt=""></div><div class="b"><div class="eb">04 · 결산 원천</div><h3>원천 단일화·현금흐름 검증</h3><p>계정 81 매핑 · 직접법 현금흐름 = 통장 순증감</p></div></a>
+</template>
+<template id="tplDemo">
+  <a class="cardx" href="../demo/one-close/"><div class="thumb"><img src="../assets/shots/one-close.jpg" alt=""></div><div class="b"><div class="eb">실운영</div><h3>월 매입 마감 앱</h3><p>입고 검수 → B/L 연결 → 부대비용 배부 → 취득원가</p><div class="pf"><b>증명</b> 원가 확정 절차를 화면 순서로 고정</div></div></a>
+  <a class="cardx" href="../demo/nrv-simulator/"><div class="thumb"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div><div class="b"><div class="eb">실운영</div><h3>NRV 시뮬레이터</h3><p>가정을 움직이면 전 품번 즉시 재계산</p><div class="pf"><b>증명</b> 판단 기준이 재현 가능</div></div></a>
+  <a class="cardx" href="../demo/linesheet-fin/"><div class="thumb"><img src="../assets/shots/linesheet-fin.jpg" alt=""></div><div class="b"><div class="eb">실운영</div><h3>라인시트 재무 집계</h3><p>매입 약정 기준 집계 · 결제조건</p><div class="pf"><b>증명</b> 계획이 자금 소요로 읽힘</div></div></a>
+  <a class="cardx" href="../demo/fund-cycle/"><div class="thumb"><img src="../assets/shots/fund-cycle.jpg" alt=""></div><div class="b"><div class="eb">실운영</div><h3>자금 대시보드</h3><p>잔액·수금 예측 · 체크섬 7종</p><div class="pf"><b>증명</b> 보고 숫자가 원천과 자동 대조</div></div></a>
+  <a class="cardx" href="../demo/card-notice/"><div class="thumb"><img src="../assets/shots/card-notice.jpg" alt=""></div><div class="b"><div class="eb">전사 공지</div><h3>법인카드 개편</h3><p>정책 변경 전후 · 한도 근거</p></div></a>
+  <a class="cardx" href="../demo/overtime-meal/"><div class="thumb"><img src="../assets/shots/overtime-meal.jpg" alt=""></div><div class="b"><div class="eb">실운영</div><h3>야근식대 대조</h3><p>근태 vs 카드 사람별 판정</p></div></a>
+</template>
+<template id="tplThree">
+  <div><b>차이는 덮지 않고 분류</b><p>원인이 지정된 차이는 다음 달에 다시 조사하지 않습니다.</p></div>
+  <div><b>검증 없이 편해지지 않는다</b><p>원천 합계·재계산·이전 확정본 재현이 맞아야 확정합니다.</p></div>
+  <div><b>판단은 문서로, 반복은 기계로</b><p>대안과 채택 근거를 남기고, 반복 확인만 자동화합니다.</p></div>
+</template>
+
+<!-- 1 기본 조합 -->
+<div class="v v1" data-v="1">
+  <div data-hero></div>
+  <div class="sh"><h2>대표 프로젝트 4.</h2><p class="sub">결산 근거를 남기는 일. 옆으로 넘겨 보세요.</p></div>
+  <div class="track" data-proj data-dots></div><div class="dots"></div>
+  <div class="sh"><h2>실제로 돌아가는 화면 6.</h2><p class="sub">샘플 데이터로, 계산·판정 로직은 실제와 동일합니다.</p></div>
+  <div class="track" data-demo data-dots></div><div class="dots"></div>
+  <div class="sh"><h2>일하는 방식.</h2></div><div class="three" data-three></div>
+  <div class="foot">아래로 이어짐: 운영 개선 · 전체 프로젝트 · FAQ</div>
+</div>
+
+<!-- 2 대형 미디어 히어로 -->
+<div class="v v2" data-v="2">
+  <div data-hero></div>
+  <div class="media"><a href="../demo/nrv-simulator/"><div class="thumb"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div></a><div class="cap">NRV 시뮬레이터 — 가정을 움직이면 전 품번 충당금이 즉시 재계산됩니다</div></div>
+  <div class="sh"><h2>판단 기준부터 재현 가능하게.</h2><p class="sub">산정 판단 15항목을 표로 확정하고 7라운드 교차검증. 최종본이 이전 확정본을 원 단위까지 재현하는지 확인한 뒤 확정.</p></div>
+  <div class="sh"><h2>대표 프로젝트.</h2></div>
+  <div class="track" data-proj data-dots></div><div class="dots"></div>
+  <div class="sh"><h2>실제로 돌아가는 화면.</h2></div>
+  <div class="track" data-demo data-dots></div><div class="dots"></div>
+  <div class="foot">아래로 이어짐: 일하는 방식 · 운영 개선 · FAQ</div>
+</div>
+
+<!-- 3 챕터 스토리 -->
+<div class="v v3" data-v="3">
+  <div data-hero></div>
+  <div class="prog"><i class="on"></i><i></i><i></i><i></i></div>
+  <div class="chap"><div class="no">01</div><div class="sh left"><h2>월결산 — 매달 같은 기준으로.</h2><p class="sub">판관비 7대 분류, 지급수수료 분해, 비경상 손익 분리. 18회.</p></div>
+    <div class="track" data-dots><div class="cardx text"><div class="eb">결산</div><h3>월 가결산 손익</h3><p>보고서 상단에 결론과 검증식이 먼저, 표는 뒤로.</p><div class="k"><div><b>7</b><span>대 분류</span></div><div><b>18</b><span>회</span></div></div></div>
+      <div class="cardx text" style="background:var(--gray6);color:var(--dk2)"><div class="eb">원천</div><h3 style="color:var(--dk2)">전표를 정본으로</h3><p style="color:var(--label2)">계정 81 매핑, 직접법 현금흐름 = 통장 순증감.</p></div></div><div class="dots"></div></div>
+  <div class="chap"><div class="no">02</div><div class="sh left"><h2>재고 평가충당금 — 판단 기준부터 재현 가능하게.</h2><p class="sub">15항목 · 7라운드 교차검증 · 이전 확정본 원 단위 재현.</p></div>
+    <div class="track" data-dots><a class="cardx big" href="../demo/nrv-simulator/"><div class="thumb"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div><div class="b"><div class="eb">데모</div><h3>NRV 시뮬레이터</h3><p>가정을 움직이면 전 품번 즉시 재계산</p></div></a>
+      <div class="cardx text"><div class="eb">검증</div><h3>원 단위 재현</h3><p>최종본이 이전 확정본과 원 단위까지 같은지 확인한 뒤 확정.</p></div></div><div class="dots"></div></div>
+  <div class="chap"><div class="no">03</div><div class="sh left"><h2>위탁 34채널 — 검증식 하나로.</h2><p class="sub">정산서 입금액 = ERP 실판매 − 수수료 − 반품 ± 상시차이.</p></div>
+    <div class="track" data-dots><div class="cardx text"><div class="eb">정산</div><h3>건별 대사</h3><p>상시 차이 4유형 분리, 남은 차이 3건 원인 규명.</p><div class="k"><div><b>34</b><span>채널</span></div><div><b>4</b><span>유형</span></div></div></div>
+      <a class="cardx" href="../demo/one-close/"><div class="thumb"><img src="../assets/shots/one-close.jpg" alt=""></div><div class="b"><div class="eb">데모</div><h3>월 매입 마감 앱</h3><p>매입 쪽 원가 확정도 같은 방식으로</p></div></a></div><div class="dots"></div></div>
+  <div class="chap"><div class="no">04</div><div class="sh left"><h2>실제로 돌아가는 화면 6.</h2><p class="sub">샘플 데이터 · 계산·판정 로직은 실제와 동일.</p></div>
+    <div class="track" data-demo data-dots></div><div class="dots"></div></div>
+  <div class="foot">아래로 이어짐: 일하는 방식 · FAQ</div>
+</div>
+
+<!-- 4 세그먼트 -->
+<div class="v v4" data-v="4">
+  <div data-hero></div>
+  <div class="sh"><h2>무엇을 했나.</h2><p class="sub">영역을 고르면 그 영역의 근거 카드만 보입니다.</p>
+    <div class="segc" id="segc"><button data-p="p1" class="on">결산</button><button data-p="p2">정산 대사</button><button data-p="p3">재고·매입</button><button data-p="p4">운영 개선</button></div></div>
+  <div class="pane on" id="p1"><div class="track" data-dots><div class="cardx text"><div class="eb">결산</div><h3>월 가결산 손익</h3><p>판관비 7대 분류 · 비경상 분리 · 한 장 보고서</p><div class="k"><div><b>18</b><span>회</span></div></div></div><div class="cardx text" style="background:var(--gray6);color:var(--dk2)"><div class="eb">원천</div><h3 style="color:var(--dk2)">단일화·현금흐름 검증</h3><p style="color:var(--label2)">계정 81 · 통장 순증감 일치</p></div><a class="cardx" href="../demo/fund-cycle/"><div class="thumb"><img src="../assets/shots/fund-cycle.jpg" alt=""></div><div class="b"><div class="eb">데모</div><h3>자금 대시보드</h3><p>체크섬 7종</p></div></a></div><div class="dots"></div></div>
+  <div class="pane" id="p2"><div class="track" data-dots><div class="cardx text"><div class="eb">정산</div><h3>위탁 34채널 건별 대사</h3><p>정산서 입금액 = ERP 실판매 − 수수료 − 반품 ± 상시차이</p><div class="k"><div><b>34</b><span>채널</span></div><div><b>4</b><span>상시차이</span></div></div></div><div class="cardx text" style="background:var(--gray6);color:var(--dk2)"><div class="eb">결제대행</div><h3 style="color:var(--dk2)">3사 자동수집</h3><p style="color:var(--label2)">매일 수집·정규화 · 주문번호별 대사</p></div></div><div class="dots"></div></div>
+  <div class="pane" id="p3"><div class="track" data-dots><a class="cardx" href="../demo/nrv-simulator/"><div class="thumb"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div><div class="b"><div class="eb">재고</div><h3>NRV 시뮬레이터</h3><p>15항목 · 7라운드 · 원 단위 재현</p></div></a><a class="cardx" href="../demo/one-close/"><div class="thumb"><img src="../assets/shots/one-close.jpg" alt=""></div><div class="b"><div class="eb">매입</div><h3>월 매입 마감 앱</h3><p>입고→B/L→부대비용→취득원가</p></div></a><a class="cardx" href="../demo/linesheet-fin/"><div class="thumb"><img src="../assets/shots/linesheet-fin.jpg" alt=""></div><div class="b"><div class="eb">계획</div><h3>라인시트 재무 집계</h3><p>매입 약정 기준</p></div></a></div><div class="dots"></div></div>
+  <div class="pane" id="p4"><div class="track" data-dots><a class="cardx" href="../demo/card-notice/"><div class="thumb"><img src="../assets/shots/card-notice.jpg" alt=""></div><div class="b"><div class="eb">경비</div><h3>법인카드 개편</h3><p>실물 축소 · 가상카드 · 대장 정비</p></div></a><a class="cardx" href="../demo/overtime-meal/"><div class="thumb"><img src="../assets/shots/overtime-meal.jpg" alt=""></div><div class="b"><div class="eb">경비</div><h3>야근식대 대조</h3><p>근태 vs 카드 사람별 판정</p></div></a></div><div class="dots"></div></div>
+  <div class="sh"><h2>일하는 방식.</h2></div><div class="three" data-three></div>
+  <div class="foot">아래로 이어짐: 전체 프로젝트 · FAQ</div>
+</div>
+
+<!-- 5 스플릿 -->
+<div class="v v5" data-v="5">
+  <div data-hero></div>
+  <div class="split"><div class="txt"><h2>결산 근거를 남기는 일 4.</h2><p>왼쪽 문장은 고정, 오른쪽 카드는 흐릅니다. 각 카드가 하나의 증거입니다.</p><div class="k"><div><b>18</b><span>월결산</span></div><div><b>34</b><span>채널</span></div><div><b>81</b><span>계정</span></div></div></div>
+    <div class="flow" data-proj></div></div>
+  <div class="sh left" style="padding-top:64px"><h2>실제로 돌아가는 화면 6.</h2><p class="sub">여기서는 옆으로.</p></div>
+  <div class="track" data-demo data-dots></div><div class="dots"></div>
+  <div class="foot">아래로 이어짐: 일하는 방식 · FAQ</div>
+</div>
+
+</div></div>
+
+<script>
+(function () {
+  var ABOUT = {
+    '1': { t: '1 · 기본 조합 — A 히어로·숫자 스트립 + 섹션마다 D 트랙(대표 4 · 데모 6)', rec: true,
+      why: '가장 단순한 결합. 세로는 A의 문장 리듬, 항목은 D의 가로 트랙. 지금 내용을 손실 없이 옮길 수 있다.',
+      pro: '장점: 구조가 예측 가능해 리크루터 스캔이 빠르고 모바일 변환이 자연스럽다.', con: '단점: 트랙 2개가 비슷한 모양이라 단조로울 수 있다 — 대표는 텍스트/이미지 교차 카드로 차이를 둠.' },
+    '2': { t: '2 · 대형 미디어 — 히어로 아래 데모 화면 1장을 크게, 그 밑에 트랙', rec: false,
+      why: 'apple.com 제품 페이지처럼 첫 스크롤에 "실물"을 크게 보여준다. NRV 화면이 명함 역할.',
+      pro: '장점: 5초 안에 "이 사람 실물이 있다"가 전달됨.', con: '단점: 첫 이미지 하나에 인상이 걸린다. 회계 본업(월결산)이 이미지가 없어 두 번째로 밀림.' },
+    '3': { t: '3 · 챕터 스토리 — 01~04 챕터마다 A 헤드라인 + 그 챕터의 증거 카드 트랙', rec: false,
+      why: '한 챕터 = 한 주장 + 근거 2~3장. 오른쪽 진행 점이 어디쯤인지 알려준다.',
+      pro: '장점: 본부장이 원한 "결산→재고→정산" 순서가 구조로 박힘. 읽는 리듬이 가장 좋다.', con: '단점: 세로가 가장 길다. 챕터당 카드가 2장이면 트랙이 허전.' },
+    '4': { t: '4 · 세그먼트 — iOS 세그먼트로 영역(결산/정산/재고·매입/운영)을 고르면 트랙이 바뀜', rec: false,
+      why: '한 화면에 트랙 하나만. 보는 사람이 관심 영역을 골라 본다(눌러보세요).',
+      pro: '장점: 세로가 가장 짧고 인터랙션이 아이폰답다.', con: '단점: 안 누르면 결산 탭만 보인다 — 나머지 영역은 존재를 모른 채 지나칠 수 있다.' },
+    '5': { t: '5 · 스플릿 — 왼쪽 sticky 문장 + 오른쪽 세로 카드 흐름, 데모만 가로 트랙', rec: false,
+      why: '데스크톱에서 문장이 고정된 채 증거 카드가 지나간다. 데모는 D 트랙.',
+      pro: '장점: 데스크톱 몰입감 최고, 문장과 증거의 대응이 명확.', con: '단점: 모바일에선 그냥 세로 나열이 된다. 카드 폭이 좁아 텍스트 카드가 길어짐.' }
+  };
+  function clone(id) { return document.getElementById(id).content.cloneNode(true); }
+  document.querySelectorAll('[data-hero]').forEach(function (el) { el.replaceWith(clone('tplHero')); });
+  document.querySelectorAll('[data-proj]').forEach(function (el) { el.appendChild(clone('tplProj')); });
+  document.querySelectorAll('[data-demo]').forEach(function (el) { el.appendChild(clone('tplDemo')); });
+  document.querySelectorAll('[data-three]').forEach(function (el) { el.appendChild(clone('tplThree')); });
+  document.querySelectorAll('.track[data-dots]').forEach(function (t) { var dots = t.nextElementSibling; if (!dots || !dots.classList.contains('dots')) return; var n = t.children.length;
+    dots.innerHTML = Array.apply(null, Array(n)).map(function (_, i) { return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('');
+    t.addEventListener('scroll', function () { var w = t.children[0].offsetWidth + 16; var i = Math.round(t.scrollLeft / w); Array.prototype.forEach.call(dots.children, function (d, j) { d.classList.toggle('on', j === i); }); }, { passive: true }); });
+  var cur = '1', picked = null; try { picked = localStorage.getItem('pf_pick3'); } catch (e) {}
+  var seg = document.getElementById('seg'), about = document.getElementById('about');
+  function show(v) { cur = v; document.querySelectorAll('.v').forEach(function (el) { el.classList.toggle('on', el.getAttribute('data-v') === v); });
+    seg.querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
+    var a = ABOUT[v]; about.innerHTML = '<h2>' + a.t + (a.rec ? ' <span class="rec">추천</span>' : '') + '</h2><p><b>왜 이 구조인가</b> — ' + a.why + '</p><p>' + a.pro + '<br>' + a.con + '</p>';
+    document.getElementById('pickBtn').classList.toggle('done', picked === v); document.getElementById('pickBtn').textContent = picked === v ? '선택됨' : '이걸로'; window.scrollTo({ top: 0 }); }
+  seg.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) show(b.getAttribute('data-v')); });
+  document.getElementById('pickBtn').addEventListener('click', function () { picked = cur; try { localStorage.setItem('pf_pick3', picked); } catch (e) {} document.getElementById('picked').textContent = picked; show(cur); });
+  document.getElementById('copyBtn').addEventListener('click', function () { var s = '3차 시안 선택: ' + (picked || '(없음)') + ' — ' + (picked ? ABOUT[picked].t : ''); try { navigator.clipboard.writeText(s); alert('복사: ' + s); } catch (e) { prompt('복사', s); } });
+  document.addEventListener('keydown', function (e) { if ('12345'.indexOf(e.key) >= 0 && !e.metaKey && !e.ctrlKey) show(e.key); });
+  if (picked) document.getElementById('picked').textContent = picked;
+  show(picked || '1');
+  var segc = document.getElementById('segc');
+  segc.addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; segc.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
+    document.querySelectorAll('.v4 .pane').forEach(function (p) { p.classList.toggle('on', p.id === b.getAttribute('data-p')); }); });
+  var chaps = document.querySelectorAll('.v3 .chap'), prog = document.querySelectorAll('.v3 .prog i');
+  window.addEventListener('scroll', function () { var y = window.scrollY + 200, cur = 0; chaps.forEach(function (c, i) { if (c.getBoundingClientRect().top + window.scrollY <= y) cur = i; }); prog.forEach(function (p, i) { p.classList.toggle('on', i === cur); }); }, { passive: true });
+})();
+</script>
+</body>
+</html>
