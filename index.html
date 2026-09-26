@@ -4,29 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>이어진 — 재무회계 포트폴리오</title>
-<meta name="description" content="패션 이커머스 재무회계 — 결산·매출정산 대사·재고평가·결산 프로세스 자동화">
+<meta name="description" content="패션 이커머스 재무회계 — 월결산·매출정산 대사·재고평가·결산 프로세스 자동화">
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="assets/tokens.css">
 <style>
-  /* 시안 A — 에디토리얼. 값은 tokens.css 변수 + 아래 강조색 2개만 */
   :root { --ac: #2F5D50; --ac-soft: #E7F0EC; --paper: #F6F1E8; --paper-2: #EFE8DC; --lede: var(--fs-16); }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ac: #7FB8A3; --ac-soft: #16302A; --paper: #1E1B16; --paper-2: #26221C; } }
   :root[data-theme="dark"] { --ac: #7FB8A3; --ac-soft: #16302A; --paper: #1E1B16; --paper-2: #26221C; }
 
   body { background: var(--paper); line-height: 1.6; font-family: "Pretendard Variable", var(--font-sans); }
-  @media (prefers-reduced-motion: reduce) { .go, .shot, .toc a { transition: none; } .shot:hover { transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .go, .shot, .toc a, .top { transition: none; } .shot:hover { transform: none; } }
   a { color: var(--ac); }
   .num { font-variant-numeric: tabular-nums; }
 
-  /* ── 2단: 고정 목차 + 본문 ── */
   .page { display: grid; grid-template-columns: 232px minmax(0, 1fr); max-width: 1160px; margin: 0 auto; }
   aside { position: sticky; top: 0; align-self: start; height: 100vh; overflow: auto; padding: var(--sp-10) var(--sp-5) var(--sp-6); border-right: 1px solid var(--line); }
   aside .name { font-size: var(--fs-18); font-weight: var(--fw-bold); letter-spacing: var(--ls-tight); }
   aside .sub { font-size: var(--fs-12); color: var(--ink-3); margin-top: var(--sp-1); }
   .toc { margin: var(--sp-8) 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
   .toc a { display: block; font-size: var(--fs-13); padding: var(--sp-2) var(--sp-3); border-radius: var(--r-2); color: var(--ink-2); text-decoration: none;
-           transition: background var(--dur-1) var(--ease-std), color var(--dur-1) var(--ease-std); }
+           white-space: nowrap; transition: background var(--dur-1) var(--ease-std), color var(--dur-1) var(--ease-std); }
   .toc a:hover { background: var(--ac-soft); }
   .toc a.on { background: var(--ac-soft); color: var(--ac); font-weight: var(--fw-semibold); }
   .toc a small { color: var(--ink-3); font-weight: var(--fw-regular); margin-left: 4px; }
@@ -36,33 +34,27 @@
   aside .upd i { width: 6px; height: 6px; border-radius: var(--r-pill); background: var(--ac); }
   main { padding: var(--sp-10) var(--sp-12) var(--sp-12); max-width: 820px; }
 
-  /* ── 히어로 ── */
   .eyebrow { color: var(--ac); }
   h1 { font-size: 40px; font-weight: var(--fw-bold); letter-spacing: -0.03em; line-height: 1.15; margin-top: var(--sp-3); }
   h1 em { font-style: normal; color: var(--ac); }
   .role { font-size: var(--fs-14); color: var(--ink-3); margin-top: var(--sp-3); }
   .lede { font-size: var(--lede); color: var(--ink-2); margin: var(--sp-4) 0 0; max-width: 40em; line-height: 1.7; }
   .lede strong { color: var(--ink); font-weight: var(--fw-semibold); }
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--sp-4); margin: var(--sp-8) 0 0; padding: var(--sp-5) 0;
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--sp-4); margin: var(--sp-8) 0 0; padding: var(--sp-5) 0;
            border-top: 1px solid var(--ac); border-bottom: 1px solid var(--line); }
   .stats b { display: block; text-align: left; white-space: nowrap; font-size: var(--fs-28); font-weight: var(--fw-bold); letter-spacing: var(--ls-display); color: var(--ac); line-height: 1.1; }
   .stats b small { font-size: var(--fs-13); color: var(--ink-3); font-weight: var(--fw-regular); letter-spacing: 0; margin-left: 2px; }
   .stats span { font-size: var(--fs-12); color: var(--ink-3); }
 
-  /* ── 섹션 ── */
   section { padding-top: var(--sp-12); scroll-margin-top: var(--sp-6); }
   h2 { font-size: var(--fs-22); font-weight: var(--fw-bold); letter-spacing: var(--ls-tight); }
   .shead { display: flex; align-items: baseline; gap: var(--sp-3); flex-wrap: wrap; margin-bottom: var(--sp-5); }
   .shead p { font-size: var(--fs-13); color: var(--ink-3); }
   .note { font-size: var(--fs-12); color: var(--ink-3); margin: var(--sp-4) 0 0; }
 
-  /* ── 대표 프로젝트: 왼쪽 그린 괘선 케이스 ── */
   .flags { display: flex; flex-direction: column; gap: var(--sp-8); }
   .flag { padding-left: var(--sp-5); border-left: 3px solid var(--ac); }
   .flag > h3 { font-size: var(--fs-18); font-weight: var(--fw-semibold); letter-spacing: var(--ls-tight); }
-  .flag .tag { display: inline-block; font-size: var(--fs-11); font-weight: var(--fw-semibold); letter-spacing: .04em; text-transform: uppercase;
-               color: var(--ac); background: var(--ac-soft); border-radius: var(--r-1); padding: 2px var(--sp-2); margin-bottom: var(--sp-2); }
-  .flag .tag.new { color: var(--warn-ink); background: var(--warn-soft); }
   .flag .one { font-size: var(--fs-14); color: var(--ink-2); margin-top: var(--sp-1); }
   .flag dl { margin: var(--sp-4) 0 0; font-size: var(--fs-14); line-height: 1.65; max-width: 44em; }
   .flag dt { font-size: var(--fs-12); color: var(--ac); font-weight: var(--fw-semibold); margin-top: var(--sp-3); }
@@ -72,12 +64,15 @@
   .metrics .m { display: block; font-size: var(--fs-12); color: var(--ink-3); }
   .metrics .v { font-weight: var(--fw-semibold); font-variant-numeric: tabular-nums; color: var(--ac); font-size: var(--fs-14); }
   .go { display: inline-flex; align-items: center; gap: var(--sp-2); margin-top: var(--sp-4); height: 32px; padding: 0 var(--sp-3);
-        font-size: var(--fs-13); font-weight: var(--fw-semibold); color: var(--g0); background: var(--ac); border-radius: var(--r-2); text-decoration: none;
-        transition: opacity var(--dur-1) var(--ease-std); }
+        font-size: var(--fs-13); font-weight: var(--fw-semibold); color: var(--g0); background: var(--ac); border-radius: var(--r-2); text-decoration: none; transition: opacity var(--dur-1) var(--ease-std); }
   .go:hover { opacity: .88; }
-  :root[data-theme="dark"] .go, .dark .go { color: var(--g900); }
 
-  /* ── 데모 갤러리 ── */
+  .ops { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--sp-4); }
+  .ops > div { background: var(--paper-2); border-radius: var(--r-3); padding: var(--sp-4) var(--sp-5); }
+  .ops h3 { font-size: var(--fs-14); font-weight: var(--fw-semibold); margin: 0 0 var(--sp-1); }
+  .ops p { font-size: var(--fs-13); color: var(--ink-2); }
+  .ops a { font-size: var(--fs-12); font-weight: var(--fw-semibold); text-decoration: none; display: inline-block; margin-top: var(--sp-2); }
+
   .gal { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: var(--sp-5) var(--sp-4); }
   .shot { display: block; text-decoration: none; color: inherit; transition: transform var(--dur-1) var(--ease-std); }
   .shot:hover { transform: translateY(-2px); }
@@ -85,73 +80,68 @@
   .shot:hover .img { border-color: var(--ac); }
   .shot img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
   .shot .b { padding: var(--sp-2) 0 0; }
-  .shot h3 { font-size: var(--fs-14); font-weight: var(--fw-semibold); display: flex; align-items: center; gap: var(--sp-2); }
-  .shot h3 .chip { font-size: var(--fs-11); font-weight: var(--fw-medium); color: var(--warn-ink); background: var(--warn-soft); border-radius: var(--r-1); padding: 1px 6px; }
+  .shot h3 { font-size: var(--fs-14); font-weight: var(--fw-semibold); }
   .shot p { font-size: var(--fs-12); color: var(--ink-3); margin-top: 2px; }
-  .shot .d { font-size: var(--fs-12); color: var(--ink-3); margin-top: 2px; }
-  .shot .d b { color: var(--ac); font-weight: var(--fw-semibold); }
+  .shot .pf { font-size: var(--fs-12); color: var(--ink-2); margin-top: var(--sp-1); }
+  .shot .pf b { color: var(--ac); font-weight: var(--fw-semibold); }
+  details.more { margin-top: var(--sp-5); border-top: 1px solid var(--line); }
+  details.more > summary { cursor: pointer; padding: var(--sp-3) 0; font-size: var(--fs-14); font-weight: var(--fw-medium); list-style: none; }
+  details.more > summary::-webkit-details-marker { display: none; }
+  details.more > summary::before { content: '+'; color: var(--ac); margin-right: var(--sp-2); font-weight: var(--fw-semibold); }
+  details.more[open] > summary::before { content: '−'; }
+  details.more .gal { margin-top: var(--sp-3); }
 
-  /* ── AI 활용 ── */
-  .ai-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--sp-3); margin: 0 0 var(--sp-6); padding: 0; }
-  .ai-kpis div { background: var(--paper-2); border-radius: var(--r-2); padding: var(--sp-3) var(--sp-4); }
-  .ai-kpis dt { font-size: var(--fs-12); color: var(--ink-3); }
-  .ai-kpis dd { margin: 2px 0 0; font-size: var(--fs-22); font-weight: var(--fw-bold); letter-spacing: var(--ls-tight); font-variant-numeric: tabular-nums; color: var(--ac); line-height: var(--lh-display); }
-  .ai-kpis dd small { font-size: var(--fs-12); font-weight: var(--fw-regular); color: var(--ink-3); margin-left: 2px; }
-  .ai-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--sp-5) var(--sp-6); }
-  .ai-grid h3 { font-size: var(--fs-14); font-weight: var(--fw-semibold); margin: 0 0 var(--sp-2); display: flex; gap: var(--sp-2); align-items: center; }
-  .ai-grid h3 b { font-size: var(--fs-11); font-weight: var(--fw-semibold); color: var(--ac); background: var(--ac-soft); border-radius: var(--r-1); padding: 1px 6px; letter-spacing: .04em; }
-  .ai-grid p { font-size: var(--fs-13); color: var(--ink-2); }
-  .ai-grid p strong { color: var(--ink); font-weight: var(--fw-semibold); }
-  .bars { margin: var(--sp-6) 0 0; padding-top: var(--sp-4); border-top: 1px solid var(--line); }
-  .bars h3 { font-size: var(--fs-13); font-weight: var(--fw-medium); color: var(--ink-3); margin: 0 0 var(--sp-3); }
-  .bar { display: grid; grid-template-columns: 150px 1fr 64px; gap: var(--sp-3); align-items: center; font-size: var(--fs-13); margin-bottom: var(--sp-2); }
-  .bar i { display: block; height: 10px; border-radius: var(--r-1); background: var(--ac); }
-  .bar i.g2 { background: var(--ac); opacity: .7; } .bar i.g3 { background: var(--warn); } .bar i.g4 { background: var(--g400); }
-  .bar .n { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
-  .bar .l { color: var(--ink-2); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .two > div { background: var(--paper-2); border-radius: var(--r-3); padding: var(--sp-4) var(--sp-5); }
+  .two h3 { font-size: var(--fs-14); font-weight: var(--fw-semibold); margin: 0 0 var(--sp-2); color: var(--ac); }
+  .two ul { margin: 0; padding-left: 18px; font-size: var(--fs-13); color: var(--ink-2); }
+  .two li { margin: 4px 0; }
+  h2.sm { font-size: var(--fs-18); }
 
-  /* ── 표 ── */
   .tw { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: var(--fs-13); }
-  caption { text-align: left; font-size: var(--fs-12); color: var(--ink-3); padding-bottom: var(--sp-2); }
   th, td { text-align: left; padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--line); vertical-align: top; }
   thead th { font-size: var(--fs-12); font-weight: var(--fw-medium); color: var(--ink-3); white-space: nowrap; border-bottom: 1px solid var(--ac); }
-  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
   tbody tr:hover { background: var(--paper-2); }
-  .grp td { font-weight: var(--fw-semibold); font-size: var(--fs-12); color: var(--ac); background: var(--ac-soft); }
-  tbody tr.grp:hover td { background: var(--ac-soft); }
-  td .sub { display: block; color: var(--ink-3); font-size: var(--fs-12); margin-top: 2px; }
-  td .nw, .shead .nw { display: inline-block; font-size: var(--fs-11); font-weight: var(--fw-semibold); color: var(--warn-ink); background: var(--warn-soft);
-                        border-radius: var(--r-1); padding: 1px 5px; margin-left: var(--sp-1); vertical-align: 1px; }
+  details.grp { border-bottom: 1px solid var(--line); }
+  details.grp > summary { cursor: pointer; padding: var(--sp-3) 0; font-size: var(--fs-14); font-weight: var(--fw-semibold); list-style: none; display: flex; gap: var(--sp-2); align-items: baseline; }
+  details.grp > summary::-webkit-details-marker { display: none; }
+  details.grp > summary::before { content: '+'; color: var(--ac); }
+  details.grp[open] > summary::before { content: '−'; }
+  details.grp > summary small { font-size: var(--fs-12); color: var(--ink-3); font-weight: var(--fw-regular); }
+  details.grp table { margin-bottom: var(--sp-3); }
 
-  /* ── 원칙 3열 ── */
   .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--sp-4); }
   .cols > div { background: var(--paper-2); border-radius: var(--r-3); padding: var(--sp-5); }
   .cols h3 { font-size: var(--fs-14); font-weight: var(--fw-semibold); margin: 0 0 var(--sp-2); }
   .cols h3 b { color: var(--ac); font-weight: var(--fw-bold); margin-right: var(--sp-2); font-variant-numeric: tabular-nums; }
   .cols p { font-size: var(--fs-13); color: var(--ink-2); }
 
-  /* ── FAQ ── */
-  details { border-bottom: 1px solid var(--line); }
-  summary { cursor: pointer; padding: var(--sp-3) 0; font-size: var(--fs-14); font-weight: var(--fw-medium); list-style: none; }
-  summary::-webkit-details-marker { display: none; }
-  summary::before { content: '+'; color: var(--ac); margin-right: var(--sp-2); font-weight: var(--fw-semibold); }
-  details[open] summary::before { content: '−'; }
-  details p { margin: 0 0 var(--sp-3) var(--sp-5); font-size: var(--fs-13); color: var(--ink-2); max-width: 44em; }
+  details.faq { border-bottom: 1px solid var(--line); }
+  details.faq > summary { cursor: pointer; padding: var(--sp-3) 0; font-size: var(--fs-14); font-weight: var(--fw-medium); list-style: none; }
+  details.faq > summary::-webkit-details-marker { display: none; }
+  details.faq > summary::before { content: '+'; color: var(--ac); margin-right: var(--sp-2); font-weight: var(--fw-semibold); }
+  details.faq[open] > summary::before { content: '−'; }
+  details.faq p { margin: 0 0 var(--sp-3) var(--sp-5); font-size: var(--fs-13); color: var(--ink-2); max-width: 44em; }
 
-  footer { margin-top: var(--sp-12); padding-top: var(--sp-6); border-top: 1px solid var(--line); font-size: var(--fs-13); color: var(--ink-2);
-           display: flex; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap; }
+  footer { margin-top: var(--sp-12); padding-top: var(--sp-6); border-top: 1px solid var(--line); font-size: var(--fs-13); color: var(--ink-2); display: flex; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap; }
   footer a { text-decoration: none; }
   footer .fine { font-size: var(--fs-12); color: var(--ink-3); }
+  .top { position: fixed; right: var(--sp-4); bottom: var(--sp-4); width: 40px; height: 40px; border-radius: var(--r-pill); background: var(--ac); color: var(--g0);
+         display: none; align-items: center; justify-content: center; text-decoration: none; font-size: var(--fs-14); font-weight: var(--fw-bold); box-shadow: var(--shadow-2); }
 
   @media (max-width: 860px) {
     .page { grid-template-columns: 1fr; }
-    aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: var(--sp-6) var(--sp-4); }
-    .toc { flex-direction: row; flex-wrap: wrap; gap: var(--sp-1); margin-top: var(--sp-4); }
+    aside { position: sticky; top: 0; z-index: 5; height: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: var(--sp-3) var(--sp-4); background: var(--paper); }
+    aside .name { font-size: var(--fs-16); display: inline; } aside .sub { display: inline; margin-left: var(--sp-2); }
+    .toc { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; gap: var(--sp-1); margin-top: var(--sp-2); padding-bottom: 2px; scrollbar-width: none; }
     .toc a { padding: var(--sp-1) var(--sp-2); font-size: var(--fs-12); }
-    aside .ct { margin-top: var(--sp-4); }
+    aside .ct, aside .upd { display: none; }
     main { padding: var(--sp-6) var(--sp-4) var(--sp-10); }
     h1 { font-size: 28px; }
+    .two { grid-template-columns: 1fr; }
+    .top { display: flex; }
+    .flag dl { max-width: none; }
   }
 </style>
 </head>
@@ -162,475 +152,280 @@
   <div class="sub">재무회계 · 결산·대사·자동화</div>
   <ul class="toc" id="toc">
     <li><a href="#s-summary">요약</a></li>
-    <li><a href="#s-flag">대표 프로젝트<small>8</small></a></li>
-    <li><a href="#s-demo">동작하는 데모<small>17</small></a></li>
+    <li><a href="#s-flag">대표 프로젝트<small>4</small></a></li>
+    <li><a href="#s-ops">운영 개선<small>4</small></a></li>
+    <li><a href="#s-demo">데모<small>6+11</small></a></li>
     <li><a href="#s-way">일하는 방식</a></li>
-    <li><a href="#s-ai">AI를 쓰는 방식</a></li>
-    <li><a href="#s-now">지금 진행 중<small>8</small></a></li>
-    <li><a href="#s-all">전체 프로젝트<small>62</small></a></li>
-    <li><a href="#s-scope">담당 업무 범위</a></li>
-    <li><a href="#s-tools">사용 도구</a></li>
-    <li><a href="#s-faq">자주 받는 질문</a></li>
+    <li><a href="#s-all">전체 프로젝트</a></li>
+    <li><a href="#s-scope">담당 업무</a></li>
+    <li><a href="#s-tools">도구</a></li>
+    <li><a href="#s-faq">FAQ</a></li>
   </ul>
-  <div class="ct">주식회사 차일디 재무회계팀 매니저<br>1년 6개월 · 재직 중<br><a href="mailto:lee-ding@naver.com">lee-ding@naver.com</a></div>
-  <span class="upd"><i></i>2026년 9월 기준 갱신 · 데모 17개</span>
+  <div class="ct">패션 이커머스(브랜드 복수 운영) 재무회계팀 매니저<br>재직 중 · 1년 6개월<br><a href="mailto:lee-ding@naver.com">lee-ding@naver.com</a></div>
+  <span class="upd"><i></i>2026년 9월 갱신</span>
 </aside>
 
 <main>
   <p class="eyebrow">Finance &amp; Accounting · Portfolio</p>
-  <h1>차이를 규명하고,<br>반복은 <em>기계에</em> 넘긴 1년 6개월</h1>
-  <p class="role">패션 브랜드 4개 운영 이커머스 · 월결산 · 매출/정산 대사 · 재고평가 · 결산 프로세스 자동화</p>
+  <h1>차이는 규명하고,<br>반복은 <em>기계에</em> 넘깁니다</h1>
+  <p class="role">월결산 · 매출/정산 대사 · 재고평가 · 결산 프로세스 자동화 — 패션 이커머스 재무회계</p>
   <div class="stats">
-    <div><b class="num">37<small>개</small></b><span>월 대사 채널 — 위탁 34 + 결제대행 3</span></div>
-    <div><b class="num">31<small>채널</small></b><span>정산 자동수집 — API 28 + 결제대행 3</span></div>
-    <div><b>원 단위</b><span>대사 재현 정확도 — 34채널 전수 검증</span></div>
-    <div><b class="num">62<small>건</small></b><span>프로젝트 — 데모 17개 공개</span></div>
+    <div><b class="num">18<small>회</small></b><span>월결산 — 가결산 손익·판관비 분류·비경상 분리</span></div>
+    <div><b class="num">34<small>채널</small></b><span>위탁 정산 대사 — 원 단위 일치 확인</span></div>
+    <div><b>원 단위</b><span>재고 평가충당금 — 이전 확정본 재현 검증</span></div>
+    <div><b class="num">6<small>+11</small></b><span>동작하는 데모 — 샘플 데이터로 공개</span></div>
   </div>
 
   <section id="s-summary">
     <div class="shead"><h2>요약</h2></div>
     <p class="lede">패션 이커머스 재무회계팀에서 월결산과 매출·원가 대사를 담당합니다. 업무의 절반은
-      <strong>차이를 규명하는 일</strong>이었고, 차이를 매달 새로 조사하지 않도록 원인별로 분류해 기준을 문서로 확정한 뒤
-      반복 확인 구간을 자동화했습니다. 자동화한 산출물은 원천 합계와 일치하는지, 재계산해도 같은 값이 나오는지
-      확인한 뒤에만 사용했습니다.</p>
-    <p class="lede">한 건이 끝나면 다음 달부터 그 업무에 드는 시간이 줄었고, 그렇게 확보한 시간을 다음 건에 썼습니다.
-      최근에는 <strong>정산서 수집 자체를 무인화</strong>하고, 채널 34개의 건별 대사를 원 단위까지 재현되는 파이프라인으로 완결했습니다.
-      아래 기록에는 <strong>금액·거래처명·내부 시스템 정보가 없습니다</strong> — 구조와 건수·비율로만 적었습니다.</p>
+      <strong>차이를 규명하는 일</strong>이었습니다. 차이를 원인별로 분류해 기준을 문서로 확정하고, 반복 확인 구간만 자동화했습니다.</p>
+    <p class="lede">자동화한 숫자는 원천 합계와 맞는지, 다시 계산해도 같은지, 이전 확정본을 재현하는지 확인한 뒤에만 씁니다.
+      아래에는 <strong>금액·거래처명·내부 시스템 정보가 없습니다</strong> — 구조와 건수로만 적었습니다.</p>
   </section>
 
   <section id="s-flag">
-    <div class="shead"><h2>대표 프로젝트</h2><p>결산 근거를 남기는 일과, 반복을 걷어내는 일</p></div>
+    <div class="shead"><h2>대표 프로젝트</h2><p>결산 근거를 남기는 일 4건</p></div>
     <div class="flags">
 
       <article class="flag">
-        <span class="tag new">2026.09 완결</span>
-        <h3>위탁매출 34채널 건별 대사 파이프라인 · 정산서 무인 수집</h3>
-        <p class="one">채널이 늘어도 마감이 밀리지 않는 구조로 바꾸고, 수집까지 사람 손을 뺐습니다.</p>
+        <h3>월 가결산 손익 — 판관비 분류 체계와 비경상 손익 분리</h3>
+        <p class="one">매달 다른 기준으로 만들어지던 손익을 한 체계로 고정했습니다.</p>
         <dl>
-          <dt>배경</dt><dd>채널마다 정산서 양식과 공제 항목이 달라 매월 채널별 대사 파일을 새로 만들었고, 정산서는 사람이 파트너 사이트 수십 곳에 로그인해 내려받았습니다. 열 위치가 달마다 밀려 수식이 조용히 틀어지는 일이 반복됐습니다.</dd>
-          <dt>한 일</dt><dd>정산서를 하나의 대사 양식으로 표준화하고 ERP 실판매 기준으로 상품매출·수수료·반품을 건별 자동 매칭했습니다. 반복되는 차이는 원인을 지정해 상시 차이로 분리했고(차수별 분할지급, 기준 미달 미지급, 프로모션 공제, 세트·색상묶음 품번), 열은 위치가 아니라 <strong>헤더 이름으로</strong> 읽게 바꿨습니다. 정산 API가 있는 채널은 API로, 없는 채널은 자격증명을 암호화 금고에 두고 브라우저를 자동 조작하는 무인 수집기로 매월 자동 수집합니다(2단계 인증 자동 생성 포함).</dd>
-          <dt>결과</dt><dd>34채널 전수를 <strong>원 단위까지 재현</strong>하는지 확인했고, 남은 차이 3건은 전부 원인을 규명했습니다. 채널별 차이는 채널×원인 축의 화면으로 상시 조회되고, 전월 이력과 비교됩니다. 정산서 수집은 11채널이 무인으로 돌아갑니다.</dd>
+          <dt>배경</dt><dd>판관비 분류가 담당자마다 달라 월별 비교가 어려웠고, 일회성 손익이 정상 손익에 섞여 경영진 판단을 흐렸습니다.</dd>
+          <dt>한 일</dt><dd>판관비를 7대 분류로 재편하고 지급수수료를 판매성·관리성으로 분해했습니다. 고정비·변동비 판정 순서를 규칙으로 정해 미판정 항목이 따로 보이게 했고, 비경상 항목을 걷어낸 정상 손익을 수식 연동 한 장 보고서로 만들었습니다.</dd>
+          <dt>결과</dt><dd>EBITDA·마진·매출 대비 비율이 같은 정의로 매달 나옵니다. 보고서 상단에 결론과 검증식이 먼저 오고, 표는 뒤로 갑니다.</dd>
         </dl>
         <div class="metrics">
-          <div><span class="m">대사 채널</span><span class="v">34</span></div>
-          <div><span class="m">정산 API 연결</span><span class="v">28채널</span></div>
-          <div><span class="m">무인 로그인 수집</span><span class="v">11채널</span></div>
-          <div><span class="m">확정 기준</span><span class="v">원 단위 재현</span></div>
+          <div><span class="m">판관비 분류</span><span class="v">7대</span></div>
+          <div><span class="m">고정·변동 판정</span><span class="v">규칙 + 미판정 리포트</span></div>
+          <div><span class="m">비경상 분리</span><span class="v">한 장 · 수식 연동</span></div>
         </div>
       </article>
 
       <article class="flag">
-        <h3>재고자산 평가충당금(NRV) 산정 로직 재설계</h3>
+        <h3>재고 평가충당금(NRV) 산정 로직 재설계</h3>
         <p class="one">계산 결과보다 <strong>판단 기준을 재현 가능하게</strong> 만드는 것이 목표였습니다.</p>
         <dl>
-          <dt>배경</dt><dd>충당금 산정 근거가 문서로 남아 있지 않아, 금액이 바뀔 때 왜 바뀌었는지 설명하기 어려웠습니다. 감사인이 반드시 근거를 확인하는 항목입니다.</dd>
-          <dt>한 일</dt><dd>산정에 필요한 판단을 15개 항목(에이징 구간, 시즌 판별, 계절지수, 순실현가치 추정, 예외 처리)으로 분해하고 항목별 대안·채택 근거를 표로 확정했습니다. 각 항목은 다른 AI 모델을 검토자로 세워 교차검증했고, 같은 지표를 표마다 다르게 계산하던 정의 불일치를 잡아냈습니다.</dd>
-          <dt>결과</dt><dd>최종본이 이전 확정본을 <strong>원 단위까지 재현</strong>하는지 확인한 뒤 확정했습니다. 충당금률 근거가 항목별 문서로 남아 설명이 가능해졌고, 가정을 바꾸면 즉시 재계산되는 시뮬레이터로 시나리오 비교가 회의 중에 끝납니다.</dd>
+          <dt>배경</dt><dd>충당금 산정 근거가 문서로 남아 있지 않아 금액이 바뀔 때 이유를 설명하기 어려웠습니다. 감사인이 반드시 근거를 확인하는 항목입니다.</dd>
+          <dt>한 일</dt><dd>산정 판단을 15개 항목(에이징 구간, 시즌 판별, 계절지수, 순실현가치 추정, 예외 처리)으로 분해해 항목별 대안과 채택 근거를 표로 확정했습니다. 다른 AI 모델을 검토자로 세워 7라운드 교차검증했고, 표마다 다르던 지표 정의를 통일했습니다.</dd>
+          <dt>결과</dt><dd>최종본이 <strong>이전 확정본을 원 단위까지 재현</strong>하는지 확인한 뒤 확정했습니다. 가정을 바꾸면 즉시 재계산되는 시뮬레이터로 시나리오 비교가 회의 중에 끝납니다.</dd>
         </dl>
         <div class="metrics">
           <div><span class="m">검증 라운드</span><span class="v">7</span></div>
           <div><span class="m">판단 항목</span><span class="v">15</span></div>
-          <div><span class="m">계산 대상</span><span class="v">2.2만 행</span></div>
+          <div><span class="m">확정 기준</span><span class="v">이전 확정본 원 단위 재현</span></div>
         </div>
         <a class="go" href="demo/nrv-simulator/">데모 열기 <span aria-hidden="true">→</span></a>
       </article>
 
       <article class="flag">
-        <span class="tag new">2026.09 진행 중</span>
-        <h3>전사 라인시트 표준화 — 상품 마스터를 하나의 양식으로</h3>
-        <p class="one">발주·입고·매출·자금이 전부 같은 품번 체계 위에서 돌아가게 만드는 상류 작업입니다.</p>
+        <h3>위탁매출 34채널 건별 정산 대사</h3>
+        <p class="one">채널이 늘어도 마감이 밀리지 않는 구조로 바꿨습니다.</p>
         <dl>
-          <dt>배경</dt><dd>본부마다 라인시트(시즌 상품 계획표) 양식이 달라 3계보·최대 173열로 갈라져 있었고, 한 파일은 SKU 키 수식 580행 중 570행이 행 삽입·삭제로 깨져 있었습니다. 키를 수식으로 만들면 언젠가 무너진다는 것이 출발점이었습니다.</dd>
-          <dt>한 일</dt><dd>본부별 실사용 파일 5종을 전수 분석해 공통 최소 필드 13개와 매핑키 3계층(스타일 › SKU › 어소트)을 정의하고, 코드사전(브랜드·시즌·아이템·생산처 37·컬러 78 등)을 만들었습니다. 통일안 3개를 비교해 <strong>본부 파일 안에 수식 연동 탭을 두고 앱은 변환기 역할만</strong> 하는 안으로 확정했고, ERP 상품등록 양식(73열)에 대한 열 좌표를 본부별로 실측했습니다. 업로드·검증·버전 비교 허브와 수집기 앱을 함께 만들었고, 생산·재무가 같이 쓰는 협업 프로젝트 방(그룹 8·상태 5·공유 뷰 4)을 설계해 요청·결정을 한곳에서 관리합니다.</dd>
-          <dt>결과</dt><dd>발주계획·예상매입(업체×월 입고예정)·자금 연동이 같은 원천에서 나오는 구조가 잡혔습니다. 남은 것은 ERP 코드 확보와 본부 인터뷰로 필드 확정 — 2026년 9월 현재 진행 중입니다.</dd>
+          <dt>배경</dt><dd>채널마다 정산서 양식과 공제 항목이 달라 매월 채널별 대사 파일을 새로 만들었고, 열 위치가 달마다 밀려 수식이 조용히 틀어지는 일이 반복됐습니다.</dd>
+          <dt>한 일</dt><dd>정산서를 하나의 대사 양식으로 표준화하고 ERP 실판매 기준으로 상품매출·수수료·반품을 건별 자동 매칭했습니다. 반복되는 차이는 원인을 지정해 상시 차이로 분리했고(차수별 분할지급, 기준 미달 미지급, 프로모션 공제, 세트·색상묶음 품번), 열은 위치가 아니라 헤더 이름으로 읽게 했습니다. 정산서 수집은 파트너사가 제공하는 방식 안에서 자동화했습니다.</dd>
+          <dt>결과</dt><dd>검증식 <strong>정산서 입금액 = ERP 실판매 − 수수료 − 반품 ± 상시차이</strong>가 34채널 전부 원 단위로 맞는지 확인했고, 남은 차이 3건은 원인을 규명해 회계처리 방침을 정했습니다.</dd>
         </dl>
         <div class="metrics">
-          <div><span class="m">분석 양식</span><span class="v">5종 · 3계보</span></div>
-          <div><span class="m">공통 필드</span><span class="v">13 · 키 3계층</span></div>
-          <div><span class="m">확정안</span><span class="v">수식 연동형</span></div>
-          <div><span class="m">협업 방</span><span class="v">그룹 8 · 뷰 4</span></div>
+          <div><span class="m">대사 채널</span><span class="v">34</span></div>
+          <div><span class="m">상시 차이 유형</span><span class="v">4</span></div>
+          <div><span class="m">확정 기준</span><span class="v">원 단위 일치</span></div>
         </div>
+        <a class="go" href="demo/wita-settlement/">데모 열기 <span aria-hidden="true">→</span></a>
       </article>
 
       <article class="flag">
-        <span class="tag new">2026.09 실운영</span>
-        <h3>월 매입 마감 앱 — 발주↔입고 대사 · 부대비용 배부 · 결재</h3>
-        <p class="one">매입 마감의 판단 순서를 화면 순서로 옮겨, 누가 해도 같은 결과가 나오게 했습니다.</p>
-        <dl>
-          <dt>배경</dt><dd>발주·입고·수입 부대비용이 서로 다른 시스템과 파일에 있어 월 매입 원가를 확정하려면 사람이 셋을 대조해야 했고, 수입 건은 필증 확인이 누락되기 쉬웠습니다.</dd>
-          <dt>한 일</dt><dd>발주번호 체계를 새로 정의하고(일자·거래처·품번·입고번호 조합) 발주↔입고를 자동 대사, 운임·관세 등 부대비용을 원천만 적재한 뒤 규칙으로 배부했습니다. 수입 건은 필증 검증 단계를 통과해야 다음으로 넘어가고, 마지막에 임원 결재까지 한 흐름으로 이어집니다. 세트 품번의 이중 계산 같은 함정은 검사 규칙으로 고정했습니다.</dd>
-          <dt>결과</dt><dd>월 매입 마감이 사람이 파일을 대조하는 작업에서 화면에서 예외만 처리하는 작업으로 바뀌었습니다. 상류의 라인시트 표준화(위)와 같은 품번 체계를 씁니다.</dd>
-        </dl>
-        <div class="metrics">
-          <div><span class="m">대사 축</span><span class="v">발주·입고·부대비용</span></div>
-          <div><span class="m">부대비용</span><span class="v">원천 적재 + 규칙 배부</span></div>
-          <div><span class="m">상류 표준화</span><span class="v">라인시트 통일안 확정</span></div>
-        </div>
-        <a class="go" href="demo/one-close/">데모 열기 <span aria-hidden="true">→</span></a>
-      </article>
-
-      <article class="flag">
-        <h3>자금 대시보드 — 잔액·수금·생산대금을 한 화면에</h3>
-        <p class="one">"이번 달 자금이 버티는가"를 파일을 열지 않고 확인하기 위해 만들었습니다.</p>
-        <dl>
-          <dt>배경</dt><dd>자금 현황과 가결산이 각각 다른 파일에 있어, 보려면 파일을 찾아 열고 수치를 옮겨 담아야 했습니다. 수금 예측은 사람이 매번 다시 계산했습니다.</dd>
-          <dt>한 일</dt><dd>원천을 중간 시트로 단일화하고 매일 자동 동기화한 뒤, 잔액 추이·수금 예측·생산대금 지급·정산 추적을 한 화면으로 묶었습니다. 화면을 열 때마다 <strong>체크섬 7종을 자동 검증</strong>해 원천과 어긋나면 즉시 표시합니다. 시즌·부서별 영업현금흐름(OCF/FCF)도 같은 원천에서 산출합니다.</dd>
-          <dt>결과</dt><dd>보고 전 자료 취합이 없어지고, 링크 하나로 최신 현황을 공유합니다. 예측이 바뀌면 변경 이력과 사유가 기록으로 남습니다.</dd>
-        </dl>
-        <div class="metrics">
-          <div><span class="m">자동 검증</span><span class="v">7종 체크섬</span></div>
-          <div><span class="m">동기화</span><span class="v">일 1회</span></div>
-          <div><span class="m">연결 원천</span><span class="v">15 테이블</span></div>
-        </div>
-        <a class="go" href="demo/fund-cycle/">데모 열기 <span aria-hidden="true">→</span></a>
-      </article>
-
-      <article class="flag">
-        <h3>투자계약 전수 분석 및 의무 관리</h3>
-        <p class="one">계약서를 읽는 일과, 계약이 만드는 <strong>월별 의무</strong>를 관리하는 일은 다릅니다.</p>
-        <dl>
-          <dt>배경</dt><dd>여러 라운드에 걸쳐 계약이 쌓였는데, 어떤 보고를 언제 누구에게 내야 하는지가 계약서 안에만 있었습니다. 사전동의가 필요한 행위의 기준 금액도 계약마다 달랐습니다.</dd>
-          <dt>한 일</dt><dd>의무를 <strong>긴급 / 정기 보고 / 이벤트 발생 시</strong> 세 축으로 재분류하고, 투자자별 카드와 조건 비교표(동의권·임원지명·보고주기·위약벌)를 만들었습니다. 기준이 다른 항목은 가장 타이트한 기준으로 통일 관리하도록 정리하고, 상환권이 열리는 시점을 타임라인으로 자금계획과 연결했습니다.</dd>
-          <dt>결과</dt><dd>분기·연간 제출물이 캘린더로 정리되고, 신주 발행·자산 처분처럼 동의가 필요한 행위를 사전에 판별할 수 있게 됐습니다.</dd>
-        </dl>
-        <div class="metrics">
-          <div><span class="m">분석 계약</span><span class="v">19건</span></div>
-          <div><span class="m">분류 축</span><span class="v">3</span></div>
-          <div><span class="m">비교 항목</span><span class="v">6</span></div>
-        </div>
-        <a class="go" href="demo/investor-contracts/">데모 열기 <span aria-hidden="true">→</span></a>
-      </article>
-
-      <article class="flag">
-        <h3>결산 원천 데이터 단일화 — 전표를 정본으로</h3>
+        <h3>결산 원천 단일화와 현금흐름 검증</h3>
         <p class="one">여러 시트를 대조하는 대신, 정본을 하나로 정했습니다.</p>
         <dl>
-          <dt>배경</dt><dd>결산 원천이 구글시트·엑셀·시스템 추출본으로 흩어져, 숫자의 출처를 추적하는 데 매번 비용이 들었습니다.</dd>
-          <dt>한 일</dt><dd>회계 전표의 모든 분개라인을 정본으로 삼아 단일 테이블로 정규화하고, 계정 81개를 유형·현금흐름 구분으로 매핑하는 규칙표를 만들었습니다. 새 계정이 나타나면 적재가 예외로 멈추게 해 임의 분류를 막았습니다. 이후 회계시스템의 원장·전표를 화면 탐색 없이 API로 직접 가져오도록 바꿔 추출 자체를 자동화했습니다.</dd>
-          <dt>결과</dt><dd>이 데이터로 직접법 현금흐름을 산출해 통장 순증감과 <strong>차이 없이</strong> 검증했습니다. 검증 중 이체가 섞인 혼합 전표는 순액으로 판정해야 한다는 오류 원인을 규명해 규칙에 반영했습니다.</dd>
+          <dt>배경</dt><dd>결산 원천이 구글시트·엑셀·시스템 추출본으로 흩어져 숫자의 출처를 추적하는 데 매번 비용이 들었습니다.</dd>
+          <dt>한 일</dt><dd>회계 전표의 모든 분개라인을 정본으로 삼아 단일 테이블로 정규화하고, 계정 81개를 유형·현금흐름 구분으로 매핑하는 규칙표를 만들었습니다. 새 계정이 나타나면 적재가 예외로 멈추게 해 임의 분류를 막았습니다. 원장·전표 추출은 회사 시스템이 제공하는 방식으로 자동화했습니다.</dd>
+          <dt>결과</dt><dd>이 데이터로 직접법 현금흐름을 산출해 통장 순증감과 <strong>차이 없이</strong> 맞췄습니다. 검증 중 이체가 섞인 혼합 전표는 순액으로 판정해야 한다는 원인을 찾아 규칙에 반영했고, 매출원가는 건별 대조로 재무상태표 재고와 일치를 확인했습니다.</dd>
         </dl>
         <div class="metrics">
           <div><span class="m">매핑 계정</span><span class="v">81</span></div>
-          <div><span class="m">현금흐름 검증</span><span class="v">차이 0원</span></div>
-          <div><span class="m">원장 추출</span><span class="v">API 직접 조회</span></div>
+          <div><span class="m">현금흐름 검증</span><span class="v">통장 순증감 = 산출값</span></div>
+          <div><span class="m">매출원가</span><span class="v">건별 대조 · 재고 일치</span></div>
         </div>
-      </article>
-
-      <article class="flag">
-        <h3>법인카드 운영 개편 — 실물 축소 + 가상카드 · 경비 자동 판정</h3>
-        <p class="one">카드 수를 줄이는 게 아니라, 통제 가능한 구조를 만드는 것이 목적이었습니다.</p>
-        <dl>
-          <dt>배경</dt><dd>실물 카드가 51장까지 늘어 발급·회수·한도 관리가 사람 손에 의존했고, 대행 결제 비중이 커 사용 내역 추적이 어려웠습니다. 야근식대 같은 규정성 경비는 근태와 대조해야 하는데 매월 수작업이었습니다.</dd>
-          <dt>한 일</dt><dd>사용 실태를 분해해 대행 결제 비중을 산출하고, 실물을 34장으로 줄이면서 나머지는 모(母)카드 토큰화 기반 가상카드로 전환하는 안을 설계했습니다. 관리 대장을 20열 체계(상태 4종·용도 9종)로 전면 개편하고, 근태기록과 카드 내역을 사람별로 펼쳐 기준 근무시간 충족 여부를 자동 판정하는 앱을 만들었습니다(동명이인·오타·단체식사·같은 날 중복은 확인필요로 분리).</dd>
-          <dt>결과</dt><dd>카드별 용도·한도가 대장으로 관리되고, 신규 발급 없이 목적별 카드를 만들 수 있는 구조가 됐습니다. 경비 판정은 예외만 사람이 보고, 부적합 안내문구까지 자동 생성됩니다.</dd>
-        </dl>
-        <div class="metrics">
-          <div><span class="m">실물 카드</span><span class="v">51 → 34장</span></div>
-          <div><span class="m">대장 체계</span><span class="v">20열 · 상태 4 · 용도 9</span></div>
-          <div><span class="m">경비 판정</span><span class="v">자동 · 예외만 검토</span></div>
-        </div>
-        <a class="go" href="demo/overtime-meal/">경비 판정 데모 열기 <span aria-hidden="true">→</span></a>
       </article>
 
     </div>
   </section>
 
-  <section id="s-demo">
-    <div class="shead"><h2>동작하는 데모</h2><p>샘플 데이터로 실제 화면을 그대로 공개합니다 — 화면·계산·판정 로직은 실제 구현과 동일. 실운영 앱은 서버 코드까지 브라우저에서 그대로 실행</p></div>
-    <div class="gal">
-      <a class="shot" href="demo/one-close/">
-        <div class="img"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱 화면" loading="lazy"></div>
-        <div class="b"><h3>월 매입 마감 앱 <span class="chip">NEW</span></h3><p>입고 검수 → ERP 입고현황 적재 → 수입신고 B/L 연결·과세환율 → 부대비용 배부 → 취득원가 확정, 서버 판정 로직 그대로</p><div class="d">데이터 <b>가상 품번 10행 · 수입 1건</b></div></div>
-      </a>
-      <a class="shot" href="demo/linesheet-collector/">
-        <div class="img"><img src="assets/shots/linesheet-collector.jpg" alt="생산 라인시트 수집기 화면" loading="lazy"></div>
-        <div class="b"><h3>생산 라인시트 수집기 <span class="chip">NEW</span></h3><p>커스텀 양식 업로드·건별 조회·작업표·사이즈 매트릭스·이미지 메모 — 서버 25개 파일을 브라우저에서 실행</p><div class="d">데이터 <b>가상 품번 36건</b></div></div>
-      </a>
-      <a class="shot" href="demo/linesheet-hub/">
-        <div class="img"><img src="assets/shots/linesheet-hub.jpg" alt="라인시트 허브 화면" loading="lazy"></div>
-        <div class="b"><h3>라인시트 허브 <span class="chip">NEW</span></h3><p>통일양식 업로드 → 검증 → 버전 적재 → 이전 버전 diff·변경사유, 코드사전</p><div class="d">데이터 <b>브랜드 2 · 버전 3</b></div></div>
-      </a>
-      <a class="shot" href="demo/linesheet-fin/">
-        <div class="img"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계 화면" loading="lazy"></div>
-        <div class="b"><h3>라인시트 재무 집계 <span class="chip">NEW</span></h3><p>매입 약정 기준 집계·매출·대장·유효성, 스냅샷 압축으로 왕복 0회</p><div class="d">데이터 <b>가상 품번 95 · 사이즈 380</b></div></div>
-      </a>
-      <a class="shot" href="demo/wita-settlement/">
-        <div class="img"><img src="assets/shots/wita-settlement.jpg" alt="위탁 정산 관리 화면" loading="lazy"></div>
-        <div class="b"><h3>위탁 정산 관리 <span class="chip">NEW</span></h3><p>채널 룰(헤더행·소계·산식·파라미터) 편집과 채널별 계산·집계·검증식</p><div class="d">데이터 <b>채널 26 · 가상 결과</b></div></div>
-      </a>
-      <a class="shot" href="demo/stg-settlement/">
-        <div class="img"><img src="assets/shots/stg-settlement.jpg" alt="자사몰 수탁정산 화면" loading="lazy"></div>
-        <div class="b"><h3>자사몰 수탁정산 <span class="chip">NEW</span></h3><p>결제대행 건별 + 주문·취소·배송 파일 → 엔진 계산 → 검증 게이트 → 정산·전표 파일</p><div class="d">데이터 <b>가상 주문 36 · PG 40</b></div></div>
-      </a>
-      <a class="shot" href="demo/expense-dashboard/">
-        <div class="img"><img src="assets/shots/expense-dashboard.jpg" alt="지출내역 대시보드 화면" loading="lazy"></div>
-        <div class="b"><h3>지출내역 대시보드 <span class="chip">NEW</span></h3><p>결재 문서의 지출 표를 붙여넣으면 용도·부서별 구성이 즉시</p><div class="d">데이터 <b>가상 48건</b></div></div>
-      </a>
-      <a class="shot" href="demo/meeting-memo/">
-        <div class="img"><img src="assets/shots/meeting-memo.jpg" alt="회의 메모 컨테이너 화면" loading="lazy"></div>
-        <div class="b"><h3>회의 메모 컨테이너 <span class="chip">NEW</span></h3><p>협의 시트에 붙는 안건·메모 입력 사이드바</p><div class="d">데이터 <b>안건 7</b></div></div>
-      </a>
-      <a class="shot" href="demo/fund-cycle/">
-        <div class="img"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드 화면" loading="lazy"></div>
-        <div class="b"><h3>자금 대시보드</h3><p>잔액 추이 · 수금 예측 · 생산대금 지급 · 정산 추적, 진입 시 품질검사 7종 자동</p><div class="d">데이터 <b>합성 15테이블</b></div></div>
-      </a>
-      <a class="shot" href="demo/nrv-simulator/">
-        <div class="img"><img src="assets/shots/nrv-simulator.jpg" alt="NRV 시뮬레이터 화면" loading="lazy"></div>
-        <div class="b"><h3>NRV 시뮬레이터</h3><p>가정(소진율·할인율·부대비용)을 움직이면 전 품번 충당금 즉시 재계산</p><div class="d">데이터 <b>1,420 품번</b></div></div>
-      </a>
-      <a class="shot" href="demo/overtime-meal/">
-        <div class="img"><img src="assets/shots/overtime-meal.jpg" alt="야근식대 대조 화면" loading="lazy"></div>
-        <div class="b"><h3>야근식대 대조 <span class="chip">NEW</span></h3><p>근태 vs 카드 내역을 사람별로 펼쳐 적합·부적합·확인필요 판정, 안내문구 생성</p><div class="d">데이터 <b>가상 28명 · 지출 34건</b></div></div>
-      </a>
-      <a class="shot" href="demo/investor-contracts/">
-        <div class="img"><img src="assets/shots/investor-contracts.jpg" alt="투자계약 대시보드 화면" loading="lazy"></div>
-        <div class="b"><h3>투자계약 대시보드</h3><p>의무를 긴급/정기/이벤트로 분류, 투자자 카드·조건 비교표·상환 타임라인</p><div class="d">데이터 <b>가상 계약 16건</b></div></div>
-      </a>
-      <a class="shot" href="demo/card-notice/">
-        <div class="img"><img src="assets/shots/card-notice.jpg" alt="법인카드 개편 공지 화면" loading="lazy"></div>
-        <div class="b"><h3>법인카드 개편 공지</h3><p>정책 변경을 전 구성원에게 설명한 안내 페이지 — 변경 전후·한도 근거·상황별 가이드</p><div class="d">데이터 <b>가상 조직·정책</b></div></div>
-      </a>
-      <a class="shot" href="demo/fund-dashboard/">
-        <div class="img"><img src="assets/shots/fund-dashboard.jpg" alt="자금 인텔리전스 화면" loading="lazy"></div>
-        <div class="b"><h3>자금 인텔리전스</h3><p>같은 데이터를 현금 시나리오·손익 시뮬레이션 관점으로 재구성한 버전</p><div class="d">데이터 <b>합성 18탭</b></div></div>
-      </a>
-      <a class="shot" href="demo/flow-diagram/">
-        <div class="img"><img src="assets/shots/flow-diagram.jpg" alt="전사 업무 흐름도 화면" loading="lazy"></div>
-        <div class="b"><h3>전사 업무 흐름도</h3><p>계획이 자금·실적으로 이어지는 경로를 한 장으로 정리한 문서</p><div class="d">데이터 <b>구조 문서</b></div></div>
-      </a>
-      <a class="shot" href="demo/one-erp/">
-        <div class="img"><img src="assets/shots/one-erp.jpg" alt="ONE ERP 목업 화면" loading="lazy"></div>
-        <div class="b"><h3>ONE ERP 목업</h3><p>흩어진 시스템을 하나로 합치면 어떤 화면이 되는지 보여주는 목업</p><div class="d">데이터 <b>가상 데이터</b></div></div>
-      </a>
-      <a class="shot" href="demo/dashboard-cart/">
-        <div class="img"><img src="assets/shots/dashboard-cart.jpg" alt="Dashboard Cart 화면" loading="lazy"></div>
-        <div class="b"><h3>Dashboard Cart</h3><p>보고 화면을 만들기 전 무엇을 어떻게 보여줄지 조합해 보는 설계 도구</p><div class="d">데이터 <b>패턴 56건</b></div></div>
-      </a>
+  <section id="s-ops">
+    <div class="shead"><h2>운영 개선</h2><p>결산 바깥에서 반복을 걷어낸 일 4건</p></div>
+    <div class="ops">
+      <div><h3>월 매입 마감 앱</h3><p>발주↔입고 대사, 수입 부대비용 배부, 필증 검증, 결재를 한 흐름으로. 예외만 사람이 봅니다.</p><a href="demo/one-close/">데모 →</a></div>
+      <div><h3>자금 대시보드</h3><p>잔액·수금 예측·생산대금 지급을 한 화면에. 열 때마다 체크섬 7종으로 원천과 대조합니다.</p><a href="demo/fund-cycle/">데모 →</a></div>
+      <div><h3>상품 계획표(라인시트) 표준화</h3><p>부서마다 다른 양식을 공통 필드 13개·키 3계층으로 통일해 발주·입고·매출·자금이 같은 품번 체계를 쓰게 했습니다.</p><a href="demo/linesheet-hub/">데모 →</a></div>
+      <div><h3>법인카드·경비 통제</h3><p>실물 카드 축소와 가상카드 전환 설계, 관리 대장 정비, 근태 대조로 경비 규정 충족을 자동 판정.</p><a href="demo/overtime-meal/">데모 →</a></div>
     </div>
+  </section>
+
+  <section id="s-demo">
+    <div class="shead"><h2>동작하는 데모</h2><p>샘플 데이터로 실제 화면 그대로 — 계산·판정 로직은 실제 구현과 동일</p></div>
+    <div class="gal">
+      <a class="shot" href="demo/wita-settlement/"><div class="img"><img src="assets/shots/wita-settlement.jpg" alt="위탁 정산 관리" loading="lazy"></div>
+        <div class="b"><h3>위탁 정산 관리</h3><p>채널 룰 편집 · 채널별 계산 · 검증식</p><div class="pf"><b>증명</b> 채널마다 다른 정산서를 한 규칙 체계로 대사한다</div></div></a>
+      <a class="shot" href="demo/nrv-simulator/"><div class="img"><img src="assets/shots/nrv-simulator.jpg" alt="NRV 시뮬레이터" loading="lazy"></div>
+        <div class="b"><h3>NRV 시뮬레이터</h3><p>가정을 움직이면 전 품번 충당금 즉시 재계산</p><div class="pf"><b>증명</b> 충당금 판단 기준이 문서화·재현 가능하다</div></div></a>
+      <a class="shot" href="demo/one-close/"><div class="img"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱" loading="lazy"></div>
+        <div class="b"><h3>월 매입 마감 앱</h3><p>입고 검수 → B/L 연결 → 부대비용 배부 → 취득원가</p><div class="pf"><b>증명</b> 매입 원가 확정 절차를 화면 순서로 고정했다</div></div></a>
+      <a class="shot" href="demo/fund-cycle/"><div class="img"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드" loading="lazy"></div>
+        <div class="b"><h3>자금 대시보드</h3><p>잔액 추이 · 수금 예측 · 진입 시 체크섬 7종</p><div class="pf"><b>증명</b> 보고 숫자가 원천과 자동으로 대조된다</div></div></a>
+      <a class="shot" href="demo/investor-contracts/"><div class="img"><img src="assets/shots/investor-contracts.jpg" alt="투자계약 대시보드" loading="lazy"></div>
+        <div class="b"><h3>투자계약 의무 관리</h3><p>의무를 긴급/정기/이벤트로 분류, 상환 타임라인</p><div class="pf"><b>증명</b> 계약 조항을 월별 실행 의무로 바꿀 수 있다</div></div></a>
+      <a class="shot" href="demo/overtime-meal/"><div class="img"><img src="assets/shots/overtime-meal.jpg" alt="야근식대 대조" loading="lazy"></div>
+        <div class="b"><h3>야근식대 대조</h3><p>근태 vs 카드 내역 사람별 판정, 안내문구 생성</p><div class="pf"><b>증명</b> 규정성 경비를 예외만 사람이 보게 만들었다</div></div></a>
+    </div>
+    <details class="more">
+      <summary>그 외 데모 11개 — 라인시트·정산 도구·목업</summary>
+      <div class="gal">
+        <a class="shot" href="demo/linesheet-collector/"><div class="img"><img src="assets/shots/linesheet-collector.jpg" alt="생산 라인시트 수집기" loading="lazy"></div><div class="b"><h3>생산 라인시트 수집기</h3><p>커스텀 양식 업로드 · 건별 조회 · 사이즈 매트릭스</p></div></a>
+        <a class="shot" href="demo/linesheet-hub/"><div class="img"><img src="assets/shots/linesheet-hub.jpg" alt="라인시트 허브" loading="lazy"></div><div class="b"><h3>라인시트 허브</h3><p>통일양식 업로드 → 검증 → 버전 비교</p></div></a>
+        <a class="shot" href="demo/linesheet-fin/"><div class="img"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계" loading="lazy"></div><div class="b"><h3>라인시트 재무 집계</h3><p>매입 약정 기준 집계 · 결제조건</p></div></a>
+        <a class="shot" href="demo/stg-settlement/"><div class="img"><img src="assets/shots/stg-settlement.jpg" alt="자사몰 수탁정산" loading="lazy"></div><div class="b"><h3>자사몰 수탁정산</h3><p>결제대행 + 주문·취소·배송 → 검증 게이트 → 전표</p></div></a>
+        <a class="shot" href="demo/fund-dashboard/"><div class="img"><img src="assets/shots/fund-dashboard.jpg" alt="자금 인텔리전스" loading="lazy"></div><div class="b"><h3>자금 인텔리전스</h3><p>현금 시나리오·손익 시뮬레이션 관점</p></div></a>
+        <a class="shot" href="demo/card-notice/"><div class="img"><img src="assets/shots/card-notice.jpg" alt="법인카드 개편 공지" loading="lazy"></div><div class="b"><h3>법인카드 개편 공지</h3><p>정책 변경 안내 페이지</p></div></a>
+        <a class="shot" href="demo/expense-dashboard/"><div class="img"><img src="assets/shots/expense-dashboard.jpg" alt="지출내역 대시보드" loading="lazy"></div><div class="b"><h3>지출내역 대시보드</h3><p>지출 표 붙여넣기 → 용도·부서 구성</p></div></a>
+        <a class="shot" href="demo/flow-diagram/"><div class="img"><img src="assets/shots/flow-diagram.jpg" alt="전사 업무 흐름도" loading="lazy"></div><div class="b"><h3>전사 업무 흐름도</h3><p>계획→자금→실적 경로 한 장</p></div></a>
+        <a class="shot" href="demo/one-erp/"><div class="img"><img src="assets/shots/one-erp.jpg" alt="ONE ERP 목업" loading="lazy"></div><div class="b"><h3>ONE ERP 목업</h3><p>시스템 통합 시 화면 목업</p></div></a>
+        <a class="shot" href="demo/dashboard-cart/"><div class="img"><img src="assets/shots/dashboard-cart.jpg" alt="Dashboard Cart" loading="lazy"></div><div class="b"><h3>Dashboard Cart</h3><p>보고 화면 설계 도구</p></div></a>
+        <a class="shot" href="demo/meeting-memo/"><div class="img"><img src="assets/shots/meeting-memo.jpg" alt="회의 메모 컨테이너" loading="lazy"></div><div class="b"><h3>회의 메모 컨테이너</h3><p>협의 시트에 붙는 메모 입력</p></div></a>
+      </div>
+    </details>
   </section>
 
   <section id="s-way">
     <div class="shead"><h2>일하는 방식</h2><p>위 프로젝트에 공통으로 적용한 기준</p></div>
     <div class="cols">
-      <div>
-        <h3><b>01</b>차이는 덮지 않고 분류한다</h3>
-        <p>원인이 지정된 차이는 다음 달에 다시 조사하지 않습니다. 마감이 매달 새로 하는 조사에서, 기준에 맞춰 확인하는 작업으로 바뀝니다.</p>
-      </div>
-      <div>
-        <h3><b>02</b>검증 없이 편해지지 않는다</h3>
-        <p>자동으로 나온 숫자는 원천 합계와 대사하고, 재계산해도 같은 값인지 확인한 뒤 사용합니다. 원 단위까지 재현되지 않으면 확정하지 않습니다.</p>
-      </div>
-      <div>
-        <h3><b>03</b>판단은 문서로, 반복은 기계로</h3>
-        <p>기준이 필요한 항목은 대안과 채택 근거를 남겨 사람이 판단하고, 반복 확인만 자동화합니다. 그래야 감사·상급자에게 설명이 됩니다.</p>
-      </div>
+      <div><h3><b>01</b>차이는 덮지 않고 분류한다</h3><p>원인이 지정된 차이는 다음 달에 다시 조사하지 않습니다. 마감이 매달 새로 하는 조사에서, 기준에 맞춰 확인하는 작업으로 바뀝니다.</p></div>
+      <div><h3><b>02</b>검증 없이 편해지지 않는다</h3><p>자동으로 나온 숫자는 원천 합계와 대사하고, 재계산해도 같은 값인지 확인한 뒤 씁니다. 원 단위까지 재현되지 않으면 확정하지 않습니다.</p></div>
+      <div><h3><b>03</b>판단은 문서로, 반복은 기계로</h3><p>기준이 필요한 항목은 대안과 채택 근거를 남겨 사람이 판단하고, 반복 확인만 자동화합니다. 그래야 감사·상급자에게 설명이 됩니다.</p></div>
     </div>
-  </section>
-
-  <section id="s-ai">
-    <div class="shead"><h2>AI를 쓰는 방식</h2><p>채팅 도구가 아니라 작업 환경으로 — 로컬 세션 기록 20주(2026-05-22 ~ 09-21) 집계</p></div>
-    <p class="lede">회계 담당자가 코드를 짜는 것이 목적이 아닙니다. <strong>기준을 문서로 고정하고, 반복은 AI 에이전트에게 맡기고, 결과는 원 단위로 검증</strong>하는 구조를 만들었습니다.
-      아래 숫자는 제 PC에 남은 세션 기록을 직접 집계한 값입니다.</p>
-    <dl class="ai-kpis">
-      <div><dt>활동일</dt><dd>81<small>일</small></dd></div>
-      <div><dt>세션</dt><dd>223<small>개</small></dd></div>
-      <div><dt>내가 보낸 지시</dt><dd>5,811<small>건</small></dd></div>
-      <div><dt>AI가 실행한 도구</dt><dd>55,660<small>회</small></dd></div>
-      <div><dt>기록된 결과물</dt><dd>157<small>건</small></dd></div>
-    </dl>
-    <div class="ai-grid">
-      <div>
-        <h3><b>01</b>기준 레이어</h3>
-        <p>워크스페이스 최상위에 <strong>모든 세션이 먼저 읽는 기준 문서</strong>를 둡니다. 파일 버전 규칙(_vN, 덮어쓰기 금지), 엑셀 품질 바(수식 오류 0·합계 대사·재계산), 지면 품질 바(대비 4.5:1·강조 면적·표 조판 수치), 환경 함정, 금지 목록, 막혔을 때의 에스컬레이션. "꼼꼼하게" 같은 형용사 대신 체크 가능한 기준만 적습니다.</p>
-      </div>
-      <div>
-        <h3><b>02</b>스킬 10개</h3>
-        <p>반복되는 작업 절차를 스킬로 고정합니다 — 증거 기반 완료 판정 자율 실행(/goal), 업무 전체 감사·로드맵(/consultant-audit), 해결 직후 추론 박제(/extract-approach), 방법론 교차검증 사이클(/methodology-review), UX 토큰 가이드·수정 사이클(ux-guide·ui-redline), 월 마감 안내 메일, 영수증 일괄 수집, 주문 조회.</p>
-      </div>
-      <div>
-        <h3><b>03</b>기억 체계</h3>
-        <p>세션이 끝나도 남아야 하는 것은 <strong>메모 노트 159개</strong>로 축적합니다 — 프로젝트 상태, 데이터 함정(예: 재고 코호트에 매출 DB를 쓰면 안 되는 이유), 받은 피드백(왜·어떻게 적용). 연구 결과는 지식 금고에 1노트 1통찰로 원자화하고, 과거 세션 45개를 전수 스윕해 흩어진 규칙을 회수했습니다.</p>
-      </div>
-      <div>
-        <h3><b>04</b>모델 간 교차검증</h3>
-        <p>판단이 걸린 숫자는 한 모델의 답을 믿지 않습니다. 검토 대상을 항목 표로 분해해 <strong>다른 AI(Codex)를 반박자로</strong> 세우고, 합의/부의를 기록한 뒤 사람이 확정합니다. 검토·핸드오프·공통결론 폴더로 두 AI의 산출물을 교환하고, 재고 평가는 이 사이클을 7라운드 돌려 표 간 정의 불일치를 잡았습니다.</p>
-      </div>
-      <div>
-        <h3><b>05</b>시스템을 직접 만지게</h3>
-        <p>AI가 화면을 보고 조작합니다 — 브라우저 자동 조작 <strong>6,300여 회</strong>(ERP·파트너 정산 사이트·데이터 저장소), 구글시트·저장소·메일은 커넥터(MCP)로, 정산서 수집은 로그인 자동화로 무인화. 화면 탐색보다 API 직접 호출을 우선하고, 화면 버그는 로컬 시험대에서 실측합니다.</p>
-      </div>
-      <div>
-        <h3><b>06</b>운영과 거버넌스</h3>
-        <p>사용량은 <strong>주간 운영일지</strong>로 남깁니다(세션 기록 → DB 적재 → 리포트 이미지, 결제 구분·한도 스냅샷 포함). 계정을 팀 3인 공용으로 전환하며 온보딩 문서 2종(사용 방식·보안 점검, 개발 용어 65개)을 만들었고, 메일 자동 발송·삭제·금전 실행은 금지로 고정했습니다. 완료는 증거가 있을 때만 선언합니다.</p>
-      </div>
+    <div class="shead" style="margin-top: var(--sp-8)"><h2 class="sm">AI는 어디까지 쓰나</h2><p>회계 판단은 사람, 반복 확인은 기계</p></div>
+    <div class="two">
+      <div><h3>AI에게 맡기는 것</h3><ul>
+        <li>대사 파일 정규화·건별 매칭 같은 반복 확인</li>
+        <li>초안 작성(보고서 골격, 검증 스크립트)</li>
+        <li>판단 항목표에 대한 반박·교차검증(다른 모델을 검토자로)</li>
+        <li>화면·시스템 조작의 반복 구간</li>
+      </ul></div>
+      <div><h3>내가 결정하는 것</h3><ul>
+        <li>회계정책·충당금률·분류 기준의 채택과 승인 요청</li>
+        <li>차이의 원인 판정과 회계처리 방침</li>
+        <li>원천 합계·재계산·이전 확정본 재현이 맞는지 최종 확인</li>
+        <li>회사 정보의 사용 범위 — 정책 범위 밖 접근은 하지 않음</li>
+      </ul></div>
     </div>
-    <div class="bars">
-      <h3>AI가 실행한 도구 55,660회의 구성</h3>
-      <div class="bar"><span class="l">셸·스크립트 실행</span><i style="width:100%"></i><span class="n">21,480</span></div>
-      <div class="bar"><span class="l">파일 작성·편집</span><i class="g2" style="width:43%"></i><span class="n">9,316</span></div>
-      <div class="bar"><span class="l">브라우저 자동 조작</span><i class="g3" style="width:30%"></i><span class="n">6,342</span></div>
-      <div class="bar"><span class="l">파일 읽기</span><i class="g4" style="width:6%"></i><span class="n">1,273</span></div>
-      <div class="bar"><span class="l">그 외(시트·저장소 API·검색)</span><i class="g4" style="width:80%"></i><span class="n">17,249</span></div>
-      <p class="note">상위 5개 도구 기준 주차별 합산. 지시 1건당 도구 실행 약 9.6회 — 한 번의 요청으로 파일을 읽고, 계산하고, 화면을 확인하고, 결과를 검증하는 흐름이 기본입니다.</p>
-    </div>
-  </section>
-
-  <section id="s-now">
-    <div class="shead"><h2>지금 진행 중</h2><p>2026년 9월 기준 — 끝난 것만 적은 페이지가 아니라, 손에 들고 있는 것</p></div>
-    <div class="tw">
-      <table>
-        <thead><tr><th style="width:27%">프로젝트</th><th>어디까지 왔고, 무엇이 남았나</th><th style="width:16%">상태</th></tr></thead>
-        <tbody>
-          <tr><td>전사 라인시트 표준화</td><td>통일안 확정·ERP 양식 열 좌표 실측 완료. 본부 인터뷰로 필드 확정, ERP 코드 확보가 남음</td><td>설계 확정 → 구축</td></tr>
-          <tr><td>월 매입 마감 앱</td><td>발주↔입고 대사·부대비용 배부·결재까지 실운영 중. 라인시트 연동으로 발주계획 자동 생성이 다음 단계</td><td>실운영 · 확장 중</td></tr>
-          <tr><td>위탁 정산 무인 수집</td><td>34채널 중 API 28 + 무인 로그인 11. 계정 불일치 1채널 대기</td><td>운영 · 마무리</td></tr>
-          <tr><td>자사몰 수탁정산 웹앱</td><td>설계 v2 확정(파일럿 브랜드 2개, 원천 분할 적재 → 전표 입력). 인식 시점 컨펌 후 1단계 착수</td><td>착수 대기</td></tr>
-          <tr><td>회계 RAW DB</td><td>매출·매출원가·입고·마케팅출고 적재/조회 뼈대 완성. 실파일 매핑과 ERP 품번 대사가 남음</td><td>뼈대 완성</td></tr>
-          <tr><td>자금시트 정규화</td><td>3중 수기 입력을 거래 DB로 — 읽기 권한만 있어 파싱 우회 전략으로 진행(주간 탭 44개 구조 동일)</td><td>진행 중</td></tr>
-          <tr><td>시즌·부서별 현금흐름</td><td>26SS 파일럿 산출, 컨펌 시트 승인 플로우 정착 중</td><td>파일럿</td></tr>
-          <tr><td>생산·재무 정보 흐름 프로젝트 방</td><td>그룹·상태·공유 뷰·고정 안내글 세팅 완료, 구성원 초대와 첫 업무 4건 운영 시작</td><td>세팅 완료</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <p class="note">작업 기준(파일 버전 규칙, 엑셀 품질 바, 금지 목록)을 문서로 고정해 모든 작업이 같은 기준을 따르게 하고, 사용량은 주간 운영일지로 남깁니다.</p>
   </section>
 
   <section id="s-all">
-    <div class="shead"><h2>전체 프로젝트</h2><p>영역별 62건 · 대표 8건은 위에서 상세히 · <span class="nw">NEW</span> 는 2026년 8~9월 추가분</p></div>
-    <div class="tw">
-      <table>
-        <thead><tr><th style="width:27%">프로젝트</th><th>한 일과 결과</th><th class="n" style="width:14%">지표</th></tr></thead>
-        <tbody>
-          <tr class="grp"><td colspan="3">매출 · 정산 대사</td></tr>
-          <tr><td>위탁매출 34채널 건별 파이프라인<span class="nw">NEW</span></td><td>채널 전수를 건별로 대사해 원 단위 재현, 남은 차이 3건 전부 규명. 열은 헤더 이름으로 읽어 달마다 밀리는 양식에 견딤</td><td class="n">34채널 · 원 단위</td></tr>
-          <tr><td>정산서 무인 수집기<span class="nw">NEW</span></td><td>자격증명 암호화 금고 + 브라우저 자동 조작, 2단계 인증 자동 생성. 로그인 방식이 다른 채널별 함정 문서화</td><td class="n">11채널</td></tr>
-          <tr><td>채널 정산 API 연결<span class="nw">NEW</span></td><td>파트너 시스템 내부 API를 분석해 건별 정산을 직접 조회. 파일과 원 단위 일치 확인, 파일보다 API가 정확한 사례 발견. 남은 채널 1개</td><td class="n">28채널</td></tr>
-          <tr><td>위탁 정산 조회 화면<span class="nw">NEW</span></td><td>채널×원인 축으로 차이를 보고 전월 이력과 비교하는 로컬 보드. 5인 관점 감사로 결함 목록 반영</td><td class="n">메뉴 3</td></tr>
-          <tr><td>대형 유통 정산구조 규명</td><td>차수별 분할지급·기준 미달 미지급·프로모션 공제가 차액의 정체임을 확인</td><td class="n">99.2%</td></tr>
-          <tr><td>결제대행 정산 자동수집</td><td>3사 API 연동, 매일 자동 수집·정규화해 단일 저장소 적재. DB에서 대사 양식 원천탭 자동 생성</td><td class="n">3사 · 일 1회</td></tr>
-          <tr><td>취소·합수거 자동 상계</td><td>주문자 단위 합이 0이 되는 조합을 허용오차 내에서 자동 상계</td><td class="n">예외만 검토</td></tr>
-          <tr><td>실판매 vs 인식매출 차이 규명</td><td>주문 원본 자동 조회로 건별 대조, 반품 시점차·협업 배분·할인율로 유형화</td><td class="n">건별 대조</td></tr>
-          <tr><td>자사몰 수탁정산 웹앱 설계<span class="nw">NEW</span></td><td>파일럿 브랜드 2개, 원천 분할 적재부터 전표 입력까지의 설계서 확정</td><td class="n">설계 v2</td></tr>
-          <tr><td>위탁 정산 관리 웹앱</td><td>파이썬 대사 엔진을 웹앱으로 이식, 판정 규칙을 시트 5장으로 꺼내 비개발자가 수정 가능하게. 이식 함정 8가지 문서화</td><td class="n">22/26 일치</td></tr>
-          <tr><td>물류 시스템 매출 정기수집<span class="nw">NEW</span></td><td>매출통계 API를 출고 기준으로 매일 자동 수집해 저장소 적재, 하루 조회 중복·인증서 함정 해결</td><td class="n">일 1회</td></tr>
-          <tr><td>자사몰 주문 API 수집 툴</td><td>쇼핑몰 공식 관리자 API(OAuth)로 주문 원본을 로컬에 수집, 대사 원천으로 사용</td><td class="n">로컬 툴</td></tr>
-          <tr><td>스마트스토어 매출 대사 양식</td><td>월 매출 구성 대사 양식 설계, 검증식·전월 취소 자동 보정(v2)</td><td class="n">월 양식</td></tr>
-          <tr><td>품의 대사</td><td>회계 대변 vs 품의 실판매를 월별 대사, 매핑표와 상시 차이(정책성 할인) 분리</td><td class="n">월</td></tr>
-          <tr><td>패션 플랫폼 4브랜드 정산 대사</td><td>ERP 실판매 vs 정산서를 주문일 축으로 대사, 이월 검증 확정률 99.2% 확인</td><td class="n">4브랜드</td></tr>
-          <tr><td>월별 결제대행 대사(DB vs 엑셀)</td><td>자동 수집 DB와 수기 수집 엑셀을 주문번호별 순액으로 대사, DB에서 원천탭 자동 생성으로 전환</td><td class="n">주문번호별</td></tr>
-
-          <tr class="grp"><td colspan="3">재고 · 매입 · 매출원가</td></tr>
-          <tr><td>월 매입 마감 앱<span class="nw">NEW</span></td><td>발주↔입고 대사·부대비용 배부·수입 필증 검증·임원 결재를 한 흐름으로, 발주번호 체계 신설. 회귀 테스트 20종 동반</td><td class="n">실운영 · 데모</td></tr>
-          <tr><td>입고·부대비용 대사 DB<span class="nw">NEW</span></td><td>원천만 적재하고 배부는 뷰로 계산, 세트 품번 이중계산 함정 차단</td><td class="n">원천 적재</td></tr>
-          <tr><td>전사 라인시트 표준화<span class="nw">NEW</span></td><td>부서마다 다른 상품 마스터 양식을 수식 연동형 통일안으로 확정, 업로드·검증·버전 비교 허브 설계</td><td class="n">안 확정</td></tr>
-          <tr><td>NRV 산정 로직 재설계</td><td>판단 15항목 분해·근거 문서화, 교차검증 후 원 단위 재현 확인</td><td class="n">7라운드</td></tr>
-          <tr><td>NRV 시뮬레이터</td><td>가정 변경 시 즉시 재계산되는 웹 도구, 확정 로직과 동일 소스 사용</td><td class="n">2.2만 행</td></tr>
-          <tr><td>재고 에이징 기준 정립</td><td>수불부 DB화·전년 로직 이식, 쓰면 안 되는 데이터 원천을 함정으로 기록</td><td class="n">월별 재현</td></tr>
-          <tr><td>매출원가 건별 재구축</td><td>건별 원가 tie-out 후 ERP 재무상태표 재고와 일치 확인, 브릿지 문서화</td><td class="n">차이 0원</td></tr>
-          <tr><td>회계 RAW DB<span class="nw">NEW</span></td><td>매출·매출원가·상품입고·마케팅출고를 로컬 DB(DuckDB)로 적재/조회, 재고 코호트 분석의 원천 함정 기록</td><td class="n">4 도메인</td></tr>
-          <tr><td>라인시트 허브·수집기 앱<span class="nw">NEW</span></td><td>통일양식 업로드·검증·버전 비교 허브, 커스텀 양식 수집기(사이즈 매트릭스·건별 조회·이미지 매칭)</td><td class="n">앱 2종</td></tr>
-          <tr><td>발매·행사별 매출 분석</td><td>판매현황 원본으로 발매/행사 단위 매출·원가·할인 집계, 전용매장 기준·품번 판별 규칙</td><td class="n">행사 단위</td></tr>
-
-          <tr class="grp"><td colspan="3">결산 · 경영 보고</td></tr>
-          <tr><td>월 가결산 손익 자동화</td><td>판관비 7대 분류 재편, EBITDA·마진·매출 대비 비율 동시 산출</td><td class="n">7대 분류</td></tr>
-          <tr><td>시즌·부서별 현금흐름(OCF/FCF)<span class="nw">NEW</span></td><td>자금 원천을 별도 DB로 옮겨 시즌·부서 축의 영업·잉여현금흐름 산출, 컨펌 시트 흐름 정착</td><td class="n">시즌 파일럿</td></tr>
-          <tr><td>회계시스템 원장·전표 API 조회<span class="nw">NEW</span></td><td>화면 탐색 대신 API로 직접 pull, 소계 판정·차변 음수행 등 함정 6종 문서화</td><td class="n">추출 자동화</td></tr>
-          <tr><td>결재문서 데이터 전수 추출<span class="nw">NEW</span></td><td>전자결재의 지출결의 데이터를 한 번의 조회로 전수 추출해 시트 적재 실증 — 결재 데이터는 pull이 정공법</td><td class="n">1건당 3행</td></tr>
-          <tr><td>자금현황 적재<span class="nw">NEW</span></td><td>일일 자금계획 754행을 웹앱 시트로 적재, 원 단위 검증·중복키 순번·계좌 강제 마스킹</td><td class="n">754행 · 원 단위</td></tr>
-          <tr><td>자금시트 정규화<span class="nw">NEW</span></td><td>3중 수기 입력을 거래 DB로, 읽기 권한만으로 파싱하는 우회 전략(주간 탭 44개)</td><td class="n">진행 중</td></tr>
-          <tr><td>고정·변동비 분류 기준표</td><td>예측용·분석용 2체계 병존, 판정 순서 규칙화 + 미판정 리포트</td><td class="n">2체계</td></tr>
-          <tr><td>비경상손익 분리 요약</td><td>일회성 항목을 걷어낸 정상 손익을 수식 연동 한 장 보고서로</td><td class="n">한 장</td></tr>
-          <tr><td>상반기 실적 분석 워크북</td><td>원천→배부→지표→피벗 수식 체인 설계, 브랜드·안분 기준 통일</td><td class="n">재현 가능</td></tr>
-          <tr><td>채널 원가율·공헌이익 분석</td><td>매출을 총액 기준으로 환산해 채널을 같은 축에 올려 비교</td><td class="n">채널×부문</td></tr>
-
-          <tr class="grp"><td colspan="3">세무 · 외부 대응</td></tr>
-          <tr><td>세금계산서 대사</td><td>매칭 키 설계로 계산서·원장·발주를 묶어 대조, 오판 방지 기준 명시</td><td class="n">3원 대조</td></tr>
-          <tr><td>부가세 신고자료·전자신고</td><td>산출 절차와 기간 지정 규칙을 문서로 고정, 재제출 순서 정리</td><td class="n">분기</td></tr>
-          <tr><td>금융기관 심사자료 체계</td><td>관계사·기관별 서류 목록화와 수집 현황·갱신 시점 관리</td><td class="n">목록화</td></tr>
-          <tr><td>투자계약 의무 관리</td><td>계약 전수 분석 후 의무를 3축 분류, 상환 타임라인을 자금계획과 연결</td><td class="n">19건</td></tr>
-          <tr><td>관계사 신용보증 자료 제출</td><td>기관 포털로 부가세 3건 제출 완료, 재무제표 전송만 잔여. 제출기관 오전송 주의점 기록</td><td class="n">3/4 완료</td></tr>
-          <tr><td>관계사 전표 인수인계서 웹앱<span class="nw">NEW</span></td><td>실제 하는 6단계와 캡처 20장을 웹앱으로, 담당자 교체에도 같은 절차가 유지되게</td><td class="n">6단계 · 20장</td></tr>
-          <tr><td>이벤트 경품 원천징수 기준</td><td>경품 5만원 이상 기타소득 22%, 대납 시 gross-up(÷0.78)을 품의 예산 기준으로 정리</td><td class="n">기준 문서</td></tr>
-
-          <tr class="grp"><td colspan="3">경비 · 자산</td></tr>
-          <tr><td>법인카드 운영 개편</td><td>실물 축소 + 가상카드 전환 설계, 직급별 한도 정책, 전사 공지</td><td class="n">51 → 34장</td></tr>
-          <tr><td>카드 관리 대장 전면 개편<span class="nw">NEW</span></td><td>20열 체계·상태 4종·용도 9종, 종료 카드 분리, 카드명 수식화</td><td class="n">20열</td></tr>
-          <tr><td>야근식대 자동 판정 앱<span class="nw">NEW</span></td><td>근태 세그먼트 합산·휴게 최대값 규칙으로 기준 충족 판정, 예외 사유 자동 기재, 안내문구 생성</td><td class="n">예외만 검토</td></tr>
-          <tr><td>온라인 전용카드 허브<span class="nw">NEW</span></td><td>카드 조회·결제·증빙 실무를 한 앱으로, 카드번호 취급 규칙 정본화</td><td class="n">전사 가이드 연결</td></tr>
-          <tr><td>지출양식 + 동적 대시보드</td><td>카드 추가 발급 대신 체크박스 양식 → 차트 데이터 → 월 누적 대시보드로 해결</td><td class="n">양식 1 · 차트</td></tr>
-          <tr><td>전자결재 양식 개편(세금계산서 품의)<span class="nw">NEW</span></td><td>전결규정 띠 + 필수항목 5섹션을 HTML 직접 주입으로 재설계, 양식 서식 규칙(괘선 0·표폭 100%) 정립</td><td class="n">양식 1종</td></tr>
-
-          <tr class="grp"><td colspan="3">인프라 · 자동화 · AI 활용</td></tr>
-          <tr><td>결산 원천 단일화</td><td>전표 전 분개라인을 정본으로 정규화, 계정 매핑 규칙표와 예외 차단</td><td class="n">계정 81</td></tr>
-          <tr><td>대시보드·흐름도 웹앱</td><td>자금·부문 현금흐름·업무 흐름도를 상시 조회 가능한 웹앱으로</td><td class="n">일 1회 동기화</td></tr>
-          <tr><td>AI 사용 운영일지 자동화<span class="nw">NEW</span></td><td>세션 기록을 주차별로 집계해 DB 적재, 결과물 행 연결, 리포트 이미지 자동 생성. 집계 누락 원인 규명 후 보정</td><td class="n">주 1회</td></tr>
-          <tr><td>팀 온보딩 문서 2종<span class="nw">NEW</span></td><td>AI 사용 방식·보안 점검 가이드, 개발 용어 65개 쉬운 정리(API·인증 포함)</td><td class="n">65 용어</td></tr>
-          <tr><td>웹앱 UX 가이드·토큰 체계<span class="nw">NEW</span></td><td>사내 앱 28개를 훑어 서체·크기·색·모션을 토큰 1벌로 통일, 자동 검사 스크립트</td><td class="n">28개 앱</td></tr>
-          <tr><td>전사 회계·전자결재 가이드</td><td>28페이지 규모로 작성·배포, 반복 문의를 문서로 흡수</td><td class="n">28p</td></tr>
-          <tr><td>가이드 웹앱 이전 + 방문 통계</td><td>노션 가이드를 자체 웹앱으로 옮겨 빌드→배포 절차화, 별도 수집기로 페이지별 방문 통계</td><td class="n">웹앱 · 통계</td></tr>
-          <tr><td>회의 메모 컨테이너</td><td>협의 시트에 붙인 사이드바로 회의 메모를 탭에 누적, 시트에 직접 바인딩</td><td class="n">시트 부착형</td></tr>
-          <tr><td>생산·재무 정보 흐름 프로젝트 방<span class="nw">NEW</span></td><td>요청·오류·결정·문서를 한 방에서 — 그룹 8·열 4·상태 5·공유 뷰 4·고정 안내글 3 설계</td><td class="n">방 1개</td></tr>
-          <tr><td>메일 업무 정리 환경</td><td>액션 라벨 4개로 추적·회신 초안까지, 자동 발송·삭제는 금지로 고정</td><td class="n">라벨 4</td></tr>
-          <tr><td>AI 작업 기준 레이어<span class="nw">NEW</span></td><td>모든 세션이 먼저 읽는 기준 문서(품질 바·환경 함정·금지) + 스킬 4개 + 지식 금고 구조</td><td class="n">스킬 4</td></tr>
-          <tr><td>방법론 교차검토 절차<span class="nw">NEW</span></td><td>분석 방법을 다른 AI 모델과 템플릿 시트로 주고받아 검토하는 사이클을 스킬로 고정</td><td class="n">사이클 1</td></tr>
-          <tr><td>AI 교차검증 절차</td><td>판단 항목을 표로 분해해 다른 모델을 검토자로 세우고 사람이 확정</td><td class="n">최대 7라운드</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="note">지표는 규모·건수·비율만 적었습니다. 금액·거래처·내부 시스템 정보는 포함하지 않습니다.</p>
+    <div class="shead"><h2>전체 프로젝트</h2><p>영역별 — 펼쳐서 봅니다</p></div>
+    <details class="grp" open>
+      <summary>결산 · 경영 보고 <small>8건</small></summary>
+      <div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
+        <tr><td>월 가결산 손익 자동화</td><td>판관비 7대 분류 재편, EBITDA·마진·매출 대비 비율 동시 산출</td></tr>
+        <tr><td>비경상손익 분리 요약</td><td>일회성 항목을 걷어낸 정상 손익을 수식 연동 한 장 보고서로</td></tr>
+        <tr><td>고정·변동비 분류 기준표</td><td>예측용·분석용 2체계 병존, 판정 순서 규칙화 + 미판정 리포트</td></tr>
+        <tr><td>결산 원천 단일화</td><td>전표 분개라인을 정본으로 정규화, 계정 81개 매핑 규칙과 예외 차단</td></tr>
+        <tr><td>직접법 현금흐름 검증</td><td>산출값과 통장 순증감 일치, 혼합 전표 순액 판정 규칙 반영</td></tr>
+        <tr><td>시즌·부서별 현금흐름</td><td>영업·잉여현금흐름을 시즌·부서 축으로 산출, 컨펌 시트 흐름</td></tr>
+        <tr><td>상반기 실적 분석 워크북</td><td>원천→배부→지표→피벗 수식 체인, 브랜드·안분 기준 통일</td></tr>
+        <tr><td>채널 원가율·공헌이익 분석</td><td>매출을 총액 기준으로 환산해 채널을 같은 축에서 비교</td></tr>
+      </tbody></table></div>
+    </details>
+    <details class="grp">
+      <summary>매출 · 정산 대사 <small>9건</small></summary>
+      <div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
+        <tr><td>위탁매출 34채널 건별 대사</td><td>표준 대사 양식·건별 매칭, 상시 차이 4유형 분리, 원 단위 일치 확인</td></tr>
+        <tr><td>대형 유통 정산구조 규명</td><td>차수별 분할지급·기준 미달 미지급·프로모션 공제가 차액의 정체임을 확인</td></tr>
+        <tr><td>정산서 수집 자동화</td><td>파트너사 제공 방식(API·다운로드) 안에서 월 수집을 자동화</td></tr>
+        <tr><td>결제대행 정산 자동수집</td><td>3사 정산을 매일 수집·정규화해 단일 저장소 적재, 대사 원천탭 자동 생성</td></tr>
+        <tr><td>월별 결제대행 대사</td><td>자동 수집 DB와 수기 엑셀을 주문번호별 순액으로 대사</td></tr>
+        <tr><td>취소·합수거 자동 상계</td><td>주문자 단위 합이 0이 되는 조합을 허용오차 내에서 자동 상계</td></tr>
+        <tr><td>실판매 vs 인식매출 차이 규명</td><td>주문 원본 건별 대조, 반품 시점차·협업 배분·할인율로 유형화</td></tr>
+        <tr><td>스마트스토어·품의·플랫폼 대사 양식</td><td>월 대사 양식 3종 설계, 검증식·전월 취소 보정, 이월 검증</td></tr>
+        <tr><td>자사몰 수탁정산 웹앱</td><td>결제대행 건별과 주문·취소·배송을 엔진으로 정산·전표 생성 (설계 확정)</td></tr>
+      </tbody></table></div>
+    </details>
+    <details class="grp">
+      <summary>재고 · 매입 · 매출원가 <small>7건</small></summary>
+      <div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
+        <tr><td>NRV 산정 로직 재설계</td><td>판단 15항목 분해·근거 문서화, 7라운드 교차검증, 이전 확정본 원 단위 재현</td></tr>
+        <tr><td>NRV 시뮬레이터</td><td>가정 변경 시 즉시 재계산, 확정 로직과 동일 소스</td></tr>
+        <tr><td>재고 에이징 기준 정립</td><td>수불부 DB화·전년 로직 이식, 쓰면 안 되는 원천을 함정으로 기록</td></tr>
+        <tr><td>매출원가 건별 재구축</td><td>건별 대조 후 재무상태표 재고와 일치 확인, 브릿지 문서화</td></tr>
+        <tr><td>월 매입 마감 앱</td><td>발주↔입고 대사·부대비용 배부·필증 검증·결재를 한 흐름으로</td></tr>
+        <tr><td>입고·부대비용 대사 DB</td><td>원천만 적재하고 배부는 뷰로 계산, 세트 품번 이중계산 차단</td></tr>
+        <tr><td>상품 계획표(라인시트) 표준화</td><td>양식 5종 분석 → 공통 필드 13·키 3계층 → 통일안 확정, 허브·수집기 앱</td></tr>
+      </tbody></table></div>
+    </details>
+    <details class="grp">
+      <summary>세무 · 경비 · 자산 <small>7건</small></summary>
+      <div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
+        <tr><td>세금계산서 대사</td><td>매칭 키 설계로 계산서·원장·발주를 묶어 대조, 오판 방지 기준 명시</td></tr>
+        <tr><td>부가세 신고자료·전자신고</td><td>산출 절차와 기간 지정 규칙을 문서로 고정, 재제출 순서 정리</td></tr>
+        <tr><td>이벤트 경품 원천징수 기준</td><td>기타소득 과세 기준과 대납 환산을 품의 예산 기준으로 정리</td></tr>
+        <tr><td>금융기관 제출자료 체계</td><td>기관별 서류 목록화, 수집 현황·갱신 시점 관리</td></tr>
+        <tr><td>법인카드 운영 개편</td><td>실물 축소 + 가상카드 전환 설계, 한도 정책, 관리 대장 20열 체계</td></tr>
+        <tr><td>야근식대 자동 판정</td><td>근태 세그먼트 합산 규칙으로 기준 충족 판정, 예외 사유 자동 기재</td></tr>
+        <tr><td>투자계약 의무 관리</td><td>계약 조항을 긴급/정기/이벤트 의무로 분류, 상환 시점을 자금계획과 연결</td></tr>
+      </tbody></table></div>
+    </details>
+    <details class="grp">
+      <summary>문서 · 인프라 <small>5건</small></summary>
+      <div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
+        <tr><td>전사 회계·전자결재 가이드</td><td>28페이지 작성·웹앱 배포, 반복 문의를 문서로 흡수</td></tr>
+        <tr><td>자금 대시보드·업무 흐름도</td><td>자금·현금흐름·업무 흐름을 상시 조회 가능한 웹앱으로</td></tr>
+        <tr><td>회계 원천 DB</td><td>매출·원가·입고·마케팅출고 적재/조회 체계</td></tr>
+        <tr><td>작업 기준 문서와 검증 절차</td><td>파일 버전·엑셀 품질 바·금지 목록을 기준 문서로, 교차검증 절차를 템플릿화</td></tr>
+        <tr><td>팀 온보딩 문서</td><td>도구 사용 방식·보안 점검·용어 정리를 팀 공유용으로 작성</td></tr>
+      </tbody></table></div>
+    </details>
+    <p class="note">지표는 건수·구조만 적었습니다. 금액·거래처·내부 시스템 정보는 포함하지 않습니다.</p>
   </section>
 
   <section id="s-scope">
-    <div class="shead"><h2>담당 업무 범위</h2><p>한 달이 어떻게 돌아가고, 그 안에서 무엇을 맡는지</p></div>
-    <div class="tw">
-      <table>
-        <thead><tr><th style="width:20%">영역</th><th>담당 내용</th><th style="width:18%">주기</th></tr></thead>
-        <tbody>
-          <tr><td>결산</td><td>월 가결산·손익계산서, 판관비 분류 체계, EBITDA·비율 지표, 비경상손익 분리, 시즌·부서별 현금흐름</td><td>월</td></tr>
-          <tr><td>매출·정산 대사</td><td>위탁 34채널, 결제대행 3사, 채널별 차이 규명·문서화, 정산서 수집 자동화 운영</td><td>월 / 일(자동수집)</td></tr>
-          <tr><td>재고·매입·매출원가</td><td>평가충당금 산정, 재고 에이징, 월 매입 마감(발주·입고·부대비용), 매출원가 건별 검증, 수불부 관리</td><td>월 / 반기</td></tr>
-          <tr><td>세무·감사</td><td>부가세 신고자료·전자신고, 세금계산서 대사, 외부감사·금융기관 제출</td><td>분기 / 수시</td></tr>
-          <tr><td>경비·자산</td><td>법인카드 운영·한도 정책·관리 대장, 경비 지급 자동 판정, 영수증 관리</td><td>월</td></tr>
-          <tr><td>인프라·문서</td><td>결산 원천 단일화, 대시보드, 전사 가이드·팀 온보딩 문서 작성·배포</td><td>상시</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <div class="shead"><h2>담당 업무 범위</h2></div>
+    <div class="tw"><table>
+      <thead><tr><th style="width:22%">영역</th><th>담당 내용</th><th style="width:18%">주기</th></tr></thead>
+      <tbody>
+        <tr><td>결산</td><td>월 가결산·손익계산서, 판관비 분류 체계, 비율 지표, 비경상손익 분리, 현금흐름</td><td>월</td></tr>
+        <tr><td>매출·정산 대사</td><td>위탁 34채널, 결제대행 3사, 차이 규명·문서화, 수집 자동화 운영</td><td>월 / 일</td></tr>
+        <tr><td>재고·매입·매출원가</td><td>평가충당금, 재고 에이징, 월 매입 마감, 매출원가 건별 검증, 수불부</td><td>월 / 반기</td></tr>
+        <tr><td>세무·감사</td><td>부가세 신고자료·전자신고, 세금계산서 대사, 외부감사·금융기관 제출</td><td>분기 / 수시</td></tr>
+        <tr><td>경비·자산</td><td>법인카드 운영·한도 정책·관리 대장, 경비 지급 판정, 영수증 관리</td><td>월</td></tr>
+      </tbody></table></div>
   </section>
 
   <section id="s-tools">
     <div class="shead"><h2>사용 도구</h2></div>
-    <div class="tw">
-      <table>
-        <thead><tr><th style="width:20%">구분</th><th>내용</th></tr></thead>
-        <tbody>
-          <tr><td>회계 · ERP</td><td>회계 전표·물류 ERP 2종 운영, 회계시스템 API 직접 조회, 전자결재 양식 편집, 세무 신고 프로그램</td></tr>
-          <tr><td>엑셀</td><td>대사 양식 설계, 수식 체인(원천→집계→지표→피벗), 동적 배열·차트 대시보드</td></tr>
-          <tr><td>데이터</td><td>Python(pandas·openpyxl·DuckDB), SQL, 분석용 DB 적재·질의, 데이터 저장소 API 연동</td></tr>
-          <tr><td>자동화 · 웹</td><td>Google Apps Script 웹앱, 브라우저 자동화(Playwright), 워크플로 스케줄러(n8n), HTML 리포트</td></tr>
-          <tr><td>AI 협업</td><td>Claude Code 기반 반자동 작업, 모델 간 교차검증, 사용 로그 집계·운영일지</td></tr>
-          <tr><td>문서</td><td>사내 가이드 작성·배포, 업무 기준·검증 이력 문서화</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <div class="tw"><table>
+      <thead><tr><th style="width:22%">구분</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>회계 · ERP</td><td>회계 전표·물류 ERP 운영, 전자결재 양식 편집, 세무 신고 프로그램</td></tr>
+        <tr><td>엑셀</td><td>대사 양식 설계, 수식 체인(원천→집계→지표→피벗), 동적 배열·차트 대시보드</td></tr>
+        <tr><td>데이터</td><td>Python(pandas·openpyxl), SQL, 분석용 로컬 DB, 데이터 저장소 연동</td></tr>
+        <tr><td>자동화 · 웹</td><td>Google Apps Script 웹앱, 브라우저 자동화, 일정 기반 수집, HTML 리포트</td></tr>
+        <tr><td>AI 협업</td><td>에이전트 기반 반자동 작업, 모델 간 교차검증, 사용 로그 운영일지</td></tr>
+      </tbody></table></div>
   </section>
 
   <section id="s-faq">
     <div class="shead"><h2>자주 받는 질문</h2></div>
-    <details>
-      <summary>회계 담당자가 왜 직접 자동화까지 하나요?</summary>
-      <p>대사 업무는 차이의 원인을 아는 사람이 규칙을 정해야 자동화가 됩니다. 외부에 맡기면 "무엇이 정상 차이인지"를 전달하는 데 더 많은 시간이 들었습니다. 그래서 기준을 정하는 일과 그 기준을 코드로 옮기는 일을 같이 했습니다.</p>
-    </details>
-    <details>
-      <summary>자동화한 숫자를 어떻게 믿습니까?</summary>
-      <p>세 가지를 확인한 뒤에만 씁니다. ① 원천 데이터 합계와 결과물 합계가 원 단위까지 일치하는지 ② 다시 계산해도 같은 값이 나오는지 ③ 이전 확정본을 재현하는지. 하나라도 안 맞으면 원인을 규명할 때까지 확정하지 않습니다.</p>
-    </details>
-    <details>
-      <summary>AI가 만든 결과를 그대로 쓰나요?</summary>
-      <p>아니요. 판단이 필요한 항목은 표로 분해해 근거를 적고, 다른 모델을 검토자로 세워 교차검증한 뒤 사람이 확정합니다. AI는 반복 확인과 초안 작성에 쓰고, 기준 결정은 사람에게 남깁니다. 구체적인 구조는 위 "AI를 쓰는 방식"에, 팀에는 온보딩 문서로 공유했습니다.</p>
-    </details>
-    <details>
-      <summary>이 페이지에 실제 숫자가 없는 이유</summary>
-      <p>재직 중인 회사의 금액·거래처·내부 시스템 정보는 공개하지 않습니다. 성과는 건수·비율·구조로만 적었고, 데모는 전부 생성된 샘플 데이터로 동작합니다. 상세 내용은 면접에서 회사 정보를 침해하지 않는 범위로 설명드리겠습니다.</p>
-    </details>
+    <details class="faq"><summary>회계 담당자가 왜 직접 자동화까지 하나요?</summary>
+      <p>대사 업무는 차이의 원인을 아는 사람이 규칙을 정해야 자동화가 됩니다. 외부에 맡기면 "무엇이 정상 차이인지"를 전달하는 데 더 많은 시간이 들었습니다. 그래서 기준을 정하는 일과 그 기준을 코드로 옮기는 일을 같이 했습니다.</p></details>
+    <details class="faq"><summary>자동화한 숫자를 어떻게 믿습니까?</summary>
+      <p>세 가지를 확인한 뒤에만 씁니다. ① 원천 데이터 합계와 결과물 합계가 원 단위까지 일치하는지 ② 다시 계산해도 같은 값이 나오는지 ③ 이전 확정본을 재현하는지. 하나라도 안 맞으면 원인을 규명할 때까지 확정하지 않습니다.</p></details>
+    <details class="faq"><summary>AI가 만든 결과를 그대로 쓰나요?</summary>
+      <p>아니요. 판단이 필요한 항목은 표로 분해해 근거를 적고, 다른 모델을 검토자로 세워 교차검증한 뒤 사람이 확정합니다. AI는 반복 확인과 초안에 쓰고, 회계정책·분류 기준·차이의 회계처리는 제가 결정하고 승인을 받습니다.</p></details>
+    <details class="faq"><summary>본인이 없으면 자동화는 누가 유지하나요?</summary>
+      <p>모든 도구는 규칙을 시트나 문서로 꺼내 두어 코드를 몰라도 기준을 고칠 수 있게 했고, 절차·함정·검증 방법을 팀 문서로 남겼습니다. 도구가 멈춰도 같은 대사 양식으로 수작업이 가능합니다.</p></details>
+    <details class="faq"><summary>이 페이지에 실제 숫자가 없는 이유</summary>
+      <p>재직 중인 회사의 금액·거래처·내부 시스템 정보는 공개하지 않습니다. 성과는 건수와 구조로만 적었고, 데모는 전부 생성된 샘플 데이터로 동작합니다. 상세 내용은 면접에서 회사 정보를 침해하지 않는 범위로 설명드리겠습니다.</p></details>
   </section>
 
   <footer>
@@ -639,6 +434,7 @@
   </footer>
 </main>
 </div>
+<a class="top" href="#" aria-label="맨 위로">↑</a>
 <script>
 (function () {
   var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
