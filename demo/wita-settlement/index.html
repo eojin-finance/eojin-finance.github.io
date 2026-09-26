@@ -1,0 +1,2694 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<script>
+window.__SHEETS={};
+window.__PROPS={"witaRootFolderId": "demo"};
+
+function Sheet(name,rows){ this.name=name; this.rows=rows||[]; }
+Sheet.prototype.getName=function(){ return this.name; };
+Sheet.prototype.getLastRow=function(){ for(var i=this.rows.length-1;i>=0;i--){ var r=this.rows[i]||[]; if(r.some(function(v){return v!==''&&v!==null&&v!==undefined;})) return i+1; } return 0; };
+Sheet.prototype.getMaxRows=function(){ return Math.max(1000,this.rows.length+100); };
+Sheet.prototype.getMaxColumns=function(){ return Math.max(26,this.getLastColumn()); };
+Sheet.prototype.getLastColumn=function(){ return this.rows.reduce(function(m,r){ return Math.max(m,(r||[]).length); },0); };
+Sheet.prototype.getDataRange=function(){ return this.getRange(1,1,Math.max(1,this.getLastRow()),Math.max(1,this.getLastColumn())); };
+Sheet.prototype.setFrozenRows=function(){ return this; }; Sheet.prototype.setFrozenColumns=function(){ return this; };
+Sheet.prototype.setColumnWidth=function(){ return this; }; Sheet.prototype.setColumnWidths=function(){ return this; }; Sheet.prototype.autoResizeColumns=function(){ return this; };
+Sheet.prototype.clear=function(){ this.rows=[]; return this; }; Sheet.prototype.clearContents=function(){ this.rows=[]; return this; };
+Sheet.prototype.appendRow=function(a){ this.rows[this.getLastRow()]=a.slice(); return this; };
+Sheet.prototype.deleteRow=function(i){ this.rows.splice(i-1,1); return this; };
+Sheet.prototype.deleteRows=function(i,n){ this.rows.splice(i-1,n||1); return this; };
+Sheet.prototype.insertRowsAfter=function(){ return this; }; Sheet.prototype.insertRowBefore=function(){ return this; };
+Sheet.prototype.hideColumns=function(){ return this; }; Sheet.prototype.getSheetId=function(){ return 0; };
+Sheet.prototype.getRange=function(r,c,nr,nc){ var sh=this;
+  if(typeof r==='string'){ var m=r.match(/^([A-Z]+)(\d+)(?::([A-Z]+)(\d+))?$/); if(m){ var col=function(s){ var n=0; for(var i=0;i<s.length;i++) n=n*26+(s.charCodeAt(i)-64); return n; };
+    var c1=col(m[1]), r1=+m[2], c2=m[3]?col(m[3]):c1, r2=m[4]?+m[4]:r1; return sh.getRange(r1,c1,r2-r1+1,c2-c1+1); } }
+  nr=nr===undefined?1:nr; nc=nc===undefined?1:nc;
+  var R={ getValues:function(){ var out=[]; for(var i=0;i<nr;i++){ var row=sh.rows[r-1+i]||[]; var o=[]; for(var j=0;j<nc;j++){ var v=row[c-1+j]; o.push(v===undefined?'':v); } out.push(o); } return out; },
+    getDisplayValues:function(){ return this.getValues().map(function(r){ return r.map(function(v){ return v===null||v===undefined?'':String(v); }); }); },
+    getValue:function(){ return this.getValues()[0][0]; }, getDisplayValue:function(){ return String(this.getValues()[0][0]); },
+    getNumRows:function(){ return nr; }, getNumColumns:function(){ return nc; }, getRow:function(){ return r; }, getColumn:function(){ return c; },
+    setValues:function(vals){ vals.forEach(function(row,i){ var ri=r-1+i; if(!sh.rows[ri]) sh.rows[ri]=[]; row.forEach(function(v,j){ sh.rows[ri][c-1+j]=v; }); }); return R; },
+    setValue:function(v){ return R.setValues([[v]]); },
+    clearContent:function(){ for(var i=0;i<nr;i++){ var ri=r-1+i; if(!sh.rows[ri]) continue; for(var j=0;j<nc;j++) sh.rows[ri][c-1+j]=''; } return R; },
+    clear:function(){ return R.clearContent(); },
+    setNumberFormat:function(){ return R; }, setNumberFormats:function(){ return R; }, setFontWeight:function(){ return R; }, setBackground:function(){ return R; }, setBackgrounds:function(){ return R; },
+    setFontColor:function(){ return R; }, setWrap:function(){ return R; }, setHorizontalAlignment:function(){ return R; }, setVerticalAlignment:function(){ return R; }, setBorder:function(){ return R; }, setFontSize:function(){ return R; },
+    setDataValidation:function(){ return R; }, setNote:function(){ return R; }, setFormula:function(){ return R; }, setFormulas:function(){ return R; }, getFormulas:function(){ return R.getValues().map(function(r){ return r.map(function(){ return ''; }); }); },
+    getA1Notation:function(){ return ''; }, offset:function(){ return R; }, merge:function(){ return R; } };
+  return R; };
+function Spread(id,sheets){ this.id=id; this.sheets=[]; var self=this; Object.keys(sheets||{}).forEach(function(n){ self.sheets.push(new Sheet(n,sheets[n])); }); }
+Spread.prototype.getId=function(){ return this.id; }; Spread.prototype.getUrl=function(){ return '#'; }; Spread.prototype.getName=function(){ return '데모 저장소'; };
+Spread.prototype.getSheets=function(){ return this.sheets; };
+Spread.prototype.getSheetByName=function(n){ return this.sheets.filter(function(s){ return s.name===n; })[0]||null; };
+Spread.prototype.insertSheet=function(n){ var s=new Sheet(n); this.sheets.push(s); return s; };
+Spread.prototype.deleteSheet=function(s){ this.sheets=this.sheets.filter(function(x){ return x!==s; }); };
+Spread.prototype.getActiveSheet=function(){ return this.sheets[0]; };
+var __SS=new Spread('DEMO', window.__SHEETS||{});
+var PROPS=window.__PROPS||{}; var CACHE={};
+function kst_(d,fmt){ if(!(d instanceof Date)||isNaN(d.getTime())) return ''; var u=new Date(d.getTime()+9*3600*1000); var p2=function(n){ return ('0'+n).slice(-2); };
+  return String(fmt).replace(/yyyy/g,u.getUTCFullYear()).replace(/yy/g,String(u.getUTCFullYear()).slice(2)).replace(/MM/g,p2(u.getUTCMonth()+1)).replace(/dd/g,p2(u.getUTCDate())).replace(/HH/g,p2(u.getUTCHours())).replace(/mm/g,p2(u.getUTCMinutes())).replace(/ss/g,p2(u.getUTCSeconds())); }
+var SpreadsheetApp={ openById:function(){ return __SS; }, openByUrl:function(){ return __SS; }, create:function(){ return __SS; }, flush:function(){}, getActiveSpreadsheet:function(){ return __SS; }, getActive:function(){ return __SS; }, getUi:function(){ return { alert:function(){}, createMenu:function(){ return { addItem:function(){ return this; }, addToUi:function(){} }; } }; } };
+var PropertiesService={ getScriptProperties:function(){ return { getProperty:function(k){ return k in PROPS?PROPS[k]:null; }, setProperty:function(k,v){ PROPS[k]=String(v); return this; }, deleteProperty:function(k){ delete PROPS[k]; return this; }, getProperties:function(){ return PROPS; }, setProperties:function(o){ Object.keys(o).forEach(function(k){ PROPS[k]=String(o[k]); }); return this; } }; } };
+PropertiesService.getUserProperties=PropertiesService.getScriptProperties; PropertiesService.getDocumentProperties=PropertiesService.getScriptProperties;
+var Session={ getActiveUser:function(){ return { getEmail:function(){ return 'demo@example.com'; } }; }, getEffectiveUser:function(){ return { getEmail:function(){ return 'demo@example.com'; } }; }, getScriptTimeZone:function(){ return 'Asia/Seoul'; }, getTemporaryActiveUserKey:function(){ return 'demo'; } };
+var Utilities={ formatDate:kst_, sleep:function(){}, getUuid:function(){ return 'uuid-'+Math.random().toString(36).slice(2); },
+  base64Encode:function(s){ try{ return btoa(unescape(encodeURIComponent(String(s)))); }catch(e){ return ''; } }, base64Decode:function(b){ return b; }, base64EncodeWebSafe:function(s){ return Utilities.base64Encode(s); },
+  newBlob:function(d,m,n){ return { getBytes:function(){ return []; }, getDataAsString:function(){ return String(d||''); }, getName:function(){ return n||''; }, setName:function(){ return this; }, getContentType:function(){ return m||''; } }; },
+  parseCsv:function(t){ return String(t).split(/\r?\n/).map(function(l){ return l.split(','); }); }, formatString:function(){ return Array.prototype.join.call(arguments,' '); },
+  computeDigest:function(){ return [0]; }, DigestAlgorithm:{ MD5:1, SHA_256:2 }, Charset:{ UTF_8:1 }, zip:function(){ return Utilities.newBlob(''); }, unzip:function(){ return []; } };
+var LockService={ getScriptLock:function(){ return { tryLock:function(){ return true; }, waitLock:function(){}, releaseLock:function(){}, hasLock:function(){ return true; } }; } };
+LockService.getDocumentLock=LockService.getScriptLock; LockService.getUserLock=LockService.getScriptLock;
+var CacheService={ getScriptCache:function(){ return { get:function(k){ return k in CACHE?CACHE[k]:null; }, put:function(k,v){ CACHE[k]=v; }, remove:function(k){ delete CACHE[k]; }, removeAll:function(ks){ (ks||[]).forEach(function(k){ delete CACHE[k]; }); },
+  putAll:function(m){ Object.keys(m||{}).forEach(function(k){ CACHE[k]=m[k]; }); }, getAll:function(ks){ var o={}; (ks||[]).forEach(function(k){ if(k in CACHE) o[k]=CACHE[k]; }); return o; } }; } };
+CacheService.getUserCache=CacheService.getScriptCache; CacheService.getDocumentCache=CacheService.getScriptCache;
+var Logger={ log:function(){} };
+var MimeType={ GOOGLE_SHEETS:'sheet', CSV:'text/csv', PLAIN_TEXT:'text/plain', MICROSOFT_EXCEL:'xlsx', JPEG:'image/jpeg', PNG:'image/png', PDF:'pdf', FOLDER:'folder' };
+var _noFiles={ hasNext:function(){ return false; }, next:function(){ return null; } };
+var _file={ getId:function(){ return 'f'; }, getUrl:function(){ return '#'; }, getName:function(){ return 'file'; }, setTrashed:function(){ return this; }, getBlob:function(){ return Utilities.newBlob(''); }, setSharing:function(){ return this; }, getDownloadUrl:function(){ return '#'; }, getMimeType:function(){ return ''; }, getSize:function(){ return 0; }, getLastUpdated:function(){ return new Date(); }, makeCopy:function(){ return _file; }, moveTo:function(){ return _file; } };
+var _folder={ createFile:function(){ return _file; }, getFilesByName:function(){ return _noFiles; }, getFiles:function(){ return _noFiles; }, getFolders:function(){ return _noFiles; }, getFoldersByName:function(){ return _noFiles; }, createFolder:function(){ return _folder; }, getId:function(){ return 'd'; }, getUrl:function(){ return '#'; }, getName:function(){ return '폴더'; }, addFile:function(){ return _folder; }, removeFile:function(){ return _folder; } };
+var DriveApp={ getFilesByName:function(){ return _noFiles; }, getFiles:function(){ return _noFiles; }, createFile:function(){ return _file; }, getFileById:function(){ return _file; }, getFolderById:function(){ return _folder; }, getRootFolder:function(){ return _folder; }, getFoldersByName:function(){ return _noFiles; }, createFolder:function(){ return _folder; }, Access:{ ANYONE_WITH_LINK:1, ANYONE:2 }, Permission:{ VIEW:1, EDIT:2 } };
+var Drive={ Files:{ insert:function(){ return { id:'tmp' }; }, remove:function(){}, create:function(){ return { id:'tmp' }; }, list:function(){ return { files:[], items:[] }; }, get:function(){ return { id:'tmp' }; } }, Permissions:{ create:function(){}, insert:function(){} } };
+var UrlFetchApp={ fetch:function(url){ return { getResponseCode:function(){ return 503; }, getContentText:function(){ return '{"error":"데모에서는 외부 연결이 꺼져 있습니다"}'; }, getBlob:function(){ return Utilities.newBlob(''); }, getHeaders:function(){ return {}; } }; }, fetchAll:function(){ return []; } };
+var HtmlService={ createHtmlOutput:function(){ return { setTitle:function(){ return this; }, getContent:function(){ return ''; }, addMetaTag:function(){ return this; }, setXFrameOptionsMode:function(){ return this; } }; }, createTemplateFromFile:function(){ return { evaluate:function(){ return HtmlService.createHtmlOutput(); } }; }, createHtmlOutputFromFile:function(){ return HtmlService.createHtmlOutput(); }, XFrameOptionsMode:{ ALLOWALL:1 }, SandboxMode:{ IFRAME:1 } };
+var ContentService={ createTextOutput:function(){ return { setMimeType:function(){ return this; } }; }, MimeType:{ JSON:'json', TEXT:'text' } };
+var ScriptApp={ getProjectTriggers:function(){ return []; }, newTrigger:function(){ var t={ timeBased:function(){ return t; }, everyDays:function(){ return t; }, everyHours:function(){ return t; }, everyMinutes:function(){ return t; }, atHour:function(){ return t; }, nearMinute:function(){ return t; }, create:function(){} }; return t; }, deleteTrigger:function(){}, getService:function(){ return { getUrl:function(){ return '#'; } }; }, getScriptId:function(){ return 'demo'; }, getOAuthToken:function(){ return 'demo'; } };
+var MailApp={ sendEmail:function(){} }; var GmailApp={ sendEmail:function(){}, createDraft:function(){} };
+var XmlService={ parse:function(){ return { getRootElement:function(){ return { getChildren:function(){ return []; }, getText:function(){ return ''; }, getName:function(){ return ''; } }; } }; } };
+var Charts={}; var SlidesApp={}; var DocumentApp={};
+
+/**
+ * 위탁매출 정산 관리 — 웹앱 진입 + 계산 오케스트레이션
+ *
+ * 폴더 구조:  <루트>/<YYYY-MM>/<시트번호>/  에 어드민 원본을 넣는다.
+ * 계산 결과는 값만 주는 게 아니라 "어느 파일 어느 컬럼을 어떻게 더했는지"(근거)를 같이 준다.
+ * 6·7월에 이 시스템을 안 쓰게 된 이유 중 하나가 "결과를 못 믿겠다" 였기 때문.
+ */
+
+var WITA_PROP_ROOT = 'witaRootFolderId';
+var WITA_ITEMS = ['상품매출', '기타매출', '수수료_별도', '수수료_계산서', '정산금액'];
+
+/* 채널별 입금 주기 — 26.01~07 회계시스템 외상매출금 원장 × 위탁 정산대상액 129건 매칭으로 도출.
+   룰의 '입금주기' 값이 있으면 그게 우선. 형식: '익월 N일' | '익월 말일' | '익익월' */
+var WITA_CYCLE = {
+  '무신사': '익월 10일', '무신사글로벌': '익월 10일', '무신사글로벌_조조타운': '익월 10일',
+  '29CM': '익월 10일', 'W컨셉': '익월 10일', '신세계몰': '익월 10일',
+  'SSF SHOP': '익월 20일', '한섬EQL': '익월 20일',
+  '롯데온': '익월 1일', '현대이지웰': '익월 말일',
+  '원더플레이스': '익익월'
+};
+
+function witaCycleOf(seller, ruleCycle) {
+  if (ruleCycle) return String(ruleCycle);
+  var s = String(seller || '');
+  var best = '';
+  Object.keys(WITA_CYCLE).forEach(function (k) {
+    if (s.indexOf(k) === 0 && k.length > best.length) best = k;
+  });
+  return best ? WITA_CYCLE[best] : '';
+}
+
+/** '2026-05' + '익월 10일' -> '2026-06-10' (말일·익익월 처리 포함) */
+function witaPayDate(month, cycle) {
+  if (!cycle) return '';
+  var y = +month.slice(0, 4), m = +month.slice(5, 7);
+  var plus = cycle.indexOf('익익월') >= 0 ? 2 : 1;
+  m += plus; while (m > 12) { m -= 12; y++; }
+  var dm = cycle.match(/(\d+)\s*일/);
+  var day;
+  if (cycle.indexOf('말일') >= 0) day = new Date(y, m, 0).getDate();
+  else if (dm) day = +dm[1];
+  else return y + '-' + ('0' + m).slice(-2) + ' 중';   // 익익월(변동) 등 날짜 미상
+  return y + '-' + ('0' + m).slice(-2) + '-' + ('0' + day).slice(-2);
+}
+
+function doGet(e) {
+  // ?action=... 은 개발용 진입점 — 로컬에서 배포URL만 호출해 검증할 수 있게 둔다.
+  var p = (e && e.parameter) || {};
+  if (p.action) {
+    var out;
+    try {
+      if (p.action === 'init') out = { ok: true, 룰: witaResetRules(), 캐시: '비움' };
+      else if (p.action === 'rule') out = witaRuleOf(p.sheet);
+      else if (p.action === 'list') out = witaChannelList(p.month || '2026-05', p.fresh === '1');
+      else if (p.action === 'clearCache') { witaClearRuleCache(); out = { ok: true, 캐시: '비움' }; }
+      else if (p.action === 'compute') out = witaComputeChannel(p.month, p.sheet, null);
+      else if (p.action === 'computeAll') out = witaComputeAll(p.month);
+      else if (p.action === 'folder') out = { url: witaRootFolder().getUrl(), id: witaRootFolder().getId() };
+      else if (p.action === 'exportMonth') out = witaExportMonth(p.month);
+      else if (p.action === 'exportJournal') out = witaExportJournal(p.month);
+      else out = { ok: false, error: 'unknown action: ' + p.action };
+    } catch (err) {
+      out = { ok: false, error: String(err && err.message || err), stack: String(err && err.stack || '').substring(0, 500) };
+    }
+    return ContentService.createTextOutput(JSON.stringify(out))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  return HtmlService.createTemplateFromFile('Index')
+    .evaluate()
+    .setTitle('위탁매출 정산 관리')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+function witaRootFolderUrl() { return witaRootFolder().getUrl(); }
+
+/**
+ * 화면에서 파일 업로드 -> <루트>/<월>/<시트>/ 에 저장.
+ * @param {Object} payload {month, sheet, name, mimeType, dataBase64}
+ */
+function witaUpload(payload) {
+  var root = witaRootFolder();
+  var mf = witaChildFolder(root, payload.month, true);
+  var cf = witaChildFolder(mf, String(payload.sheet), true);
+  // 같은 이름이 있으면 교체 (재업로드가 흔함)
+  var old = cf.getFilesByName(payload.name);
+  while (old.hasNext()) old.next().setTrashed(true);
+  var blob = Utilities.newBlob(
+    Utilities.base64Decode(payload.dataBase64),
+    payload.mimeType || 'application/octet-stream',
+    payload.name);
+  var f = cf.createFile(blob);
+  try { CacheService.getScriptCache().remove('list_' + payload.month); } catch (e) {}
+  return { ok: true, name: f.getName(), size: f.getSize() };
+}
+
+/** 채널 폴더의 파일 삭제 */
+function witaDeleteFile(month, sheetNo, name) {
+  var root = witaRootFolder();
+  var mf = witaChildFolder(root, month, false);
+  if (!mf) return { ok: false };
+  var cf = witaChildFolder(mf, String(sheetNo), false);
+  if (!cf) return { ok: false };
+  var it = cf.getFilesByName(name), n = 0;
+  while (it.hasNext()) { it.next().setTrashed(true); n++; }
+  try { CacheService.getScriptCache().remove('list_' + month); } catch (e) {}
+  return { ok: true, 삭제: n };
+}
+
+/* ===== 계산 결과 영속화 =====
+   결과가 화면 메모리에만 있으면 새로고침에 사라진다 — 월별 _results_<월>.json 에 저장해
+   다음에 열어도 집계탭이 채워져 있게 한다. 근거(trace)는 커서 제외, 값·검증·문제만. */
+function witaResultsFileName(month) { return '_results_' + month + '.json'; }
+
+function witaReadResults(month) {
+  var it = witaRootFolder().getFilesByName(witaResultsFileName(month));
+  if (!it.hasNext()) return {};
+  try { return JSON.parse(it.next().getBlob().getDataAsString('UTF-8')); }
+  catch (e) { return {}; }
+}
+
+function witaSaveResult(month, sn, slim) {
+  var root = witaRootFolder();
+  var name = witaResultsFileName(month);
+  var it = root.getFilesByName(name);
+  var data = {};
+  var file = null;
+  if (it.hasNext()) {
+    file = it.next();
+    try { data = JSON.parse(file.getBlob().getDataAsString('UTF-8')); } catch (e) {}
+  }
+  data[sn] = slim;
+  if (file) file.setContent(JSON.stringify(data));
+  else root.createFile(name, JSON.stringify(data), MimeType.PLAIN_TEXT);
+  try { CacheService.getScriptCache().remove('list_' + month); } catch (e) {}
+}
+
+/** 전 채널 계산 (파일이 올라온 채널만) */
+function witaComputeAll(month) {
+  var list = witaChannelList(month).채널;
+  var res = [], tot = {};
+  WITA_ITEMS.forEach(function (k) { tot[k] = 0; });
+  list.forEach(function (c) {
+    if (!c.파일수) return;
+    var r = witaComputeChannel(month, c.시트, null);
+    WITA_ITEMS.forEach(function (k) { tot[k] += Number(r.값[k] || 0); });
+    res.push({ 시트: r.시트, 판매처: r.판매처, 값: r.값,
+               검증: r.검증 ? (r.검증.통과 ? 'OK' : '차이 ' + r.검증.차이) : '-',
+               문제: r.문제 });
+  });
+  return { 월: month, 채널수: res.length, 합계: tot, 결과: res };
+}
+
+function include(name) {
+  return HtmlService.createHtmlOutputFromFile(name).getContent();
+}
+
+/** 업로드 루트 폴더 (없으면 생성) */
+function witaRootFolder() {
+  var props = PropertiesService.getScriptProperties();
+  var id = props.getProperty(WITA_PROP_ROOT);
+  if (id) {
+    try { return DriveApp.getFolderById(id); } catch (e) { /* 삭제됨 -> 재생성 */ }
+  }
+  var f = DriveApp.createFolder('위탁매출_정산파일');
+  props.setProperty(WITA_PROP_ROOT, f.getId());
+  return f;
+}
+
+/** 시트번호 정규화 — 시트에 숫자로 저장되면 '01'이 1이 되어버린다 */
+function witaSn(v) {
+  var s = String(v === null || v === undefined ? '' : v).trim();
+  return /^\d$/.test(s) ? '0' + s : s;
+}
+
+function witaChildFolder(parent, name, create) {
+  var nm = String(name);
+  var it = parent.getFoldersByName(nm);
+  if (it.hasNext()) return it.next();
+  // '01' <-> '1' 별칭도 찾아본다 (0 패딩 유실 시기에 만들어진 폴더 호환)
+  var alt = /^0\d$/.test(nm) ? nm.replace(/^0/, '') : (/^\d$/.test(nm) ? '0' + nm : null);
+  if (alt) {
+    var it2 = parent.getFoldersByName(alt);
+    if (it2.hasNext()) return it2.next();
+  }
+  return create ? parent.createFolder(nm) : null;
+}
+
+/**
+ * 월 폴더를 한 번만 훑어 {시트번호: [파일...]} 로 만든다.
+ * 이전 구현은 채널마다 폴더를 찾아 26채널 × 2회 = 50회 넘게 Drive 를 때려서 느렸다.
+ * 요청 1회 안에서는 캐시로 재사용한다.
+ */
+var _witaScanCache = {};
+
+/** Drive REST 호출 (files.list) — DriveApp 반복보다 몇 배 빠르다 */
+function witaDriveList(q, fields) {
+  var out = [], pageToken = null;
+  do {
+    var url = 'https://www.googleapis.com/drive/v3/files?pageSize=1000' +
+      '&q=' + encodeURIComponent(q + " and trashed=false") +
+      '&fields=' + encodeURIComponent('nextPageToken,files(' + fields + ')') +
+      (pageToken ? '&pageToken=' + pageToken : '');
+    var res = UrlFetchApp.fetch(url, {
+      headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
+      muteHttpExceptions: true
+    });
+    if (res.getResponseCode() >= 300)
+      throw new Error('Drive 조회 실패: ' + res.getContentText().substring(0, 150));
+    var j = JSON.parse(res.getContentText());
+    out = out.concat(j.files || []);
+    pageToken = j.nextPageToken;
+  } while (pageToken);
+  return out;
+}
+
+/**
+ * 월 폴더 스캔 — DriveApp 으로 폴더 26개를 순회하면 폴더당 수백 ms 라 목록이 늦다.
+ * Drive REST 로 ①채널 폴더 목록 1회 ②전 폴더의 파일을 'in parents' OR 로 1회 = 총 2회 호출.
+ */
+function witaScanMonth(month, fresh) {
+  if (!fresh && _witaScanCache[month]) return _witaScanCache[month];
+  var map = {};
+  var root = witaRootFolder();
+  var months = witaDriveList("'" + root.getId() + "' in parents and name='" + month +
+    "' and mimeType='application/vnd.google-apps.folder'", 'id,name');
+  if (months.length) {
+    var chs = witaDriveList("'" + months[0].id + "' in parents and mimeType='application/vnd.google-apps.folder'", 'id,name');
+    if (chs.length) {
+      var byId = {};
+      chs.forEach(function (c) { byId[c.id] = witaSn(c.name); map[byId[c.id]] = map[byId[c.id]] || []; });
+      // 폴더 30개 안팎이라 쿼리 길이는 문제 없다 (26개 × ~50자)
+      var q = '(' + chs.map(function (c) { return "'" + c.id + "' in parents"; }).join(' or ') + ')';
+      witaDriveList(q, 'id,name,size,modifiedTime,parents').forEach(function (f) {
+        var sn = byId[(f.parents || [])[0]];
+        if (!sn) return;
+        map[sn].push({ id: f.id, name: f.name, size: Number(f.size || 0),
+          updated: Utilities.formatDate(new Date(f.modifiedTime), 'Asia/Seoul', 'MM-dd HH:mm') });
+      });
+    }
+  }
+  _witaScanCache[month] = map;
+  return map;
+}
+
+function witaChannelFiles(month, sheetNo) {
+  return witaScanMonth(month)[witaSn(sheetNo)] || [];
+}
+
+/**
+ * 산출 산식들이 참조하는 컬럼명 모으기 (메인 파일 판별용).
+ * top_lookup 의 라벨도 포함해야 한다 — 원본모드에서는 그 라벨이 곧 컬럼명이고,
+ * 29CM·카카오톡처럼 산식이 전부 top_lookup 인 채널은 이게 없으면 후보가 0개가 된다.
+ */
+function witaWantedCols(outputs) {
+  var set = {};
+  Object.keys(outputs || {}).forEach(function (k) {
+    var s = String(outputs[k]), m;
+    var re = /col_sum(?:_all)?\(([^(),]+)\)/g;
+    while ((m = re.exec(s)) !== null) set[m[1].trim()] = 1;
+    var re2 = /col_sumif\(([^,]+),/g;
+    while ((m = re2.exec(s)) !== null) set[m[1].trim()] = 1;
+    // top_lookup(라벨행, 값행, 라벨) / top_lookup0(...) 의 3번째 인자
+    var re3 = /top_lookup0?\(\s*\d+\s*,\s*\d+\s*,([^()]*(?:\([^()]*\)[^()]*)*)\)/g;
+    while ((m = re3.exec(s)) !== null) set[m[1].trim()] = 1;
+  });
+  return Object.keys(set).filter(function (x) { return x && x !== '0'; });
+}
+
+/** 파일명 키워드로 역할 매칭 */
+function witaMatchFile(files, keyword) {
+  if (!keyword) return null;
+  var kw = String(keyword).replace(/\s+/g, '');
+  // '(메인)' 같은 표기는 키워드가 아니라 '첫 파일' 을 뜻한다
+  if (kw === '(메인)' || kw === '메인') return files.length ? files[0] : null;
+  for (var i = 0; i < files.length; i++) {
+    if (files[i].name.replace(/\s+/g, '').indexOf(kw) >= 0) return files[i];
+  }
+  return null;
+}
+
+/**
+ * 채널 1개 계산.
+ * @return {{시트, 판매처, ok, 값:{}, 근거:{}, 문제:[]}}
+ */
+function witaComputeChannel(month, sheetNo, paramsOverride) {
+  var rules = witaLoadRules();
+  sheetNo = witaSn(sheetNo);
+  var r = rules[sheetNo];
+  if (!r) return { 시트: sheetNo, ok: false, 문제: ['룰에 없는 채널'] };
+
+  var files = witaChannelFiles(month, sheetNo);
+  var out = { 시트: sheetNo, 판매처: r.판매처, 브랜드: r.브랜드, 본부: r.본부,
+              ok: false, 값: {}, 근거: {}, 문제: [], 파일: [] };
+  if (!files.length) { out.문제.push('업로드된 파일 없음'); return out; }
+
+  // ★같은 파일 + 같은 룰이면 결과도 같다 — 지문이 일치하면 저장된 결과를 그대로 반환.
+  //   (엑셀이 빠른 원리와 동일: 바뀐 것만 다시 계산한다)
+  var fp = files.map(function (f) { return f.id + ':' + f.updated; }).sort().join('|') +
+           '#' + Utilities.base64Encode(Utilities.computeDigest(
+                 Utilities.DigestAlgorithm.MD5, JSON.stringify(r)));
+  if (!paramsOverride) {
+    var saved = witaReadResults(month)[sheetNo];
+    if (saved && saved.fp === fp) {
+      saved.시트 = sheetNo; saved.판매처 = r.판매처; saved.브랜드 = r.브랜드; saved.본부 = r.본부;
+      saved.캐시 = true;
+      return saved;
+    }
+  }
+
+  // 파라미터: 기본값 <- 시트, 덮어쓰기 <- 화면 입력
+  var params = {};
+  Object.keys(r.파라미터).forEach(function (k) { params[k] = r.파라미터[k]; });
+  if (paramsOverride) Object.keys(paramsOverride).forEach(function (k) {
+    if (paramsOverride[k] !== '' && paramsOverride[k] !== null) params[k] = paramsOverride[k];
+  });
+
+  // 0) 역추출 모드 — 월파일에서 뽑은 '역추출_<시트>.csv' 가 있으면 그걸로 계산.
+  //    어드민 원본을 다시 안 받아도 과거 월을 통째로 재현할 수 있다.
+  //    역추출 시트는 소계 미니표를 포함한 풀시트라, 원본모드 변환 없이(plain)
+  //    채널의 헤더행·소계위치와 역추출 산식(top_lookup 등)을 그대로 쓴다.
+  var exMain = null;
+  for (var xi = 0; xi < files.length; xi++) {
+    if (files[xi].name === '역추출_' + sheetNo + '.csv') { exMain = files[xi]; break; }
+  }
+  if (exMain && (r.산출R || Object.keys(r.산출).length)) {
+    out.파일.push({ 역할: '역추출', 파일명: exMain.name });
+    var exRows, exCtx = null, exSubs = {};
+    try {
+      exRows = witaLoadFile(DriveApp.getFileById(exMain.id));
+      exCtx = new WitaCtx(exRows, r.헤더행, r.소계위치, false);
+    } catch (e0) {
+      out.문제.push('역추출 파일 해석 불가: ' + e0.message);
+      return out;
+    }
+    // 부속 탭 (17-1, 21-2 ...) — 파일 룰의 sub: 역할로 정의됨
+    Object.keys(r.파일).forEach(function (role) {
+      if (role.indexOf('sub:') !== 0) return;
+      var name = role.substring(4);
+      var fs2 = r.파일[role];
+      var hit2 = null;
+      for (var yj = 0; yj < files.length; yj++) {
+        if (files[yj].name === '역추출_' + name + '.csv') { hit2 = files[yj]; break; }
+      }
+      if (!hit2) return;
+      try {
+        var rows2 = witaLoadFile(DriveApp.getFileById(hit2.id));
+        var ctx2 = new WitaCtx(rows2, fs2.파일헤더행 || 1, fs2.소계위치, false);
+        var aggs2 = r.집계[role] || {};
+        Object.keys(aggs2).forEach(function (an) {
+          try {
+            // sub(17-1, 배송비) 참조 키는 'sub:' 접두사 없이 저장
+            exSubs[name + ' ' + an] = witaEvaluate(aggs2[an], ctx2, exSubs, params);
+          } catch (e2) { out.문제.push(role + '.' + an + ': ' + e2.message); }
+        });
+      } catch (e1) { out.문제.push(role + ' 해석 불가: ' + e1.message); }
+    });
+    var exOuts = r.산출R || r.산출;
+    var exOk = true;
+    for (var xk = 0; xk < WITA_ITEMS.length; xk++) {
+      var item0 = WITA_ITEMS[xk], expr0 = exOuts[item0];
+      if (!expr0) { out.문제.push('역추출 산식 없음: ' + item0); exOk = false; continue; }
+      var tr0 = [];
+      try {
+        out.값[item0] = Math.round(witaEvaluate(expr0, exCtx, exSubs, params, tr0));
+        out.근거[item0] = { 산식: expr0, 값: out.값[item0], 세부: tr0 };
+      } catch (e3) { out.문제.push(item0 + ': ' + e3.message); exOk = false; }
+    }
+    if (exOk) {
+      var pen0 = params['패널티'] !== undefined && params['패널티'] !== '' ? Math.round(Number(params['패널티']) || 0) : 0;
+      if (pen0) out.값['패널티'] = pen0;
+      var lhs0 = (out.값['상품매출'] || 0) + (out.값['기타매출'] || 0) -
+                 (out.값['수수료_별도'] || 0) - (out.값['수수료_계산서'] || 0) - pen0;
+      var rhs0 = out.값['정산금액'] || 0;
+      out.검증 = { 식: '상품 + 기타 − 별도 − 계산서 − 패널티 = 정산', 좌변: lhs0, 우변: rhs0,
+                   차이: lhs0 - rhs0, 통과: Math.abs(lhs0 - rhs0) <= 1 };
+    }
+    out.ok = exOk && out.문제.length === 0;
+    try {
+      witaSaveResult(month, sheetNo, {
+        값: out.값, 검증: out.검증 || null, 문제: out.문제, 파일: out.파일, fp: fp,
+        시각: Utilities.formatDate(new Date(), 'Asia/Seoul', 'MM-dd HH:mm') });
+    } catch (e4) {}
+    return out;
+  }
+
+  // 1) 컨텍스트 준비
+  //    (가) files 룰이 있는 멀티파일 채널 -> 역할별 매칭 후 집계 선계산
+  //    (나) files 룰이 없는 단일파일 채널(11번가 등) -> 올라온 첫 파일을 메인으로
+  //        어느 쪽이든 원본모드 컨텍스트를 쓴다(소계행 없음 -> top_lookup을 col_sum으로 변환).
+  var subvals = {}, mainCtx = null;
+  var roles = Object.keys(r.파일);
+  if (roles.length) {
+    for (var i = 0; i < roles.length; i++) {
+      var role = roles[i], fspec = r.파일[role];
+      var hit = witaMatchFile(files, fspec.키워드);
+      if (!hit) {
+        if (!fspec.선택) out.문제.push('파일 없음: ' + role + ' (키워드 "' + fspec.키워드 + '")');
+        continue;
+      }
+      out.파일.push({ 역할: role, 파일명: hit.name });
+      var rows;
+      try {
+        rows = witaLoadFile(DriveApp.getFileById(hit.id));
+      } catch (e) {
+        out.문제.push(role + ' 읽기 실패: ' + e.message);
+        continue;
+      }
+      var plain = fspec.컨텍스트 === 'plain';
+      // 파일 수준 헤더행이 지정돼 있으면 그게 최우선 (LF몰 4행, 무신사 2행, CJ 3행)
+      var hrow = fspec.파일헤더행 || (plain ? r.헤더행 : (witaDetectHeader(rows) || r.헤더행));
+      // 그룹헤더의 빈칸을 왼쪽 값으로 채움 — LF몰처럼 동명 컬럼을 col_sum_all 로 합치는 채널에 필수
+      if (fspec.헤더왼쪽채움) witaFillHeaderLeft(rows, hrow);
+      if (fspec.헤더보조행) witaMergeHeader(rows, hrow, fspec.헤더보조행);
+      var ctx = new WitaCtx(rows, hrow, fspec.소계위치, !plain);
+      if (!mainCtx) mainCtx = ctx;
+      var aggs = r.집계[role] || {};
+      (function (ctx2, role2, fname, ov) {
+        Object.keys(aggs).forEach(function (an) {
+          var tr = [];
+          try {
+            var v = witaEvaluate(aggs[an], ctx2, subvals, params, tr);
+            subvals[role2 + ' ' + an] = v;
+            out.근거[role2 + ' / ' + an] = { 산식: aggs[an], 값: Math.round(v), 세부: tr, 파일: fname };
+          } catch (e) {
+            out.문제.push(role2 + '.' + an + ': ' + e.message);
+          }
+        });
+        // param_override: 이 파일이 올라왔으면 집계값이 수기 파라미터를 이긴다.
+        // (하프클럽 패널티, 현대이지웰 패널티, 스마트스토어 부담할인 — 우선순위 파일 > 수기 > 기본값)
+        Object.keys(ov || {}).forEach(function (pname) {
+          var k = role2 + ' ' + ov[pname];
+          if (subvals[k] !== undefined) {
+            params[pname] = subvals[k];
+            out.근거['파라미터 / ' + pname] = {
+              산식: '파일 ' + fname + ' 의 [' + ov[pname] + '] 값으로 덮어씀',
+              값: Math.round(subvals[k]), 세부: [] };
+          }
+        });
+      })(ctx, role, hit.name, fspec.덮어쓰기);
+    }
+  } else {
+    // 단일파일 채널이라도 폴더엔 부속 파일이 같이 있을 수 있다(11번가 = 정산내역 + 부가세 + 현금영수증).
+    // Drive 목록은 순서를 보장하지 않으므로 '첫 파일'에 기대면 안 된다.
+    // -> 산출 산식이 요구하는 컬럼이 실제로 있는 파일을 메인으로 고른다.
+    var wanted = witaWantedCols(r.산출);
+    var cands = files.slice().sort(function (a, b) { return a.name < b.name ? -1 : 1; });
+    var picked = null, tried = [];
+    for (var ci = 0; ci < cands.length; ci++) {
+      var cand = cands[ci];
+      try {
+        var rowsC = witaLoadFile(DriveApp.getFileById(cand.id));
+        var hC = witaDetectHeader(rowsC) || r.헤더행;
+        var ctxC = new WitaCtx(rowsC, hC, 'above_header', true);
+        var hit2 = 0;
+        for (var wi = 0; wi < wanted.length; wi++) {
+          try { ctxC.colIdx(wanted[wi]); hit2++; } catch (e2) {}
+        }
+        tried.push(cand.name + '(' + hit2 + '/' + wanted.length + ')');
+        if (!picked || hit2 > picked.hit) picked = { file: cand, ctx: ctxC, hit: hit2, hrow: hC };
+        if (wanted.length && hit2 === wanted.length) break;   // 완전 일치면 더 볼 것 없음
+      } catch (e3) {
+        tried.push(cand.name + '(읽기실패)');
+      }
+    }
+    if (picked && picked.hit > 0) {
+      mainCtx = picked.ctx;
+      out.파일.push({ 역할: '(메인)', 파일명: picked.file.name });
+      out.헤더행 = picked.hrow;
+      if (wanted.length && picked.hit < wanted.length)
+        out.문제.push('일부 컬럼을 못 찾음 (' + picked.hit + '/' + wanted.length + ') — 파일 확인 필요');
+    } else {
+      out.문제.push('산식에 맞는 파일을 못 찾음. 후보: ' + tried.join(', '));
+    }
+  }
+  if (!mainCtx) { out.문제.push('메인 파일을 읽지 못했습니다'); return out; }
+
+  // 2) 5개 산출값
+  var okAll = true;
+  for (var k = 0; k < WITA_ITEMS.length; k++) {
+    var item = WITA_ITEMS[k], expr = r.산출[item];
+    if (!expr) { out.문제.push('산식 없음: ' + item); okAll = false; continue; }
+    var tr2 = [];
+    try {
+      var val = witaEvaluate(expr, mainCtx, subvals, params, tr2);
+      out.값[item] = Math.round(val);
+      out.근거[item] = { 산식: expr, 값: Math.round(val), 세부: tr2 };
+    } catch (e) {
+      out.문제.push(item + ': ' + e.message);
+      okAll = false;
+    }
+  }
+
+  // 3) 자체 검증식 — 상품 + 기타 − 별도 − 계산서 − 패널티 = 정산
+  //    (월파일 TTL 의 대사식과 동일. 패널티를 빼지 않으면 하프클럽·이지웰·CJ 가 항상 "차이"로 떴다)
+  if (okAll) {
+    var pen = params['패널티'] !== undefined && params['패널티'] !== '' ? Math.round(Number(params['패널티']) || 0) : 0;
+    if (pen) out.값['패널티'] = pen;
+    var lhs = (out.값['상품매출'] || 0) + (out.값['기타매출'] || 0) -
+              (out.값['수수료_별도'] || 0) - (out.값['수수료_계산서'] || 0) - pen;
+    var rhs = out.값['정산금액'] || 0;
+    var diff = lhs - rhs;
+    out.검증 = { 식: '상품 + 기타 − 별도 − 계산서 − 패널티 = 정산', 좌변: lhs, 우변: rhs, 차이: diff,
+                 통과: Math.abs(diff) <= 1,
+                 힌트: Math.abs(diff) > 1 && !pen ?
+                   '차이가 패널티·기타공제라면 룰 편집 > 파라미터에 "패널티" 를 등록하세요' : '' };
+  }
+  out.ok = okAll && out.문제.length === 0;
+  // 슬림 결과를 저장 — 집계탭이 새로고침 후에도 채워져 있게
+  try {
+    witaSaveResult(month, sheetNo, {
+      값: out.값, 검증: out.검증 || null, 문제: out.문제, 파일: out.파일, fp: fp,
+      시각: Utilities.formatDate(new Date(), 'Asia/Seoul', 'MM-dd HH:mm') });
+  } catch (e) { /* 저장 실패해도 계산 결과는 반환 */ }
+  return out;
+}
+
+/** 화면용: 채널 목록 + 파일 현황 */
+function witaChannelList(month, fresh) {
+  var cache = CacheService.getScriptCache();
+  if (fresh) { witaClearRuleCache(); cache.remove('list_' + month); witaScanMonth(month, true); }
+  else {
+    var hit = cache.get('list_' + month);
+    if (hit) { try { return JSON.parse(hit); } catch (e) {} }
+  }
+  var rules = witaLoadRules();
+  var scan = witaScanMonth(month);
+  var out = [];
+  Object.keys(rules).sort().forEach(function (sn) {
+    var r = rules[sn];
+    var files = scan[sn] || [];
+    var need = Object.keys(r.파일).filter(function (k) { return !r.파일[k].선택; });
+    var got = need.filter(function (k) { return !!witaMatchFile(files, r.파일[k].키워드); });
+    // 상세 화면의 필요파일 체크리스트용 — 역할별 확보 여부 + 어드민 경로
+    var checklist = Object.keys(r.파일).map(function (k) {
+      var fs = r.파일[k];
+      return { 역할: k, 키워드: fs.키워드, 경로: fs.경로 || '', 선택: fs.선택,
+               확보: !!witaMatchFile(files, fs.키워드) };
+    });
+    var cyc = witaCycleOf(r.판매처, r.입금주기);
+    out.push({
+      시트: sn, 판매처: r.판매처, 브랜드: r.브랜드, 본부: r.본부,
+      원본모드: r.원본모드, 어드민경로: r.어드민경로,
+      입금주기: cyc, 입금예정일: witaPayDate(month, cyc),
+      필요: need.length, 확보: got.length, 파일수: files.length,
+      파일: files.map(function (f) { return { name: f.name, size: f.size, updated: f.updated }; }),
+      필요파일: checklist,
+      파라미터: Object.keys(r.파라미터)
+    });
+  });
+  var result = { 월: month, 채널: out, 결과: witaReadResults(month) };
+  try { CacheService.getScriptCache().put('list_' + month, JSON.stringify(result), 90); } catch (e) {}
+  return result;
+}
+
+/** 메뉴에서 부르는 계산 테스트 */
+function witaMenuTest_UNUSED() {
+  var ui = SpreadsheetApp.getUi();
+  var m = ui.prompt('계산 테스트', '월 (예: 2026-05)', ui.ButtonSet.OK_CANCEL);
+  if (m.getSelectedButton() !== ui.Button.OK) return;
+  var c = ui.prompt('계산 테스트', '채널 시트번호 (예: 07)', ui.ButtonSet.OK_CANCEL);
+  if (c.getSelectedButton() !== ui.Button.OK) return;
+  var res = witaComputeChannel(m.getResponseText().trim(), c.getResponseText().trim());
+  var msg = [];
+  msg.push(res.시트 + ' ' + (res.판매처 || ''));
+  WITA_ITEMS.forEach(function (k) {
+    if (res.값[k] !== undefined) msg.push('  ' + k + ': ' + Number(res.값[k]).toLocaleString());
+  });
+  if (res.검증) msg.push('\n검증 ' + res.검증.식 + '\n  ' + res.검증.좌변.toLocaleString() +
+                        ' vs ' + res.검증.우변.toLocaleString() +
+                        ' → ' + (res.검증.통과 ? '통과' : '차이 ' + res.검증.차이.toLocaleString()));
+  if (res.문제.length) msg.push('\n문제:\n  ' + res.문제.join('\n  '));
+  ui.alert(msg.join('\n'));
+}
+
+
+/**
+ * 위탁매출 계산엔진 (파이썬 src/wita/engine.py 이식본)
+ *
+ * 규칙 어휘
+ *   col_sum(헤더명)                 헤더 아래 데이터행의 해당 컬럼 합
+ *   col_sum_all(헤더명)             동명 컬럼 전부 합 (그룹헤더 펼친 경우)
+ *   col_sumif(합계열, 조건열, 값)    조건 일치 행만 합 (값이 빈칸이면 '빈칸인 행')
+ *   top_lookup(라벨행, 값행, 라벨)   헤더 위 미니표에서 라벨 찾아 값행 읽기
+ *   top_lookup0(...)                위와 같되 라벨 없으면 0 (IFERROR 대응)
+ *   cell(행, 열문자)                 특정 셀 직접
+ *   sub(역할, 집계명)                다른 파일의 선계산 집계값
+ *   param(이름)                      수기 파라미터
+ *   ROUND(x, n)                      엑셀식 반올림 (JS Math.round 와 음수 처리가 다름)
+ *
+ * ★함정: col_sumif 를 col_sum 보다, col_sum_all 을 col_sum 보다 먼저 치환해야 한다.
+ *        (접두어가 겹쳐서 순서가 틀리면 엉뚱하게 잘림)
+ */
+
+/** 숫자 파싱 — 콤마·공백 제거, 빈값/'-'는 0 */
+function wNum(v) {
+  if (v === null || v === undefined) return 0;
+  if (typeof v === 'number') return isFinite(v) ? v : 0;
+  var s = String(v).trim().replace(/,/g, '').replace(/ /g, '');
+  if (s === '' || s === '-' || s === 'None' || s === 'nan') return 0;
+  // (1,234) 형태 음수
+  var m = s.match(/^\((.+)\)$/);
+  if (m) { var n0 = parseFloat(m[1]); return isFinite(n0) ? -n0 : 0; }
+  var n = parseFloat(s);
+  return isFinite(n) ? n : 0;
+}
+
+function wNorm(s) { return String(s === null || s === undefined ? '' : s).replace(/\s+/g, ''); }
+
+/** 엑셀식 반올림 (0.5는 항상 절대값 증가 방향) */
+function wRound(x, n) {
+  n = n || 0;
+  var m = Math.pow(10, n);
+  return Math.floor(Math.abs(x) * m + 0.5) / m * (x >= 0 ? 1 : -1);
+}
+
+/**
+ * 한 파일(2D 배열)의 컨텍스트.
+ * @param {Array<Array>} rows  0-based 2D
+ * @param {number} headerRow   1-based 헤더 행번호
+ * @param {string} subtotal    'above_header' | 'below_header'
+ */
+function WitaCtx(rows, headerRow, subtotal, originalMode) {
+  this.rows = rows || [];
+  this.headerRow = headerRow || 1;
+  this.header = (this.rows[this.headerRow - 1] || []).map(function (c) {
+    return String(c === null || c === undefined ? '' : c).trim();
+  });
+  this.hnorm = this.header.map(wNorm);
+  // 데이터 시작(0-based). 소계행이 헤더 바로 아래면 한 행 더 건너뛴다.
+  this.dataStart = this.headerRow + (subtotal === 'below_header' ? 1 : 0);
+  // 원본모드: 어드민 원본에는 월파일에 있던 소계행이 없다.
+  // 그래서 top_lookup(헤더행, 소계행, 라벨)은 col_sum(라벨)과 수학적으로 같다 → 자동 변환.
+  // (파이썬 original.py 의 OriginalCtx 와 동일 동작)
+  this.originalMode = !!originalMode;
+}
+
+WitaCtx.prototype.colIdx = function (name) {
+  var nm = String(name).trim();
+  var i = this.header.indexOf(nm);
+  if (i >= 0) return i;
+  var n = wNorm(nm);
+  i = this.hnorm.indexOf(n);
+  if (i >= 0) return i;
+  throw new Error('컬럼 없음: ' + nm + ' (헤더: ' + this.header.slice(0, 12).join(' | ') + ')');
+};
+
+WitaCtx.prototype.col_sum = function (name) {
+  var ci = this.colIdx(name), s = 0;
+  for (var r = this.dataStart; r < this.rows.length; r++) {
+    var row = this.rows[r];
+    if (row && ci < row.length) s += wNum(row[ci]);
+  }
+  return s;
+};
+
+WitaCtx.prototype.col_sum_all = function (name) {
+  var n = wNorm(name), idxs = [], s = 0;
+  for (var i = 0; i < this.hnorm.length; i++) if (this.hnorm[i] === n) idxs.push(i);
+  if (!idxs.length) throw new Error('컬럼 없음: ' + name);
+  for (var r = this.dataStart; r < this.rows.length; r++) {
+    var row = this.rows[r];
+    if (!row) continue;
+    for (var k = 0; k < idxs.length; k++) if (idxs[k] < row.length) s += wNum(row[idxs[k]]);
+  }
+  return s;
+};
+
+WitaCtx.prototype.col_sumif = function (sumCol, critCol, critVal) {
+  var si = this.colIdx(sumCol), ci = this.colIdx(critCol);
+  var want = String(critVal === undefined ? '' : critVal).trim();
+  var s = 0;
+  for (var r = this.dataStart; r < this.rows.length; r++) {
+    var row = this.rows[r];
+    if (!row || ci >= row.length) continue;
+    var got = String(row[ci] === null || row[ci] === undefined ? '' : row[ci]).trim();
+    if (got === want && si < row.length) s += wNum(row[si]);
+  }
+  return s;
+};
+
+WitaCtx.prototype.top_lookup = function (labelRow, valueRow, label) {
+  var want = String(label).trim();
+  // 원본모드에서 라벨이 헤더 컬럼명이면 = 소계 참조였던 것 → 데이터 합으로 동치 변환
+  if (this.originalMode) {
+    if (this.header.indexOf(want) >= 0 || this.hnorm.indexOf(wNorm(want)) >= 0) {
+      return this.col_sum(want);
+    }
+  }
+  var lr = this.rows[labelRow - 1] || [];
+  for (var i = 0; i < lr.length; i++) {
+    if (String(lr[i] === null || lr[i] === undefined ? '' : lr[i]).trim() === want) {
+      var vr = this.rows[valueRow - 1] || [];
+      return wNum(vr[i]);
+    }
+  }
+  throw new Error(labelRow + '행에서 라벨 없음: ' + want);
+};
+
+WitaCtx.prototype.top_lookup0 = function (labelRow, valueRow, label) {
+  try { return this.top_lookup(labelRow, valueRow, label); } catch (e) { return 0; }
+};
+
+/** 엑셀 열문자 -> 0-based 인덱스 (A=0, AA=26) */
+function wColLetter(s) {
+  s = String(s).trim().toUpperCase();
+  var n = 0;
+  for (var i = 0; i < s.length; i++) {
+    var c = s.charCodeAt(i) - 64;
+    if (c < 1 || c > 26) throw new Error('열문자 아님: ' + s);
+    n = n * 26 + c;
+  }
+  return n - 1;
+}
+
+WitaCtx.prototype.cell = function (row, colLetter) {
+  var ci = wColLetter(colLetter);
+  var r = this.rows[row - 1] || [];
+  return ci < r.length ? wNum(r[ci]) : 0;
+};
+
+/** expr 에서 fn( ... ) 하나를 찾아 [시작, 끝+1, 인자문자열] — 괄호 중첩 대응 */
+function wFindCall(expr, fn) {
+  var i = expr.indexOf(fn + '(');
+  if (i < 0) return null;
+  var depth = 0;
+  for (var j = i + fn.length; j < expr.length; j++) {
+    if (expr[j] === '(') depth++;
+    else if (expr[j] === ')') {
+      depth--;
+      if (depth === 0) return [i, j + 1, expr.substring(i + fn.length + 1, j)];
+    }
+  }
+  throw new Error('괄호 불일치: ' + expr);
+}
+
+/** 인자 문자열을 n개로 자르기 (파이썬 split(',', n) 과 동일: 마지막은 안 자름) */
+function wSplitArgs(s, n) {
+  var out = [], cur = '', cnt = 0;
+  for (var i = 0; i < s.length; i++) {
+    if (s[i] === ',' && cnt < n) { out.push(cur); cur = ''; cnt++; }
+    else cur += s[i];
+  }
+  out.push(cur);
+  return out;
+}
+
+/**
+ * 규칙식 -> 숫자.
+ * @param {string} expr
+ * @param {WitaCtx} ctx      기본 컨텍스트 (없어도 됨 — sub/param 만 쓰는 식)
+ * @param {Object} subvals   {"역할 집계명": 값}
+ * @param {Object} params    수기 파라미터
+ * @param {Array}  trace     (선택) 치환 로그를 담을 배열 — 화면에 근거 표시용
+ */
+function witaEvaluate(expr, ctx, subvals, params, trace) {
+  expr = String(expr);
+  var guard = 0;
+  var push = function (kind, arg, val) {
+    if (trace) trace.push({ 함수: kind, 인자: String(arg).trim(), 값: val });
+  };
+  while (true) {
+    if (++guard > 500) throw new Error('치환 루프 과다: ' + expr);
+    var hit;
+
+    hit = wFindCall(expr, 'param');
+    if (hit) {
+      var pname = hit[2].trim();
+      if (!params || params[pname] === undefined || params[pname] === '')
+        throw new Error('파라미터 없음: ' + pname + ' (화면에서 입력 필요)');
+      var pv = wNum(params[pname]);
+      push('param', pname, pv);
+      expr = expr.substring(0, hit[0]) + '(' + pv + ')' + expr.substring(hit[1]);
+      continue;
+    }
+    // ★ col_sum_all -> col_sumif -> col_sum 순서 (접두어 겹침)
+    hit = wFindCall(expr, 'col_sum_all');
+    if (hit) {
+      var v1 = ctx.col_sum_all(hit[2]);
+      push('col_sum_all', hit[2], v1);
+      expr = expr.substring(0, hit[0]) + '(' + v1 + ')' + expr.substring(hit[1]);
+      continue;
+    }
+    hit = wFindCall(expr, 'col_sumif');
+    if (hit) {
+      var a2 = wSplitArgs(hit[2], 2);
+      var v2 = ctx.col_sumif(a2[0], a2[1], a2[2]);
+      push('col_sumif', hit[2], v2);
+      expr = expr.substring(0, hit[0]) + '(' + v2 + ')' + expr.substring(hit[1]);
+      continue;
+    }
+    hit = wFindCall(expr, 'col_sum');
+    if (hit) {
+      var v3 = ctx.col_sum(hit[2]);
+      push('col_sum', hit[2], v3);
+      expr = expr.substring(0, hit[0]) + '(' + v3 + ')' + expr.substring(hit[1]);
+      continue;
+    }
+    hit = wFindCall(expr, 'top_lookup0');
+    if (hit) {
+      var a4 = wSplitArgs(hit[2], 2);
+      var v4 = ctx.top_lookup0(parseInt(a4[0], 10), parseInt(a4[1], 10), a4[2]);
+      push('top_lookup0', hit[2], v4);
+      expr = expr.substring(0, hit[0]) + '(' + v4 + ')' + expr.substring(hit[1]);
+      continue;
+    }
+    hit = wFindCall(expr, 'top_lookup');
+    if (hit) {
+      var a5 = wSplitArgs(hit[2], 2);
+      var v5 = ctx.top_lookup(parseInt(a5[0], 10), parseInt(a5[1], 10), a5[2]);
+      push('top_lookup', hit[2], v5);
+      expr = expr.substring(0, hit[0]) + '(' + v5 + ')' + expr.substring(hit[1]);
+      continue;
+    }
+    hit = wFindCall(expr, 'cell');
+    if (hit) {
+      var a6 = wSplitArgs(hit[2], 1);
+      var v6 = ctx.cell(parseInt(a6[0], 10), a6[1]);
+      push('cell', hit[2], v6);
+      expr = expr.substring(0, hit[0]) + '(' + v6 + ')' + expr.substring(hit[1]);
+      continue;
+    }
+    hit = wFindCall(expr, 'sub');
+    if (hit) {
+      var a7 = wSplitArgs(hit[2], 1);
+      var k = a7[0].trim() + ' ' + a7[1].trim();
+      if (!subvals || subvals[k] === undefined)
+        throw new Error('집계 없음: [' + k + '] · 있는 키: ' + (subvals ? Object.keys(subvals).join(' | ') : '(없음)'));
+      push('sub', hit[2], subvals[k]);
+      expr = expr.substring(0, hit[0]) + '(' + subvals[k] + ')' + expr.substring(hit[1]);
+      continue;
+    }
+    break;
+  }
+  return witaArith(expr);
+}
+
+/**
+ * 산술만 남은 식을 계산. eval 대신 자체 파서 — 함수 치환이 덜 된 경우를 조용히 넘기지 않는다.
+ * 지원: + - * / ( ) 숫자, ROUND(x,n)
+ */
+function witaArith(expr) {
+  // ROUND 먼저 처리 (중첩 대응)
+  var g = 0;
+  while (true) {
+    if (++g > 200) throw new Error('ROUND 루프 과다');
+    var hit = wFindCall(expr, 'ROUND');
+    if (!hit) break;
+    var a = wSplitArgs(hit[2], 1);
+    var x = witaArith(a[0]);
+    var n = a.length > 1 && String(a[1]).trim() !== '' ? witaArith(a[1]) : 0;
+    expr = expr.substring(0, hit[0]) + '(' + wRound(x, n) + ')' + expr.substring(hit[1]);
+  }
+  if (!/^[\d\s+\-*/().eE]*$/.test(expr))
+    throw new Error('식에 미치환 토큰이 남음: ' + expr.substring(0, 120));
+  var s = expr.replace(/\s+/g, '');
+  if (s === '') return 0;
+  var pos = 0;
+  function parseExpr() {
+    var v = parseTerm();
+    while (pos < s.length && (s[pos] === '+' || s[pos] === '-')) {
+      var op = s[pos++];
+      var r = parseTerm();
+      v = op === '+' ? v + r : v - r;
+    }
+    return v;
+  }
+  function parseTerm() {
+    var v = parseFactor();
+    while (pos < s.length && (s[pos] === '*' || s[pos] === '/')) {
+      var op = s[pos++];
+      var r = parseFactor();
+      v = op === '*' ? v * r : (r === 0 ? 0 : v / r);
+    }
+    return v;
+  }
+  function parseFactor() {
+    if (s[pos] === '+') { pos++; return parseFactor(); }
+    if (s[pos] === '-') { pos++; return -parseFactor(); }
+    if (s[pos] === '(') {
+      pos++;
+      var v = parseExpr();
+      if (s[pos] !== ')') throw new Error('괄호 불일치');
+      pos++;
+      return v;
+    }
+    var st = pos;
+    while (pos < s.length && /[\d.eE]/.test(s[pos])) {
+      // 지수표기 1e-5 의 부호
+      if ((s[pos] === 'e' || s[pos] === 'E') && (s[pos + 1] === '+' || s[pos + 1] === '-')) pos++;
+      pos++;
+    }
+    var num = parseFloat(s.substring(st, pos));
+    if (!isFinite(num)) throw new Error('숫자 파싱 실패: ' + s.substring(st, st + 20));
+    return num;
+  }
+  var out = parseExpr();
+  if (pos !== s.length) throw new Error('식 해석 실패(남은 문자): ' + s.substring(pos, pos + 20));
+  return out;
+}
+
+
+/**
+ * 정산파일 로더 (파이썬 src/wita/original.py 의 _load_original_raw 이식본)
+ *
+ * 어드민이 주는 파일은 확장자를 못 믿는다. magic bytes 로 진짜 포맷을 판별한다.
+ *   PK..        -> 진짜 xlsx  : Drive 변환 후 시트로 읽기
+ *   D0CF11E0    -> 진짜 xls   : Drive 변환 (단, 암호화면 GAS 로는 불가)
+ *   그 외        -> HTML 위장  : 텍스트로 읽어 <table> 파싱
+ *
+ * 파이썬판과의 유일한 차이: 암호화 엑셀(현대홈쇼핑·스마트스토어)은 GAS 에서 복호화가
+ * 불가능하므로 명확한 에러로 되돌린다 — 조용히 빈 값을 내지 않는다.
+ */
+
+var WITA_CACHE_PROP = 'witaFileCache';
+
+/**
+ * 시트 값 정규화.
+ * ★getDisplayValues() 를 쓰면 안 된다 — 셀 서식이 적용된 '보이는 문자열'이라
+ *   소수점이 반올림된 채로 합산돼 원본과 값이 달라진다(원더플레이스에서 실제로 2,219,974 차이).
+ *   getValues() 로 실제 값을 받고, 날짜만 문자열로 바꿔 파이썬(dtype=str)과 동작을 맞춘다.
+ */
+function witaNormalizeValues(vals) {
+  return vals.map(function (row) {
+    return row.map(function (v) {
+      if (v === null || v === undefined) return '';
+      if (Object.prototype.toString.call(v) === '[object Date]')
+        return Utilities.formatDate(v, 'Asia/Seoul', 'yyyy-MM-dd');
+      return v;   // number 는 숫자 그대로, 문자열은 문자열 그대로
+    });
+  });
+}
+
+/** Blob 앞부분 바이트로 포맷 판별 */
+function witaSniff(blob) {
+  var b = blob.getBytes();
+  if (b.length >= 2 && (b[0] & 0xff) === 0x50 && (b[1] & 0xff) === 0x4b) return 'xlsx';
+  if (b.length >= 4 && (b[0] & 0xff) === 0xd0 && (b[1] & 0xff) === 0xcf &&
+      (b[2] & 0xff) === 0x11 && (b[3] & 0xff) === 0xe0) return 'ole';
+  return 'text';
+}
+
+/** 여러 인코딩으로 시도해 한글이 안 깨지는 쪽을 고른다 */
+function witaDecode(blob) {
+  var encs = ['UTF-8', 'EUC-KR'];
+  var best = null, bestBad = 1e9;
+  for (var i = 0; i < encs.length; i++) {
+    var t;
+    try { t = blob.getDataAsString(encs[i]); } catch (e) { continue; }
+    // 치환문자(U+FFFD) 개수가 적은 쪽이 올바른 인코딩
+    var bad = (t.match(/�/g) || []).length;
+    if (bad < bestBad) { bestBad = bad; best = t; }
+    if (bad === 0) break;
+  }
+  return best || '';
+}
+
+/**
+ * HTML 표 -> 2D 배열 (XmlService 는 어드민 HTML 의 비정형 태그에 자주 실패해서 정규식 사용)
+ *
+ * ★colspan / rowspan 을 반드시 펼쳐야 한다.
+ *   무신사 정산내역은 1행이 그룹헤더(병합), 2행이 서브헤더, 3행이 합계인데
+ *   병합을 1칸으로 넣으면 열 위치가 어긋나 top_lookup(1,3,라벨) 이 엉뚱한 값을 읽는다.
+ *   (파이썬 pandas.read_html 은 자동으로 펼쳐준다)
+ */
+function witaParseHtmlTable(html) {
+  var tables = html.match(/<table[\s\S]*?<\/table>/gi) || [];
+  if (!tables.length) tables = [html];
+  var best = [], bestN = -1;
+
+  function cellText(c) {
+    return c.replace(/<br\s*\/?>/gi, ' ')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/&amp;/gi, '&').replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
+      .replace(/&quot;/gi, '"').replace(/&#39;/gi, "'")
+      .trim();
+  }
+  function spanOf(tag, name) {
+    var m = tag.match(new RegExp(name + '\\s*=\\s*["\']?(\\d+)', 'i'));
+    var n = m ? parseInt(m[1], 10) : 1;
+    return (isFinite(n) && n > 0) ? n : 1;
+  }
+
+  for (var t = 0; t < tables.length; t++) {
+    var rows = [];
+    var carry = {};          // {열: {v:값, n:남은행수}}  rowspan 전파용
+    var trs = tables[t].match(/<tr[\s\S]*?<\/tr>/gi) || [];
+    for (var i = 0; i < trs.length; i++) {
+      var cells = trs[i].match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/gi) || [];
+      var row = [], col = 0;
+      var place = function () {                    // rowspan 으로 내려온 값 먼저 채움
+        while (carry[col]) {
+          row[col] = carry[col].v;
+          if (--carry[col].n <= 0) delete carry[col];
+          col++;
+        }
+      };
+      place();
+      for (var j = 0; j < cells.length; j++) {
+        var open = cells[j].match(/<t[dh][^>]*>/i)[0];
+        var v = cellText(cells[j]);
+        var cs = spanOf(open, 'colspan'), rs = spanOf(open, 'rowspan');
+        for (var k = 0; k < cs; k++) {
+          row[col] = v;
+          if (rs > 1) carry[col] = { v: v, n: rs - 1 };
+          col++;
+          place();
+        }
+      }
+      for (var z = 0; z < row.length; z++) if (row[z] === undefined) row[z] = '';
+      if (row.length) rows.push(row);
+    }
+    if (rows.length > bestN) { bestN = rows.length; best = rows; }
+  }
+  return best;
+}
+
+/** CSV 텍스트 -> 2D (따옴표 안의 콤마/개행 대응) */
+function witaParseCsv(text) {
+  return Utilities.parseCsv(text);
+}
+
+/**
+ * Drive 파일을 Google Sheets 로 변환해 2D 로 읽는다. 변환본은 즉시 삭제.
+ * @param {Blob} blob
+ * @param {string} name
+ */
+/**
+ * 변환 결과 캐시.
+ * Drive 변환은 파일당 수 초가 걸린다. 같은 파일을 다시 계산할 때마다 변환하면
+ * 26채널 재계산이 몇 분이 된다 -> 변환된 시트를 지우지 않고 보관해 재사용.
+ * 키 = 원본파일ID + 최종수정시각 (파일이 바뀌면 자동으로 새 키가 되어 갱신된다.
+ *      파이썬판이 mtime 으로 캐시하던 것과 같은 발상)
+ */
+function witaCacheFolder() {
+  var root = witaRootFolder();
+  var it = root.getFoldersByName('_변환캐시');
+  return it.hasNext() ? it.next() : root.createFolder('_변환캐시');
+}
+
+function witaConvertCached(file) {
+  var key = 'wc_' + file.getId() + '_' + file.getLastUpdated().getTime();
+  var cf = witaCacheFolder();
+  var it = cf.getFilesByName(key);
+  if (it.hasNext()) {
+    try {
+      return witaNormalizeValues(
+        SpreadsheetApp.openById(it.next().getId()).getSheets()[0].getDataRange().getValues());
+    } catch (e) { /* 캐시가 깨졌으면 재변환 */ }
+  }
+  var res = witaViaDriveConvertRaw(file.getBlob(), file.getName());
+  try {
+    var conv = DriveApp.getFileById(res.id);
+    conv.setName(key);
+    cf.addFile(conv);
+    DriveApp.getRootFolder().removeFile(conv);
+  } catch (e) { /* 이동 실패해도 값은 이미 얻었다 */ }
+  return res.values;
+}
+
+function witaViaDriveConvert(blob, name) {
+  return witaViaDriveConvertRaw(blob, name).values;
+}
+
+function witaViaDriveConvertRaw(blob, name) {
+  var token = ScriptApp.getOAuthToken();
+  var meta = { name: 'wita_tmp_' + name, mimeType: MimeType.GOOGLE_SHEETS };
+  var boundary = '-------wita' + Date.now();
+  var payload = Utilities.newBlob(
+    '--' + boundary + '\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n' +
+    JSON.stringify(meta) + '\r\n--' + boundary + '\r\nContent-Type: application/octet-stream\r\n\r\n'
+  ).getBytes()
+    .concat(blob.getBytes())
+    .concat(Utilities.newBlob('\r\n--' + boundary + '--').getBytes());
+
+  var res = UrlFetchApp.fetch(
+    'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true', {
+      method: 'post',
+      contentType: 'multipart/related; boundary=' + boundary,
+      payload: payload,
+      headers: { Authorization: 'Bearer ' + token },
+      muteHttpExceptions: true
+    });
+  if (res.getResponseCode() >= 300)
+    throw new Error('Drive 변환 실패(' + res.getResponseCode() + '): ' +
+                    res.getContentText().substring(0, 200));
+  var id = JSON.parse(res.getContentText()).id;
+  var sh = SpreadsheetApp.openById(id).getSheets()[0];
+  return { id: id, values: witaNormalizeValues(sh.getDataRange().getValues()) };
+}
+
+/**
+ * 파일 1개 -> 2D 배열.
+ * @param {GoogleAppsScript.Drive.File} file
+ */
+function witaLoadFile(file) {
+  var name = file.getName();
+  var blob = file.getBlob();
+  var kind = witaSniff(blob);
+
+  if (/\.csv$/i.test(name)) return witaParseCsv(witaDecode(blob));
+
+  if (kind === 'ole') {
+    // 암호화 여부는 OLE 내부를 봐야 정확하지만, GAS 는 어차피 복호화를 못 한다.
+    // Drive 변환을 시도하고 실패하면 암호화로 안내한다.
+    try {
+      return witaConvertCached(file);
+    } catch (e) {
+      throw new Error('이 파일은 GAS에서 열 수 없습니다 (암호화된 엑셀로 보임). ' +
+        '엑셀에서 암호를 풀어 다시 저장한 뒤 올려주세요. — ' + name);
+    }
+  }
+  if (kind === 'xlsx') return witaConvertCached(file);
+
+  // text: HTML 위장 or 순수 텍스트
+  var text = witaDecode(blob);
+  if (/<\s*table/i.test(text)) return witaParseHtmlTable(text);
+  if (text.indexOf('\t') >= 0) {
+    return text.split(/\r?\n/).map(function (l) { return l.split('\t'); });
+  }
+  return witaParseCsv(text);
+}
+
+/** 헤더행 자동탐지 — 비어있지 않은 셀 수가 최대치의 80% 이상인 첫 행(1-based) */
+function witaDetectHeader(rows, scan) {
+  scan = scan || 20;
+  var counts = [];
+  for (var i = 0; i < Math.min(scan, rows.length); i++) {
+    var c = 0, r = rows[i] || [];
+    for (var j = 0; j < r.length; j++) if (String(r[j] || '').trim() !== '') c++;
+    counts.push(c);
+  }
+  if (!counts.length) return 1;
+  var mx = Math.max.apply(null, counts);
+  // 파이썬판과 동일 조건: 최대치의 80% 이상 && 최소 3칸 (제목 한 줄짜리를 헤더로 오인하지 않게)
+  for (var k = 0; k < counts.length; k++) if (counts[k] >= mx * 0.8 && counts[k] >= 3) return k + 1;
+  return counts.indexOf(mx) + 1;
+}
+
+/** 그룹헤더 빈칸을 왼쪽 값으로 채움 (LF몰 4행 그룹헤더 대응) */
+function witaFillHeaderLeft(rows, headerRow) {
+  var h = rows[headerRow - 1];
+  if (!h) return;
+  var last = '';
+  for (var i = 0; i < h.length; i++) {
+    var v = String(h[i] || '').trim();
+    if (v) last = v; else h[i] = last;
+  }
+}
+
+/** 2단 헤더 병합 — 메인행 빈칸을 보조행 값으로 보충 (CJ몰 3행+4행) */
+function witaMergeHeader(rows, headerRow, helperRow) {
+  var h = rows[headerRow - 1], s = rows[helperRow - 1];
+  if (!h || !s) return;
+  for (var i = 0; i < Math.max(h.length, s.length); i++) {
+    if (!String(h[i] || '').trim() && String(s[i] || '').trim()) h[i] = s[i];
+  }
+}
+
+
+/**
+ * 룰 저장소 — Drive JSON 파일 1개.
+ *
+ * 왜 시트가 아니라 Drive JSON 인가 (어진 결정, 2026-08-28):
+ *   - 관리 지점을 웹앱 하나로 (시트를 따로 열 일이 없어야 한다)
+ *   - Drive 는 파일 버전 이력을 자동 보관하므로 룰을 잘못 고쳐도 되돌릴 수 있다
+ *     ※ GAS 배포 버전 기록은 '코드'만 담는다. 스크립트 속성에 넣은 데이터는 거기 안 들어가고
+ *       키당 9KB 제한도 있어서(룰이 26KB) 부적합.
+ *
+ * 파일: <업로드 루트>/_rules.json
+ * 구조: { 채널:[...], 파일:[...], 집계:[...], 산출:[...], 파라미터:[...] }
+ */
+
+var WITA_RULES_FILE = '_rules.json';
+
+var WITA_COLS = {
+  채널: ['시트', '판매처', '브랜드', '본부', '헤더행', '소계위치', '원본모드', '입금주기', '어드민경로'],
+  파일: ['시트', '역할', '파일명키워드', '소계위치', '파일헤더행', '헤더왼쪽채움', '헤더보조행',
+        '선택', '컨텍스트', '파라미터덮어쓰기', '경로'],
+  집계: ['시트', '역할', '집계명', '산식'],
+  산출: ['시트', '항목', '산식', '모드'],
+  파라미터: ['시트', '이름', '기본값'],
+  부가세: ['시트', '구분', '파일키워드', '합계컬럼', '키컬럼', '메인파일', '메인키']
+};
+var WITA_KEYS = ['채널', '파일', '집계', '산출', '파라미터', '부가세'];
+
+/** 룰 JSON 파일 (없으면 시드로 생성) */
+function witaRulesFile(create) {
+  var root = witaRootFolder();
+  var it = root.getFilesByName(WITA_RULES_FILE);
+  if (it.hasNext()) return it.next();
+  if (!create) return null;
+  return root.createFile(WITA_RULES_FILE,
+    JSON.stringify(witaRulesSeed(), null, 1), MimeType.PLAIN_TEXT);
+}
+
+/** 원본 룰 데이터(행 배열) 읽기 */
+function witaRulesData() {
+  var f = witaRulesFile(true);
+  try {
+    return JSON.parse(f.getBlob().getDataAsString('UTF-8'));
+  } catch (e) {
+    throw new Error('_rules.json 을 읽지 못했습니다: ' + e.message +
+      ' — Drive 에서 이전 버전으로 되돌리거나 [룰 초기화]를 실행하세요.');
+  }
+}
+
+/** 룰 저장. Drive 가 이전 내용을 버전으로 보관하므로 되돌리기가 가능하다. */
+function witaSaveRules(data) {
+  WITA_KEYS.forEach(function (k) {
+    if (data[k] && !(data[k] instanceof Array))
+      throw new Error('저장 거부: ' + k + ' 가 배열이 아닙니다');
+  });
+  if (!data['채널'] || !data['채널'].length)
+    throw new Error('저장 거부: 채널이 비어 있습니다');
+  witaRulesFile(true).setContent(JSON.stringify(data, null, 1));
+  witaClearRuleCache();
+  return { ok: true, 저장시각: Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss') };
+}
+
+/** 시드로 되돌리기 (파일 버전이 남으므로 안전) */
+function witaResetRules() {
+  witaRulesFile(true).setContent(JSON.stringify(witaRulesSeed(), null, 1));
+  witaClearRuleCache();
+  var d = witaRulesData();
+  return WITA_KEYS.map(function (k) { return k + '(' + (d[k] || []).length + ')'; });
+}
+
+/** 계산용 채널별 룰 (5분 캐시 — 계산마다 파일을 다시 읽지 않게) */
+function witaLoadRules() {
+  var cache = CacheService.getScriptCache();
+  var hit = cache.get('witaRules');
+  if (hit) {
+    try { return JSON.parse(hit); } catch (e) { /* 깨졌으면 새로 읽는다 */ }
+  }
+  var built = witaBuildRules(witaRulesData());
+  try { cache.put('witaRules', JSON.stringify(built), 300); } catch (e) { /* 100KB 초과 시 생략 */ }
+  return built;
+}
+
+function witaClearRuleCache() {
+  CacheService.getScriptCache().remove('witaRules');
+  return true;
+}
+
+/** 행 배열 -> 채널별 구조 */
+function witaBuildRules(d) {
+  var ch = {};
+  (d['채널'] || []).forEach(function (r) {
+    var sn = witaSn(r['시트']);
+    if (!sn) return;
+    ch[sn] = {
+      시트: sn, 판매처: r['판매처'], 브랜드: r['브랜드'], 본부: r['본부'],
+      헤더행: Number(r['헤더행']) || 1,
+      소계위치: String(r['소계위치'] || 'above_header'),
+      원본모드: String(r['원본모드'] || 'N') === 'Y',
+      입금주기: r['입금주기'] || '',
+      어드민경로: r['어드민경로'],
+      파일: {}, 집계: {}, 산출: {}, 파라미터: {}
+    };
+  });
+  var numOrNull = function (v) {
+    return (v === '' || v === undefined || v === null) ? null : Number(v);
+  };
+  (d['파일'] || []).forEach(function (r) {
+    var c = ch[witaSn(r['시트'])]; if (!c) return;
+    c.파일[String(r['역할']).trim()] = {
+      키워드: String(r['파일명키워드'] || '').trim(),
+      소계위치: String(r['소계위치'] || 'above_header'),
+      파일헤더행: numOrNull(r['파일헤더행']),
+      헤더왼쪽채움: String(r['헤더왼쪽채움'] || '') === 'Y',
+      헤더보조행: numOrNull(r['헤더보조행']),
+      선택: String(r['선택'] || 'N') === 'Y',
+      컨텍스트: String(r['컨텍스트'] || ''),
+      덮어쓰기: witaParseOverride(r['파라미터덮어쓰기']),
+      경로: r['경로']
+    };
+  });
+  (d['집계'] || []).forEach(function (r) {
+    var c = ch[witaSn(r['시트'])]; if (!c) return;
+    var role = String(r['역할']).trim();
+    if (!c.집계[role]) c.집계[role] = {};
+    c.집계[role][String(r['집계명']).trim()] = String(r['산식']);
+  });
+  (d['산출'] || []).forEach(function (r) {
+    var c = ch[witaSn(r['시트'])]; if (!c) return;
+    var mode = String(r['모드'] || '');
+    var item = String(r['항목']).trim();
+    if (mode === '역추출') {
+      // 역추출 산식(월파일 시트용)은 따로 보관 — 역추출 CSV 로 계산할 때 쓴다
+      if (!c.산출R) c.산출R = {};
+      c.산출R[item] = String(r['산식']);
+      if (!c.산출[item]) c.산출[item] = String(r['산식']);   // 원본 산식이 없는 채널은 이걸 기본으로
+      return;
+    }
+    c.산출[item] = String(r['산식']);
+  });
+  (d['파라미터'] || []).forEach(function (r) {
+    var c = ch[witaSn(r['시트'])]; if (!c) return;
+    c.파라미터[String(r['이름']).trim()] = r['기본값'];
+  });
+  (d['부가세'] || []).forEach(function (r) {
+    var c = ch[witaSn(r['시트'])]; if (!c) return;
+    if (!c.부가세) c.부가세 = [];
+    c.부가세.push({ 구분: r['구분'], 파일키워드: String(r['파일키워드'] || ''),
+      합계컬럼: String(r['합계컬럼'] || '').split(';').filter(String),
+      키컬럼: String(r['키컬럼'] || '').split(';').filter(String),
+      메인파일: String(r['메인파일'] || ''), 메인키: String(r['메인키'] || '').split(';').filter(String) });
+  });
+  return ch;
+}
+
+/** "패널티=보상합; 부담할인=부담할인합" -> {패널티:'보상합', ...} */
+function witaParseOverride(s) {
+  var out = {};
+  String(s || '').split(';').forEach(function (part) {
+    var i = part.indexOf('=');
+    if (i > 0) out[part.substring(0, i).trim()] = part.substring(i + 1).trim();
+  });
+  return out;
+}
+
+/* ===== 화면용 룰 편집 API ===== */
+
+/** 채널 하나의 모든 룰 행 */
+function witaRuleOf(sheetNo) {
+  var sn = witaSn(sheetNo);
+  var d = witaRulesData();
+  var pick = function (key) {
+    return (d[key] || []).filter(function (r) { return witaSn(r['시트']) === sn; });
+  };
+  var o = { 시트: sn, 컬럼: WITA_COLS };
+  WITA_KEYS.forEach(function (k) { o[k] = pick(k); });
+  return o;
+}
+
+/** 채널 하나의 룰을 통째로 교체 저장 */
+function witaSaveRuleOf(sheetNo, payload) {
+  var sn = witaSn(sheetNo);
+  var d = witaRulesData();
+  WITA_KEYS.forEach(function (key) {
+    var others = (d[key] || []).filter(function (r) { return witaSn(r['시트']) !== sn; });
+    var mine = (payload[key] || []).filter(function (r) {
+      // 전부 빈 행은 버린다
+      return WITA_COLS[key].some(function (col) {
+        return col !== '시트' && String(r[col] === undefined ? '' : r[col]).trim() !== '';
+      });
+    }).map(function (r) {
+      var o = {};
+      WITA_COLS[key].forEach(function (col) {
+        o[col] = (col === '시트') ? sn : (r[col] === undefined ? '' : r[col]);
+      });
+      return o;
+    });
+    d[key] = others.concat(mine);
+  });
+  witaSaveRules(d);
+  return witaRuleOf(sn);
+}
+
+/** 신규 채널 추가 (빈 골격) */
+function witaAddChannel(sheetNo, seller) {
+  var sn = witaSn(sheetNo);
+  var d = witaRulesData();
+  if ((d['채널'] || []).some(function (r) { return witaSn(r['시트']) === sn; }))
+    throw new Error('이미 있는 채널입니다: ' + sn);
+  d['채널'].push({ 시트: sn, 판매처: seller || '', 브랜드: '', 본부: '',
+                  헤더행: 1, 소계위치: 'above_header', 원본모드: 'N', 어드민경로: '' });
+  ['상품매출', '기타매출', '수수료_별도', '수수료_계산서', '정산금액'].forEach(function (item) {
+    d['산출'].push({ 시트: sn, 항목: item, 산식: '0', 모드: '원본' });
+  });
+  witaSaveRules(d);
+  return witaRuleOf(sn);
+}
+
+/** 채널 삭제 */
+function witaDeleteChannel(sheetNo) {
+  var sn = witaSn(sheetNo);
+  var d = witaRulesData();
+  WITA_KEYS.forEach(function (key) {
+    d[key] = (d[key] || []).filter(function (r) { return witaSn(r['시트']) !== sn; });
+  });
+  witaSaveRules(d);
+  return { ok: true };
+}
+
+
+/** 채널 룰 원본 (build_rules.py 생성). 시트 최초 적재용 — 이후 편집은 시트에서. */
+function witaRulesSeed() {
+  return {"채널":[{"시트":"01","판매처":"11번가","브랜드":"ODP","본부":"패션사업","헤더행":11,"소계위치":"above_header","원본모드":"N","어드민경로":"정산관리 → 판매/정산현황 → 월별,정산확정처리일"},{"시트":"02","판매처":"29CM(OH)","브랜드":"OH","본부":"패션사업","헤더행":11,"소계위치":"above_header","원본모드":"N","어드민경로":"정산 → 정산내역"},{"시트":"03","판매처":"29CM(UO)","브랜드":"UO","본부":"운영본부","헤더행":11,"소계위치":"above_header","원본모드":"N","어드민경로":"정산 → 정산내역"},{"시트":"04","판매처":"CJ MALL","브랜드":"ODP","본부":"패션사업","헤더행":11,"소계위치":"above_header","원본모드":"Y","어드민경로":"정산관리 → 실적관리 → 수수료매출현황  → 주문번호별 상세내역"},{"시트":"05","판매처":"GS SHOP","브랜드":"ODP","본부":"패션사업","헤더행":11,"소계위치":"above_header","원본모드":"Y","어드민경로":"정산관리 → 대급지급내역조회  → 거래상세내역 → 고객주문별"},{"시트":"06","판매처":"LF MALL","브랜드":"ODP","본부":"패션사업","헤더행":11,"소계위치":"above_header","원본모드":"Y","어드민경로":"정산관리 → 정산내역"},{"시트":"07","판매처":"SSF SHOP","브랜드":"ODP","본부":"패션사업","헤더행":12,"소계위치":"above_header","원본모드":"Y","어드민경로":"정산관리 → 정산상세내역"},{"시트":"08","판매처":"롯데온","브랜드":"ODP","본부":"패션사업","헤더행":11,"소계위치":"above_header","원본모드":"Y","어드민경로":"SCM → 중개거래정산관리 → 매출내역 (구매확정)"},{"시트":"09","판매처":"롯데홈쇼핑","브랜드":"ODP","본부":"패션사업","헤더행":11,"소계위치":"above_header","원본모드":"Y","어드민경로":"정산/세금계산서 → 수수료매출현황"},{"시트":"10","판매처":"W컨셉","브랜드":"ODP","본부":"패션사업","헤더행":12,"소계위치":"above_header","원본모드":"N","어드민경로":"정산 → 정산내역"},{"시트":"11","판매처":"무신사(OH)","브랜드":"OH","본부":"패션사업","헤더행":12,"소계위치":"below_header","원본모드":"Y","어드민경로":"정산 → 정산내역"},{"시트":"12","판매처":"무신사(UO)","브랜드":"UO","본부":"운영본부","헤더행":12,"소계위치":"below_header","원본모드":"Y","어드민경로":"정산 → 정산내역"},{"시트":"13","판매처":"무신사(ODP)","브랜드":"ODP","본부":"패션사업","헤더행":12,"소계위치":"below_header","원본모드":"Y","어드민경로":"정산 → 정산내역"},{"시트":"14","판매처":"무신사(ALPHA)","브랜드":"ALPHA","본부":"A본부사업","헤더행":12,"소계위치":"below_header","원본모드":"Y","어드민경로":"정산 → 정산내역"},{"시트":"15","판매처":"무신사글로벌(OH)","브랜드":"OH","본부":"패션사업","헤더행":11,"소계위치":"below_header","원본모드":"Y","어드민경로":""},{"시트":"16","판매처":"무신사글로벌_조조타운(OH)","브랜드":"OH","본부":"패션사업","헤더행":11,"소계위치":"below_header","원본모드":"Y","어드민경로":""},{"시트":"17","판매처":"스마트스토어(UO)","브랜드":"UO","본부":"운영본부","헤더행":12,"소계위치":"above_header","원본모드":"Y","어드민경로":"판매관리 → 구매확정내역"},{"시트":"18","판매처":"스마트스토어(ODP)","브랜드":"ODP","본부":"패션사업","헤더행":12,"소계위치":"above_header","원본모드":"Y","어드민경로":"판매관리 → 구매확정내역"},{"시트":"19","판매처":"신세계몰(SSG)","브랜드":"ODP","본부":"패션사업","헤더행":18,"소계위치":"above_header","원본모드":"Y","어드민경로":"정산관리 → 정산조회 → 위수탁정산"},{"시트":"21","판매처":"하프클럽","브랜드":"ODP","본부":"패션사업","헤더행":11,"소계위치":"above_header","원본모드":"Y","어드민경로":"H.정산관리 → H301.부가세신고내역"},{"시트":"22","판매처":"현대이지웰","브랜드":"ODP","본부":"패션사업","헤더행":12,"소계위치":"above_header","원본모드":"Y","어드민경로":""},{"시트":"23","판매처":"원더플레이스(OH)","브랜드":"OH","본부":"패션사업","헤더행":11,"소계위치":"above_header","원본모드":"N","어드민경로":""},{"시트":"24","판매처":"원더플레이스(UO)","브랜드":"UO","본부":"운영본부","헤더행":12,"소계위치":"below_header","원본모드":"Y","어드민경로":""},{"시트":"25","판매처":"원더플레이스(ODP)","브랜드":"ODP","본부":"패션사업","헤더행":11,"소계위치":"above_header","원본모드":"N","어드민경로":""},{"시트":"26","판매처":"카카오톡스토어","브랜드":"ODP","본부":"패션사업","헤더행":11,"소계위치":"above_header","원본모드":"N","어드민경로":"정산관리 > 구매결정상세 > 기간조회 : 정산기준일"},{"시트":"27","판매처":"현대홈쇼핑","브랜드":"ODP","본부":"패션사업","헤더행":11,"소계위치":"above_header","원본모드":"Y","어드민경로":""}],"파일":[{"시트":"04","역할":"주문내역","파일명키워드":"주문번호별내역","소계위치":"above_header","파일헤더행":3,"헤더왼쪽채움":"","헤더보조행":4,"선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 실적관리 → 수수료매출현황 → 주문번호별 상세내역"},{"시트":"04","역할":"공제","파일명키워드":"공제내역","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 공제내역"},{"시트":"05","역할":"결산요약","파일명키워드":"결산내역요약","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 대급지급내역조회 → 결산내역"},{"시트":"05","역할":"할인쿠폰","파일명키워드":"할인쿠폰내역","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 할인쿠폰내역"},{"시트":"05","역할":"판매내역","파일명키워드":"주문매출실적","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 대급지급내역조회 → 거래상세내역 → 고객주문별(주문매출실적_상세)"},{"시트":"06","역할":"정산내역","파일명키워드":"정산내역","소계위치":"above_header","파일헤더행":4,"헤더왼쪽채움":"Y","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 정산내역"},{"시트":"07","역할":"정산상세","파일명키워드":"정산상세내역","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 정산상세내역(입점사 정산상세내역)"},{"시트":"07","역할":"배송비","파일명키워드":"배송비내역","소계위치":"below_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 배송비내역(상세 배송비내역)"},{"시트":"08","역할":"매출내역","파일명키워드":"매출내역","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"SCM → 중개거래정산관리 → 매출내역(구매확정)"},{"시트":"09","역할":"매출상세","파일명키워드":"매출상세","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산/세금계산서 → 수수료매출현황"},{"시트":"11","역할":"정산내역","파일명키워드":"정산내역","소계위치":"above_header","파일헤더행":2,"헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"plain","파라미터덮어쓰기":"","경로":"정산 → 정산내역"},{"시트":"12","역할":"정산내역","파일명키워드":"정산내역","소계위치":"above_header","파일헤더행":2,"헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"plain","파라미터덮어쓰기":"","경로":"정산 → 정산내역"},{"시트":"13","역할":"정산내역","파일명키워드":"정산내역","소계위치":"above_header","파일헤더행":2,"헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"plain","파라미터덮어쓰기":"","경로":"정산 → 정산내역"},{"시트":"14","역할":"정산내역","파일명키워드":"정산내역","소계위치":"above_header","파일헤더행":2,"헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"plain","파라미터덮어쓰기":"","경로":"정산 → 정산내역"},{"시트":"15","역할":"정산","파일명키워드":"정산","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":""},{"시트":"16","역할":"정산","파일명키워드":"정산","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":""},{"시트":"17","역할":"구매확정","파일명키워드":"구매확정내역","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"판매관리 → 구매확정내역"},{"시트":"17","역할":"수수료상세","파일명키워드":"수수료상세","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 항목별정산내역 → 결제대금정산 → 수수료상세내역"},{"시트":"17","역할":"건별정산","파일명키워드":"SettleCaseByCase","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 건별정산내역 → 구분:배송비"},{"시트":"17","역할":"부가세","파일명키워드":"VATDeclaration","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 부가세신고내역"},{"시트":"17","역할":"혜택정산","파일명키워드":"SettleBenefitDetail","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"Y","컨텍스트":"","파라미터덮어쓰기":"부담할인=부담할인합","경로":"정산관리 → 항목별정산내역 → 혜택정산(선택)"},{"시트":"18","역할":"구매확정","파일명키워드":"구매확정내역","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"판매관리 → 구매확정내역"},{"시트":"18","역할":"수수료상세","파일명키워드":"수수료상세","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 항목별정산내역 → 결제대금정산 → 수수료상세내역"},{"시트":"18","역할":"건별정산","파일명키워드":"SettleCaseByCase","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 건별정산내역 → 구분:배송비"},{"시트":"18","역할":"부가세","파일명키워드":"VATDeclaration","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 부가세신고내역"},{"시트":"18","역할":"혜택정산","파일명키워드":"SettleBenefitDetail","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"Y","컨텍스트":"","파라미터덮어쓰기":"부담할인=부담할인합","경로":"정산관리 → 항목별정산내역 → 혜택정산(선택)"},{"시트":"19","역할":"마감상세","파일명키워드":"위수탁 마감","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산관리 → 정산조회 → 위수탁정산(위수탁 마감 업체별 상세내역)"},{"시트":"19","역할":"공제내역","파일명키워드":"공제내역","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"지불관리 → 지불금액 공제내역 상세 리스트"},{"시트":"21","역할":"상품대","파일명키워드":"상품대","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"H.정산관리 → 상품대 정산내역 상세"},{"시트":"21","역할":"배송비","파일명키워드":"배송비","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"H.정산관리 → H501.배송비 정산"},{"시트":"21","역할":"패널티파일","파일명키워드":"보상","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"Y","컨텍스트":"","파라미터덮어쓰기":"패널티=보상합","경로":"H.정산관리 → H601.품절/출고지연/적립금보상"},{"시트":"22","역할":"정산확정","파일명키워드":"정산확정","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":"정산확정 → 확정상세내역"},{"시트":"22","역할":"패널티조회","파일명키워드":"패널티","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"Y","컨텍스트":"","파라미터덮어쓰기":"패널티=패널티합","경로":"협력사 패널티 조회"},{"시트":"24","역할":"위탁정산","파일명키워드":"위탁정산","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":""},{"시트":"27","역할":"매입상세","파일명키워드":"매입상세","소계위치":"above_header","파일헤더행":"","헤더왼쪽채움":"","헤더보조행":"","선택":"N","컨텍스트":"","파라미터덮어쓰기":"","경로":""}],"집계":[{"시트":"04","역할":"주문내역","집계명":"원판매금액","산식":"col_sumif(원판매금액, 매출구분, 매출)"},{"시트":"04","역할":"주문내역","집계명":"판매차액","산식":"col_sumif(판매차액, 매출구분, 매출)"},{"시트":"04","역할":"주문내역","집계명":"지급예정","산식":"col_sumif(상품대금지급예정액(공제전), 매출구분, 매출)"},{"시트":"04","역할":"주문내역","집계명":"CJ합계금액","산식":"col_sumif(CJ합계금액, 매출구분, 매출)"},{"시트":"04","역할":"공제","집계명":"배송비","산식":"0 - col_sumif(공제금액, 공제명, 저단가배송비)"},{"시트":"04","역할":"공제","집계명":"할인쿠폰","산식":"col_sumif(공제금액, 공제명, 할인쿠폰)"},{"시트":"04","역할":"공제","집계명":"패널티","산식":"col_sumif(공제금액, 공제명, 업체불만보상)"},{"시트":"04","역할":"sub:04-1","집계명":"배송비","산식":"0 - col_sumif(공제금액, 공제명, 저단가배송비)"},{"시트":"04","역할":"sub:04-1","집계명":"할인쿠폰","산식":"col_sumif(공제금액, 공제명, 할인쿠폰)"},{"시트":"04","역할":"sub:04-1","집계명":"패널티","산식":"col_sumif(공제금액, 공제명, 업체불만보상)"},{"시트":"05","역할":"결산요약","집계명":"배송비","산식":"col_sumif(유료배송비(D), 결산차수, 합계)"},{"시트":"05","역할":"결산요약","집계명":"수수료B","산식":"col_sumif(수수료(B), 결산차수, 합계)"},{"시트":"05","역할":"결산요약","집계명":"지급대상","산식":"col_sumif(지급대상금액(A-B+C+D+E), 결산차수, 합계)"},{"시트":"05","역할":"결산요약","집계명":"지급예정","산식":"col_sumif(지급예정액(GS→협력사), 결산차수, 합계)"},{"시트":"05","역할":"할인쿠폰","집계명":"할인쿠폰","산식":"col_sum(업체부담액)"},{"시트":"05","역할":"판매내역","집계명":"판매가격","산식":"col_sum(판매가격)"},{"시트":"05","역할":"sub:05-1","집계명":"할인쿠폰","산식":"cell(2, D)"},{"시트":"05","역할":"sub:05-1","집계명":"입금액","산식":"cell(2, K)"},{"시트":"05","역할":"sub:05-1","집계명":"배송비","산식":"cell(2, O)"},{"시트":"05","역할":"sub:05-1","집계명":"계산서","산식":"cell(18, K)"},{"시트":"06","역할":"정산내역","집계명":"판매금액","산식":"col_sum(판매금액)"},{"시트":"06","역할":"정산내역","집계명":"업체부담","산식":"col_sum_all(업체부담금액)"},{"시트":"06","역할":"정산내역","집계명":"LF부담","산식":"col_sum_all(LF부담금액)"},{"시트":"06","역할":"정산내역","집계명":"판매수수료","산식":"col_sum(판매수수료)"},{"시트":"06","역할":"정산내역","집계명":"배송비","산식":"col_sum_all(배송비 금액)"},{"시트":"06","역할":"정산내역","집계명":"추가배송비","산식":"col_sum(추가배송비)"},{"시트":"06","역할":"정산내역","집계명":"정산금액","산식":"col_sum(정산금액)"},{"시트":"07","역할":"정산상세","집계명":"판매가","산식":"col_sumif(판매가(A), 브랜드명, )"},{"시트":"07","역할":"정산상세","집계명":"업체부담","산식":"col_sumif(업체부담(D), 브랜드명, )"},{"시트":"07","역할":"정산상세","집계명":"물산부담","산식":"col_sumif(물산부담(C), 브랜드명, )"},{"시트":"07","역할":"정산상세","집계명":"입점수수료","산식":"col_sumif(입점수수료(F) (물산부담(C)제외), 브랜드명, )"},{"시트":"07","역할":"배송비","집계명":"업체지급배송비","산식":"col_sum(업체지급배송비)"},{"시트":"08","역할":"매출내역","집계명":"판매금액","산식":"col_sumif(판매금액, 제휴프로모션제외처리, 비해당)"},{"시트":"08","역할":"매출내역","집계명":"셀러할인","산식":"col_sumif(상품할인(셀러부담), 제휴프로모션제외처리, 비해당)"},{"시트":"08","역할":"매출내역","집계명":"총배송비","산식":"col_sumif(총배송비, 제휴프로모션제외처리, 비해당)"},{"시트":"08","역할":"매출내역","집계명":"당사할인","산식":"col_sumif(상품할인(당사부담), 제휴프로모션제외처리, 비해당)"},{"시트":"08","역할":"매출내역","집계명":"수수료합","산식":"col_sumif(총 수수료 합계, 제휴프로모션제외처리, 비해당)"},{"시트":"08","역할":"매출내역","집계명":"지급대상","산식":"col_sumif(지급대상금액, 제휴프로모션제외처리, 비해당)"},{"시트":"09","역할":"매출상세","집계명":"판매금액","산식":"col_sumif(판매금액, 과세, 과세)"},{"시트":"09","역할":"매출상세","집계명":"매입금액","산식":"col_sumif(매입금액, 과세, 과세)"},{"시트":"09","역할":"매출상세","집계명":"매입수수료","산식":"col_sumif(매입수수료, 과세, 과세)"},{"시트":"09","역할":"매출상세","집계명":"기타","산식":"ROUND((col_sumif(판매금액, 상품명, 반품비) + col_sumif(판매금액, 상품명, 배송비) + col_sumif(판매금액, 상품명, 교환비)) * 1.1, 0)"},{"시트":"15","역할":"정산","집계명":"판매금액","산식":"col_sumif(판매금액, 구분, 판매)"},{"시트":"15","역할":"정산","집계명":"정산금액","산식":"col_sumif(매입금액(정산금액), 구분, 판매)"},{"시트":"16","역할":"정산","집계명":"판매금액","산식":"col_sumif(판매금액, 구분, 판매)"},{"시트":"16","역할":"정산","집계명":"정산금액","산식":"col_sumif(매입금액(정산금액), 구분, 판매)"},{"시트":"17","역할":"구매확정","집계명":"주문금액","산식":"col_sum(최종 상품별 총 주문금액)"},{"시트":"17","역할":"수수료상세","집계명":"할인지원금","산식":"col_sumif(수수료 기준금액, 결제수단, 네이버 할인지원금)"},{"시트":"17","역할":"수수료상세","집계명":"수수료합","산식":"col_sum(수수료금액)"},{"시트":"17","역할":"건별정산","집계명":"배송비","산식":"col_sumif(정산기준금액, 구분, 배송비)"},{"시트":"17","역할":"부가세","집계명":"과세매출","산식":"col_sum(과세매출금액)"},{"시트":"17","역할":"혜택정산","집계명":"부담할인합","산식":"col_sum(금액)"},{"시트":"17","역할":"sub:17-1","집계명":"할인지원금","산식":"col_sumif(수수료 기준금액, 결제수단, 네이버 할인지원금)"},{"시트":"17","역할":"sub:17-1","집계명":"수수료합","산식":"col_sum(수수료금액)"},{"시트":"17","역할":"sub:17-2","집계명":"배송비","산식":"col_sum(정산기준금액)"},{"시트":"17","역할":"sub:17-3","집계명":"부담할인","산식":"col_sum(금액)"},{"시트":"17","역할":"sub:17-4","집계명":"과세매출","산식":"col_sum(과세매출금액)"},{"시트":"17","역할":"sub:17-5","집계명":"쿠폰조정","산식":"top_lookup(3, 4, 익월정산)"},{"시트":"18","역할":"구매확정","집계명":"주문금액","산식":"col_sum(최종 상품별 총 주문금액)"},{"시트":"18","역할":"수수료상세","집계명":"할인지원금","산식":"col_sumif(수수료 기준금액, 결제수단, 네이버 할인지원금)"},{"시트":"18","역할":"수수료상세","집계명":"수수료합","산식":"col_sum(수수료금액)"},{"시트":"18","역할":"건별정산","집계명":"배송비","산식":"col_sumif(정산기준금액, 구분, 배송비)"},{"시트":"18","역할":"부가세","집계명":"과세매출","산식":"col_sum(과세매출금액)"},{"시트":"18","역할":"혜택정산","집계명":"부담할인합","산식":"col_sum(금액)"},{"시트":"18","역할":"sub:18-1","집계명":"할인지원금","산식":"col_sumif(수수료 기준금액, 결제수단, 네이버 할인지원금)"},{"시트":"18","역할":"sub:18-1","집계명":"수수료합","산식":"col_sum(수수료금액)"},{"시트":"18","역할":"sub:18-2","집계명":"배송비","산식":"cell(2, N)"},{"시트":"18","역할":"sub:18-3","집계명":"부담할인","산식":"cell(2, L)"},{"시트":"18","역할":"sub:18-4","집계명":"과세매출","산식":"col_sum(과세매출)"},{"시트":"18","역할":"sub:18-5","집계명":"쿠폰조정","산식":"top_lookup(3, 4, 익월정산)"},{"시트":"18","역할":"sub:18-5","집계명":"이월반영","산식":"cell(1, G)"},{"시트":"19","역할":"마감상세","집계명":"총판매가","산식":"col_sum(상품대총판매가)"},{"시트":"19","역할":"마감상세","집계명":"협력사할인","산식":"col_sum(협력사 (할인부담금))"},{"시트":"19","역할":"마감상세","집계명":"배송비","산식":"col_sum(고객부담 배송비)"},{"시트":"19","역할":"마감상세","집계명":"SSG할인","산식":"col_sum(SSG부담 (할인부담금))"},{"시트":"19","역할":"마감상세","집계명":"SSG청구할인","산식":"col_sum(SSG부담 (청구할인))"},{"시트":"19","역할":"마감상세","집계명":"판매수수료","산식":"col_sum(판매수수료)"},{"시트":"19","역할":"마감상세","집계명":"정산금액","산식":"col_sum(정산금액(VAT포함))"},{"시트":"19","역할":"공제내역","집계명":"상품정보유지비","산식":"col_sumif(공제금액, 공제항목, 상품정보유지비)"},{"시트":"19","역할":"공제내역","집계명":"광고비","산식":"col_sumif(공제금액, 공제항목, 채권청구 광고비)"},{"시트":"19","역할":"공제내역","집계명":"초과할인","산식":"col_sumif(공제금액, 공제항목, 위수탁 수수료 초과할인액)"},{"시트":"21","역할":"상품대","집계명":"실출고","산식":"col_sum(실출고금액(1))"},{"시트":"21","역할":"상품대","집계명":"출고업체쿠폰","산식":"col_sum(출고 업체 쿠폰 부담액)"},{"시트":"21","역할":"상품대","집계명":"반품업체쿠폰","산식":"col_sum(반품 업체 쿠폰 부담액)"},{"시트":"21","역할":"상품대","집계명":"당사할인","산식":"col_sum(당사부담 할인액(B))"},{"시트":"21","역할":"상품대","집계명":"계산서발행","산식":"col_sum(세금계산서 발행액(A-B))"},{"시트":"21","역할":"상품대","집계명":"실지급","산식":"col_sum(실지급 금액)"},{"시트":"21","역할":"배송비","집계명":"배송비합","산식":"col_sum(합계)"},{"시트":"21","역할":"패널티파일","집계명":"보상합","산식":"col_sum(보상금액)"},{"시트":"21","역할":"sub:21-1","집계명":"배송비","산식":"cell(2, Q)"},{"시트":"21","역할":"sub:21-2","집계명":"패널티","산식":"cell(2, S)"},{"시트":"22","역할":"정산확정","집계명":"판매금액","산식":"col_sumif(판매금액, 협력사명, 샘플기업)"},{"시트":"22","역할":"정산확정","집계명":"매입금액","산식":"col_sumif(매입금액, 협력사명, 샘플기업)"},{"시트":"22","역할":"패널티조회","집계명":"패널티합","산식":"col_sum(적립금액)"},{"시트":"22","역할":"sub:22-1","집계명":"배송비","산식":"cell(1, F)"},{"시트":"22","역할":"sub:22-2","집계명":"패널티","산식":"cell(1, I)"},{"시트":"24","역할":"위탁정산","집계명":"원판매가","산식":"col_sumif(원판매가, 서브브랜드, TTL)"},{"시트":"24","역할":"위탁정산","집계명":"계산서발행","산식":"col_sumif(최종 공급가액(계산서 발행금액), 서브브랜드, TTL)"},{"시트":"27","역할":"매입상세","집계명":"판매계","산식":"col_sumif(판매계(VAT포함), 협력사명, 샘플기업)"},{"시트":"27","역할":"매입상세","집계명":"납품계","산식":"col_sumif(납품계(VAT제외), 협력사명, 샘플기업)"}],"산출":[{"시트":"01","항목":"상품매출","산식":"col_sum(판매가) - col_sum(할인쿠폰이용료) - col_sum(판매자부담카드추가할인) + col_sum(옵션가)","모드":"역추출"},{"시트":"01","항목":"기타매출","산식":"col_sum(구매자부담 반품/교환배송비) + col_sum(선결제배송비) + col_sum(도서산간배송비)","모드":"역추출"},{"시트":"01","항목":"수수료_별도","산식":"col_sum(11번가할인) + col_sum([공제]스토어묶음할인)","모드":"역추출"},{"시트":"01","항목":"수수료_계산서","산식":"col_sum(서비스이용료(상품)) + col_sum(서비스이용료(선결제배송비)) + col_sum(후불광고비) - col_sum(11번가할인)","모드":"역추출"},{"시트":"01","항목":"정산금액","산식":"col_sum(정산금액)","모드":"역추출"},{"시트":"02","항목":"상품매출","산식":"top_lookup(11, 10, 판매가) - top_lookup(11, 10, 쿠폰할인액(파트너부담))","모드":"역추출"},{"시트":"02","항목":"기타매출","산식":"top_lookup(11, 10, 배송비) + top_lookup(11, 10, 제주/도서/산간 배송비)","모드":"역추출"},{"시트":"02","항목":"수수료_별도","산식":"top_lookup(11, 10, 쿠폰할인액(29CM부담)) - top_lookup0(11, 10, 쿠폰 할인 조정액)","모드":"역추출"},{"시트":"02","항목":"수수료_계산서","산식":"top_lookup(11, 10, 수수료(판매수수료-29CM부담쿠폰할인액))","모드":"역추출"},{"시트":"02","항목":"정산금액","산식":"top_lookup(11, 10, 정산금액)","모드":"역추출"},{"시트":"03","항목":"상품매출","산식":"top_lookup(11, 10, 판매가) - top_lookup(11, 10, 쿠폰할인액(파트너부담))","모드":"역추출"},{"시트":"03","항목":"기타매출","산식":"top_lookup(11, 10, 배송비) + top_lookup(11, 10, 제주/도서/산간 배송비)","모드":"역추출"},{"시트":"03","항목":"수수료_별도","산식":"top_lookup(11, 10, 쿠폰할인액(29CM부담))","모드":"역추출"},{"시트":"03","항목":"수수료_계산서","산식":"top_lookup(11, 10, 수수료(판매수수료-29CM부담쿠폰할인액))","모드":"역추출"},{"시트":"03","항목":"정산금액","산식":"top_lookup(11, 10, 정산금액)","모드":"역추출"},{"시트":"04","항목":"상품매출","산식":"sub(주문내역, 원판매금액)","모드":"원본"},{"시트":"04","항목":"기타매출","산식":"sub(공제, 배송비)","모드":"원본"},{"시트":"04","항목":"수수료_별도","산식":"sub(주문내역, 판매차액)","모드":"원본"},{"시트":"04","항목":"수수료_계산서","산식":"sub(주문내역, CJ합계금액) + sub(공제, 할인쿠폰)","모드":"원본"},{"시트":"04","항목":"정산금액","산식":"sub(주문내역, 지급예정) + sub(공제, 배송비) - sub(공제, 할인쿠폰) - sub(공제, 패널티)","모드":"원본"},{"시트":"05","항목":"상품매출","산식":"sub(판매내역, 판매가격) - sub(할인쿠폰, 할인쿠폰)","모드":"원본"},{"시트":"05","항목":"기타매출","산식":"sub(결산요약, 배송비)","모드":"원본"},{"시트":"05","항목":"수수료_별도","산식":"sub(판매내역, 판매가격) - sub(할인쿠폰, 할인쿠폰) + sub(결산요약, 배송비) - (sub(결산요약, 지급대상) - sub(결산요약, 지급예정) + sub(결산요약, 수수료B)) - sub(결산요약, 지급예정)","모드":"원본"},{"시트":"05","항목":"수수료_계산서","산식":"sub(결산요약, 지급대상) - sub(결산요약, 지급예정) + sub(결산요약, 수수료B)","모드":"원본"},{"시트":"05","항목":"정산금액","산식":"sub(결산요약, 지급예정)","모드":"원본"},{"시트":"06","항목":"상품매출","산식":"sub(정산내역, 판매금액) + sub(정산내역, 업체부담)","모드":"원본"},{"시트":"06","항목":"기타매출","산식":"sub(정산내역, 배송비) + sub(정산내역, 추가배송비)","모드":"원본"},{"시트":"06","항목":"수수료_별도","산식":"sub(정산내역, LF부담)","모드":"원본"},{"시트":"06","항목":"수수료_계산서","산식":"0 - sub(정산내역, 판매수수료) - sub(정산내역, LF부담)","모드":"원본"},{"시트":"06","항목":"정산금액","산식":"sub(정산내역, 정산금액)","모드":"원본"},{"시트":"07","항목":"상품매출","산식":"sub(정산상세, 판매가) - sub(정산상세, 업체부담)","모드":"원본"},{"시트":"07","항목":"기타매출","산식":"sub(배송비, 업체지급배송비)","모드":"원본"},{"시트":"07","항목":"수수료_별도","산식":"sub(정산상세, 물산부담)","모드":"원본"},{"시트":"07","항목":"수수료_계산서","산식":"sub(정산상세, 입점수수료)","모드":"원본"},{"시트":"07","항목":"정산금액","산식":"sub(정산상세, 판매가) - sub(정산상세, 업체부담) + sub(배송비, 업체지급배송비) - sub(정산상세, 물산부담) - sub(정산상세, 입점수수료)","모드":"원본"},{"시트":"08","항목":"상품매출","산식":"sub(매출내역, 판매금액) - sub(매출내역, 셀러할인)","모드":"원본"},{"시트":"08","항목":"기타매출","산식":"sub(매출내역, 총배송비)","모드":"원본"},{"시트":"08","항목":"수수료_별도","산식":"sub(매출내역, 당사할인)","모드":"원본"},{"시트":"08","항목":"수수료_계산서","산식":"sub(매출내역, 수수료합)","모드":"원본"},{"시트":"08","항목":"정산금액","산식":"sub(매출내역, 지급대상)","모드":"원본"},{"시트":"09","항목":"상품매출","산식":"ROUND(sub(매출상세, 판매금액) * 1.1 - sub(매출상세, 기타), 0)","모드":"원본"},{"시트":"09","항목":"기타매출","산식":"sub(매출상세, 기타)","모드":"원본"},{"시트":"09","항목":"수수료_별도","산식":"0","모드":"원본"},{"시트":"09","항목":"수수료_계산서","산식":"ROUND(sub(매출상세, 매입수수료) * 1.1, 0)","모드":"원본"},{"시트":"09","항목":"정산금액","산식":"ROUND(sub(매출상세, 매입금액) * 1.1, 0)","모드":"원본"},{"시트":"10","항목":"상품매출","산식":"top_lookup(12, 11, 주문금액합계(기본가))","모드":"역추출"},{"시트":"10","항목":"기타매출","산식":"top_lookup(12, 11, 배송료)","모드":"역추출"},{"시트":"10","항목":"수수료_별도","산식":"top_lookup(12, 11, 본사 쿠폰) + top_lookup(12, 11, 사용적립금) + col_sumif(고객결제금액, 구분, 역마진) - col_sumif(순매출금액, 구분, 역마진)","모드":"역추출"},{"시트":"10","항목":"수수료_계산서","산식":"top_lookup(12, 11, 세금계산서)","모드":"역추출"},{"시트":"10","항목":"정산금액","산식":"top_lookup(12, 11, 업체지급금액)","모드":"역추출"},{"시트":"11","항목":"상품매출","산식":"top_lookup(2, 3, 판매금액) + top_lookup(2, 3, 클레임금액) + top_lookup(2, 3, 업체쿠폰) + top_lookup(2, 3, 장바구니쿠폰(업체))","모드":"원본"},{"시트":"11","항목":"기타매출","산식":"top_lookup(2, 3, 반품비환불차감) + top_lookup(2, 3, 배송비결제) + top_lookup(2, 3, 반품비결제) + top_lookup(2, 3, 저단가배송비지원액) + top_lookup(2, 3, 기타정산액)","모드":"원본"},{"시트":"11","항목":"수수료_별도","산식":"0 - (top_lookup(2, 3, 할인) + top_lookup(2, 3, 무신사쿠폰) + top_lookup(2, 3, 적립금) + top_lookup(2, 3, 장바구니할인) + top_lookup(2, 3, 장바구니쿠폰(무신사)) + top_lookup(2, 3, 그룹할인) + top_lookup(2, 3, 판매지원금(6)))","모드":"원본"},{"시트":"11","항목":"수수료_계산서","산식":"top_lookup(1, 3, 수수료(12)=(7)+(8)+(9)+(10)+(11))","모드":"원본"},{"시트":"11","항목":"정산금액","산식":"top_lookup(1, 3, 정산(13)=(5)+(6)-(12))","모드":"원본"},{"시트":"12","항목":"상품매출","산식":"top_lookup(2, 3, 판매금액) + top_lookup(2, 3, 클레임금액) + top_lookup(2, 3, 업체쿠폰) + top_lookup(2, 3, 장바구니쿠폰(업체))","모드":"원본"},{"시트":"12","항목":"기타매출","산식":"top_lookup(2, 3, 반품비환불차감) + top_lookup(2, 3, 배송비결제) + top_lookup(2, 3, 반품비결제) + top_lookup(2, 3, 저단가배송비지원액) + top_lookup(2, 3, 기타정산액)","모드":"원본"},{"시트":"12","항목":"수수료_별도","산식":"0 - (top_lookup(2, 3, 할인) + top_lookup(2, 3, 무신사쿠폰) + top_lookup(2, 3, 적립금) + top_lookup(2, 3, 장바구니할인) + top_lookup(2, 3, 장바구니쿠폰(무신사)) + top_lookup(2, 3, 그룹할인) + top_lookup(2, 3, 판매지원금(6)))","모드":"원본"},{"시트":"12","항목":"수수료_계산서","산식":"top_lookup(1, 3, 수수료(12)=(7)+(8)+(9)+(10)+(11))","모드":"원본"},{"시트":"12","항목":"정산금액","산식":"top_lookup(1, 3, 정산(13)=(5)+(6)-(12))","모드":"원본"},{"시트":"13","항목":"상품매출","산식":"top_lookup(2, 3, 판매금액) + top_lookup(2, 3, 클레임금액) + top_lookup(2, 3, 업체쿠폰) + top_lookup(2, 3, 장바구니쿠폰(업체))","모드":"원본"},{"시트":"13","항목":"기타매출","산식":"top_lookup(2, 3, 반품비환불차감) + top_lookup(2, 3, 배송비결제) + top_lookup(2, 3, 반품비결제) + top_lookup(2, 3, 저단가배송비지원액) + top_lookup(2, 3, 기타정산액)","모드":"원본"},{"시트":"13","항목":"수수료_별도","산식":"0 - (top_lookup(2, 3, 할인) + top_lookup(2, 3, 무신사쿠폰) + top_lookup(2, 3, 적립금) + top_lookup(2, 3, 장바구니할인) + top_lookup(2, 3, 장바구니쿠폰(무신사)) + top_lookup(2, 3, 그룹할인) + top_lookup(2, 3, 판매지원금(6)))","모드":"원본"},{"시트":"13","항목":"수수료_계산서","산식":"top_lookup(1, 3, 수수료(12)=(7)+(8)+(9)+(10)+(11))","모드":"원본"},{"시트":"13","항목":"정산금액","산식":"top_lookup(1, 3, 정산(13)=(5)+(6)-(12))","모드":"원본"},{"시트":"14","항목":"상품매출","산식":"top_lookup(2, 3, 판매금액) + top_lookup(2, 3, 클레임금액) + top_lookup(2, 3, 업체쿠폰) + top_lookup(2, 3, 장바구니쿠폰(업체))","모드":"원본"},{"시트":"14","항목":"기타매출","산식":"top_lookup(2, 3, 반품비환불차감) + top_lookup(2, 3, 배송비결제) + top_lookup(2, 3, 반품비결제) + top_lookup(2, 3, 저단가배송비지원액) + top_lookup(2, 3, 기타정산액)","모드":"원본"},{"시트":"14","항목":"수수료_별도","산식":"0 - (top_lookup(2, 3, 할인) + top_lookup(2, 3, 무신사쿠폰) + top_lookup(2, 3, 적립금) + top_lookup(2, 3, 장바구니할인) + top_lookup(2, 3, 장바구니쿠폰(무신사)) + top_lookup(2, 3, 그룹할인) + top_lookup(2, 3, 판매지원금(6)))","모드":"원본"},{"시트":"14","항목":"수수료_계산서","산식":"top_lookup(1, 3, 수수료(12)=(7)+(8)+(9)+(10)+(11))","모드":"원본"},{"시트":"14","항목":"정산금액","산식":"top_lookup(1, 3, 정산(13)=(5)+(6)-(12))","모드":"원본"},{"시트":"15","항목":"상품매출","산식":"sub(정산, 판매금액)","모드":"원본"},{"시트":"15","항목":"기타매출","산식":"0","모드":"원본"},{"시트":"15","항목":"수수료_별도","산식":"sub(정산, 판매금액) - sub(정산, 정산금액)","모드":"원본"},{"시트":"15","항목":"수수료_계산서","산식":"0","모드":"원본"},{"시트":"15","항목":"정산금액","산식":"sub(정산, 정산금액)","모드":"원본"},{"시트":"16","항목":"상품매출","산식":"sub(정산, 판매금액)","모드":"원본"},{"시트":"16","항목":"기타매출","산식":"0","모드":"원본"},{"시트":"16","항목":"수수료_별도","산식":"sub(정산, 판매금액) - sub(정산, 정산금액)","모드":"원본"},{"시트":"16","항목":"수수료_계산서","산식":"0","모드":"원본"},{"시트":"16","항목":"정산금액","산식":"sub(정산, 정산금액)","모드":"원본"},{"시트":"17","항목":"상품매출","산식":"sub(구매확정, 주문금액) + sub(수수료상세, 할인지원금)","모드":"원본"},{"시트":"17","항목":"기타매출","산식":"sub(건별정산, 배송비)","모드":"원본"},{"시트":"17","항목":"수수료_별도","산식":"0","모드":"원본"},{"시트":"17","항목":"수수료_계산서","산식":"0 - sub(수수료상세, 수수료합)","모드":"원본"},{"시트":"17","항목":"정산금액","산식":"sub(부가세, 과세매출) + sub(수수료상세, 수수료합) + param(부담할인) + param(쿠폰조정) + param(이월반영)","모드":"원본"},{"시트":"18","항목":"상품매출","산식":"sub(구매확정, 주문금액) + sub(수수료상세, 할인지원금)","모드":"원본"},{"시트":"18","항목":"기타매출","산식":"sub(건별정산, 배송비)","모드":"원본"},{"시트":"18","항목":"수수료_별도","산식":"0","모드":"원본"},{"시트":"18","항목":"수수료_계산서","산식":"0 - sub(수수료상세, 수수료합)","모드":"원본"},{"시트":"18","항목":"정산금액","산식":"sub(부가세, 과세매출) + sub(수수료상세, 수수료합) + param(부담할인) + param(쿠폰조정) + param(이월반영)","모드":"원본"},{"시트":"19","항목":"상품매출","산식":"sub(마감상세, 총판매가) - sub(마감상세, 협력사할인)","모드":"원본"},{"시트":"19","항목":"기타매출","산식":"sub(마감상세, 배송비)","모드":"원본"},{"시트":"19","항목":"수수료_별도","산식":"sub(마감상세, SSG할인) + sub(마감상세, SSG청구할인) - sub(공제내역, 초과할인)","모드":"원본"},{"시트":"19","항목":"수수료_계산서","산식":"sub(공제내역, 상품정보유지비) + sub(공제내역, 광고비) + sub(마감상세, 판매수수료) + sub(공제내역, 초과할인)","모드":"원본"},{"시트":"19","항목":"정산금액","산식":"sub(마감상세, 정산금액) - sub(공제내역, 상품정보유지비) - sub(공제내역, 광고비)","모드":"원본"},{"시트":"21","항목":"상품매출","산식":"sub(상품대, 실출고) - sub(상품대, 출고업체쿠폰) + sub(상품대, 반품업체쿠폰)","모드":"원본"},{"시트":"21","항목":"기타매출","산식":"sub(배송비, 배송비합)","모드":"원본"},{"시트":"21","항목":"수수료_별도","산식":"sub(상품대, 당사할인)","모드":"원본"},{"시트":"21","항목":"수수료_계산서","산식":"sub(상품대, 계산서발행) + param(DB유지비)","모드":"원본"},{"시트":"21","항목":"정산금액","산식":"sub(상품대, 실지급) + sub(배송비, 배송비합) - param(패널티) - param(DB유지비)","모드":"원본"},{"시트":"22","항목":"상품매출","산식":"sub(정산확정, 판매금액)","모드":"원본"},{"시트":"22","항목":"기타매출","산식":"param(배송비)","모드":"원본"},{"시트":"22","항목":"수수료_별도","산식":"sub(정산확정, 판매금액) - sub(정산확정, 매입금액)","모드":"원본"},{"시트":"22","항목":"수수료_계산서","산식":"0","모드":"원본"},{"시트":"22","항목":"정산금액","산식":"sub(정산확정, 매입금액) + param(배송비) - param(패널티)","모드":"원본"},{"시트":"23","항목":"상품매출","산식":"col_sum(실판매금액)","모드":"역추출"},{"시트":"23","항목":"기타매출","산식":"0","모드":"역추출"},{"시트":"23","항목":"수수료_별도","산식":"col_sum(수수료액)","모드":"역추출"},{"시트":"23","항목":"수수료_계산서","산식":"0","모드":"역추출"},{"시트":"23","항목":"정산금액","산식":"col_sum(샘플기업 마진액)","모드":"역추출"},{"시트":"24","항목":"상품매출","산식":"sub(위탁정산, 원판매가)","모드":"원본"},{"시트":"24","항목":"기타매출","산식":"0","모드":"원본"},{"시트":"24","항목":"수수료_별도","산식":"sub(위탁정산, 원판매가) - sub(위탁정산, 계산서발행)","모드":"원본"},{"시트":"24","항목":"수수료_계산서","산식":"0","모드":"원본"},{"시트":"24","항목":"정산금액","산식":"sub(위탁정산, 계산서발행)","모드":"원본"},{"시트":"25","항목":"상품매출","산식":"col_sum(실판매금액)","모드":"역추출"},{"시트":"25","항목":"기타매출","산식":"0","모드":"역추출"},{"시트":"25","항목":"수수료_별도","산식":"col_sum(수수료액)","모드":"역추출"},{"시트":"25","항목":"수수료_계산서","산식":"0","모드":"역추출"},{"시트":"25","항목":"정산금액","산식":"col_sum(샘플기업 마진액)","모드":"역추출"},{"시트":"26","항목":"상품매출","산식":"top_lookup(11, 10, 상품주문금액) - top_lookup(11, 10, 판매자할인금액합계)","모드":"역추출"},{"시트":"26","항목":"기타매출","산식":"top_lookup0(11, 10, 배송비)","모드":"역추출"},{"시트":"26","항목":"수수료_별도","산식":"0","모드":"역추출"},{"시트":"26","항목":"수수료_계산서","산식":"top_lookup(11, 10, 기본수수료(할인적용))","모드":"역추출"},{"시트":"26","항목":"정산금액","산식":"top_lookup(11, 10, 판매정산금액)","모드":"역추출"},{"시트":"27","항목":"상품매출","산식":"sub(매입상세, 판매계)","모드":"원본"},{"시트":"27","항목":"기타매출","산식":"0","모드":"원본"},{"시트":"27","항목":"수수료_별도","산식":"sub(매입상세, 판매계) - sub(매입상세, 납품계) * 1.1","모드":"원본"},{"시트":"27","항목":"수수료_계산서","산식":"0","모드":"원본"},{"시트":"27","항목":"정산금액","산식":"sub(매입상세, 납품계) * 1.1","모드":"원본"}],"파라미터":[{"시트":"17","이름":"파일암호","기본값":"0000"},{"시트":"17","이름":"부담할인","기본값":0},{"시트":"17","이름":"쿠폰조정","기본값":0},{"시트":"17","이름":"이월반영","기본값":0},{"시트":"18","이름":"파일암호","기본값":"0000"},{"시트":"18","이름":"부담할인","기본값":0},{"시트":"18","이름":"쿠폰조정","기본값":0},{"시트":"18","이름":"이월반영","기본값":0},{"시트":"21","이름":"DB유지비","기본값":165000},{"시트":"21","이름":"패널티","기본값":0},{"시트":"22","이름":"배송비","기본값":0},{"시트":"22","이름":"패널티","기본값":0},{"시트":"27","이름":"파일암호","기본값":"024761"}]};
+}
+
+
+/** ERP 거래처코드 (회계시스템) — 전표 생성용. 원본: finance-accounting-automation interim/erp_vendors.json */
+function witaVendors() {
+  return {"11번가(ODP)":{"거래처명":"11번가(주)","세무플래그":"세무구분","거래처코드":"00557"},"29CM(OH)":{"거래처명":"주식회사 무신사","세무플래그":"","거래처코드":"00133"},"29CM(UO)":{"거래처명":"주식회사 무신사","세무플래그":"","거래처코드":"00133"},"CJ MALL(ODP)":{"거래처명":"(주)씨제이이엔엠","세무플래그":"","거래처코드":"02635"},"GS SHOP(ODP)":{"거래처명":"(주)지에스리테일홈쇼핑","세무플래그":"","거래처코드":"00932"},"LF MALL(ODP)":{"거래처명":"(주) LF","세무플래그":"","거래처코드":"01419"},"SSF SHOP(ODP)":{"거래처명":"삼성물산(주)패션부문","세무플래그":"","거래처코드":"00425"},"롯데온(ODP)":{"거래처명":"롯데쇼핑(주)e커머스사업본부","세무플래그":"세무구분","거래처코드":"00841"},"롯데홈쇼핑(ODP)":{"거래처명":"（주）우리홈쇼핑","세무플래그":"","거래처코드":"00153"},"W컨셉(ODP)":{"거래처명":"(주)더블유컨셉코리아","세무플래그":"","거래처코드":"00982"},"무신사(OH)":{"거래처명":"주식회사 무신사","세무플래그":"","거래처코드":"00133"},"무신사(UO)":{"거래처명":"주식회사 무신사","세무플래그":"","거래처코드":"00133"},"무신사(ODP)":{"거래처명":"주식회사 무신사","세무플래그":"","거래처코드":"00133"},"무신사(ALPHA)":{"거래처명":"주식회사 무신사","세무플래그":"","거래처코드":"00133"},"무신사글로벌(OH)":{"거래처명":"주식회사 무신사","세무플래그":"역발행","거래처코드":"00133"},"무신사글로벌_조조타운(OH)":{"거래처명":"주식회사 무신사","세무플래그":"역발행","거래처코드":"00133"},"스마트스토어(UO)":{"거래처명":"네이버파이낸셜 주식회사","세무플래그":"세무구분","거래처코드":"00116"},"스마트스토어(ODP)":{"거래처명":"네이버파이낸셜 주식회사","세무플래그":"세무구분","거래처코드":"00116"},"신세계몰(ODP)":{"거래처명":"㈜에스에스지닷컴","세무플래그":"세무구분","거래처코드":"00221"},"하프클럽(ODP)":{"거래처명":"(주)트라이씨클","세무플래그":"세무구분","거래처코드":"01420"},"현대이지웰(ODP)":{"거래처명":"주식회사 현대이지웰","세무플래그":"역발행","거래처코드":"01484"},"원더플레이스(OH)":{"거래처명":"주식회사 원더플레이스","세무플래그":"수기발행","거래처코드":"00591"},"원더플레이스(UO)":{"거래처명":"주식회사 원더플레이스","세무플래그":"수기발행","거래처코드":"00591"},"원더플레이스(ODP)":{"거래처명":"주식회사 원더플레이스","세무플래그":"수기발행","거래처코드":"00591"},"카카오톡스토어(ODP)":{"거래처명":"카카오톡스토어","세무플래그":"역발행","거래처코드":""},"현대홈쇼핑(ODP)":{"거래처명":"주식회사 현대홈쇼핑","세무플래그":"","거래처코드":""}};
+}
+
+
+/**
+ * 엑셀 다운로드 — 실제 월파일(07월_위탁매출_v8)·전표입력(_v7) 레이아웃 재현
+ *
+ * 방식: 임시 Google Sheets 를 만들어 채우고 xlsx export 링크 반환.
+ * 카과/현과: 세무구분 채널(11번가·롯데온·스마트스토어·신세계·하프클럽·SSF직접발행)만 분해.
+ *   분해값은 <루트>/_taxsplit_<월>.json (부가세 분해파일에서 추출). 없으면 건별=전액.
+ */
+
+var WITA_TTL_HEADER = ['판매처', '브랜드명', '본부명', '시트명',
+  '상품매출(-v)', '상품매출(+v)', '기타매출(+v)',
+  '판매수수료\n(별도반영/v+)', '판매수수료\n(계산서발행/v+)', '정산대상액', '패널티', '대사'];
+
+function witaExportFolder() {
+  var root = witaRootFolder();
+  var it = root.getFoldersByName('_다운로드');
+  return it.hasNext() ? it.next() : root.createFolder('_다운로드');
+}
+
+function witaReadTaxSplit(month) {
+  var it = witaRootFolder().getFilesByName('_taxsplit_' + month + '.json');
+  if (!it.hasNext()) return {};
+  try { return JSON.parse(it.next().getBlob().getDataAsString('UTF-8')); } catch (e) { return {}; }
+}
+
+function witaSupply(v) { return Math.round(v / 1.1); }   // 공급가 (엑셀 ROUND(/1.1) 동일)
+
+/**
+ * 부가세 분해 자동계산 (파이썬 tax_split_compute 이식).
+ * 분해파일(부가세신고데이터·VATDeclaration·현금영수증 등)을 채널 폴더에서 찾아
+ * 카과/현과 v+ 합계를 구하고, main_key 가 있으면 당월 매출 주문키와 교집합만 합산.
+ * 컬럼 매칭: 정확일치 우선, 없으면 부분포함 (파이썬 _col_of 와 동일 — '신용카드'가
+ * '신용카드 매출전표'에 매칭되는 식).
+ */
+function witaColOf(ctx, name) {
+  var n = wNorm(name);
+  for (var i = 0; i < ctx.hnorm.length; i++) if (ctx.hnorm[i] === n) return i;
+  for (var j = 0; j < ctx.hnorm.length; j++)
+    if (ctx.hnorm[j] && ctx.hnorm[j].indexOf(n) >= 0) return j;
+  return -1;
+}
+
+function witaKeyOf(row, idxs) {
+  return idxs.map(function (i) {
+    var v = String(i < row.length ? row[i] : '').trim();
+    // '3.0' 같은 숫자꼬리 정규화 (엑셀 숫자화 대응)
+    if (/^\d+\.0$/.test(v)) v = v.slice(0, -2);
+    return v;
+  }).join('_');
+}
+
+function witaTaxSplitCompute(month, sn, r) {
+  if (!r.부가세 || !r.부가세.length) return null;
+  var files = witaChannelFiles(month, sn);
+  var loadByKw = function (kw) {
+    if (!kw) return null;
+    var kwn = wNorm(kw);
+    for (var i = 0; i < files.length; i++) {
+      if (wNorm(files[i].name).indexOf(kwn) >= 0)
+        return witaLoadFile(DriveApp.getFileById(files[i].id));
+    }
+    return null;
+  };
+  // main_key 집합: 키워드 파일 -> 없으면 역추출_<sn>.csv 로 폴백
+  var mkCfg = r.부가세[0];
+  var mainSet = null;
+  if (mkCfg.메인키.length) {
+    var mrows = loadByKw(mkCfg.메인파일);
+    if (!mrows) {
+      for (var f2 = 0; f2 < files.length; f2++)
+        if (files[f2].name === '역추출_' + sn + '.csv')
+          mrows = witaLoadFile(DriveApp.getFileById(files[f2].id));
+    }
+    if (mrows) {
+      var mh = witaDetectHeader(mrows);
+      var mctx = new WitaCtx(mrows, mh, 'above_header', false);
+      var mIdx = mkCfg.메인키.map(function (k) { return witaColOf(mctx, k); });
+      if (mIdx.indexOf(-1) < 0) {
+        mainSet = {};
+        for (var mr2 = mctx.dataStart; mr2 < mrows.length; mr2++) {
+          var kk = witaKeyOf(mrows[mr2], mIdx);
+          if (kk.replace(/_/g, '')) mainSet[kk] = 1;
+        }
+      }
+    }
+  }
+  var out = {}, any = false;
+  r.부가세.forEach(function (g) {
+    var rows = loadByKw(g.파일키워드);
+    if (!rows) return;
+    var h = witaDetectHeader(rows);
+    var ctx = new WitaCtx(rows, h, 'above_header', false);
+    var sumIdx = g.합계컬럼.map(function (s2) { return witaColOf(ctx, s2); })
+      .filter(function (x) { return x >= 0; });
+    if (!sumIdx.length) return;
+    var keyIdx = null;
+    if (mainSet && g.키컬럼.length) {
+      keyIdx = g.키컬럼.map(function (k) { return witaColOf(ctx, k); });
+      if (keyIdx.indexOf(-1) >= 0) keyIdx = null;
+    }
+    var s = 0;
+    for (var i2 = ctx.dataStart; i2 < rows.length; i2++) {
+      if (keyIdx && !mainSet[witaKeyOf(rows[i2], keyIdx)]) continue;
+      for (var j2 = 0; j2 < sumIdx.length; j2++) s += wNum(rows[i2][sumIdx[j2]]);
+    }
+    // v+ 합계 -> 공급가 저장 (전표입력 시트가 공급가 기준)
+    out[g.구분] = witaSupply(s);
+    out[g.구분 + 'v+'] = Math.round(s);
+    any = true;
+  });
+  return any ? out : null;
+}
+
+/** 채널별 계산결과 -> 공통 행 데이터 */
+function witaChannelRows(month) {
+  var rules = witaLoadRules();
+  var results = witaReadResults(month);
+  var ts = witaReadTaxSplit(month);
+  var out = [];
+  Object.keys(rules).sort().forEach(function (sn) {
+    var r = rules[sn], res = results[sn];
+    var v = (res && res.값) || {};
+    var label = r.판매처 + '(' + (r.브랜드 || '') + ')';
+    out.push({
+      sn: sn, 판매처: r.판매처, 브랜드: r.브랜드, 본부: r.본부, 적요: label,
+      pv: v['상품매출'] || 0, etc: v['기타매출'] || 0,
+      s1: v['수수료_별도'] || 0, s2: v['수수료_계산서'] || 0,
+      pen: v['패널티'] || 0, st: v['정산금액'] || 0,
+      계산됨: v['상품매출'] !== undefined,
+      분해: (function () {
+        try {
+          var auto = witaTaxSplitCompute(month, sn, r);
+          if (auto) return auto;              // 분해파일이 있으면 자동계산이 최우선
+        } catch (e) { /* 분해 실패는 건별=전액으로 폴백 */ }
+        return ts[label] || null;             // 없으면 월별 추출값(_taxsplit json)
+      })()
+    });
+  });
+  return out;
+}
+
+/** 시트에 2D 채우기 */
+function witaFillSheet(sh, rows) {
+  if (!rows.length) return;
+  var w = 0;
+  rows.forEach(function (r) { if (r.length > w) w = r.length; });
+  var norm = rows.map(function (r) {
+    var o = r.slice();
+    while (o.length < w) o.push('');
+    return o;
+  });
+  sh.getRange(1, 1, norm.length, w).setValues(norm);
+}
+
+/** TTL 시트 — 월파일 v8 레이아웃 (A열 여백, R2 제목, R5 헤더, R6 합계) */
+function witaBuildTtl(ss, month, chs) {
+  var mNo = String(+month.slice(5, 7));
+  var ttl = ss.getSheets()[0];
+  ttl.setName('TTL');
+  var rows = [];
+  rows.push([mNo, '', mNo + '월']);
+  rows.push(['', mNo + '월 위탁 매출 정산']);
+  rows.push(['']);
+  rows.push(['', '매출', '', '', '', '', '', '', '매입', '', '기타']);
+  rows.push([''].concat(WITA_TTL_HEADER));
+  var tot = [0, 0, 0, 0, 0, 0, 0];
+  var body = [];
+  chs.forEach(function (c) {
+    var mv = witaSupply(c.pv);
+    var chk = c.계산됨 ? (c.pv + c.etc - c.s1 - c.s2 - c.pen - c.st === 0) : '';
+    body.push(['', c.판매처, c.브랜드, c.본부, c.sn,
+               c.계산됨 ? mv : '', c.계산됨 ? c.pv : '', c.계산됨 ? c.etc : '',
+               c.계산됨 ? c.s1 : '', c.계산됨 ? c.s2 : '', c.계산됨 ? c.st : '',
+               c.pen || '', chk]);
+    tot[0] += mv; tot[1] += c.pv; tot[2] += c.etc; tot[3] += c.s1; tot[4] += c.s2;
+    tot[5] += c.st; tot[6] += c.pen;
+  });
+  rows.push(['', '합계', '', '', '', tot[0], tot[1], tot[2], tot[3], tot[4], tot[5], tot[6] || '', '']);
+  rows = rows.concat(body);
+  witaFillSheet(ttl, rows);
+  ttl.getRange(5, 2, 1, WITA_TTL_HEADER.length).setFontWeight('bold');
+  ttl.getRange(6, 2, 1, WITA_TTL_HEADER.length).setFontWeight('bold');
+  ttl.setFrozenRows(6);
+  return ttl;
+}
+
+/** 월파일: TTL + 채널별 raw 탭 */
+function witaExportMonth(month) {
+  var name = month.slice(5, 7) + '월_위탁매출';
+  var ss = SpreadsheetApp.create('wita_export_' + Date.now());
+  witaBuildTtl(ss, month, witaChannelRows(month));
+  var scan = witaScanMonth(month);
+  Object.keys(scan).sort().forEach(function (sn) {
+    (scan[sn] || []).forEach(function (f) {
+      var m = f.name.match(/^역추출_(.+)\.csv$/);
+      if (!m) return;
+      try {
+        var rows = witaLoadFile(DriveApp.getFileById(f.id));
+        if (!rows.length) return;
+        witaFillSheet(ss.insertSheet(m[1]), rows);
+      } catch (e) { /* 한 탭 실패가 전체를 막지 않게 */ }
+    });
+  });
+  return witaFinishExport(ss, name);
+}
+
+/**
+ * 전표입력 파일: 전표입력(27열) + TTL + 직접입금 + 원장대사 + 전표
+ * 전표입력 시트 열 구조는 실제 v7 과 동일:
+ *   A세무구분표시 B판매처 C거래처명 D적요 E브랜드명 F본부명 G상품매출(+v)
+ *   H건별공급가 I세액 J카과공급가 K세액 L현과공급가 M세액 N현과(직접발행v+) O공급가 P세액
+ *   Q대사 R기타매출(+v) S건별공급가 T세액 U수수료별도(-v+) V공급가(+) W세액(-) X실제세액 Y패널티 Z정산대상액
+ */
+function witaExportJournal(month) {
+  var name = month.slice(5, 7) + '월_위탁매출_전표입력';
+  var mNo = String(+month.slice(5, 7));
+  var chs = witaChannelRows(month);
+  var vendors = witaVendors();
+  var ss = SpreadsheetApp.create('wita_journal_' + Date.now());
+
+  /* ── 전표입력 시트 ── */
+  var je = ss.getSheets()[0];
+  je.setName('전표입력');
+  var H = ['', '판매처', '거래처명', '적요', '브랜드명', '본부명', '상품매출(+v)',
+           '건별', '세액', '카과', '세액', '현과', '세액', '현과(직접발행)', '공급가', '세액', '대사',
+           '기타매출(+v)', '건별', '세액', '판매수수료\n(별도반영/v+)', '건별', '세액', '실제세액',
+           '패널티', '정산대상액'];
+  var rows = [];
+  rows.push([mNo, '', mNo + '월']);
+  rows.push(['', mNo + '월 위탁 매출 정산']);
+  rows.push(['']);
+  rows.push(H);
+  var body = [], T = {};
+  ['pv','g','gv','k','kv','h','hv','d','ds','dv','etc','es','ev','s1','s1s','s1v','pen','st'].forEach(function (k) { T[k] = 0; });
+  chs.forEach(function (c) {
+    if (!c.계산됨) return;
+    var ven = vendors[c.적요] || vendors[c.판매처] || {};
+    var sp = c.분해 || {};
+    var kv = (sp['카과'] || 0), hv = (sp['현과'] || 0);            // 공급가 기준으로 저장돼 있음
+    var kAll = Math.round(kv * 1.1), hAll = Math.round(hv * 1.1);  // v+ 환산
+    var dAll = sp['현과직접발행'] || 0;                             // v+ 기준
+    var ds = witaSupply(dAll), dv = dAll - ds;
+    var gAll = c.pv - kAll - hAll - dAll;                          // 건별(v+)
+    var g = witaSupply(gAll), gv = gAll - g;
+    var es = witaSupply(c.etc), ev = c.etc - es;
+    var s1s = witaSupply(c.s1), s1v = c.s1 - s1s;
+    var chk = (g + gv + kv + (kAll - kv) + hv + (hAll - hv) + dAll) === c.pv;
+    body.push([sp && (kv || hv || dAll) ? '세무구분' : '',
+      c.판매처, ven['거래처명'] || '', c.적요, c.브랜드, c.본부, c.pv,
+      g, gv, kv, kAll - kv, hv, hAll - hv, dAll, ds, dv, chk,
+      c.etc, es, ev, -c.s1, s1s, -(c.s1 - s1s), '', c.pen || 0, c.st]);
+    T.pv += c.pv; T.g += g; T.gv += gv; T.k += kv; T.kv += kAll - kv;
+    T.h += hv; T.hv += hAll - hv; T.d += dAll; T.ds += ds; T.dv += dv;
+    T.etc += c.etc; T.es += es; T.ev += ev;
+    T.s1 += -c.s1; T.s1s += s1s; T.s1v += -(c.s1 - s1s); T.pen += c.pen; T.st += c.st;
+  });
+  rows.push(['', '합계', '', '', '', '', T.pv, T.g, T.gv, T.k, T.kv, T.h, T.hv, T.d, T.ds, T.dv, '',
+             T.etc, T.es, T.ev, T.s1, T.s1s, T.s1v, '', T.pen || '', T.st]);
+  rows = rows.concat(body);
+  witaFillSheet(je, rows);
+  je.getRange(4, 1, 2, H.length).setFontWeight('bold');
+  je.setFrozenRows(5);
+
+  /* ── TTL ── */
+  witaBuildTtl2(ss, month, chs);
+
+  /* ── 직접입금 (수기 골격) ── */
+  var dj = ss.insertSheet('직접입금');
+  var djRows = [[''], ['', '판매처', '브랜드명', '본부명', '입금액', '상품매출(-V)', '부가세액', '현금영수증발행', '빌행X'],
+                ['', '합계', '', '', 0, 0, 0, 0, 0]];
+  chs.forEach(function (c) { djRows.push(['', c.판매처, c.브랜드, c.본부, 0, 0, 0, 0, 0]); });
+  witaFillSheet(dj, djRows);
+  dj.getRange(2, 2, 1, 8).setFontWeight('bold');
+
+  /* ── 원장대사 (회계시스템 잔액은 수기 붙여넣기 칸) ── */
+  var lg = ss.insertSheet('원장대사');
+  var byCode = {};
+  chs.forEach(function (c) {
+    if (!c.계산됨) return;
+    var ven = vendors[c.적요] || vendors[c.판매처] || {};
+    var code = ven['거래처코드'] || '?';
+    if (!byCode[code]) byCode[code] = { 명: ven['거래처명'] || c.판매처, 액: 0 };
+    byCode[code].액 += c.st;
+  });
+  var lgRows = [[''], [''], ['', '', '', '', '', '', '', '회계시스템', '정산파일'],
+    ['', '거래처코드', '거래처명', '사업자(주민)번호', '전기(월)이월', '증가', '감소', '잔액', '입금대상액', '차액', '확인', '비고']];
+  Object.keys(byCode).sort().forEach(function (code) {
+    lgRows.push(['', code, byCode[code].명, '', '', '', '', '', byCode[code].액, '', '', '']);
+  });
+  witaFillSheet(lg, lgRows);
+  lg.getRange(4, 2, 1, 11).setFontWeight('bold');
+
+  /* ── 전표 (분개 — 건별/카과/현과 상품매출·부가세 쌍) ── */
+  var jrows = [['시트', '적요', '순번', '차대', '계정코드', '계정과목명', '거래처코드', '거래처명', '금액', '구분']];
+  var dSum = 0, cSum = 0;
+  chs.forEach(function (c) {
+    if (!c.계산됨) return;
+    var ven = vendors[c.적요] || vendors[c.판매처] || {};
+    var code = ven['거래처코드'] || '', vn = ven['거래처명'] || '';
+    var sp = c.분해 || {};
+    var kv = sp['카과'] || 0, hv = sp['현과'] || 0, dAll = sp['현과직접발행'] || 0;
+    var kAll = Math.round(kv * 1.1), hAll = Math.round(hv * 1.1);
+    var gAll = c.pv - kAll - hAll - dAll, g = witaSupply(gAll);
+    var seq = 0;
+    var push = function (cd, acct, acctNm, amt, tag) {
+      if (!amt) return;
+      jrows.push([c.sn, c.적요, ++seq, cd, acct, acctNm, code, vn, amt, tag]);
+      if (cd === '차변') dSum += amt; else cSum += amt;
+    };
+    push('차변', '1080000', '외상매출금', c.pv, '상품매출');
+    push('대변', '4010000', '상품매출', g, '건별');
+    push('대변', '2550000', '부가세예수금', gAll - g, '건별');
+    push('대변', '4010000', '상품매출', kv, '카과');
+    push('대변', '2550000', '부가세예수금', kAll - kv, '카과');
+    push('대변', '4010000', '상품매출', hv, '현과');
+    push('대변', '2550000', '부가세예수금', hAll - hv, '현과');
+    if (dAll) { var ds2 = witaSupply(dAll);
+      push('대변', '4010000', '상품매출', ds2, '현과(직접발행)');
+      push('대변', '2550000', '부가세예수금', dAll - ds2, '현과(직접발행)'); }
+    if (c.etc) { var es2 = witaSupply(c.etc);
+      push('차변', '1080000', '외상매출금', c.etc, '기타매출');
+      push('대변', '4140000', '기타매출', es2, '기타매출');
+      push('대변', '2550000', '부가세예수금', c.etc - es2, '기타매출'); }
+    if (c.s1) { var s1s2 = witaSupply(c.s1);
+      push('차변', '1080000', '외상매출금', -c.s1, '수수료(별도)');
+      push('차변', '8390000', '판매수수료', s1s2, '수수료(별도)');
+      push('대변', '2550000', '부가세예수금', -(c.s1 - s1s2), '수수료(별도)'); }
+  });
+  var jv = ss.insertSheet('전표');
+  witaFillSheet(jv, jrows);
+  jv.setFrozenRows(1);
+  jv.getRange(1, 1, 1, 10).setFontWeight('bold');
+  jv.getRange(jrows.length + 2, 8, 1, 3).setValues([[
+    '차변합 ' + dSum, '대변합 ' + cSum, dSum === cSum ? '차대일치' : '★불일치 ' + (dSum - cSum)]]);
+
+  return witaFinishExport(ss, name);
+}
+
+/** TTL 을 두 번째 이후 시트로 추가하는 변형 */
+function witaBuildTtl2(ss, month, chs) {
+  var sh = ss.insertSheet('TTL');
+  var tmp = ss.getSheets()[0];
+  // witaBuildTtl 은 첫 시트를 쓰므로 직접 구성
+  var mNo = String(+month.slice(5, 7));
+  var rows = [];
+  rows.push([mNo, '', mNo + '월']);
+  rows.push(['', mNo + '월 위탁 매출 정산']);
+  rows.push(['']);
+  rows.push(['', '매출', '', '', '', '', '', '', '매입', '', '기타']);
+  rows.push([''].concat(WITA_TTL_HEADER));
+  var tot = [0, 0, 0, 0, 0, 0, 0], body = [];
+  chs.forEach(function (c) {
+    var mv = witaSupply(c.pv);
+    body.push(['', c.판매처, c.브랜드, c.본부, c.sn,
+               c.계산됨 ? mv : '', c.계산됨 ? c.pv : '', c.계산됨 ? c.etc : '',
+               c.계산됨 ? c.s1 : '', c.계산됨 ? c.s2 : '', c.계산됨 ? c.st : '', c.pen || '',
+               c.계산됨 ? (c.pv + c.etc - c.s1 - c.s2 - c.pen - c.st === 0) : '']);
+    tot[0] += mv; tot[1] += c.pv; tot[2] += c.etc; tot[3] += c.s1; tot[4] += c.s2;
+    tot[5] += c.st; tot[6] += c.pen;
+  });
+  rows.push(['', '합계', '', '', '', tot[0], tot[1], tot[2], tot[3], tot[4], tot[5], tot[6] || '', '']);
+  witaFillSheet(sh, rows.concat(body));
+  sh.getRange(5, 2, 2, WITA_TTL_HEADER.length).setFontWeight('bold');
+  sh.setFrozenRows(6);
+}
+
+function witaFinishExport(ss, name) {
+  var file = DriveApp.getFileById(ss.getId());
+  file.setName(name);
+  var folder = witaExportFolder();
+  folder.addFile(file);
+  try { DriveApp.getRootFolder().removeFile(file); } catch (e) {}
+  return { url: 'https://docs.google.com/spreadsheets/d/' + ss.getId() + '/export?format=xlsx',
+           보관: folder.getUrl(), name: name + '.xlsx' };
+}
+
+
+/* ── 데모 오버라이드: 룰은 익명화, 파일·계산 결과는 가상 ── */
+var __RULES=null, __RESULTS={};
+function __rules(){ if(__RULES) return __RULES; var b=witaBuildRules(witaRulesSeed()); Object.keys(b).forEach(function(sn){ var r=b[sn]; r.판매처='판매처 '+sn; r.어드민경로='파트너 어드민 → 정산 메뉴'; r.본부={ '패션사업':'본부 A', '운영본부':'본부 B', 'B본부사업':'본부 C', '키즈사업':'본부 C' }[r.본부]||('본부 '+String(r.본부||'').slice(0,1)); }); __RULES=b; return b; }
+witaLoadRules=function(){ return __rules(); };
+witaClearRuleCache=function(){ return true; };
+witaCycleOf=function(seller, rc){ if(rc) return String(rc); var n=parseInt(String(seller).replace(/\D/g,''),10)||1; return ['익월 10일','익월 20일','익월 말일','익월 1일','익익월'][n%5]; };
+witaSaveRuleOf=function(sn,payload){ return witaRuleOf(sn); };
+witaAddChannel=function(){ return true; }; witaDeleteChannel=function(){ return true; };
+witaReadResults=function(month){ return __RESULTS[month]||{}; };
+witaSaveResult=function(month,sn,slim){ (__RESULTS[month]=__RESULTS[month]||{})[sn]=slim; };
+witaScanMonth=function(month){ var map={}, R=__rules(); Object.keys(R).forEach(function(sn){ var r=R[sn], fs=[]; var roles=Object.keys(r.파일||{});
+  if(roles.length){ roles.forEach(function(role,i){ var kw=String(r.파일[role].키워드||'정산'); if(kw==='(메인)'||kw==='메인') kw='정산내역'; fs.push({ id:sn+'#'+i, name:kw+'_'+month+'.xlsx', size:180000+i*20000, updated:month.slice(5)+'-03 09:1'+i }); }); }
+  else fs.push({ id:sn+'#0', name:'정산내역_'+month+'.xlsx', size:240000, updated:month.slice(5)+'-03 09:10' });
+  map[sn]=fs; }); return map; };
+witaChannelFiles=function(month,sn){ return witaScanMonth(month)[witaSn(sn)]||[]; };
+witaUpload=function(p){ return { ok:true, name:p.name, size:1 }; };
+witaDeleteFile=function(){ return { ok:true, 삭제:1 }; };
+witaRootFolderUrl=function(){ return '#'; };
+witaExportMonth=function(){ return { url:'#', note:'데모에서는 파일 생성이 꺼져 있습니다' }; };
+witaExportJournal=witaExportMonth;
+function __rng(seed){ var h=2166136261; String(seed).split('').forEach(function(c){ h^=c.charCodeAt(0); h=Math.imul(h,16777619); }); return function(){ h^=h<<13; h^=h>>>17; h^=h<<5; return ((h>>>0)%100000)/100000; }; }
+witaComputeChannel=function(month,sn,params){ var R=__rules(); sn=witaSn(sn); var r=R[sn]; if(!r) return { 시트:sn, ok:false, 문제:['룰에 없는 채널'] };
+  var g=__rng(sn+month); var sales=Math.round((3+g()*60)*1000000/10)*10; var etc=Math.round(g()*400000/10)*10;
+  var feeRate=0.18+g()*0.17; var sep=Math.round(sales*feeRate*(g()<0.5?1:0)); var inv=Math.round(sales*feeRate)-sep; var pen=(params&&params['패널티']!==undefined&&params['패널티']!=='')?Math.round(Number(params['패널티'])||0):0;
+  var vals={ 상품매출:sales, 기타매출:etc, 수수료_별도:sep, 수수료_계산서:inv }; vals.정산금액=sales+etc-sep-inv-pen; if(pen) vals.패널티=pen;
+  var out={ 시트:sn, 판매처:r.판매처, 브랜드:r.브랜드, 본부:r.본부, ok:true, 값:vals, 근거:{}, 문제:[], 파일:witaChannelFiles(month,sn).map(function(f,i){ return { 역할:i?('부속'+i):'(메인)', 파일명:f.name }; }) };
+  WITA_ITEMS.forEach(function(k){ out.근거[k]={ 산식:(r.산출&&r.산출[k])||'(가상 데모값)', 값:vals[k], 세부:[{ 식:(r.산출&&r.산출[k])||'', 값:vals[k], 메모:'데모 — 가상 정산서에서 계산한 값' }] }; });
+  out.검증={ 식:'상품 + 기타 − 별도 − 계산서 − 패널티 = 정산', 좌변:sales+etc-sep-inv-pen, 우변:vals.정산금액, 차이:0, 통과:true };
+  witaSaveResult(month,sn,{ 값:vals, 검증:out.검증, 문제:[], 파일:out.파일, fp:'demo', 시각:month.slice(5)+'-03 10:00' }); return out; };
+window.addEventListener('DOMContentLoaded', function(){ var m=document.getElementById('month'); if(m && !m.value) m.value='2026-08'; });
+
+
+window.google={ script:{ run:(function(){
+  function mk(ok,fail,uo){
+    var api={ withSuccessHandler:function(f){ return mk(f,fail,uo); }, withFailureHandler:function(f){ return mk(ok,f,uo); }, withUserObject:function(o){ return mk(ok,fail,o); } };
+    return new Proxy(api,{ get:function(t,name){ if(name in t) return t[name]; if(typeof name!=='string') return undefined;
+      return function(){ var args=Array.prototype.slice.call(arguments);
+        // form 요소가 넘어오면 GAS 처럼 {name:value} 로 바꾼다
+        args=args.map(function(a){ if(a && typeof HTMLFormElement!=='undefined' && a instanceof HTMLFormElement){ var o={}; Array.prototype.forEach.call(a.elements,function(el){ if(el.name) o[el.name]=el.value; }); return o; } return a; });
+        setTimeout(function(){ var fn=window[name]; if(typeof fn!=='function'){ fail&&fail(new Error('데모에 없는 함수: '+name)); return; }
+          try{ var r=fn.apply(null,args); r=(r===undefined)?null:JSON.parse(JSON.stringify(r)); ok&&ok(r,uo); }catch(e){ console.warn('demo rpc',name,e); fail&&fail({ message:String(e&&e.message||e) },uo); } },60); }; } });
+  }
+  return mk(null,null,null);
+})(), host:{ close:function(){}, setHeight:function(){}, setWidth:function(){}, editor:{ focus:function(){} } }, url:{ getLocation:function(cb){ cb({ parameter:{}, parameters:{}, hash:'' }); } } } };
+
+</script>
+
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* 라인시트 수집기 디자인 시스템 (어진 기준) */
+:root{
+  --bg:#0B0D10; --card:#14181F; --card2:#1A2029; --line:#252D3A; --hair:#1E252F;
+  --ink:#E9EDF3; --ink2:#B7C1D0; --mut:#8B96A8;
+  --acc:#C8FF3C; --acc2:#4DD8E6; --tint:#141A12; --onacc:#0B0D10;
+  --accdim:#3D5418; --acc2dim:#1C4A52;
+  --errbd:#5A2626; --errbg:#1A1212; --errink:#FFD5D5;
+  --red:#FF6B6B; --shadow:rgba(0,0,0,.35);
+  --h:36px; --hs:30px; --r:10px; --rs:8px; --fs:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink)}
+body{font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",
+  "Malgun Gothic","맑은 고딕",sans-serif;
+  font-size:15px;line-height:1.62;letter-spacing:-0.01em;-webkit-font-smoothing:antialiased;
+  word-break:keep-all}
+.wrap{width:100%;margin:0;padding:0 26px 60px}
+.num{font-variant-numeric:tabular-nums}
+*{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;border:2px solid var(--bg)}
+
+/* 헤더 — 제목 · 탭 · 월 · 테마 (라인시트처럼 한 줄) */
+header{display:flex;align-items:center;gap:16px;padding:10px 0 9px;
+  border-bottom:1px solid var(--line)}
+.brand{flex:0 0 auto;font-size:20px;font-weight:800;letter-spacing:-0.045em;white-space:nowrap}
+.brand em{font-style:normal;color:var(--acc)}
+nav.tabs{display:flex;gap:4px;align-items:center;flex:1 1 auto}
+nav.tabs button{font-family:inherit;font-size:14px;font-weight:700;color:var(--ink2);
+  background:transparent;border:1px solid transparent;border-radius:999px;
+  height:var(--hs);padding:0 16px;cursor:pointer;letter-spacing:-0.01em;
+  transition:background .12s,color .12s}
+nav.tabs button:hover:not(.on){background:var(--card2);color:var(--ink)}
+nav.tabs button.on{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+.hright{flex:0 0 auto;display:flex;gap:8px;align-items:center}
+input.t{font-family:inherit;font-size:13.5px;height:var(--hs);padding:0 11px;
+  border:1px solid var(--line);border-radius:var(--rs);background:var(--card2);color:var(--ink);
+  width:92px;text-align:center;font-variant-numeric:tabular-nums}
+input.t:focus{outline:none;border-color:var(--mut)}
+
+button.b{font-family:inherit;font-size:var(--fs);font-weight:700;border-radius:var(--r);
+  height:var(--h);padding:0 17px;cursor:pointer;border:1px solid var(--line);
+  background:var(--card2);color:var(--ink);letter-spacing:-0.01em;
+  transition:border-color .12s,transform .06s}
+button.b:hover{border-color:var(--mut)}
+button.b:active{transform:translateY(1px)}
+button.b:focus-visible{outline:none;box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--acc)}
+button.b.pri{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+button.b.pri:hover{filter:brightness(1.07)}
+button.b:disabled{opacity:.45;cursor:not-allowed;transform:none}
+button.b.sm{height:var(--hs);padding:0 12px;font-size:13px;border-radius:var(--rs)}
+
+section.tab{display:none}
+section.tab.on{display:block}
+
+/* ── 등록: 좌 목록 / 우 상세 ── */
+.split{display:flex;gap:14px;margin-top:14px;align-items:flex-start}
+.llist{flex:0 0 330px;max-height:calc(100vh - 130px);overflow-y:auto;
+  display:flex;flex-direction:column;gap:8px;padding-right:2px}
+.chc{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:10px 13px;cursor:pointer;transition:border-color .12s,background .12s}
+.chc:hover{border-color:var(--mut)}
+.chc.on{border-color:var(--acc);background:var(--tint)}
+.chc .t{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.chc .nm{font-weight:700;font-size:14px}
+.chc .sn{color:var(--mut);font-size:12px;font-variant-numeric:tabular-nums;margin-right:5px}
+.chc .sub{font-size:12px;color:var(--mut);margin-top:1px}
+.detail{flex:1 1 auto;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:18px 20px;box-shadow:0 1px 2px var(--shadow);margin-bottom:12px}
+.dhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.dhead h2{margin:0;font-size:18px;font-weight:800;letter-spacing:-0.03em}
+.chip{display:inline-flex;align-items:center;font-size:12px;font-weight:600;
+  padding:2px 11px;border-radius:999px;background:var(--card2);border:1px solid var(--line);
+  color:var(--ink2)}
+.chip.acc{border-color:var(--acc);color:var(--acc);background:transparent}
+.path{font-size:12.5px;color:var(--mut);margin-top:6px}
+
+/* 필요파일 체크리스트 */
+.need{display:flex;flex-direction:column;gap:5px;margin-top:12px}
+.need .it{display:flex;gap:9px;align-items:baseline;font-size:13px}
+.need .st{flex:0 0 auto;font-size:13px}
+.need .st.y{color:var(--acc)}
+.need .st.n{color:var(--mut)}
+.need .role{font-weight:600;min-width:70px}
+.need .kw{color:var(--mut);font-size:12px}
+.need .pt{color:var(--mut);font-size:12px}
+
+/* 드롭존 */
+.drop{border:2px dashed var(--line);border-radius:14px;padding:26px 18px;text-align:center;
+  background:var(--card);cursor:pointer;transition:border-color .15s,background .15s;margin-top:12px}
+.drop:hover,.drop.hot{border-color:var(--acc);background:var(--tint)}
+.drop b{display:block;font-size:15.5px;font-weight:800;margin-bottom:3px}
+.drop span{color:var(--mut);font-size:12.5px}
+.drop input{display:none}
+
+/* 파일 목록 */
+.flist{display:flex;flex-direction:column;gap:5px;margin-top:10px}
+.fit{display:flex;align-items:center;gap:9px;font-size:13px;background:var(--card2);
+  border:1px solid var(--hair);border-radius:9px;padding:6px 11px}
+.fit .nm2{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fit .sz{color:var(--mut);font-size:12px;flex:0 0 auto}
+.xbtn{border:none;background:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 4px}
+
+/* 결과 매트릭 */
+.mets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:6px}
+.met{background:var(--card2);border:1px solid var(--hair);border-radius:12px;padding:10px 14px}
+.met span{display:block;font-size:12px;color:var(--mut);font-weight:600}
+.met b{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
+.vline{margin-top:10px;font-size:13px}
+.vline .y{color:var(--acc)} .vline .n{color:var(--red)}
+
+/* 상태 배지 */
+.bd{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;
+  padding:1px 9px;border-radius:999px;background:var(--card2);border:1px solid var(--line);
+  color:var(--ink2);white-space:nowrap}
+.bd.ok{border-color:var(--acc2dim);background:var(--tint);color:var(--acc2)}
+.bd.bad{border-color:var(--errbd);background:var(--errbg);color:var(--errink)}
+.bd.run{border-color:var(--acc2dim);background:var(--card2);color:var(--acc2)}
+.bd.dim{opacity:.6}
+
+/* 근거·룰 패널 */
+.panel{background:var(--card2);border-left:3px solid var(--acc2);border-radius:0 10px 10px 0;
+  padding:13px 15px;font-size:12.5px;margin-top:12px}
+.panel.why{font-family:Consolas,"D2Coding",monospace;white-space:pre-wrap;line-height:1.7;
+  color:var(--ink2)}
+.panel h4{margin:12px 0 6px;font-size:12px;color:var(--mut);font-weight:700}
+.panel h4:first-child{margin-top:0}
+.panel table{font-size:12.5px;border-collapse:collapse}
+.panel th{font-size:11px;padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;
+  color:var(--mut);font-weight:600}
+.panel td{padding:3px 4px;border:none}
+.panel input{width:100%;min-width:56px;padding:4px 7px;font-size:12.5px;
+  font-family:Consolas,monospace;background:var(--card);border:1px solid var(--line);
+  border-radius:6px;color:var(--ink)}
+.panel input:focus{outline:none;border-color:var(--mut)}
+.panel .act{margin-top:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lk{color:var(--acc2);cursor:pointer;font-size:12.5px;font-weight:600;padding:2px 4px;border-radius:6px}
+.lk:hover{background:var(--card)}
+.mut{color:var(--mut)}
+
+/* ── 집계 ── */
+.aggbar{display:flex;gap:10px;align-items:center;margin:14px 0 12px;flex-wrap:wrap}
+.prog{display:none;margin:0 0 12px}
+.prog.on{display:block}
+.track{height:6px;background:var(--card2);border-radius:3px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--acc);transition:width .25s ease}
+.ptext{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mut);margin-top:6px}
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:4px 0;box-shadow:0 1px 2px var(--shadow);overflow-x:auto}
+table.agg{border-collapse:collapse;width:100%;font-size:13.5px}
+table.agg th{text-align:left;font-weight:600;color:var(--mut);font-size:12px;
+  border-bottom:1px solid var(--line);padding:9px 10px;white-space:nowrap}
+table.agg th.num,table.agg td.num{text-align:right;font-variant-numeric:tabular-nums}
+table.agg td{border-bottom:1px solid var(--hair);padding:7px 10px}
+table.agg tr:hover td{background:var(--card2)}
+table.agg tr.sum td{border-top:2px solid var(--line);border-bottom:none;font-weight:800;
+  background:var(--card2)}
+
+/* 스켈레톤·토스트·테마픽커 */
+.sk{display:inline-block;height:11px;border-radius:3px;background:
+  linear-gradient(90deg,var(--card2) 25%,var(--line) 37%,var(--card2) 63%);
+  background-size:400% 100%;animation:sh 1.3s ease infinite}
+@keyframes sh{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);
+  background:var(--card2);border:1px solid var(--line);color:var(--ink);
+  padding:10px 18px;border-radius:12px;font-size:13.5px;opacity:0;
+  transition:opacity .2s;pointer-events:none;z-index:9;box-shadow:0 4px 16px var(--shadow)}
+.toast.on{opacity:1}
+.thwrap{position:relative}
+.sws{display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:50;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px;
+  box-shadow:0 10px 26px var(--shadow);gap:5px;align-items:center;flex-wrap:nowrap}
+.thwrap.open .sws{display:flex}
+.sws .gap{width:1px;height:18px;background:var(--line);margin:0 3px}
+button.sw{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);cursor:pointer;
+  padding:0;position:relative;overflow:hidden}
+button.sw i{position:absolute;right:2px;bottom:2px;width:9px;height:9px;border-radius:50%}
+button.sw.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--accdim)}
+button.sw:hover{transform:scale(1.12)}
+</style>
+<title>위탁매출 정산 관리 (데모) — 이어진 포트폴리오</title></head>
+<body>
+<div id="demobar">
+  <b>데모</b>
+  <span>위탁매출 정산 관리 앱 그대로 — 채널 룰(헤더행·소계 위치·산식·파라미터) 편집 화면은 실제 로직이고, 정산서 파일과 계산 결과는 가상값입니다. 판매처 이름은 번호로 가렸습니다.</span>
+  <a href="../../">← 포트폴리오</a>
+</div>
+<style>
+#demobar{position:sticky;top:0;z-index:9999;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  background:#fff8e1;border-bottom:1px solid #f0dfa8;padding:9px 16px;font-size:12.5px;color:#6b5b21;
+  font-family:system-ui,-apple-system,'Malgun Gothic',sans-serif}
+#demobar b{background:#6b5b21;color:#fff8e1;padding:2px 8px;border-radius:10px;font-size:11.5px}
+#demobar a{margin-left:auto;color:#6b5b21;font-weight:700;text-decoration:none}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">위탁 <em>정산</em></div>
+    <nav class="tabs">
+      <button id="tabReg" class="on" onclick="showTab('reg')">등록</button>
+      <button id="tabAgg" onclick="showTab('agg')">집계</button>
+    </nav>
+    <div class="hright">
+      <input class="t num" id="month" value="2026-05" onchange="loadList(true)">
+      <button class="b sm" onclick="loadList(true)">새로고침</button>
+      <button class="b sm" onclick="addChannel()">＋ 채널</button>
+      <button class="b sm" onclick="openFolder()">Drive</button>
+      <span class="thwrap" id="thwrap">
+        <button class="b sm" onclick="document.getElementById('thwrap').classList.toggle('open')">테마</button>
+        <span class="sws" id="theme"></span>
+      </span>
+    </div>
+  </header>
+
+  <!-- ── 등록 ── -->
+  <section class="tab on" id="sec_reg">
+    <div class="split">
+      <div class="llist" id="llist"></div>
+      <div class="detail" id="detail"><div class="card mut">채널을 선택하세요</div></div>
+    </div>
+  </section>
+
+  <!-- ── 집계 ── -->
+  <section class="tab" id="sec_agg">
+    <div class="aggbar">
+      <button class="b pri" id="btnAll" onclick="calcAll()">전 채널 계산</button>
+      <button class="b" onclick="stopAll()" id="btnStop" style="display:none">중지</button>
+      <button class="b" onclick="exportFile('witaExportMonth','월파일')">📊 월파일 다운로드</button>
+      <button class="b" onclick="exportFile('witaExportJournal','전표입력')">🧾 전표입력 다운로드</button>
+      <span class="mut" id="aggmsg" style="font-size:13px"></span>
+    </div>
+    <div class="prog" id="prog">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <div class="ptext"><span id="pnow"></span><span id="ppct"></span></div>
+    </div>
+    <div class="tcard">
+      <table class="agg">
+        <thead><tr>
+          <th style="width:36px">시트</th><th>판매처</th><th>브랜드</th><th>본부</th>
+          <th class="num">상품매출(−v)</th><th class="num">상품매출(+v)</th><th class="num">기타매출</th>
+          <th class="num">수수료(별도)</th><th class="num">수수료(계산서)</th><th class="num">패널티</th><th class="num">정산대상액</th>
+          <th class="num">실수취율</th><th>입금예정</th>
+          <th style="width:70px">검증</th>
+        </tr></thead>
+        <tbody id="aggbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+var CH = [], RESULT = {}, RULE = null, SEL = null, RUN = false, STOP = false;
+var ITEMS = ['상품매출', '기타매출', '수수료_별도', '수수료_계산서', '정산금액'];
+
+function $(id) { return document.getElementById(id); }
+function mon() { return $('month').value.trim(); }
+function fmt(n) { return (n === null || n === undefined || n === '') ? '' : Number(n).toLocaleString(); }
+/* 실수취율 = 정산대상액 ÷ (상품매출+기타매출). 원가가 없어 마진율은 못 내고, 몰에 떼이고 남는 비율을 본다 */
+function rate(v) {
+  var sales = (v['상품매출'] || 0) + (v['기타매출'] || 0);
+  if (!sales || v['정산금액'] === undefined) return '';
+  return (v['정산금액'] / sales * 100).toFixed(1) + '%';
+}
+function esc(s) { return String(s === undefined || s === null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+var toastT = null;
+function toast(s) {
+  var t = $('toast'); t.textContent = s; t.className = 'toast on';
+  clearTimeout(toastT); toastT = setTimeout(function () { t.className = 'toast'; }, 2600);
+}
+function kb(n) { return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.round(n / 1024) + ' KB'; }
+
+function showTab(k) {
+  $('tabReg').className = k === 'reg' ? 'on' : '';
+  $('tabAgg').className = k === 'agg' ? 'on' : '';
+  $('sec_reg').className = 'tab' + (k === 'reg' ? ' on' : '');
+  $('sec_agg').className = 'tab' + (k === 'agg' ? ' on' : '');
+  if (k === 'agg') drawAgg();
+}
+
+/* ── 목록 ── */
+function loadList(fresh) {
+  /* stale-while-revalidate: 직전 목록을 즉시 그리고, 뒤에서 최신본으로 바꾼다.
+     스켈레톤은 캐시가 없는 첫 방문에만 보인다. */
+  var cached = null;
+  try { cached = JSON.parse(localStorage.getItem('wita_list_' + mon()) || 'null'); } catch (e) {}
+  if (cached && cached.length) {
+    CH = cached; drawList(); if (SEL) drawDetail(); drawAgg();
+  } else {
+    var h = '';
+    for (var i = 0; i < 10; i++)
+      h += '<div class="chc"><span class="sk" style="width:' + (110 + (i * 17) % 70) + 'px"></span><br>' +
+           '<span class="sk" style="width:70px"></span></div>';
+    $('llist').innerHTML = h;
+  }
+  google.script.run.withSuccessHandler(function (res) {
+    CH = res.채널;
+    try { localStorage.setItem('wita_list_' + mon(), JSON.stringify(CH)); } catch (e) {}
+    /* 서버에 저장된 지난 계산 결과 복원 — 지금 세션에서 계산 중이거나 더 새 결과가 있으면 유지 */
+    Object.keys(res.결과 || {}).forEach(function (sn) {
+      if (!RESULT[sn] || (!RESULT[sn].__running && !RESULT[sn].근거)) RESULT[sn] = res.결과[sn];
+    });
+    drawList();
+    if (SEL) drawDetail();
+    drawAgg();
+  }).withFailureHandler(function (e) {
+    if (!cached) $('llist').innerHTML =
+      '<div class="chc" style="color:var(--red)">불러오기 실패: ' + esc(e.message) + '</div>';
+    else toast('목록 갱신 실패: ' + e.message);
+  }).witaChannelList(mon(), !!fresh);
+}
+
+function chOf(sn) {
+  return CH.filter(function (c) { return c.시트 === sn; })[0];
+}
+
+function drawList() {
+  var h = '';
+  CH.forEach(function (c) {
+    var r = RESULT[c.시트];
+    var badge;
+    if (r && r.__running) badge = '<span class="bd run">계산중</span>';
+    else if (r && r.검증) badge = r.검증.통과 ? '<span class="bd ok">통과</span>'
+      : '<span class="bd bad">차이</span>';
+    else if (r && r.문제 && r.문제.length) badge = '<span class="bd bad">실패</span>';
+    else if (c.파일수) badge = '<span class="bd">파일 ' + c.파일수 + '</span>';
+    else badge = '<span class="bd dim">파일없음</span>';
+    h += '<div class="chc' + (SEL === c.시트 ? ' on' : '') + '" onclick="selCh(\'' + c.시트 + '\')">' +
+      '<div class="t"><div><span class="sn">' + c.시트 + '</span><span class="nm">' + esc(c.판매처) + '</span></div>' +
+      badge + '</div>' +
+      '<div class="sub">' + esc(c.브랜드) + (c.본부 ? ' · ' + esc(c.본부) : '') + '</div></div>';
+  });
+  $('llist').innerHTML = h;
+}
+
+function selCh(sn) {
+  SEL = sn; RULE = null;
+  drawList(); drawDetail();
+}
+
+/* ── 상세 ── */
+function drawDetail() {
+  var c = chOf(SEL);
+  if (!c) { $('detail').innerHTML = '<div class="card mut">채널을 선택하세요</div>'; return; }
+  var r = RESULT[SEL];
+  var h = '<div class="card">';
+  h += '<div class="dhead"><h2>' + esc(c.판매처) + '</h2>' +
+       '<span class="chip">' + c.시트 + '</span>' +
+       (c.브랜드 ? '<span class="chip acc">' + esc(c.브랜드) + '</span>' : '') +
+       (c.본부 ? '<span class="chip">' + esc(c.본부) + '</span>' : '') +
+       (c.입금주기 ? '<span class="chip">입금 ' + esc(c.입금주기) + (c.입금예정일 ? ' → ' + esc(c.입금예정일) : '') + '</span>' : '') +
+       '<span style="flex:1"></span>' +
+       '<button class="b sm pri" onclick="calcOne(\'' + SEL + '\')">계산</button>' +
+       '<span class="lk" onclick="openRule(\'' + SEL + '\')">룰 편집</span></div>';
+  if (c.어드민경로) h += '<div class="path">어드민 경로 · ' + esc(c.어드민경로) + '</div>';
+
+  /* 필요파일 체크리스트 */
+  if ((c.필요파일 || []).length) {
+    h += '<div class="need">';
+    c.필요파일.forEach(function (n) {
+      var st = n.확보 ? '<span class="st y">●</span>' : (n.선택 ? '<span class="st n">○</span>' : '<span class="st n">◌</span>');
+      h += '<div class="it">' + st + '<span class="role">' + esc(n.역할) + '</span>' +
+           '<span class="kw">파일명에 "' + esc(n.키워드) + '"</span>' +
+           (n.선택 ? '<span class="pt">(선택)</span>' : '') +
+           (n.경로 ? '<span class="pt">· ' + esc(n.경로) + '</span>' : '') + '</div>';
+    });
+    h += '</div>';
+  }
+
+  /* 드롭존 */
+  h += '<div class="drop" id="drop" onclick="document.getElementById(\'fi\').click()">' +
+       '<b>정산파일 끌어다 놓기</b><span>또는 클릭해서 선택 · 여러 파일 가능</span>' +
+       '<input type="file" id="fi" multiple onchange="pickFiles(this.files)"></div>';
+
+  /* 올라온 파일 */
+  if ((c.파일 || []).length) {
+    h += '<div class="flist">';
+    c.파일.forEach(function (f) {
+      h += '<div class="fit"><span class="nm2">' + esc(f.name) + '</span>' +
+           '<span class="sz">' + kb(f.size) + ' · ' + esc(f.updated) + '</span>' +
+           '<button class="xbtn" onclick="delFile(\'' + esc(f.name).replace(/'/g, "\\'") + '\')">×</button></div>';
+    });
+    h += '</div>';
+  }
+  h += '</div>';
+
+  /* 결과 */
+  if (r && !r.__running && (r.값 || r.문제)) {
+    h += '<div class="card">';
+    if (r.값 && Object.keys(r.값).length) {
+      h += '<div class="mets">';
+      [['상품매출', '상품매출(+v)'], ['기타매출', '기타매출'], ['수수료_별도', '수수료(별도)'],
+       ['수수료_계산서', '수수료(계산서)'], ['패널티', '패널티'], ['정산금액', '정산대상액']].forEach(function (p) {
+        if (r.값[p[0]] !== undefined)
+          h += '<div class="met"><span>' + p[1] + '</span><b>' + fmt(r.값[p[0]]) + '</b></div>';
+      });
+      if (rate(r.값)) h += '<div class="met"><span>실수취율</span><b>' + rate(r.값) + '</b></div>';
+      h += '</div>';
+    }
+    if (r.검증) {
+      h += '<div class="vline">검증 · ' + r.검증.식 + ' → ' +
+        (r.검증.통과 ? '<span class="y">통과</span>'
+                     : '<span class="n">차이 ' + fmt(r.검증.차이) + '</span>') +
+        (r.검증.힌트 ? '<div class="mut" style="font-size:12px;margin-top:3px">' + esc(r.검증.힌트) + '</div>' : '') + '</div>';
+    }
+    if (r.문제 && r.문제.length) {
+      h += '<div class="vline n" style="color:var(--red)">' +
+           r.문제.map(function (p) { return '⚠ ' + esc(p); }).join('<br>') + '</div>';
+    }
+    if (r.근거) {
+      h += '<div style="margin-top:10px"><span class="lk" onclick="toggleWhy()">' +
+           (r.__open ? '근거 접기' : '근거 펼치기 (어느 컬럼을 어떻게 더했는지)') + '</span></div>';
+      if (r.__open) h += '<div class="panel why">' + esc(whyText(r)) + '</div>';
+    }
+    h += '</div>';
+  } else if (r && r.__running) {
+    h += '<div class="card"><span class="bd run">계산중…</span></div>';
+  }
+
+  /* 룰 편집 */
+  if (RULE) h += rulePanel();
+
+  $('detail').innerHTML = h;
+  bindDrop();
+}
+
+function whyText(r) {
+  var s = [];
+  (r.파일 || []).forEach(function (f) { s.push('[' + f.역할 + '] ' + f.파일명); });
+  if (r.근거) {
+    s.push('');
+    Object.keys(r.근거).forEach(function (k) {
+      var g = r.근거[k];
+      s.push(k + ' = ' + fmt(g.값));
+      s.push('   ' + g.산식);
+      (g.세부 || []).forEach(function (d) {
+        s.push('      ' + d.함수 + '(' + d.인자 + ') = ' + fmt(d.값));
+      });
+    });
+  }
+  return s.join('\n');
+}
+
+function toggleWhy() {
+  var r = RESULT[SEL]; if (!r) return;
+  r.__open = !r.__open; drawDetail();
+}
+
+/* ── 업로드 (클릭 + 드래그) ── */
+function bindDrop() {
+  var d = $('drop'); if (!d) return;
+  ['dragenter', 'dragover'].forEach(function (ev) {
+    d.addEventListener(ev, function (e) { e.preventDefault(); d.className = 'drop hot'; });
+  });
+  ['dragleave', 'drop'].forEach(function (ev) {
+    d.addEventListener(ev, function (e) { e.preventDefault(); d.className = 'drop'; });
+  });
+  d.addEventListener('drop', function (e) {
+    if (e.dataTransfer && e.dataTransfer.files.length) pickFiles(e.dataTransfer.files);
+  });
+}
+
+function pickFiles(fileList) {
+  var files = Array.prototype.slice.call(fileList);
+  if (!files.length || !SEL) return;
+  var sn = SEL, done = 0;
+  toast(sn + ' 업로드 0/' + files.length);
+  (function next(i) {
+    if (i >= files.length) {
+      toast(sn + ' 업로드 완료 ' + done + '개 — 자동 계산');
+      loadList(true);
+      calcOne(sn);          /* 업로드 끝나면 그 채널은 바로 계산 */
+      return;
+    }
+    var f = files[i];
+    var fr = new FileReader();
+    fr.onload = function () {
+      google.script.run.withSuccessHandler(function () {
+        done++; toast(sn + ' 업로드 ' + done + '/' + files.length); next(i + 1);
+      }).withFailureHandler(function (e) {
+        toast('실패: ' + f.name + ' — ' + e.message); next(i + 1);
+      }).witaUpload({ month: mon(), sheet: sn, name: f.name,
+                      mimeType: f.type, dataBase64: fr.result.split(',')[1] });
+    };
+    fr.readAsDataURL(f);
+  })(0);
+}
+
+function delFile(name) {
+  if (!confirm('삭제할까요?\n' + name)) return;
+  google.script.run.withSuccessHandler(function () { toast('삭제됨'); loadList(true); })
+    .withFailureHandler(function (e) { toast('삭제 실패: ' + e.message); })
+    .witaDeleteFile(mon(), SEL, name);
+}
+
+/* ── 계산 ── */
+function calcOne(sn) {
+  RESULT[sn] = RESULT[sn] || {};
+  RESULT[sn].__running = true;
+  drawList(); if (SEL === sn) drawDetail();
+  google.script.run.withSuccessHandler(function (r) {
+    r.__open = RESULT[sn] && RESULT[sn].__open;
+    RESULT[sn] = r;
+    drawList(); if (SEL === sn) drawDetail(); drawAgg();
+    if (r.문제 && r.문제.length) toast(sn + ' — ' + r.문제[0]);
+  }).withFailureHandler(function (e) {
+    RESULT[sn] = { 문제: [e.message] };
+    drawList(); if (SEL === sn) drawDetail(); drawAgg();
+  }).witaComputeChannel(mon(), sn, null);
+}
+
+/* ── 집계 ── */
+function drawAgg() {
+  var h = '', tot = { mv: 0, pv: 0, etc: 0, s1: 0, s2: 0, st: 0 };
+  CH.forEach(function (c) {
+    var r = RESULT[c.시트], v = (r && r.값) || {};
+    var pv = v['상품매출'], mv = pv === undefined ? undefined : Math.round(pv / 1.1);
+    var badge = '';
+    if (r && r.__running) badge = '<span class="bd run">…</span>';
+    else if (r && r.검증) badge = r.검증.통과 ? '<span class="bd ok">통과</span>'
+      : '<span class="bd bad">' + fmt(r.검증.차이) + '</span>';
+    else if (r && r.문제 && r.문제.length) badge = '<span class="bd bad">실패</span>';
+    else if (!c.파일수) badge = '<span class="bd dim">파일없음</span>';
+    if (pv !== undefined) {
+      tot.mv += mv; tot.pv += pv; tot.etc += (v['기타매출'] || 0);
+      tot.s1 += (v['수수료_별도'] || 0); tot.s2 += (v['수수료_계산서'] || 0);
+    tot.pen = (tot.pen || 0) + (v['패널티'] || 0); tot.st += (v['정산금액'] || 0);
+    }
+    h += '<tr onclick="showTab(\'reg\');selCh(\'' + c.시트 + '\')" style="cursor:pointer">' +
+      '<td class="mut num">' + c.시트 + '</td>' +
+      '<td style="font-weight:600">' + esc(c.판매처) + '</td>' +
+      '<td class="mut">' + esc(c.브랜드) + '</td>' +
+      '<td class="mut">' + esc(c.본부) + '</td>' +
+      '<td class="num">' + fmt(mv) + '</td>' +
+      '<td class="num">' + fmt(pv) + '</td>' +
+      '<td class="num">' + fmt(v['기타매출']) + '</td>' +
+      '<td class="num">' + fmt(v['수수료_별도']) + '</td>' +
+      '<td class="num">' + fmt(v['수수료_계산서']) + '</td>' +
+      '<td class="num">' + fmt(v['패널티']) + '</td>' +
+      '<td class="num">' + fmt(v['정산금액']) + '</td>' +
+      '<td class="num mut">' + rate(v) + '</td>' +
+      '<td class="mut" style="white-space:nowrap">' + (c.입금예정일 || '') + '</td>' +
+      '<td>' + badge + '</td></tr>';
+  });
+  h += '<tr class="sum"><td></td><td>합계</td><td></td><td></td>' +
+    '<td class="num">' + fmt(tot.mv) + '</td><td class="num">' + fmt(tot.pv) + '</td>' +
+    '<td class="num">' + fmt(tot.etc) + '</td><td class="num">' + fmt(tot.s1) + '</td>' +
+    '<td class="num">' + fmt(tot.s2) + '</td><td class="num">' + fmt(tot.pen || 0) + '</td>' +
+    '<td class="num">' + fmt(tot.st) + '</td>' +
+    '<td class="num">' + rate({ 상품매출: tot.pv, 기타매출: tot.etc, 정산금액: tot.st }) + '</td>' +
+    '<td></td><td></td></tr>';
+  $('aggbody').innerHTML = h;
+}
+
+function calcAll() {
+  var targets = CH.filter(function (c) { return c.파일수 > 0; }).map(function (c) { return c.시트; });
+  if (!targets.length) { toast('파일이 올라온 채널이 없습니다'); return; }
+  RUN = true; STOP = false;
+  $('btnAll').disabled = true; $('btnStop').style.display = '';
+  $('prog').className = 'prog on';
+  var i = 0, t0 = Date.now();
+  (function next() {
+    if (STOP || i >= targets.length) { finish(t0); return; }
+    var sn = targets[i], c = chOf(sn);
+    var pct = Math.round(i / targets.length * 100);
+    $('fill').style.width = pct + '%';
+    $('pnow').textContent = sn + ' ' + (c ? c.판매처 : '') + ' 계산 중 (' + (i + 1) + '/' + targets.length + ')';
+    $('ppct').textContent = pct + '%';
+    RESULT[sn] = RESULT[sn] || {}; RESULT[sn].__running = true; drawAgg();
+    google.script.run.withSuccessHandler(function (r) {
+      RESULT[sn] = r; i++; drawAgg(); drawList(); next();
+    }).withFailureHandler(function (e) {
+      RESULT[sn] = { 문제: [e.message] }; i++; drawAgg(); drawList(); next();
+    }).witaComputeChannel(mon(), sn, null);
+  })();
+}
+
+function finish(t0) {
+  RUN = false;
+  $('btnAll').disabled = false; $('btnStop').style.display = 'none';
+  $('fill').style.width = '100%'; $('ppct').textContent = '100%';
+  var ok = 0, bad = 0;
+  Object.keys(RESULT).forEach(function (sn) {
+    var r = RESULT[sn];
+    if (r.검증 && r.검증.통과) ok++;
+    else if ((r.문제 || []).length || (r.검증 && !r.검증.통과)) bad++;
+  });
+  $('pnow').textContent = '완료 · ' + Math.round((Date.now() - t0) / 1000) + '초 · 통과 ' + ok + ' / 확인필요 ' + bad;
+  $('aggmsg').textContent = '';
+  drawAgg(); drawList();
+  setTimeout(function () { $('prog').className = 'prog'; }, 5000);
+}
+
+function stopAll() { STOP = true; toast('중지 — 진행 중인 채널까지만'); }
+
+function exportFile(fn, label) {
+  toast(label + ' 생성 중... (raw 탭 포함, 수십 초)');
+  google.script.run.withSuccessHandler(function (r) {
+    toast(label + ' 완료 — 다운로드 시작');
+    window.open(r.url, '_blank');
+  }).withFailureHandler(function (e) { toast(label + ' 실패: ' + e.message); })[fn](mon());
+}
+
+function openFolder() {
+  google.script.run.withSuccessHandler(function (url) { window.open(url, '_blank'); })
+    .withFailureHandler(function (e) { toast('실패: ' + e.message); })
+    .witaRootFolderUrl();
+}
+
+/* ── 룰 편집 ── */
+function openRule(sn) {
+  if (RULE) { RULE = null; drawDetail(); return; }
+  toast('룰 불러오는 중...');
+  google.script.run.withSuccessHandler(function (r) { RULE = r; drawDetail(); })
+    .withFailureHandler(function (e) { toast('룰 로드 실패: ' + e.message); })
+    .witaRuleOf(sn);
+}
+
+function rulePanel() {
+  var d = RULE;
+  var h = '<div class="card"><div class="panel" style="border-left-color:var(--acc)">';
+  ['채널', '파일', '집계', '산출', '파라미터'].forEach(function (key) {
+    var cols = d.컬럼[key].filter(function (c) { return c !== '시트'; });
+    h += '<h4>' + key + '</h4><div style="overflow-x:auto"><table id="rt_' + key + '"><tr>';
+    cols.forEach(function (c) { h += '<th>' + c + '</th>'; });
+    h += '<th style="width:22px"></th></tr>';
+    (d[key] || []).forEach(function (row) {
+      h += '<tr>';
+      cols.forEach(function (c) {
+        h += '<td><input value="' + esc(row[c]) + '" data-col="' + c + '"></td>';
+      });
+      h += '<td><button class="xbtn" onclick="this.closest(\'tr\').remove()">×</button></td></tr>';
+    });
+    h += '</table></div><span class="lk" onclick="addRuleRow(\'' + key + '\')">＋ 행</span>';
+  });
+  h += '<div class="act">' +
+       '<button class="b sm pri" onclick="saveRule()">저장</button>' +
+       '<button class="b sm" onclick="openRule()">닫기</button>' +
+       '<button class="b sm" onclick="delChannel()" style="color:var(--red)">채널 삭제</button>' +
+       '<span class="mut" style="font-size:12px">Drive _rules.json 저장 · 버전 기록으로 되돌리기 가능</span>' +
+       '</div></div></div>';
+  return h;
+}
+
+function addRuleRow(key) {
+  var t = document.getElementById('rt_' + key);
+  var cols = RULE.컬럼[key].filter(function (c) { return c !== '시트'; });
+  var tr = t.insertRow(-1);
+  cols.forEach(function (c) {
+    tr.insertCell(-1).innerHTML = '<input value="" data-col="' + c + '">';
+  });
+  tr.insertCell(-1).innerHTML = '<button class="xbtn" onclick="this.closest(\'tr\').remove()">×</button>';
+}
+
+function saveRule() {
+  var payload = {};
+  ['채널', '파일', '집계', '산출', '파라미터'].forEach(function (key) {
+    var t = document.getElementById('rt_' + key);
+    var rows = [];
+    for (var i = 1; i < t.rows.length; i++) {
+      var o = {}, ins = t.rows[i].querySelectorAll('input');
+      for (var j = 0; j < ins.length; j++) o[ins[j].getAttribute('data-col')] = ins[j].value;
+      rows.push(o);
+    }
+    payload[key] = rows;
+  });
+  toast('저장 중...');
+  google.script.run.withSuccessHandler(function (r) {
+    RULE = r; toast('룰 저장 완료'); loadList(true);
+  }).withFailureHandler(function (e) { toast('저장 실패: ' + e.message); })
+    .witaSaveRuleOf(SEL, payload);
+}
+
+function addChannel() {
+  var sn = prompt('새 채널 시트번호 (예: 33)');
+  if (!sn) return;
+  var seller = prompt('판매처 이름') || '';
+  google.script.run.withSuccessHandler(function () {
+    toast(sn + ' 채널 추가됨'); SEL = sn; loadList(true);
+  }).withFailureHandler(function (e) { toast('추가 실패: ' + e.message); })
+    .witaAddChannel(sn, seller);
+}
+
+function delChannel() {
+  if (!confirm(SEL + ' 채널의 룰을 삭제할까요? (Drive 버전 기록으로 되돌릴 수 있습니다)')) return;
+  google.script.run.withSuccessHandler(function () {
+    RULE = null; SEL = null; toast('삭제됨'); loadList(true);
+  }).withFailureHandler(function (e) { toast('삭제 실패: ' + e.message); })
+    .witaDeleteChannel(SEL);
+}
+
+/* ── 테마 (라인시트와 동일 팔레트) ── */
+var THEMES = {
+  lime: { name:'라임', tone:'어두운',
+    acc:'#C8FF3C', acc2:'#4DD8E6', accdim:'#3D5418', acc2dim:'#1C4A52',
+    bg:'#0B0D10', card:'#14181F', card2:'#1A2029', line:'#252D3A', hair:'#1E252F', tint:'#141A12',
+    ink:'#E9EDF3', ink2:'#B7C1D0', mut:'#8B96A8', onacc:'#0B0D10',
+    errbd:'#5A2626', errbg:'#1A1212', errink:'#FFD5D5', shadow:'rgba(0,0,0,.35)', red:'#FF6B6B' },
+  cyan: { name:'시안', tone:'어두운',
+    acc:'#3BD9F5', acc2:'#9BE86B', accdim:'#12454F', acc2dim:'#2E4A18',
+    bg:'#080D12', card:'#111922', card2:'#17212C', line:'#22303C', hair:'#1C2836', tint:'#0E1D24',
+    ink:'#E7EEF5', ink2:'#B2C2D0', mut:'#8796A6', onacc:'#061014',
+    errbd:'#5A2626', errbg:'#1A1214', errink:'#FFD5D5', shadow:'rgba(0,0,0,.38)', red:'#FF6B6B' },
+  violet: { name:'바이올렛', tone:'어두운',
+    acc:'#BD97FF', acc2:'#7FE3C0', accdim:'#3B2A60', acc2dim:'#1D4A3C',
+    bg:'#0C0A13', card:'#16131F', card2:'#1D1929', line:'#2B2540', hair:'#241F35', tint:'#181228',
+    ink:'#EBE8F5', ink2:'#BDB6D2', mut:'#8F87A6', onacc:'#0C0713',
+    errbd:'#5A2636', errbg:'#191117', errink:'#FFD5E0', shadow:'rgba(0,0,0,.4)', red:'#FF6B6B' },
+  steel: { name:'스틸 블루', tone:'중간',
+    acc:'#7FB2FF', acc2:'#7FE0C4', accdim:'#2A3D5C', acc2dim:'#1F4A40',
+    bg:'#1B212A', card:'#232A35', card2:'#2A323E', line:'#38424F', hair:'#303945', tint:'#243044',
+    ink:'#EDF1F6', ink2:'#C2CBD6', mut:'#96A1AF', onacc:'#101820',
+    errbd:'#6B3232', errbg:'#2A1E1E', errink:'#FFD9D9', shadow:'rgba(0,0,0,.3)', red:'#FFD9D9' },
+  paper: { name:'페이퍼 블루', tone:'밝은',
+    acc:'#2563EB', acc2:'#0E7490', accdim:'#BFD4F7', acc2dim:'#B6DDE6',
+    bg:'#F1F4F9', card:'#FFFFFF', card2:'#F6F8FC', line:'#DCE3ED', hair:'#E8EDF4', tint:'#EAF1FE',
+    ink:'#141C27', ink2:'#3D4A5C', mut:'#5A6673', onacc:'#FFFFFF',
+    errbd:'#F0B3B3', errbg:'#FDF1F1', errink:'#9B1C1C', shadow:'rgba(20,28,39,.12)', red:'#9B1C1C' },
+  linen: { name:'리넨', tone:'밝은',
+    acc:'#C2410C', acc2:'#0F766E', accdim:'#F3CDB6', acc2dim:'#B9DEDA',
+    bg:'#F8F5F0', card:'#FFFFFF', card2:'#FBF9F5', line:'#E5DED4', hair:'#EFEAE2', tint:'#FCEFE6',
+    ink:'#221C15', ink2:'#4A4136', mut:'#6A6055', onacc:'#FFFFFF',
+    errbd:'#F0B3B3', errbg:'#FDF1F1', errink:'#9B1C1C', shadow:'rgba(34,28,21,.12)', red:'#9B1C1C' },
+  green: { name:'그린', tone:'밝은',
+    acc:'#15803D', acc2:'#1D4ED8', accdim:'#BFE3CB', acc2dim:'#C5D5F9',
+    bg:'#F2F7F3', card:'#FFFFFF', card2:'#F6FAF7', line:'#D9E5DC', hair:'#E7F0E9', tint:'#E6F4EA',
+    ink:'#16211A', ink2:'#3E4C42', mut:'#5D6B60', onacc:'#FFFFFF',
+    errbd:'#F0B3B3', errbg:'#FDF1F1', errink:'#9B1C1C', shadow:'rgba(22,33,26,.12)', red:'#9B1C1C' },
+  mono: { name:'블랙', tone:'밝은',
+    acc:'#16181D', acc2:'#4B5563', accdim:'#D9DCE1', acc2dim:'#E3E5E9',
+    bg:'#F5F5F4', card:'#FFFFFF', card2:'#F8F8F7', line:'#DEDEDA', hair:'#EBEBE8', tint:'#ECECEA',
+    ink:'#191B1E', ink2:'#43464B', mut:'#64676C', onacc:'#FFFFFF',
+    errbd:'#F0B3B3', errbg:'#FDF1F1', errink:'#9B1C1C', shadow:'rgba(0,0,0,.12)', red:'#9B1C1C' }
+};
+var THEME_KEYS = ['lime','cyan','violet','steel','paper','linen','green','mono'];
+var THEME_VARS = ['acc','acc2','accdim','acc2dim','bg','card','card2','line','hair','tint',
+  'ink','ink2','mut','onacc','errbd','errbg','errink','shadow','red'];
+
+function applyTheme(k) {
+  var t = THEMES[k] || THEMES.lime;
+  var r = document.documentElement.style;
+  THEME_VARS.forEach(function (v) { if (t[v]) r.setProperty('--' + v, t[v]); });
+  document.documentElement.style.colorScheme = (t.tone === '밝은' ? 'light' : 'dark');
+  try { localStorage.setItem('wita_theme', k); } catch (e) {}
+}
+
+function initTheme() {
+  var box = $('theme');
+  var tones = ['어두운', '중간', '밝은'];
+  var h = [];
+  tones.forEach(function (tone, ti) {
+    if (ti) h.push('<span class="gap"></span>');
+    THEME_KEYS.filter(function (k) { return THEMES[k].tone === tone; }).forEach(function (k) {
+      var t = THEMES[k];
+      h.push('<button class="sw" data-t="' + k + '" title="' + t.name + ' · ' + tone +
+        '" style="background:' + t.bg + '"><i style="background:' + t.acc + '"></i></button>');
+    });
+  });
+  box.innerHTML = h.join('');
+  var saved = 'lime';
+  try { saved = localStorage.getItem('wita_theme') || 'lime'; } catch (e) {}
+  if (!THEMES[saved]) saved = 'lime';
+  function mark(k) {
+    box.querySelectorAll('button.sw').forEach(function (b) {
+      b.className = 'sw' + (b.getAttribute('data-t') === k ? ' on' : '');
+    });
+  }
+  applyTheme(saved); mark(saved);
+  box.querySelectorAll('button.sw').forEach(function (b) {
+    b.addEventListener('click', function () {
+      applyTheme(b.getAttribute('data-t')); mark(b.getAttribute('data-t'));
+    });
+  });
+  document.addEventListener('click', function (ev) {
+    var w = $('thwrap');
+    if (w && !w.contains(ev.target)) w.classList.remove('open');
+  });
+}
+
+initTheme();
+loadList(false);
+</script>
+</body>
+</html>

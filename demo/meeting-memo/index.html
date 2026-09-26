@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<script>
+window.__SHEETS={"협의항목": [["소모품 구매 협의 — 2026년 4분기", "", "", "", "", "", ""], ["사무·물류 소모품의 구매 주기와 단가 기준을 정하는 자리입니다. 항목별로 의견을 남겨 주세요.", "", "", "", "", "", ""], ["구분", "No", "항목", "현행", "질문", "의견", "결과"], ["사무", 1, "복사용지 A4", "월 20박스 · 개별 구매", "묶음 계약으로 바꿀까요?", "", ""], ["사무", 2, "프린터 토너", "부서별 개별 구매", "정품/재생 기준을 정할까요?", "", ""], ["물류", 3, "택배 박스 3종", "주 1회 발주", "규격을 2종으로 줄일 수 있나요?", "", ""], ["물류", 4, "완충재·테이프", "물류팀 재량", "월 사용량 기준을 둘까요?", "", ""], ["매장", 5, "쇼핑백·포장지", "시즌별 대량 구매", "재고 상한을 둘까요?", "", ""], ["공통", 6, "생수·커피", "주 2회 배송", "구독형으로 전환할까요?", "", ""], ["공통", 7, "청소·위생용품", "월 1회", "업체 일원화 검토", "", ""]], "회의메모": [["시각", "작성자", "항목", "메모"], ["09/24 10:12", "담당자B", "No.1 복사용지 A4", "묶음 계약 시 단가 12% 절감 견적 받았음"], ["09/24 10:15", "담당자C", "No.3 택배 박스 3종", "중형 규격이 전체의 70%, 대형은 월 30개 미만"], ["09/24 10:20", "데모 사용자", "No.6 생수·커피", "구독형은 최소 6개월 약정 — 해지 조건 확인 필요"]]};
+window.__PROPS={};
+
+function Sheet(name,rows){ this.name=name; this.rows=rows||[]; }
+Sheet.prototype.getName=function(){ return this.name; };
+Sheet.prototype.getLastRow=function(){ for(var i=this.rows.length-1;i>=0;i--){ var r=this.rows[i]||[]; if(r.some(function(v){return v!==''&&v!==null&&v!==undefined;})) return i+1; } return 0; };
+Sheet.prototype.getMaxRows=function(){ return Math.max(1000,this.rows.length+100); };
+Sheet.prototype.getMaxColumns=function(){ return Math.max(26,this.getLastColumn()); };
+Sheet.prototype.getLastColumn=function(){ return this.rows.reduce(function(m,r){ return Math.max(m,(r||[]).length); },0); };
+Sheet.prototype.getDataRange=function(){ return this.getRange(1,1,Math.max(1,this.getLastRow()),Math.max(1,this.getLastColumn())); };
+Sheet.prototype.setFrozenRows=function(){ return this; }; Sheet.prototype.setFrozenColumns=function(){ return this; };
+Sheet.prototype.setColumnWidth=function(){ return this; }; Sheet.prototype.setColumnWidths=function(){ return this; }; Sheet.prototype.autoResizeColumns=function(){ return this; };
+Sheet.prototype.clear=function(){ this.rows=[]; return this; }; Sheet.prototype.clearContents=function(){ this.rows=[]; return this; };
+Sheet.prototype.appendRow=function(a){ this.rows[this.getLastRow()]=a.slice(); return this; };
+Sheet.prototype.deleteRow=function(i){ this.rows.splice(i-1,1); return this; };
+Sheet.prototype.deleteRows=function(i,n){ this.rows.splice(i-1,n||1); return this; };
+Sheet.prototype.insertRowsAfter=function(){ return this; }; Sheet.prototype.insertRowBefore=function(){ return this; };
+Sheet.prototype.hideColumns=function(){ return this; }; Sheet.prototype.getSheetId=function(){ return 0; };
+Sheet.prototype.getRange=function(r,c,nr,nc){ var sh=this;
+  if(typeof r==='string'){ var m=r.match(/^([A-Z]+)(\d+)(?::([A-Z]+)(\d+))?$/); if(m){ var col=function(s){ var n=0; for(var i=0;i<s.length;i++) n=n*26+(s.charCodeAt(i)-64); return n; };
+    var c1=col(m[1]), r1=+m[2], c2=m[3]?col(m[3]):c1, r2=m[4]?+m[4]:r1; return sh.getRange(r1,c1,r2-r1+1,c2-c1+1); } }
+  nr=nr===undefined?1:nr; nc=nc===undefined?1:nc;
+  var R={ getValues:function(){ var out=[]; for(var i=0;i<nr;i++){ var row=sh.rows[r-1+i]||[]; var o=[]; for(var j=0;j<nc;j++){ var v=row[c-1+j]; o.push(v===undefined?'':v); } out.push(o); } return out; },
+    getDisplayValues:function(){ return this.getValues().map(function(r){ return r.map(function(v){ return v===null||v===undefined?'':String(v); }); }); },
+    getValue:function(){ return this.getValues()[0][0]; }, getDisplayValue:function(){ return String(this.getValues()[0][0]); },
+    getNumRows:function(){ return nr; }, getNumColumns:function(){ return nc; }, getRow:function(){ return r; }, getColumn:function(){ return c; },
+    setValues:function(vals){ vals.forEach(function(row,i){ var ri=r-1+i; if(!sh.rows[ri]) sh.rows[ri]=[]; row.forEach(function(v,j){ sh.rows[ri][c-1+j]=v; }); }); return R; },
+    setValue:function(v){ return R.setValues([[v]]); },
+    clearContent:function(){ for(var i=0;i<nr;i++){ var ri=r-1+i; if(!sh.rows[ri]) continue; for(var j=0;j<nc;j++) sh.rows[ri][c-1+j]=''; } return R; },
+    clear:function(){ return R.clearContent(); },
+    setNumberFormat:function(){ return R; }, setNumberFormats:function(){ return R; }, setFontWeight:function(){ return R; }, setBackground:function(){ return R; }, setBackgrounds:function(){ return R; },
+    setFontColor:function(){ return R; }, setWrap:function(){ return R; }, setHorizontalAlignment:function(){ return R; }, setVerticalAlignment:function(){ return R; }, setBorder:function(){ return R; }, setFontSize:function(){ return R; },
+    setDataValidation:function(){ return R; }, setNote:function(){ return R; }, setFormula:function(){ return R; }, setFormulas:function(){ return R; }, getFormulas:function(){ return R.getValues().map(function(r){ return r.map(function(){ return ''; }); }); },
+    getA1Notation:function(){ return ''; }, offset:function(){ return R; }, merge:function(){ return R; } };
+  return R; };
+function Spread(id,sheets){ this.id=id; this.sheets=[]; var self=this; Object.keys(sheets||{}).forEach(function(n){ self.sheets.push(new Sheet(n,sheets[n])); }); }
+Spread.prototype.getId=function(){ return this.id; }; Spread.prototype.getUrl=function(){ return '#'; }; Spread.prototype.getName=function(){ return '데모 저장소'; };
+Spread.prototype.getSheets=function(){ return this.sheets; };
+Spread.prototype.getSheetByName=function(n){ return this.sheets.filter(function(s){ return s.name===n; })[0]||null; };
+Spread.prototype.insertSheet=function(n){ var s=new Sheet(n); this.sheets.push(s); return s; };
+Spread.prototype.deleteSheet=function(s){ this.sheets=this.sheets.filter(function(x){ return x!==s; }); };
+Spread.prototype.getActiveSheet=function(){ return this.sheets[0]; };
+var __SS=new Spread('DEMO', window.__SHEETS||{});
+var PROPS=window.__PROPS||{}; var CACHE={};
+function kst_(d,fmt){ if(!(d instanceof Date)||isNaN(d.getTime())) return ''; var u=new Date(d.getTime()+9*3600*1000); var p2=function(n){ return ('0'+n).slice(-2); };
+  return String(fmt).replace(/yyyy/g,u.getUTCFullYear()).replace(/yy/g,String(u.getUTCFullYear()).slice(2)).replace(/MM/g,p2(u.getUTCMonth()+1)).replace(/dd/g,p2(u.getUTCDate())).replace(/HH/g,p2(u.getUTCHours())).replace(/mm/g,p2(u.getUTCMinutes())).replace(/ss/g,p2(u.getUTCSeconds())); }
+var SpreadsheetApp={ openById:function(){ return __SS; }, openByUrl:function(){ return __SS; }, create:function(){ return __SS; }, flush:function(){}, getActiveSpreadsheet:function(){ return __SS; }, getActive:function(){ return __SS; }, getUi:function(){ return { alert:function(){}, createMenu:function(){ return { addItem:function(){ return this; }, addToUi:function(){} }; } }; } };
+var PropertiesService={ getScriptProperties:function(){ return { getProperty:function(k){ return k in PROPS?PROPS[k]:null; }, setProperty:function(k,v){ PROPS[k]=String(v); return this; }, deleteProperty:function(k){ delete PROPS[k]; return this; }, getProperties:function(){ return PROPS; }, setProperties:function(o){ Object.keys(o).forEach(function(k){ PROPS[k]=String(o[k]); }); return this; } }; } };
+PropertiesService.getUserProperties=PropertiesService.getScriptProperties; PropertiesService.getDocumentProperties=PropertiesService.getScriptProperties;
+var Session={ getActiveUser:function(){ return { getEmail:function(){ return 'demo@example.com'; } }; }, getEffectiveUser:function(){ return { getEmail:function(){ return 'demo@example.com'; } }; }, getScriptTimeZone:function(){ return 'Asia/Seoul'; }, getTemporaryActiveUserKey:function(){ return 'demo'; } };
+var Utilities={ formatDate:kst_, sleep:function(){}, getUuid:function(){ return 'uuid-'+Math.random().toString(36).slice(2); },
+  base64Encode:function(s){ try{ return btoa(unescape(encodeURIComponent(String(s)))); }catch(e){ return ''; } }, base64Decode:function(b){ return b; }, base64EncodeWebSafe:function(s){ return Utilities.base64Encode(s); },
+  newBlob:function(d,m,n){ return { getBytes:function(){ return []; }, getDataAsString:function(){ return String(d||''); }, getName:function(){ return n||''; }, setName:function(){ return this; }, getContentType:function(){ return m||''; } }; },
+  parseCsv:function(t){ return String(t).split(/\r?\n/).map(function(l){ return l.split(','); }); }, formatString:function(){ return Array.prototype.join.call(arguments,' '); },
+  computeDigest:function(){ return [0]; }, DigestAlgorithm:{ MD5:1, SHA_256:2 }, Charset:{ UTF_8:1 }, zip:function(){ return Utilities.newBlob(''); }, unzip:function(){ return []; } };
+var LockService={ getScriptLock:function(){ return { tryLock:function(){ return true; }, waitLock:function(){}, releaseLock:function(){}, hasLock:function(){ return true; } }; } };
+LockService.getDocumentLock=LockService.getScriptLock; LockService.getUserLock=LockService.getScriptLock;
+var CacheService={ getScriptCache:function(){ return { get:function(k){ return k in CACHE?CACHE[k]:null; }, put:function(k,v){ CACHE[k]=v; }, remove:function(k){ delete CACHE[k]; }, removeAll:function(ks){ (ks||[]).forEach(function(k){ delete CACHE[k]; }); },
+  putAll:function(m){ Object.keys(m||{}).forEach(function(k){ CACHE[k]=m[k]; }); }, getAll:function(ks){ var o={}; (ks||[]).forEach(function(k){ if(k in CACHE) o[k]=CACHE[k]; }); return o; } }; } };
+CacheService.getUserCache=CacheService.getScriptCache; CacheService.getDocumentCache=CacheService.getScriptCache;
+var Logger={ log:function(){} };
+var MimeType={ GOOGLE_SHEETS:'sheet', CSV:'text/csv', PLAIN_TEXT:'text/plain', MICROSOFT_EXCEL:'xlsx', JPEG:'image/jpeg', PNG:'image/png', PDF:'pdf', FOLDER:'folder' };
+var _noFiles={ hasNext:function(){ return false; }, next:function(){ return null; } };
+var _file={ getId:function(){ return 'f'; }, getUrl:function(){ return '#'; }, getName:function(){ return 'file'; }, setTrashed:function(){ return this; }, getBlob:function(){ return Utilities.newBlob(''); }, setSharing:function(){ return this; }, getDownloadUrl:function(){ return '#'; }, getMimeType:function(){ return ''; }, getSize:function(){ return 0; }, getLastUpdated:function(){ return new Date(); }, makeCopy:function(){ return _file; }, moveTo:function(){ return _file; } };
+var _folder={ createFile:function(){ return _file; }, getFilesByName:function(){ return _noFiles; }, getFiles:function(){ return _noFiles; }, getFolders:function(){ return _noFiles; }, getFoldersByName:function(){ return _noFiles; }, createFolder:function(){ return _folder; }, getId:function(){ return 'd'; }, getUrl:function(){ return '#'; }, getName:function(){ return '폴더'; }, addFile:function(){ return _folder; }, removeFile:function(){ return _folder; } };
+var DriveApp={ getFilesByName:function(){ return _noFiles; }, getFiles:function(){ return _noFiles; }, createFile:function(){ return _file; }, getFileById:function(){ return _file; }, getFolderById:function(){ return _folder; }, getRootFolder:function(){ return _folder; }, getFoldersByName:function(){ return _noFiles; }, createFolder:function(){ return _folder; }, Access:{ ANYONE_WITH_LINK:1, ANYONE:2 }, Permission:{ VIEW:1, EDIT:2 } };
+var Drive={ Files:{ insert:function(){ return { id:'tmp' }; }, remove:function(){}, create:function(){ return { id:'tmp' }; }, list:function(){ return { files:[], items:[] }; }, get:function(){ return { id:'tmp' }; } }, Permissions:{ create:function(){}, insert:function(){} } };
+var UrlFetchApp={ fetch:function(url){ return { getResponseCode:function(){ return 503; }, getContentText:function(){ return '{"error":"데모에서는 외부 연결이 꺼져 있습니다"}'; }, getBlob:function(){ return Utilities.newBlob(''); }, getHeaders:function(){ return {}; } }; }, fetchAll:function(){ return []; } };
+var HtmlService={ createHtmlOutput:function(){ return { setTitle:function(){ return this; }, getContent:function(){ return ''; }, addMetaTag:function(){ return this; }, setXFrameOptionsMode:function(){ return this; } }; }, createTemplateFromFile:function(){ return { evaluate:function(){ return HtmlService.createHtmlOutput(); } }; }, createHtmlOutputFromFile:function(){ return HtmlService.createHtmlOutput(); }, XFrameOptionsMode:{ ALLOWALL:1 }, SandboxMode:{ IFRAME:1 } };
+var ContentService={ createTextOutput:function(){ return { setMimeType:function(){ return this; } }; }, MimeType:{ JSON:'json', TEXT:'text' } };
+var ScriptApp={ getProjectTriggers:function(){ return []; }, newTrigger:function(){ var t={ timeBased:function(){ return t; }, everyDays:function(){ return t; }, everyHours:function(){ return t; }, everyMinutes:function(){ return t; }, atHour:function(){ return t; }, nearMinute:function(){ return t; }, create:function(){} }; return t; }, deleteTrigger:function(){}, getService:function(){ return { getUrl:function(){ return '#'; } }; }, getScriptId:function(){ return 'demo'; }, getOAuthToken:function(){ return 'demo'; } };
+var MailApp={ sendEmail:function(){} }; var GmailApp={ sendEmail:function(){}, createDraft:function(){} };
+var XmlService={ parse:function(){ return { getRootElement:function(){ return { getChildren:function(){ return []; }, getText:function(){ return ''; }, getName:function(){ return ''; } }; } }; } };
+var Charts={}; var SlidesApp={}; var DocumentApp={};
+
+// 소모품 협의 회의메모 웹앱 (독립형)
+// 회의 참여자가 URL로 접속해 항목별 메모를 입력하면 협의 시트의 '회의메모' 탭에 누적 저장.
+// 배포자(lej) 권한으로 실행되므로 작성자는 화면에서 직접 입력받는다.
+// GAS 함정 주의: 인라인 스크립트에 리터럴 달러-중괄호/백틱 금지, 이모지 금지.
+
+var SHEET_ID = 'DEMO';
+var MEMO_SHEET = '회의메모';
+var AGENDA_SHEET = '협의항목';
+
+function doGet() {
+  return HtmlService.createTemplateFromFile('Index')
+    .evaluate()
+    .setTitle('소모품 협의 회의메모')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+function include(name) {
+  return HtmlService.createHtmlOutputFromFile(name).getContent();
+}
+
+function ss_() {
+  return SpreadsheetApp.openById(SHEET_ID);
+}
+
+function getAgendaItems() {
+  var sh = ss_().getSheetByName(AGENDA_SHEET);
+  var items = [];
+  if (!sh) return items;
+  var last = sh.getLastRow();
+  if (last < 1) return items;
+  var data = sh.getRange(1, 1, last, 4).getValues();
+  for (var i = 0; i < data.length; i++) {
+    var no = data[i][1];
+    var name = data[i][2];
+    if (name && String(name).trim() && no !== '' && !isNaN(no)) {
+      items.push('No.' + no + ' ' + String(name).trim());
+    }
+  }
+  return items;
+}
+
+// 협의항목 탭을 구조화해서 반환 — 안건 화면용
+function getAgenda() {
+  var sh = ss_().getSheetByName(AGENDA_SHEET);
+  var res = { title: '협의 안건', intro: '', items: [] };
+  if (!sh) return res;
+  var last = sh.getLastRow();
+  if (last < 1) return res;
+  var data = sh.getRange(1, 1, last, 7).getValues();
+  if (data[0] && data[0][0]) res.title = String(data[0][0]).trim();
+  if (data[1] && data[1][0]) res.intro = String(data[1][0]).trim();
+  for (var i = 0; i < data.length; i++) {
+    var no = data[i][1];
+    var name = data[i][2];
+    if (name && String(name).trim() && no !== '' && !isNaN(no)) {
+      res.items.push({
+        group: String(data[i][0] || '').trim(),
+        no: no,
+        item: String(data[i][2] || '').trim(),
+        plan: String(data[i][3] || '').trim(),
+        question: String(data[i][4] || '').trim(),
+        opinion: String(data[i][5] || '').trim(),
+        result: String(data[i][6] || '').trim()
+      });
+    }
+  }
+  return res;
+}
+
+function ensureMemoSheet_() {
+  var ss = ss_();
+  var sh = ss.getSheetByName(MEMO_SHEET);
+  if (!sh) {
+    sh = ss.insertSheet(MEMO_SHEET);
+    sh.getRange(1, 1, 1, 4).setValues([['시각', '작성자', '항목', '메모']]);
+    sh.setFrozenRows(1);
+    sh.getRange(1, 1, 1, 4).setFontWeight('bold').setBackground('#f1f3f4');
+    sh.setColumnWidth(1, 120);
+    sh.setColumnWidth(2, 170);
+    sh.setColumnWidth(3, 240);
+    sh.setColumnWidth(4, 520);
+    sh.getRange(1, 4, sh.getMaxRows(), 1).setWrap(true);
+  }
+  return sh;
+}
+
+function saveMemo(payload) {
+  var memo = payload && payload.memo ? String(payload.memo).trim() : '';
+  if (!memo) throw new Error('메모 내용을 입력해주세요.');
+  var who = payload && payload.who ? String(payload.who).trim() : '';
+  if (!who) who = '(작성자 미입력)';
+  var item = payload && payload.item ? String(payload.item).trim() : '(항목 미지정)';
+  var sh = ensureMemoSheet_();
+  var now = Utilities.formatDate(new Date(), 'Asia/Seoul', 'MM/dd HH:mm');
+  sh.appendRow([now, who, item, memo]);
+  SpreadsheetApp.flush();
+  return getRecent();
+}
+
+function getRecent() {
+  var sh = ss_().getSheetByName(MEMO_SHEET);
+  if (!sh) return [];
+  var last = sh.getLastRow();
+  var n = Math.min(15, last - 1);
+  if (n <= 0) return [];
+  var rows = sh.getRange(last - n + 1, 1, n, 4).getValues();
+  var out = [];
+  for (var i = rows.length - 1; i >= 0; i--) {
+    out.push({ t: rows[i][0], who: rows[i][1], item: rows[i][2], memo: rows[i][3] });
+  }
+  return out;
+}
+
+
+
+window.google={ script:{ run:(function(){
+  function mk(ok,fail,uo){
+    var api={ withSuccessHandler:function(f){ return mk(f,fail,uo); }, withFailureHandler:function(f){ return mk(ok,f,uo); }, withUserObject:function(o){ return mk(ok,fail,o); } };
+    return new Proxy(api,{ get:function(t,name){ if(name in t) return t[name]; if(typeof name!=='string') return undefined;
+      return function(){ var args=Array.prototype.slice.call(arguments);
+        // form 요소가 넘어오면 GAS 처럼 {name:value} 로 바꾼다
+        args=args.map(function(a){ if(a && typeof HTMLFormElement!=='undefined' && a instanceof HTMLFormElement){ var o={}; Array.prototype.forEach.call(a.elements,function(el){ if(el.name) o[el.name]=el.value; }); return o; } return a; });
+        setTimeout(function(){ var fn=window[name]; if(typeof fn!=='function'){ fail&&fail(new Error('데모에 없는 함수: '+name)); return; }
+          try{ var r=fn.apply(null,args); r=(r===undefined)?null:JSON.parse(JSON.stringify(r)); ok&&ok(r,uo); }catch(e){ console.warn('demo rpc',name,e); fail&&fail({ message:String(e&&e.message||e) },uo); } },60); }; } });
+  }
+  return mk(null,null,null);
+})(), host:{ close:function(){}, setHeight:function(){}, setWidth:function(){}, editor:{ focus:function(){} } }, url:{ getLocation:function(cb){ cb({ parameter:{}, parameters:{}, hash:'' }); } } } };
+
+</script>
+
+  <base target="_top">
+  <meta charset="utf-8">
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Malgun Gothic', sans-serif; margin: 0; background: #f6f8fa; color: #202124; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 14px; }
+    header { padding: 2px 0 10px; }
+    h1 { font-size: 18px; margin: 0 0 2px; }
+    .sub { color: #5f6368; font-size: 12px; }
+    .tabs { position: sticky; top: 0; z-index: 5; display: flex; gap: 8px; background: #f6f8fa;
+      padding: 8px 0; margin-bottom: 8px; }
+    .tab { flex: 1; text-align: center; padding: 10px; font-size: 14px; font-weight: 700;
+      border: 1px solid #d5dae0; border-radius: 8px; background: #fff; color: #5f6368; cursor: pointer; }
+    .tab.active { background: #1a73e8; color: #fff; border-color: #1a73e8; }
+    .panel { background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
+    .hidden { display: none; }
+
+    /* 안건 */
+    .grp { margin-bottom: 16px; }
+    .grp-head { font-size: 14px; font-weight: 800; color: #fff; padding: 7px 11px; border-radius: 8px 8px 0 0; }
+    .grp-body { border: 1px solid #e6e8eb; border-top: none; border-radius: 0 0 8px 8px; }
+    .agenda { padding: 12px 13px; border-bottom: 1px solid #f0f1f3; }
+    .agenda:last-child { border-bottom: none; }
+    .a-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .no { font-size: 11px; font-weight: 800; color: #fff; background: #5f6368; border-radius: 20px; padding: 2px 9px; }
+    .a-title { font-size: 15px; font-weight: 800; flex: 1; min-width: 140px; }
+    .chip { font-size: 11px; font-weight: 800; border-radius: 20px; padding: 3px 10px; white-space: nowrap; }
+    .chip.done { background: #e6f4ea; color: #188038; }
+    .chip.open { background: #fef7e0; color: #b06000; }
+    .field { margin-top: 9px; }
+    .flabel { font-size: 11px; font-weight: 700; color: #80868b; margin-bottom: 2px; }
+    .ftext { font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+    .opinion { background: #f1f6ff; border-left: 3px solid #1a73e8; padding: 7px 9px; border-radius: 4px; }
+    .result { background: #e9f7ef; border-left: 3px solid #188038; padding: 7px 9px; border-radius: 4px; }
+    .btn-memo { margin-top: 8px; font-size: 12px; color: #1a73e8; background: #eef3fb; border: 1px solid #d6e2f5;
+      padding: 7px 12px; border-radius: 6px; cursor: pointer; font-weight: 700; display: inline-block; }
+    .btn-memo:hover { background: #e2ecfb; }
+    .inline-memo { margin-top: 8px; background: #f6f8fa; border: 1px solid #e0e4e9; border-radius: 8px; padding: 10px; }
+    .inline-memo textarea { min-height: 60px; margin-top: 6px; }
+    .inline-memo input { margin-bottom: 2px; }
+    .im-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+    .im-row button { flex: 0 0 auto; width: auto; margin: 0; padding: 8px 18px; font-size: 13px; font-weight: 700;
+      color: #fff; background: #1a73e8; border: none; border-radius: 6px; cursor: pointer; }
+    .im-row button:disabled { background: #9aa0a6; }
+    .im-msg { font-size: 12px; min-height: 14px; }
+    .im-label { font-size: 11px; font-weight: 700; color: #5f6368; }
+
+    /* 메모 입력 */
+    label { display: block; font-size: 12px; font-weight: 600; margin: 10px 0 4px; }
+    label.first { margin-top: 0; }
+    select, textarea, input { width: 100%; font-size: 14px; padding: 9px; border: 1px solid #dadce0;
+      border-radius: 8px; font-family: inherit; }
+    textarea { resize: vertical; min-height: 84px; }
+    button.save { margin-top: 12px; width: 100%; padding: 12px; font-size: 15px; font-weight: 700; color: #fff;
+      background: #1a73e8; border: none; border-radius: 8px; cursor: pointer; }
+    button.save:disabled { background: #9aa0a6; }
+    .msg { font-size: 13px; margin-top: 8px; min-height: 18px; }
+    .ok { color: #188038; }
+    .err { color: #d93025; }
+    .recent-title { font-size: 13px; font-weight: 700; color: #444; margin: 4px 0 8px; }
+    .card { border: 1px solid #eee; border-radius: 8px; padding: 9px 11px; margin-bottom: 8px; background: #fafbfc; }
+    .card .meta { font-size: 10px; color: #80868b; margin-bottom: 3px; }
+    .card .citem { font-size: 11px; font-weight: 700; color: #1a73e8; }
+    .card .cmemo { font-size: 13px; white-space: pre-wrap; word-break: break-word; margin-top: 3px; }
+    .empty { font-size: 12px; color: #9aa0a6; }
+    .loading { font-size: 13px; color: #9aa0a6; padding: 8px; }
+  </style>
+<title>회의 메모 컨테이너 (데모) — 이어진 포트폴리오</title></head>
+<body>
+<div id="demobar">
+  <b>데모</b>
+  <span>협의 시트에 붙여 쓰는 회의 메모 앱 그대로. 안건·메모는 이 페이지 안 메모리에 저장되고 새로고침하면 초기화됩니다.</span>
+  <a href="../../">← 포트폴리오</a>
+</div>
+<style>
+#demobar{position:sticky;top:0;z-index:9999;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  background:#fff8e1;border-bottom:1px solid #f0dfa8;padding:9px 16px;font-size:12.5px;color:#6b5b21;
+  font-family:system-ui,-apple-system,'Malgun Gothic',sans-serif}
+#demobar b{background:#6b5b21;color:#fff8e1;padding:2px 8px;border-radius:10px;font-size:11.5px}
+#demobar a{margin-left:auto;color:#6b5b21;font-weight:700;text-decoration:none}
+</style>
+
+  <div class="wrap">
+    <header>
+      <h1 id="title">소모품 협의 회의</h1>
+      <div class="sub" id="intro">안건을 보며 회의하고, 메모 탭에서 논의 내용을 바로 기록하세요.</div>
+    </header>
+
+    <div class="tabs">
+      <div class="tab active" id="tabAgenda" onclick="showView('agenda')">안건</div>
+      <div class="tab" id="tabMemo" onclick="showView('memo')">메모</div>
+    </div>
+
+    <!-- 안건 화면 -->
+    <div id="viewAgenda">
+      <div id="agendaBox"><div class="loading">안건 불러오는 중...</div></div>
+    </div>
+
+    <!-- 메모 화면 -->
+    <div id="viewMemo" class="hidden">
+      <div class="panel">
+        <label class="first" for="who">작성자 (이 기기에 저장돼요)</label>
+        <input id="who" type="text" placeholder="이름 입력 (예: 데모 사용자)">
+        <label for="item">협의 항목</label>
+        <select id="item"><option value="(항목 미지정)">(불러오는 중...)</option></select>
+        <label for="memo">메모</label>
+        <textarea id="memo" placeholder="회의 중 논의/결정 사항을 입력"></textarea>
+        <button class="save" id="saveBtn" onclick="save()">저장</button>
+        <div id="msg" class="msg"></div>
+      </div>
+      <div class="panel">
+        <div class="recent-title">최근 메모</div>
+        <div id="recent"><div class="empty">불러오는 중...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var GROUP_COLORS = {
+      'A': '#1a73e8', 'B': '#12886a', 'C': '#b06000', 'D': '#8430ce', 'E': '#c2185b'
+    };
+    function esc(s) {
+      s = (s == null) ? '' : String(s);
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    function groupColor(g) {
+      var key = (g || '').charAt(0).toUpperCase();
+      return GROUP_COLORS[key] || '#5f6368';
+    }
+    function showView(v) {
+      var a = v === 'agenda';
+      document.getElementById('viewAgenda').className = a ? '' : 'hidden';
+      document.getElementById('viewMemo').className = a ? 'hidden' : '';
+      document.getElementById('tabAgenda').className = a ? 'tab active' : 'tab';
+      document.getElementById('tabMemo').className = a ? 'tab' : 'tab active';
+    }
+
+    // ----- 안건 -----
+    function fieldHtml(label, text, cls) {
+      if (!text) return '';
+      var box = cls ? (' ftext ' + cls) : ' ftext';
+      return '<div class="field"><div class="flabel">' + esc(label) + '</div>'
+        + '<div class="' + box.trim() + '">' + esc(text) + '</div></div>';
+    }
+    var inlineLabels = [];
+    function renderAgenda(data) {
+      document.getElementById('title').textContent = data.title || '소모품 협의 회의';
+      if (data.intro) document.getElementById('intro').textContent = data.intro;
+      var items = data.items || [];
+      var box = document.getElementById('agendaBox');
+      if (!items.length) { box.innerHTML = '<div class="empty">안건이 없습니다.</div>'; return; }
+      var html = '';
+      var curGroup = null;
+      inlineLabels = [];
+      for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        inlineLabels[i] = 'No.' + it.no + ' ' + it.item;
+        if (it.group !== curGroup) {
+          if (curGroup !== null) html += '</div></div>';
+          curGroup = it.group;
+          var col = groupColor(curGroup);
+          html += '<div class="grp"><div class="grp-head" style="background:' + col + '">'
+            + esc(curGroup) + '</div><div class="grp-body">';
+        }
+        var done = it.result && it.result.length > 0;
+        var chip = done ? '<span class="chip done">확정</span>' : '<span class="chip open">논의중</span>';
+        html += '<div class="agenda">'
+          + '<div class="a-top"><span class="no">No.' + esc(it.no) + '</span>'
+          + '<span class="a-title">' + esc(it.item) + '</span>' + chip + '</div>'
+          + fieldHtml('현재안 · 제안', it.plan, '')
+          + fieldHtml('인사팀에 드리는 질문', it.question, '')
+          + fieldHtml('인사팀 의견', it.opinion, 'opinion')
+          + fieldHtml('협의 결과 (확정)', it.result, 'result')
+          + '<button class="btn-memo" id="imbtn_' + i + '" onclick="toggleMemo(' + i + ')">+ 이 항목에 메모</button>'
+          + '<div class="inline-memo hidden" id="im_' + i + '">'
+          + '<span class="im-label">작성자</span>'
+          + '<input id="im_who_' + i + '" type="text" placeholder="이름 입력 (이 기기에 저장돼요)">'
+          + '<textarea id="im_memo_' + i + '" placeholder="이 항목에 대한 회의 메모 입력"></textarea>'
+          + '<div class="im-row"><button id="im_save_' + i + '" onclick="saveInline(' + i + ')">저장</button>'
+          + '<span class="im-msg" id="im_msg_' + i + '"></span></div>'
+          + '</div>'
+          + '</div>';
+      }
+      if (curGroup !== null) html += '</div></div>';
+      box.innerHTML = html;
+    }
+    function toggleMemo(i) {
+      var box = document.getElementById('im_' + i);
+      var btn = document.getElementById('imbtn_' + i);
+      var open = box.className.indexOf('hidden') >= 0;
+      if (open) {
+        box.className = 'inline-memo';
+        btn.textContent = '- 메모 접기';
+        var who = document.getElementById('im_who_' + i);
+        if (!who.value) { try { who.value = window.localStorage.getItem('memo_who') || ''; } catch (e) {} }
+        document.getElementById('im_memo_' + i).focus();
+      } else {
+        box.className = 'inline-memo hidden';
+        btn.textContent = '+ 이 항목에 메모';
+      }
+    }
+    function saveInline(i) {
+      var btn = document.getElementById('im_save_' + i);
+      var msg = document.getElementById('im_msg_' + i);
+      var who = document.getElementById('im_who_' + i).value;
+      var memo = document.getElementById('im_memo_' + i).value;
+      if (!who || !who.trim()) { msg.className = 'im-msg err'; msg.textContent = '작성자 이름을 입력해주세요.'; return; }
+      if (!memo || !memo.trim()) { msg.className = 'im-msg err'; msg.textContent = '메모를 입력해주세요.'; return; }
+      saveWho(who.trim());
+      btn.disabled = true;
+      msg.className = 'im-msg';
+      msg.textContent = '저장 중...';
+      google.script.run
+        .withSuccessHandler(function (list) {
+          document.getElementById('im_memo_' + i).value = '';
+          msg.className = 'im-msg ok';
+          msg.textContent = '저장 완료';
+          render(list);
+          btn.disabled = false;
+        })
+        .withFailureHandler(function (e) {
+          msg.className = 'im-msg err';
+          msg.textContent = '저장 실패: ' + (e && e.message ? e.message : e);
+          btn.disabled = false;
+        })
+        .saveMemo({ who: who.trim(), item: inlineLabels[i], memo: memo });
+    }
+
+    // ----- 메모 -----
+    function loadWho() {
+      try { var v = window.localStorage.getItem('memo_who'); if (v) document.getElementById('who').value = v; } catch (e) {}
+    }
+    function saveWho(v) { try { window.localStorage.setItem('memo_who', v); } catch (e) {} }
+    function loadItems() {
+      google.script.run.withSuccessHandler(function (items) {
+        var sel = document.getElementById('item');
+        sel.innerHTML = '';
+        var o0 = document.createElement('option');
+        o0.value = '(항목 미지정)'; o0.textContent = '(항목 미지정)';
+        sel.appendChild(o0);
+        for (var i = 0; i < items.length; i++) {
+          var o = document.createElement('option');
+          o.value = items[i]; o.textContent = items[i];
+          sel.appendChild(o);
+        }
+        var etc = document.createElement('option');
+        etc.value = '기타'; etc.textContent = '기타';
+        sel.appendChild(etc);
+      }).getAgendaItems();
+    }
+    function render(list) {
+      var box = document.getElementById('recent');
+      if (!list || !list.length) { box.innerHTML = '<div class="empty">아직 메모가 없습니다.</div>'; return; }
+      var html = '';
+      for (var i = 0; i < list.length; i++) {
+        var r = list[i];
+        html += '<div class="card"><div class="meta">' + esc(r.t) + ' | ' + esc(r.who) + '</div>'
+          + '<div class="citem">' + esc(r.item) + '</div>'
+          + '<div class="cmemo">' + esc(r.memo) + '</div></div>';
+      }
+      box.innerHTML = html;
+    }
+    function save() {
+      var btn = document.getElementById('saveBtn');
+      var msg = document.getElementById('msg');
+      var who = document.getElementById('who').value;
+      var memo = document.getElementById('memo').value;
+      var item = document.getElementById('item').value;
+      if (!who || !who.trim()) { msg.className = 'msg err'; msg.textContent = '작성자 이름을 입력해주세요.'; return; }
+      if (!memo || !memo.trim()) { msg.className = 'msg err'; msg.textContent = '메모를 입력해주세요.'; return; }
+      saveWho(who.trim());
+      btn.disabled = true; msg.className = 'msg'; msg.textContent = '저장 중...';
+      google.script.run
+        .withSuccessHandler(function (list) {
+          document.getElementById('memo').value = '';
+          msg.className = 'msg ok'; msg.textContent = '저장 완료';
+          render(list); btn.disabled = false;
+        })
+        .withFailureHandler(function (e) {
+          msg.className = 'msg err';
+          msg.textContent = '저장 실패: ' + (e && e.message ? e.message : e);
+          btn.disabled = false;
+        })
+        .saveMemo({ who: who.trim(), item: item, memo: memo });
+    }
+
+    // 초기 로딩
+    google.script.run.withSuccessHandler(renderAgenda).getAgenda();
+    loadWho();
+    loadItems();
+    google.script.run.withSuccessHandler(render).getRecent();
+  </script>
+</body>
+</html>

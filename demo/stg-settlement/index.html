@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<script>
+window.__SHEETS={};
+window.__PROPS={};
+
+function Sheet(name,rows){ this.name=name; this.rows=rows||[]; }
+Sheet.prototype.getName=function(){ return this.name; };
+Sheet.prototype.getLastRow=function(){ for(var i=this.rows.length-1;i>=0;i--){ var r=this.rows[i]||[]; if(r.some(function(v){return v!==''&&v!==null&&v!==undefined;})) return i+1; } return 0; };
+Sheet.prototype.getMaxRows=function(){ return Math.max(1000,this.rows.length+100); };
+Sheet.prototype.getMaxColumns=function(){ return Math.max(26,this.getLastColumn()); };
+Sheet.prototype.getLastColumn=function(){ return this.rows.reduce(function(m,r){ return Math.max(m,(r||[]).length); },0); };
+Sheet.prototype.getDataRange=function(){ return this.getRange(1,1,Math.max(1,this.getLastRow()),Math.max(1,this.getLastColumn())); };
+Sheet.prototype.setFrozenRows=function(){ return this; }; Sheet.prototype.setFrozenColumns=function(){ return this; };
+Sheet.prototype.setColumnWidth=function(){ return this; }; Sheet.prototype.setColumnWidths=function(){ return this; }; Sheet.prototype.autoResizeColumns=function(){ return this; };
+Sheet.prototype.clear=function(){ this.rows=[]; return this; }; Sheet.prototype.clearContents=function(){ this.rows=[]; return this; };
+Sheet.prototype.appendRow=function(a){ this.rows[this.getLastRow()]=a.slice(); return this; };
+Sheet.prototype.deleteRow=function(i){ this.rows.splice(i-1,1); return this; };
+Sheet.prototype.deleteRows=function(i,n){ this.rows.splice(i-1,n||1); return this; };
+Sheet.prototype.insertRowsAfter=function(){ return this; }; Sheet.prototype.insertRowBefore=function(){ return this; };
+Sheet.prototype.hideColumns=function(){ return this; }; Sheet.prototype.getSheetId=function(){ return 0; };
+Sheet.prototype.getRange=function(r,c,nr,nc){ var sh=this;
+  if(typeof r==='string'){ var m=r.match(/^([A-Z]+)(\d+)(?::([A-Z]+)(\d+))?$/); if(m){ var col=function(s){ var n=0; for(var i=0;i<s.length;i++) n=n*26+(s.charCodeAt(i)-64); return n; };
+    var c1=col(m[1]), r1=+m[2], c2=m[3]?col(m[3]):c1, r2=m[4]?+m[4]:r1; return sh.getRange(r1,c1,r2-r1+1,c2-c1+1); } }
+  nr=nr===undefined?1:nr; nc=nc===undefined?1:nc;
+  var R={ getValues:function(){ var out=[]; for(var i=0;i<nr;i++){ var row=sh.rows[r-1+i]||[]; var o=[]; for(var j=0;j<nc;j++){ var v=row[c-1+j]; o.push(v===undefined?'':v); } out.push(o); } return out; },
+    getDisplayValues:function(){ return this.getValues().map(function(r){ return r.map(function(v){ return v===null||v===undefined?'':String(v); }); }); },
+    getValue:function(){ return this.getValues()[0][0]; }, getDisplayValue:function(){ return String(this.getValues()[0][0]); },
+    getNumRows:function(){ return nr; }, getNumColumns:function(){ return nc; }, getRow:function(){ return r; }, getColumn:function(){ return c; },
+    setValues:function(vals){ vals.forEach(function(row,i){ var ri=r-1+i; if(!sh.rows[ri]) sh.rows[ri]=[]; row.forEach(function(v,j){ sh.rows[ri][c-1+j]=v; }); }); return R; },
+    setValue:function(v){ return R.setValues([[v]]); },
+    clearContent:function(){ for(var i=0;i<nr;i++){ var ri=r-1+i; if(!sh.rows[ri]) continue; for(var j=0;j<nc;j++) sh.rows[ri][c-1+j]=''; } return R; },
+    clear:function(){ return R.clearContent(); },
+    setNumberFormat:function(){ return R; }, setNumberFormats:function(){ return R; }, setFontWeight:function(){ return R; }, setBackground:function(){ return R; }, setBackgrounds:function(){ return R; },
+    setFontColor:function(){ return R; }, setWrap:function(){ return R; }, setHorizontalAlignment:function(){ return R; }, setVerticalAlignment:function(){ return R; }, setBorder:function(){ return R; }, setFontSize:function(){ return R; },
+    setDataValidation:function(){ return R; }, setNote:function(){ return R; }, setFormula:function(){ return R; }, setFormulas:function(){ return R; }, getFormulas:function(){ return R.getValues().map(function(r){ return r.map(function(){ return ''; }); }); },
+    getA1Notation:function(){ return ''; }, offset:function(){ return R; }, merge:function(){ return R; } };
+  return R; };
+function Spread(id,sheets){ this.id=id; this.sheets=[]; var self=this; Object.keys(sheets||{}).forEach(function(n){ self.sheets.push(new Sheet(n,sheets[n])); }); }
+Spread.prototype.getId=function(){ return this.id; }; Spread.prototype.getUrl=function(){ return '#'; }; Spread.prototype.getName=function(){ return '데모 저장소'; };
+Spread.prototype.getSheets=function(){ return this.sheets; };
+Spread.prototype.getSheetByName=function(n){ return this.sheets.filter(function(s){ return s.name===n; })[0]||null; };
+Spread.prototype.insertSheet=function(n){ var s=new Sheet(n); this.sheets.push(s); return s; };
+Spread.prototype.deleteSheet=function(s){ this.sheets=this.sheets.filter(function(x){ return x!==s; }); };
+Spread.prototype.getActiveSheet=function(){ return this.sheets[0]; };
+var __SS=new Spread('DEMO', window.__SHEETS||{});
+var PROPS=window.__PROPS||{}; var CACHE={};
+function kst_(d,fmt){ if(!(d instanceof Date)||isNaN(d.getTime())) return ''; var u=new Date(d.getTime()+9*3600*1000); var p2=function(n){ return ('0'+n).slice(-2); };
+  return String(fmt).replace(/yyyy/g,u.getUTCFullYear()).replace(/yy/g,String(u.getUTCFullYear()).slice(2)).replace(/MM/g,p2(u.getUTCMonth()+1)).replace(/dd/g,p2(u.getUTCDate())).replace(/HH/g,p2(u.getUTCHours())).replace(/mm/g,p2(u.getUTCMinutes())).replace(/ss/g,p2(u.getUTCSeconds())); }
+var SpreadsheetApp={ openById:function(){ return __SS; }, openByUrl:function(){ return __SS; }, create:function(){ return __SS; }, flush:function(){}, getActiveSpreadsheet:function(){ return __SS; }, getActive:function(){ return __SS; }, getUi:function(){ return { alert:function(){}, createMenu:function(){ return { addItem:function(){ return this; }, addToUi:function(){} }; } }; } };
+var PropertiesService={ getScriptProperties:function(){ return { getProperty:function(k){ return k in PROPS?PROPS[k]:null; }, setProperty:function(k,v){ PROPS[k]=String(v); return this; }, deleteProperty:function(k){ delete PROPS[k]; return this; }, getProperties:function(){ return PROPS; }, setProperties:function(o){ Object.keys(o).forEach(function(k){ PROPS[k]=String(o[k]); }); return this; } }; } };
+PropertiesService.getUserProperties=PropertiesService.getScriptProperties; PropertiesService.getDocumentProperties=PropertiesService.getScriptProperties;
+var Session={ getActiveUser:function(){ return { getEmail:function(){ return 'demo@example.com'; } }; }, getEffectiveUser:function(){ return { getEmail:function(){ return 'demo@example.com'; } }; }, getScriptTimeZone:function(){ return 'Asia/Seoul'; }, getTemporaryActiveUserKey:function(){ return 'demo'; } };
+var Utilities={ formatDate:kst_, sleep:function(){}, getUuid:function(){ return 'uuid-'+Math.random().toString(36).slice(2); },
+  base64Encode:function(s){ try{ return btoa(unescape(encodeURIComponent(String(s)))); }catch(e){ return ''; } }, base64Decode:function(b){ return b; }, base64EncodeWebSafe:function(s){ return Utilities.base64Encode(s); },
+  newBlob:function(d,m,n){ return { getBytes:function(){ return []; }, getDataAsString:function(){ return String(d||''); }, getName:function(){ return n||''; }, setName:function(){ return this; }, getContentType:function(){ return m||''; } }; },
+  parseCsv:function(t){ return String(t).split(/\r?\n/).map(function(l){ return l.split(','); }); }, formatString:function(){ return Array.prototype.join.call(arguments,' '); },
+  computeDigest:function(){ return [0]; }, DigestAlgorithm:{ MD5:1, SHA_256:2 }, Charset:{ UTF_8:1 }, zip:function(){ return Utilities.newBlob(''); }, unzip:function(){ return []; } };
+var LockService={ getScriptLock:function(){ return { tryLock:function(){ return true; }, waitLock:function(){}, releaseLock:function(){}, hasLock:function(){ return true; } }; } };
+LockService.getDocumentLock=LockService.getScriptLock; LockService.getUserLock=LockService.getScriptLock;
+var CacheService={ getScriptCache:function(){ return { get:function(k){ return k in CACHE?CACHE[k]:null; }, put:function(k,v){ CACHE[k]=v; }, remove:function(k){ delete CACHE[k]; }, removeAll:function(ks){ (ks||[]).forEach(function(k){ delete CACHE[k]; }); },
+  putAll:function(m){ Object.keys(m||{}).forEach(function(k){ CACHE[k]=m[k]; }); }, getAll:function(ks){ var o={}; (ks||[]).forEach(function(k){ if(k in CACHE) o[k]=CACHE[k]; }); return o; } }; } };
+CacheService.getUserCache=CacheService.getScriptCache; CacheService.getDocumentCache=CacheService.getScriptCache;
+var Logger={ log:function(){} };
+var MimeType={ GOOGLE_SHEETS:'sheet', CSV:'text/csv', PLAIN_TEXT:'text/plain', MICROSOFT_EXCEL:'xlsx', JPEG:'image/jpeg', PNG:'image/png', PDF:'pdf', FOLDER:'folder' };
+var _noFiles={ hasNext:function(){ return false; }, next:function(){ return null; } };
+var _file={ getId:function(){ return 'f'; }, getUrl:function(){ return '#'; }, getName:function(){ return 'file'; }, setTrashed:function(){ return this; }, getBlob:function(){ return Utilities.newBlob(''); }, setSharing:function(){ return this; }, getDownloadUrl:function(){ return '#'; }, getMimeType:function(){ return ''; }, getSize:function(){ return 0; }, getLastUpdated:function(){ return new Date(); }, makeCopy:function(){ return _file; }, moveTo:function(){ return _file; } };
+var _folder={ createFile:function(){ return _file; }, getFilesByName:function(){ return _noFiles; }, getFiles:function(){ return _noFiles; }, getFolders:function(){ return _noFiles; }, getFoldersByName:function(){ return _noFiles; }, createFolder:function(){ return _folder; }, getId:function(){ return 'd'; }, getUrl:function(){ return '#'; }, getName:function(){ return '폴더'; }, addFile:function(){ return _folder; }, removeFile:function(){ return _folder; } };
+var DriveApp={ getFilesByName:function(){ return _noFiles; }, getFiles:function(){ return _noFiles; }, createFile:function(){ return _file; }, getFileById:function(){ return _file; }, getFolderById:function(){ return _folder; }, getRootFolder:function(){ return _folder; }, getFoldersByName:function(){ return _noFiles; }, createFolder:function(){ return _folder; }, Access:{ ANYONE_WITH_LINK:1, ANYONE:2 }, Permission:{ VIEW:1, EDIT:2 } };
+var Drive={ Files:{ insert:function(){ return { id:'tmp' }; }, remove:function(){}, create:function(){ return { id:'tmp' }; }, list:function(){ return { files:[], items:[] }; }, get:function(){ return { id:'tmp' }; } }, Permissions:{ create:function(){}, insert:function(){} } };
+var UrlFetchApp={ fetch:function(url){ return { getResponseCode:function(){ return 503; }, getContentText:function(){ return '{"error":"데모에서는 외부 연결이 꺼져 있습니다"}'; }, getBlob:function(){ return Utilities.newBlob(''); }, getHeaders:function(){ return {}; } }; }, fetchAll:function(){ return []; } };
+var HtmlService={ createHtmlOutput:function(){ return { setTitle:function(){ return this; }, getContent:function(){ return ''; }, addMetaTag:function(){ return this; }, setXFrameOptionsMode:function(){ return this; } }; }, createTemplateFromFile:function(){ return { evaluate:function(){ return HtmlService.createHtmlOutput(); } }; }, createHtmlOutputFromFile:function(){ return HtmlService.createHtmlOutput(); }, XFrameOptionsMode:{ ALLOWALL:1 }, SandboxMode:{ IFRAME:1 } };
+var ContentService={ createTextOutput:function(){ return { setMimeType:function(){ return this; } }; }, MimeType:{ JSON:'json', TEXT:'text' } };
+var ScriptApp={ getProjectTriggers:function(){ return []; }, newTrigger:function(){ var t={ timeBased:function(){ return t; }, everyDays:function(){ return t; }, everyHours:function(){ return t; }, everyMinutes:function(){ return t; }, atHour:function(){ return t; }, nearMinute:function(){ return t; }, create:function(){} }; return t; }, deleteTrigger:function(){}, getService:function(){ return { getUrl:function(){ return '#'; } }; }, getScriptId:function(){ return 'demo'; }, getOAuthToken:function(){ return 'demo'; } };
+var MailApp={ sendEmail:function(){} }; var GmailApp={ sendEmail:function(){}, createDraft:function(){} };
+var XmlService={ parse:function(){ return { getRootElement:function(){ return { getChildren:function(){ return []; }, getText:function(){ return ''; }, getName:function(){ return ''; } }; } }; } };
+var Charts={}; var SlidesApp={}; var DocumentApp={};
+
+/**
+ * 공홈 수탁정산 웹앱 — 서버
+ *
+ * 서버는 얇게 간다. 계산은 전부 브라우저에서 한다(A본부 주문 5.4만행을 서버로 보내면
+ * 6분 제한에 걸린다). 서버가 하는 일은 네 가지뿐:
+ *   ① 화면 서빙  ② Baserow 중계(CORS·토큰 은닉)  ③ Drive 백업  ④ 이월·조정·이력 저장
+ */
+
+var APP_VERSION = "v14 · 2026-08-31";
+
+var CFG = {
+  BASEROW: 'https://baserow.example.com',
+  TOKEN: 'demo',
+  T_PG: 2290,          // PG 건별 (토스·페이코·네이버페이)
+  T_DANAL: 2337,       // 다날 건별
+  // 아래 4개는 테이블 생성 후 채운다 (설정 시트가 아니라 여기 상수로 — 조회가 잦다)
+  T_CARRY: 0,          // stg_carryover
+  T_ADJUST: 0,         // stg_adjust
+  T_RUNLOG: 0,         // stg_runlog
+  DRIVE_FOLDER: ''     // 산출물 백업 폴더 ID (비우면 백업 생략)
+};
+
+/**
+ * 정산 브랜드 → Baserow brand 값.
+ * 2290에는 전 브랜드 PG가 섞여 있어 이 필터가 없으면 남의 브랜드 결제까지 끌어온다
+ * (2026-08-31: 필터 누락으로 (B)가 539,141,532원으로 부풀었던 버그).
+ * 브랜드B클래스(go_hiro)가 A본부 정산에 포함되는지는 A본부 파일로 확인 후 조정할 것.
+ */
+/** PG별 '정산 귀속월' 판정 기준 — 근거는 loadPg 주석 참조 */
+var SRC_BASIS = [
+  { id: 2290, pg: 'toss',     dateField: 'base_date' },
+  { id: 2290, pg: 'naverpay', dateField: 'base_date' },
+  { id: 2290, pg: 'payco',    dateField: 'approved_at' },
+  { id: 2337, pg: null,       dateField: 'approved_at' }
+];
+
+var BRAND_MAP = { '브랜드A': ['A'], '브랜드B': ['B'] };
+
+function doGet(e) {
+  // ?diag=1&ym=2026-07 로 열면 서버 쪽 상태를 텍스트로 확인할 수 있다 (iframe 없이 보인다)
+  if (e && e.parameter && e.parameter.diag === 'spike') {
+    var sp = { ok: true, version: APP_VERSION };
+    try { sp.spike = rpt_spike(Number(e.parameter.n) || 10000); }
+    catch (err) { sp.ok = false; sp.error = String(err && err.message ? err.message : err); }
+    return ContentService.createTextOutput(JSON.stringify(sp, null, 2))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  if (e && e.parameter && e.parameter.diag) {
+    var r = { ok: true, version: APP_VERSION, steps: [] };
+    try {
+      r.steps.push({ whoami: whoami() });
+      var ym = e.parameter.ym || '2026-07';
+      var brand = e.parameter.brand || '브랜드A';
+      var pg = loadPg(ym, brand);
+      var byPg = {};
+      pg.forEach(function (x) { byPg[x.PG사] = (byPg[x.PG사] || 0) + x.결제액; });
+      r.steps.push({ loadPg: { ym: ym, brand: brand, baserowBrands: BRAND_MAP[brand], rows: pg.length,
+        pending: pg.filter(function (x) { return x.pending; }).length, byPg: byPg,
+        sum: pg.reduce(function (t, x) { return t + x.결제액; }, 0) } });
+      r.steps.push({ loadCarryover: loadCarryover(brand, ym).rows.length });
+    } catch (err) {
+      r.ok = false;
+      r.error = String(err && err.message ? err.message : err);
+      r.stack = String(err && err.stack ? err.stack : '').slice(0, 800);
+    }
+    return ContentService.createTextOutput(JSON.stringify(r, null, 2))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  return HtmlService.createTemplateFromFile('index')
+    .evaluate()
+    .setTitle('공홈 수탁정산')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function include(name) {
+  return HtmlService.createHtmlOutputFromFile(name).getContent();
+}
+
+function whoami() {
+  // USER_DEPLOYING으로 돌리므로 접속자 이메일이 빈 값일 수 있다(같은 도메인이면 대개 나온다)
+  var me = '';
+  try { me = Session.getActiveUser().getEmail() || ''; } catch (e) {}
+  return { email: me || '(도메인 계정)', runAs: Session.getEffectiveUser().getEmail(),
+           version: APP_VERSION };
+}
+
+// ── Baserow 중계 ──────────────────────────────────────────────
+function brFetch_(path) {
+  var res = UrlFetchApp.fetch(CFG.BASEROW + path, {
+    headers: { Authorization: 'Token ' + CFG.TOKEN },
+    muteHttpExceptions: true
+  });
+  var code = res.getResponseCode();
+  if (code >= 400) throw new Error('Baserow ' + code + ': ' + res.getContentText().slice(0, 300));
+  return JSON.parse(res.getContentText());
+}
+
+/**
+ * 해당 월 PG 건별 — 전표 (B)블록의 원천
+ * ★ 테이블마다 날짜 필드가 다르다. 2290(토스·페이코·네이버페이)은 base_date,
+ *   2337(다날 건별)은 base_date 자체가 없어 approved_at으로 걸러야 한다.
+ *   없는 필드로 필터를 걸면 Baserow가 400을 던져 조회 전체가 죽는다.
+ */
+function loadPg(ym, brand) {
+  if (!/^\d{4}-\d{2}$/.test(ym)) throw new Error('기간 형식이 올바르지 않습니다 (예: 2026-08)');
+  var brands = BRAND_MAP[brand];
+  if (!brands) throw new Error('브랜드 매핑이 없습니다: ' + brand);
+  var out = [], errs = [];
+  var combos = [];
+  // ★ PG마다 '어느 달 것인가'의 기준이 다르다 (2026-08-31 실측으로 확정)
+  //  · 토스   = base_date(정산기준일). 6월 결제를 7월에 취소한 건이 7월에 잡혀야 하고,
+  //             어진의 [카드]탭도 취소완료일 기준이라 여기 맞는다. 7월 BETA 151,983,052 일치
+  //  · 페이코 = approved_at(승인일). 어진은 (P)탭 '결제내역'(승인 기준)으로 받으므로,
+  //             무통장입금처럼 승인 후 120일 뒤 정산되는 건이 정산월로 딸려오면 안 된다
+  //  · 네이버페이 = payDate == settleBasisDate 라 어느 쪽이든 같다 → base_date로 통일
+  //  · 다날(2337) = base_date 필드가 아예 없다
+  SRC_BASIS.forEach(function (t) {
+    if (!t.id) return;
+    brands.forEach(function (b) {
+      combos.push({ id: t.id, dateField: t.dateField, brand: b, pg: t.pg });
+    });
+  });
+  combos.forEach(function (t) {
+    if (!t.id) return;
+    try {
+      var page = 1;
+      for (;;) {
+        var j = brFetch_('/api/database/rows/table/' + t.id + '/?user_field_names=true&size=200&page=' +
+                         page + '&filter__' + t.dateField + '__contains=' + ym +
+                         '&filter__brand__equal=' + encodeURIComponent(t.brand) +
+                         (t.pg ? '&filter__pg__equal=' + encodeURIComponent(t.pg) : ''));
+        (j.results || []).forEach(function (r) {
+          out.push({
+            주문번호: String(r.mrc_order_no || '').trim(),
+            결제액: Number(r.amount) || 0,
+            PG사: pgKor_(r.pg),
+            결제수단: r.method || '',
+            기준일: r[t.dateField] || '',
+            // 정산 전에 손으로 넣어둔 건. 나중에 진짜 정산분이 들어오면 이 행이 밀려나야 한다
+            pending: String(r.dedupe_key || '').indexOf('pending-') === 0
+          });
+        });
+        if (!j.next) break;
+        page++;
+        if (page > 400) break;   // 안전장치
+      }
+    } catch (e) {
+      // 한 테이블이 실패해도 나머지는 살린다 (다날은 없어도 정산이 돌아간다)
+      errs.push('table ' + t.id + '/' + (t.pg || 'all') + '/' + t.brand + ': ' +
+                (e && e.message ? e.message : e));
+    }
+  });
+  if (!out.length && errs.length) throw new Error(errs.join(' / '));
+
+  // ★ 수동 적재분(pending) 중복 제거
+  // 무통장입금처럼 정산이 늦는 건은 대사파일에 뜨기 전에 손으로 넣어둔다(dedupe_key가 'pending-').
+  // 나중에 페이코가 실제로 정산해 같은 주문이 대사파일로 들어오면 두 건이 겹치므로,
+  // 같은 주문번호에 정식 수집분이 있으면 수동 적재분은 버린다. Baserow 행은 그대로 둬도 안전하다.
+  var realOrders = {};
+  out.forEach(function (r) { if (!r.pending && r.주문번호) realOrders[r.주문번호] = true; });
+  var dropped = 0;
+  out = out.filter(function (r) {
+    if (r.pending && realOrders[r.주문번호]) { dropped++; return false; }
+    return true;
+  });
+  if (dropped) Logger.log('pending 중복 제거: ' + dropped + '건');
+  return out;
+}
+
+function pgKor_(pg) {
+  var m = { toss: '토스', payco: '페이코', naverpay: '네이버페이', danal: '다날' };
+  return m[pg] || pg || '';
+}
+
+/** 전월 차기이월 — 당월 (A)블록 */
+function loadCarryover(brand, ym) {
+  if (!CFG.T_CARRY) return { rows: [], note: '이월 테이블 미설정 — 전월 파일에서 업로드하세요' };
+  var out = [], page = 1;
+  for (;;) {
+    var j = brFetch_('/api/database/rows/table/' + CFG.T_CARRY +
+                     '/?user_field_names=true&size=200&page=' + page +
+                     '&filter__ym__equal=' + ym + '&filter__brand__equal=' + encodeURIComponent(brand));
+    (j.results || []).forEach(function (r) {
+      out.push({
+        kind: r.kind || 'item',
+        품목별주문번호: r.item_no, 주문번호: r.order_no, 상품코드: r.sku,
+        상품명: r.name, 수량: Number(r.qty) || 0, 결제취소액: Number(r.amount) || 0,
+        PG사: r.pg || '', 결제수단: r.method || ''
+      });
+    });
+    if (!j.next) break;
+    page++;
+    if (page > 400) break;
+  }
+  return { rows: out, note: '' };
+}
+
+/** 차기이월 저장 (다음 달 (A)가 된다) */
+function saveCarryover(brand, ym, rows) {
+  if (!CFG.T_CARRY) throw new Error('이월 테이블이 아직 설정되지 않았습니다');
+  var items = rows.map(function (r) {
+    return {
+      ym: ym, brand: brand, kind: String(r.kind || 'item'),
+      item_no: String(r.품목별주문번호 || ''),
+      order_no: String(r.주문번호 || ''), sku: String(r.상품코드 || ''),
+      name: String(r.상품명 || ''), qty: String(r.수량 || 0), amount: String(r.차액 || 0),
+      pg: String(r.PG사 || ''), method: String(r.결제수단 || '')
+    };
+  });
+  var sent = 0;
+  for (var i = 0; i < items.length; i += 200) {
+    var chunk = items.slice(i, i + 200);
+    var res = UrlFetchApp.fetch(CFG.BASEROW + '/api/database/rows/table/' + CFG.T_CARRY +
+                                '/batch/?user_field_names=true', {
+      method: 'post', contentType: 'application/json',
+      headers: { Authorization: 'Token ' + CFG.TOKEN },
+      payload: JSON.stringify({ items: chunk }), muteHttpExceptions: true
+    });
+    if (res.getResponseCode() >= 400) throw new Error('이월 저장 실패: ' + res.getContentText().slice(0, 200));
+    sent += chunk.length;
+  }
+  return sent;
+}
+
+/** 실행 이력 */
+function saveRunlog(rec) {
+  if (!CFG.T_RUNLOG) return 0;
+  var res = UrlFetchApp.fetch(CFG.BASEROW + '/api/database/rows/table/' + CFG.T_RUNLOG +
+                              '/?user_field_names=true', {
+    method: 'post', contentType: 'application/json',
+    headers: { Authorization: 'Token ' + CFG.TOKEN },
+    payload: JSON.stringify({
+      ym: String(rec.ym || ''), brand: String(rec.brand || ''),
+      user: (function(){ try { return Session.getActiveUser().getEmail() || ''; } catch(e){ return ''; } })(),
+      ran_at: Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
+      gates: String(rec.gates || ''), totals: String(rec.totals || '')
+    }), muteHttpExceptions: true
+  });
+  return res.getResponseCode() < 400 ? 1 : 0;
+}
+
+/** 산출물 Drive 백업 (base64) */
+function backupToDrive(name, b64) {
+  if (!CFG.DRIVE_FOLDER) return '';
+  var blob = Utilities.newBlob(Utilities.base64Decode(b64),
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', name);
+  var f = DriveApp.getFolderById(CFG.DRIVE_FOLDER).createFile(blob);
+  return f.getUrl();
+}
+
+/* ────────────────────────────────────────────────────────────────
+ *  리포트 빌더 (ⓑ 경로) — 브라우저가 계산한 결과를 받아 서식까지 입혀 xlsx로
+ *
+ *  SheetJS(브라우저)는 데이터바·차트·테두리를 못 만든다. 그래서 결과만 서버로 보내고
+ *  SpreadsheetApp이 서식을 입힌 뒤 xlsx로 내보낸다.
+ *  1만 행을 한 번에 보내면 페이로드·6분 제한에 걸리므로 청크로 나눠 append 한다.
+ * ──────────────────────────────────────────────────────────────── */
+
+/**
+ * 작업용 스프레드시트를 하나만 두고 재사용한다.
+ * SpreadsheetApp이 만든 파일은 drive.file 스코프로 지울 수 없고(403),
+ * Drive REST는 이 프로젝트에서 API가 꺼져 있다. 매번 새로 만들면 Drive에 쓰레기가 쌓이므로
+ * 고정 시트 1개를 재사용하고 매 실행마다 비운다. 동시 실행은 LockService로 막는다.
+ */
+function rpt_workbook_() {
+  var props = PropertiesService.getScriptProperties();
+  var id = props.getProperty('REPORT_SS_ID');
+  if (id) {
+    try { SpreadsheetApp.openById(id); return id; }
+    catch (e) { id = null; }   // 지워졌으면 새로 만든다
+  }
+  var ss = SpreadsheetApp.create('[작업용] 공홈 수탁정산 리포트');
+  props.setProperty('REPORT_SS_ID', ss.getId());
+  return ss.getId();
+}
+
+function rpt_create(title) {
+  var t0 = new Date().getTime();
+  var id = rpt_workbook_();
+  var ss = SpreadsheetApp.openById(id);
+  ss.rename(title);
+  // 이전 실행 잔재 제거 — 시트 1장만 남기고 비운다
+  var sheets = ss.getSheets();
+  var keep = sheets[0];
+  keep.clear();
+  keep.clearConditionalFormatRules();
+  if (keep.getFrozenRows()) keep.setFrozenRows(0);
+  keep.setName('_tmp');
+  for (var i = 1; i < sheets.length; i++) ss.deleteSheet(sheets[i]);
+  return { id: id, url: ss.getUrl(), ms: new Date().getTime() - t0 };
+}
+
+/** 청크 append — rows는 2차원 배열 */
+function rpt_append(ssId, sheetName, rows, isFirst) {
+  var t0 = new Date().getTime();
+  var ss = SpreadsheetApp.openById(ssId);
+  var sh = ss.getSheetByName(sheetName);
+  if (!sh) sh = ss.insertSheet(sheetName);
+  if (isFirst) sh.clear();
+  if (rows && rows.length) {
+    var w = 0;
+    rows.forEach(function (r) { if (r.length > w) w = r.length; });
+    var norm = rows.map(function (r) {
+      var a = r.slice();
+      while (a.length < w) a.push('');
+      return a;
+    });
+    sh.getRange(sh.getLastRow() + 1, 1, norm.length, w).setValues(norm);
+  }
+  return { rows: rows ? rows.length : 0, ms: new Date().getTime() - t0 };
+}
+
+/** 서식 적용 + xlsx 내보내기 */
+function rpt_finalize(ssId, opt) {
+  var t0 = new Date().getTime();
+  var ss = SpreadsheetApp.openById(ssId);
+  var log = [];
+  (opt.sheets || []).forEach(function (s) {
+    var sh = ss.getSheetByName(s.name);
+    if (!sh) return;
+    var last = sh.getLastRow(), lastCol = sh.getLastColumn();
+    if (last < 1 || lastCol < 1) return;
+    sh.getRange(1, 1, last, lastCol).setFontFamily('맑은 고딕').setFontSize(10);
+    if (s.headerRow) {
+      sh.getRange(s.headerRow, 1, 1, lastCol).setFontWeight('bold')
+        .setBackground('#F2F2F2').setBorder(null, null, true, null, null, null, '#808080',
+          SpreadsheetApp.BorderStyle.SOLID);
+    }
+    (s.numCols || []).forEach(function (c) {
+      if (c <= lastCol && last > (s.headerRow || 0)) {
+        sh.getRange((s.headerRow || 0) + 1, c, last - (s.headerRow || 0), 1)
+          .setNumberFormat('#,##0;(#,##0)').setHorizontalAlignment('right');
+      }
+    });
+    if (s.bar && s.bar.col <= lastCol && last > (s.headerRow || 0)) {
+      var rng = sh.getRange((s.headerRow || 0) + 1, s.bar.col, last - (s.headerRow || 0), 1);
+      var rule = SpreadsheetApp.newConditionalFormatRule()
+        .setGradientMinpoint('#FFFFFF').setGradientMaxpoint('#CFE0F5').setRanges([rng]).build();
+      var rules = sh.getConditionalFormatRules(); rules.push(rule);
+      sh.setConditionalFormatRules(rules);
+    }
+    if (s.freeze) sh.setFrozenRows(s.freeze);
+    log.push(s.name + ':' + last + 'r');
+  });
+  var fmtMs = new Date().getTime() - t0;
+  // xlsx 내보내기
+  var t1 = new Date().getTime();
+  var url = 'https://docs.google.com/spreadsheets/d/' + ssId + '/export?format=xlsx';
+  var res = UrlFetchApp.fetch(url, {
+    headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
+    muteHttpExceptions: true
+  });
+  var code = res.getResponseCode();
+  var size = code < 400 ? res.getBlob().getBytes().length : 0;
+  var expMs = new Date().getTime() - t1;
+  return { formatted: log, fmtMs: fmtMs, exportCode: code, xlsxBytes: size, exportMs: expMs };
+}
+
+/** 스파이크 — 서버 안에서 더미 1만 행으로 전 과정 시간 측정 */
+function rpt_spike(nRows) {
+  nRows = nRows || 10000;
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return { error: '다른 실행이 진행 중입니다. 잠시 후 다시.' };
+  var out = { nRows: nRows };
+  var t0 = new Date().getTime();
+  var c = rpt_create('[작업용] 공홈 수탁정산 리포트');
+  out.create = c.ms;
+  var rows = [];
+  rows.push(['품목별 주문번호', '상품', '전월이월', '신규결제', '취소', '정산대상', '매출', '기타', '차기이월', '판정']);
+  for (var i = 0; i < nRows; i++) {
+    rows.push(['20260701-' + ('0000000' + i).slice(-7) + '-01', '상품명 테스트 ' + i,
+               0, 36300, 0, 36300, 36300, 0, 0, '배송 → 매출']);
+  }
+  var t1 = new Date().getTime();
+  for (var j = 0; j < rows.length; j += 2000) {
+    rpt_append(c.id, '주문추적', rows.slice(j, j + 2000), j === 0);
+  }
+  out.append = new Date().getTime() - t1;
+  var f = rpt_finalize(c.id, { sheets: [{ name: '주문추적', headerRow: 1, freeze: 1,
+    numCols: [3, 4, 5, 6, 7, 8, 9], bar: { col: 6 } }] });
+  out.finalize = f;
+  out.totalMs = new Date().getTime() - t0;
+  out.ssUrl = c.url;
+  lock.releaseLock();
+  out.reused = '고정 시트 재사용 (파일이 쌓이지 않는다)';
+  return out;
+}
+
+
+var __STG={"order": [{"품목별주문번호": "20260801-0100000-01", "주문번호": "20260801-0100000", "주문상태": "배송완료", "상품코드": "P-1001", "상품명": "린넨 셔츠", "수량": 1, "판매가": 49000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 49000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260805-0100001-01", "주문번호": "20260805-0100001", "주문상태": "배송완료", "상품코드": "P-1005", "상품명": "볼캡", "수량": 1, "판매가": 25000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 25000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "간편결제", "환불번호": ""}, {"품목별주문번호": "20260805-0100002-01", "주문번호": "20260805-0100002", "주문상태": "배송완료", "상품코드": "P-1001", "상품명": "린넨 셔츠", "수량": 1, "판매가": 49000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 49000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260805-0100002-02", "주문번호": "20260805-0100002", "주문상태": "배송완료", "상품코드": "P-1006", "상품명": "양말 세트", "수량": 2, "판매가": 12000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 24000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260807-0100003-01", "주문번호": "20260807-0100003", "주문상태": "배송완료", "상품코드": "P-1001", "상품명": "린넨 셔츠", "수량": 1, "판매가": 49000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 49000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260807-0100003-02", "주문번호": "20260807-0100003", "주문상태": "배송완료", "상품코드": "P-1006", "상품명": "양말 세트", "수량": 1, "판매가": 12000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 12000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260812-0100004-01", "주문번호": "20260812-0100004", "주문상태": "환불 완료", "상품코드": "P-1002", "상품명": "와이드 팬츠", "수량": 2, "판매가": 59000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 118000, "예치금환불액": "", "환불금액": 118000, "환불완료일": "2026-08-16", "결제수단": "카드", "환불번호": "R100004"}, {"품목별주문번호": "20260812-0100004-02", "주문번호": "20260812-0100004", "주문상태": "환불 완료", "상품코드": "P-1006", "상품명": "양말 세트", "수량": 2, "판매가": 12000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 24000, "예치금환불액": "", "환불금액": 24000, "환불완료일": "2026-08-27", "결제수단": "카드", "환불번호": "R100004"}, {"품목별주문번호": "20260827-0100005-01", "주문번호": "20260827-0100005", "주문상태": "배송완료", "상품코드": "P-1003", "상품명": "니트 베스트", "수량": 1, "판매가": 39000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 39000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260801-0100006-01", "주문번호": "20260801-0100006", "주문상태": "배송완료", "상품코드": "P-1006", "상품명": "양말 세트", "수량": 2, "판매가": 12000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 24000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260807-0100007-01", "주문번호": "20260807-0100007", "주문상태": "배송완료", "상품코드": "P-1006", "상품명": "양말 세트", "수량": 1, "판매가": 12000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 12000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260816-0100008-01", "주문번호": "20260816-0100008", "주문상태": "배송완료", "상품코드": "P-1003", "상품명": "니트 베스트", "수량": 1, "판매가": 39000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 39000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260816-0100009-01", "주문번호": "20260816-0100009", "주문상태": "환불 완료", "상품코드": "P-1006", "상품명": "양말 세트", "수량": 1, "판매가": 12000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 12000, "예치금환불액": "", "환불금액": 12000, "환불완료일": "2026-08-13", "결제수단": "카드", "환불번호": "R100009"}, {"품목별주문번호": "20260816-0100009-02", "주문번호": "20260816-0100009", "주문상태": "환불 완료", "상품코드": "P-1003", "상품명": "니트 베스트", "수량": 1, "판매가": 39000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 39000, "예치금환불액": "", "환불금액": 39000, "환불완료일": "2026-08-27", "결제수단": "간편결제", "환불번호": "R100009"}, {"품목별주문번호": "20260803-0100010-01", "주문번호": "20260803-0100010", "주문상태": "배송완료", "상품코드": "P-1002", "상품명": "와이드 팬츠", "수량": 1, "판매가": 59000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 59000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "간편결제", "환불번호": ""}, {"품목별주문번호": "20260823-0100011-01", "주문번호": "20260823-0100011", "주문상태": "배송완료", "상품코드": "P-1006", "상품명": "양말 세트", "수량": 1, "판매가": 12000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 12000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260804-0100012-01", "주문번호": "20260804-0100012", "주문상태": "배송완료", "상품코드": "P-1002", "상품명": "와이드 팬츠", "수량": 1, "판매가": 59000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 59000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260818-0100013-01", "주문번호": "20260818-0100013", "주문상태": "배송완료", "상품코드": "P-1001", "상품명": "린넨 셔츠", "수량": 1, "판매가": 49000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 49000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "간편결제", "환불번호": ""}, {"품목별주문번호": "20260818-0100013-02", "주문번호": "20260818-0100013", "주문상태": "배송완료", "상품코드": "P-1003", "상품명": "니트 베스트", "수량": 1, "판매가": 39000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 39000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260823-0100014-01", "주문번호": "20260823-0100014", "주문상태": "배송완료", "상품코드": "P-1004", "상품명": "코튼 원피스", "수량": 1, "판매가": 79000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 79000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260828-0100015-01", "주문번호": "20260828-0100015", "주문상태": "환불 완료", "상품코드": "P-1005", "상품명": "볼캡", "수량": 1, "판매가": 25000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 25000, "예치금환불액": "", "환불금액": 25000, "환불완료일": "2026-08-28", "결제수단": "카드", "환불번호": "R100015"}, {"품목별주문번호": "20260816-0100016-01", "주문번호": "20260816-0100016", "주문상태": "배송완료", "상품코드": "P-1006", "상품명": "양말 세트", "수량": 2, "판매가": 12000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 24000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "간편결제", "환불번호": ""}, {"품목별주문번호": "20260809-0100017-01", "주문번호": "20260809-0100017", "주문상태": "배송완료", "상품코드": "P-1004", "상품명": "코튼 원피스", "수량": 1, "판매가": 79000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 79000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260813-0100018-01", "주문번호": "20260813-0100018", "주문상태": "배송완료", "상품코드": "P-1003", "상품명": "니트 베스트", "수량": 1, "판매가": 39000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 39000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260813-0100018-02", "주문번호": "20260813-0100018", "주문상태": "배송완료", "상품코드": "P-1004", "상품명": "코튼 원피스", "수량": 1, "판매가": 79000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 79000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "간편결제", "환불번호": ""}, {"품목별주문번호": "20260820-0100019-01", "주문번호": "20260820-0100019", "주문상태": "배송완료", "상품코드": "P-1002", "상품명": "와이드 팬츠", "수량": 1, "판매가": 59000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 59000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "간편결제", "환불번호": ""}, {"품목별주문번호": "20260818-0100020-01", "주문번호": "20260818-0100020", "주문상태": "배송완료", "상품코드": "P-1005", "상품명": "볼캡", "수량": 2, "판매가": 25000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 50000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "간편결제", "환불번호": ""}, {"품목별주문번호": "20260818-0100020-02", "주문번호": "20260818-0100020", "주문상태": "배송완료", "상품코드": "P-1006", "상품명": "양말 세트", "수량": 1, "판매가": 12000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 12000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "간편결제", "환불번호": ""}, {"품목별주문번호": "20260810-0100021-01", "주문번호": "20260810-0100021", "주문상태": "배송완료", "상품코드": "P-1004", "상품명": "코튼 원피스", "수량": 1, "판매가": 79000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 79000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260810-0100021-02", "주문번호": "20260810-0100021", "주문상태": "배송완료", "상품코드": "P-1003", "상품명": "니트 베스트", "수량": 1, "판매가": 39000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 39000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "간편결제", "환불번호": ""}, {"품목별주문번호": "20260824-0100022-01", "주문번호": "20260824-0100022", "주문상태": "환불 완료", "상품코드": "P-1003", "상품명": "니트 베스트", "수량": 2, "판매가": 39000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 78000, "예치금환불액": "", "환불금액": 78000, "환불완료일": "2026-08-22", "결제수단": "간편결제", "환불번호": "R100022"}, {"품목별주문번호": "20260802-0100023-01", "주문번호": "20260802-0100023", "주문상태": "배송완료", "상품코드": "P-1001", "상품명": "린넨 셔츠", "수량": 1, "판매가": 49000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 49000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260802-0100023-02", "주문번호": "20260802-0100023", "주문상태": "배송완료", "상품코드": "P-1004", "상품명": "코튼 원피스", "수량": 1, "판매가": 79000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 79000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260823-0100024-01", "주문번호": "20260823-0100024", "주문상태": "배송완료", "상품코드": "P-1005", "상품명": "볼캡", "수량": 2, "판매가": 25000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 50000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260824-0100025-01", "주문번호": "20260824-0100025", "주문상태": "배송완료", "상품코드": "P-1001", "상품명": "린넨 셔츠", "수량": 1, "판매가": 49000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 49000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "간편결제", "환불번호": ""}, {"품목별주문번호": "20260818-0100026-01", "주문번호": "20260818-0100026", "주문상태": "배송완료", "상품코드": "P-1004", "상품명": "코튼 원피스", "수량": 2, "판매가": 79000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 158000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260802-0100027-01", "주문번호": "20260802-0100027", "주문상태": "배송완료", "상품코드": "P-1004", "상품명": "코튼 원피스", "수량": 2, "판매가": 79000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 158000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260811-0100028-01", "주문번호": "20260811-0100028", "주문상태": "배송완료", "상품코드": "P-1003", "상품명": "니트 베스트", "수량": 2, "판매가": 39000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 78000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260803-0100029-01", "주문번호": "20260803-0100029", "주문상태": "배송완료", "상품코드": "P-1005", "상품명": "볼캡", "수량": 2, "판매가": 25000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 50000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260821-0100030-01", "주문번호": "20260821-0100030", "주문상태": "배송완료", "상품코드": "P-1006", "상품명": "양말 세트", "수량": 1, "판매가": 12000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 12000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260816-0100031-01", "주문번호": "20260816-0100031", "주문상태": "배송완료", "상품코드": "P-1003", "상품명": "니트 베스트", "수량": 1, "판매가": 39000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 39000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260813-0100032-01", "주문번호": "20260813-0100032", "주문상태": "배송완료", "상품코드": "P-1003", "상품명": "니트 베스트", "수량": 1, "판매가": 39000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 39000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260813-0100033-01", "주문번호": "20260813-0100033", "주문상태": "배송완료", "상품코드": "P-1002", "상품명": "와이드 팬츠", "수량": 2, "판매가": 59000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 118000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260828-0100034-01", "주문번호": "20260828-0100034", "주문상태": "배송완료", "상품코드": "P-1006", "상품명": "양말 세트", "수량": 2, "판매가": 12000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 24000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "간편결제", "환불번호": ""}, {"품목별주문번호": "20260812-0100035-01", "주문번호": "20260812-0100035", "주문상태": "배송완료", "상품코드": "P-1004", "상품명": "코튼 원피스", "수량": 2, "판매가": 79000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 158000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}, {"품목별주문번호": "20260812-0100035-02", "주문번호": "20260812-0100035", "주문상태": "배송완료", "상품코드": "P-1003", "상품명": "니트 베스트", "수량": 1, "판매가": 39000, "예치금최초": 0, "예치금최종": 0, "품목별결제금액": 39000, "예치금환불액": "", "환불금액": "", "환불완료일": "", "결제수단": "카드", "환불번호": ""}], "claim": [{"품목별주문번호": "20260812-0100004-01", "주문번호": "20260812-0100004", "주문상태": "환불 완료", "상품코드": "P-1002", "상품명": "와이드 팬츠", "수량": 2, "판매가": 59000, "예치금환불액": "", "환불금액": 118000, "환불완료일": "2026-08-16", "환불번호": "R100004"}, {"품목별주문번호": "20260812-0100004-02", "주문번호": "20260812-0100004", "주문상태": "환불 완료", "상품코드": "P-1006", "상품명": "양말 세트", "수량": 2, "판매가": 12000, "예치금환불액": "", "환불금액": 24000, "환불완료일": "2026-08-27", "환불번호": "R100004"}, {"품목별주문번호": "20260816-0100009-01", "주문번호": "20260816-0100009", "주문상태": "환불 완료", "상품코드": "P-1006", "상품명": "양말 세트", "수량": 1, "판매가": 12000, "예치금환불액": "", "환불금액": 12000, "환불완료일": "2026-08-13", "환불번호": "R100009"}, {"품목별주문번호": "20260816-0100009-02", "주문번호": "20260816-0100009", "주문상태": "환불 완료", "상품코드": "P-1003", "상품명": "니트 베스트", "수량": 1, "판매가": 39000, "예치금환불액": "", "환불금액": 39000, "환불완료일": "2026-08-27", "환불번호": "R100009"}, {"품목별주문번호": "20260828-0100015-01", "주문번호": "20260828-0100015", "주문상태": "환불 완료", "상품코드": "P-1005", "상품명": "볼캡", "수량": 1, "판매가": 25000, "예치금환불액": "", "환불금액": 25000, "환불완료일": "2026-08-28", "환불번호": "R100015"}, {"품목별주문번호": "20260824-0100022-01", "주문번호": "20260824-0100022", "주문상태": "환불 완료", "상품코드": "P-1003", "상품명": "니트 베스트", "수량": 2, "판매가": 39000, "예치금환불액": "", "환불금액": 78000, "환불완료일": "2026-08-22", "환불번호": "R100022"}], "delivery": [{"품목별주문번호": "20260801-0100000-01", "주문상태": "배송완료", "배송시작일": "2026-08-26"}, {"품목별주문번호": "20260805-0100001-01", "주문상태": "배송완료", "배송시작일": "2026-08-29"}, {"품목별주문번호": "20260805-0100002-01", "주문상태": "배송완료", "배송시작일": "2026-08-22"}, {"품목별주문번호": "20260805-0100002-02", "주문상태": "배송완료", "배송시작일": "2026-08-21"}, {"품목별주문번호": "20260807-0100003-01", "주문상태": "배송완료", "배송시작일": "2026-08-15"}, {"품목별주문번호": "20260807-0100003-02", "주문상태": "배송완료", "배송시작일": "2026-08-15"}, {"품목별주문번호": "20260827-0100005-01", "주문상태": "배송완료", "배송시작일": "2026-08-09"}, {"품목별주문번호": "20260801-0100006-01", "주문상태": "배송완료", "배송시작일": "2026-08-25"}, {"품목별주문번호": "20260807-0100007-01", "주문상태": "배송완료", "배송시작일": "2026-08-15"}, {"품목별주문번호": "20260816-0100008-01", "주문상태": "배송완료", "배송시작일": "2026-09-03"}, {"품목별주문번호": "20260823-0100011-01", "주문상태": "배송완료", "배송시작일": "2026-08-14"}, {"품목별주문번호": "20260804-0100012-01", "주문상태": "배송완료", "배송시작일": "2026-08-17"}, {"품목별주문번호": "20260818-0100013-01", "주문상태": "배송완료", "배송시작일": "2026-08-08"}, {"품목별주문번호": "20260818-0100013-02", "주문상태": "배송완료", "배송시작일": "2026-08-15"}, {"품목별주문번호": "20260823-0100014-01", "주문상태": "배송완료", "배송시작일": "2026-08-24"}, {"품목별주문번호": "20260816-0100016-01", "주문상태": "배송완료", "배송시작일": "2026-08-20"}, {"품목별주문번호": "20260809-0100017-01", "주문상태": "배송완료", "배송시작일": "2026-09-01"}, {"품목별주문번호": "20260813-0100018-01", "주문상태": "배송완료", "배송시작일": "2026-08-09"}, {"품목별주문번호": "20260813-0100018-02", "주문상태": "배송완료", "배송시작일": "2026-08-24"}, {"품목별주문번호": "20260820-0100019-01", "주문상태": "배송완료", "배송시작일": "2026-08-10"}, {"품목별주문번호": "20260818-0100020-01", "주문상태": "배송완료", "배송시작일": "2026-08-17"}, {"품목별주문번호": "20260818-0100020-02", "주문상태": "배송완료", "배송시작일": "2026-08-11"}, {"품목별주문번호": "20260802-0100023-01", "주문상태": "배송완료", "배송시작일": "2026-08-12"}, {"품목별주문번호": "20260802-0100023-02", "주문상태": "배송완료", "배송시작일": "2026-08-11"}, {"품목별주문번호": "20260823-0100024-01", "주문상태": "배송완료", "배송시작일": "2026-08-29"}, {"품목별주문번호": "20260824-0100025-01", "주문상태": "배송완료", "배송시작일": "2026-08-13"}, {"품목별주문번호": "20260818-0100026-01", "주문상태": "배송완료", "배송시작일": "2026-09-02"}, {"품목별주문번호": "20260802-0100027-01", "주문상태": "배송완료", "배송시작일": "2026-08-12"}, {"품목별주문번호": "20260811-0100028-01", "주문상태": "배송완료", "배송시작일": "2026-08-08"}, {"품목별주문번호": "20260803-0100029-01", "주문상태": "배송완료", "배송시작일": "2026-08-20"}, {"품목별주문번호": "20260821-0100030-01", "주문상태": "배송완료", "배송시작일": "2026-08-06"}, {"품목별주문번호": "20260816-0100031-01", "주문상태": "배송완료", "배송시작일": "2026-08-05"}, {"품목별주문번호": "20260813-0100033-01", "주문상태": "배송완료", "배송시작일": "2026-08-25"}, {"품목별주문번호": "20260828-0100034-01", "주문상태": "배송완료", "배송시작일": "2026-08-11"}, {"품목별주문번호": "20260812-0100035-01", "주문상태": "배송완료", "배송시작일": "2026-09-05"}, {"품목별주문번호": "20260812-0100035-02", "주문상태": "배송완료", "배송시작일": "2026-09-04"}], "pg": [{"주문번호": "20260801-0100000", "결제액": 49000, "PG사": "토스", "결제수단": "카드", "기준일": "20260801", "pending": false}, {"주문번호": "20260805-0100001", "결제액": 25000, "PG사": "토스", "결제수단": "카드", "기준일": "20260805", "pending": false}, {"주문번호": "20260805-0100002", "결제액": 73000, "PG사": "페이코", "결제수단": "카드", "기준일": "20260805", "pending": false}, {"주문번호": "20260807-0100003", "결제액": 61000, "PG사": "페이코", "결제수단": "카드", "기준일": "20260807", "pending": false}, {"주문번호": "20260812-0100004", "결제액": 142000, "PG사": "토스", "결제수단": "카드", "기준일": "20260812", "pending": false}, {"주문번호": "20260812-0100004", "결제액": -142000, "PG사": "토스", "결제수단": "카드", "기준일": "2026-08-20", "pending": false}, {"주문번호": "20260827-0100005", "결제액": 39000, "PG사": "페이코", "결제수단": "카드", "기준일": "20260827", "pending": false}, {"주문번호": "20260801-0100006", "결제액": 24000, "PG사": "토스", "결제수단": "카드", "기준일": "20260801", "pending": false}, {"주문번호": "20260807-0100007", "결제액": 12000, "PG사": "토스", "결제수단": "카드", "기준일": "20260807", "pending": false}, {"주문번호": "20260816-0100008", "결제액": 39000, "PG사": "페이코", "결제수단": "카드", "기준일": "20260816", "pending": false}, {"주문번호": "20260816-0100009", "결제액": 51000, "PG사": "네이버페이", "결제수단": "카드", "기준일": "20260816", "pending": false}, {"주문번호": "20260816-0100009", "결제액": -51000, "PG사": "네이버페이", "결제수단": "카드", "기준일": "2026-08-20", "pending": false}, {"주문번호": "20260803-0100010", "결제액": 59000, "PG사": "네이버페이", "결제수단": "카드", "기준일": "20260803", "pending": false}, {"주문번호": "20260823-0100011", "결제액": 12000, "PG사": "토스", "결제수단": "카드", "기준일": "20260823", "pending": false}, {"주문번호": "20260804-0100012", "결제액": 59000, "PG사": "토스", "결제수단": "카드", "기준일": "20260804", "pending": false}, {"주문번호": "20260818-0100013", "결제액": 88000, "PG사": "토스", "결제수단": "카드", "기준일": "20260818", "pending": false}, {"주문번호": "20260823-0100014", "결제액": 79000, "PG사": "네이버페이", "결제수단": "카드", "기준일": "20260823", "pending": false}, {"주문번호": "20260828-0100015", "결제액": 25000, "PG사": "토스", "결제수단": "카드", "기준일": "20260828", "pending": false}, {"주문번호": "20260828-0100015", "결제액": -25000, "PG사": "토스", "결제수단": "카드", "기준일": "2026-08-20", "pending": false}, {"주문번호": "20260816-0100016", "결제액": 24000, "PG사": "토스", "결제수단": "카드", "기준일": "20260816", "pending": false}, {"주문번호": "20260809-0100017", "결제액": 79000, "PG사": "토스", "결제수단": "카드", "기준일": "20260809", "pending": false}, {"주문번호": "20260813-0100018", "결제액": 118000, "PG사": "토스", "결제수단": "카드", "기준일": "20260813", "pending": false}, {"주문번호": "20260820-0100019", "결제액": 59000, "PG사": "페이코", "결제수단": "카드", "기준일": "20260820", "pending": false}, {"주문번호": "20260818-0100020", "결제액": 62000, "PG사": "페이코", "결제수단": "카드", "기준일": "20260818", "pending": false}, {"주문번호": "20260810-0100021", "결제액": 118000, "PG사": "네이버페이", "결제수단": "카드", "기준일": "20260810", "pending": false}, {"주문번호": "20260824-0100022", "결제액": 78000, "PG사": "토스", "결제수단": "카드", "기준일": "20260824", "pending": false}, {"주문번호": "20260824-0100022", "결제액": -78000, "PG사": "토스", "결제수단": "카드", "기준일": "2026-08-20", "pending": false}, {"주문번호": "20260802-0100023", "결제액": 128000, "PG사": "페이코", "결제수단": "카드", "기준일": "20260802", "pending": false}, {"주문번호": "20260823-0100024", "결제액": 50000, "PG사": "네이버페이", "결제수단": "카드", "기준일": "20260823", "pending": false}, {"주문번호": "20260824-0100025", "결제액": 49000, "PG사": "네이버페이", "결제수단": "카드", "기준일": "20260824", "pending": false}, {"주문번호": "20260818-0100026", "결제액": 158000, "PG사": "페이코", "결제수단": "카드", "기준일": "20260818", "pending": false}, {"주문번호": "20260802-0100027", "결제액": 158000, "PG사": "토스", "결제수단": "카드", "기준일": "20260802", "pending": false}, {"주문번호": "20260811-0100028", "결제액": 78000, "PG사": "토스", "결제수단": "카드", "기준일": "20260811", "pending": false}, {"주문번호": "20260803-0100029", "결제액": 50000, "PG사": "페이코", "결제수단": "카드", "기준일": "20260803", "pending": false}, {"주문번호": "20260821-0100030", "결제액": 12000, "PG사": "토스", "결제수단": "카드", "기준일": "20260821", "pending": false}, {"주문번호": "20260816-0100031", "결제액": 39000, "PG사": "네이버페이", "결제수단": "카드", "기준일": "20260816", "pending": false}, {"주문번호": "20260813-0100032", "결제액": 39000, "PG사": "네이버페이", "결제수단": "카드", "기준일": "20260813", "pending": false}, {"주문번호": "20260813-0100033", "결제액": 118000, "PG사": "네이버페이", "결제수단": "카드", "기준일": "20260813", "pending": false}, {"주문번호": "20260828-0100034", "결제액": 24000, "PG사": "토스", "결제수단": "카드", "기준일": "20260828", "pending": false}, {"주문번호": "20260812-0100035", "결제액": 197000, "PG사": "페이코", "결제수단": "카드", "기준일": "20260812", "pending": false}]};
+loadPg=function(ym,brand){ return JSON.parse(JSON.stringify(__STG.pg)); };
+loadCarryover=function(){ return { rows:[], note:'데모 — 전월 이월 없음' }; };
+saveCarryover=function(brand,ym,rows){ return rows.length; };
+saveRunlog=function(){ return true; };
+backupToDrive=function(){ return { ok:true }; };
+window.addEventListener('DOMContentLoaded', function(){
+  var ym=document.getElementById('ym'); if(ym) ym.value='2026-08';
+  var drops=document.getElementById('drops');
+  var btn=document.createElement('button'); btn.textContent='가상 파일 3종 채우기 (주문 '+__STG.order.length+' · 취소 '+__STG.claim.length+' · 배송 '+__STG.delivery.length+'행)';
+  btn.style.cssText='margin:10px 0 4px'; btn.id='demoFill';
+  btn.onclick=function(){ ['order','claim','delivery'].forEach(function(k){ ST.files[k]=JSON.parse(JSON.stringify(__STG[k])); var st=document.getElementById('st_'+k), box=document.getElementById('d_'+k); if(st){ st.textContent=ST.files[k].length+'행 읽음 (가상)'; st.className='st ok'; } if(box) box.className='drop has'; });
+    try{ checkStep2(); }catch(e){} };
+  if(drops) drops.parentNode.insertBefore(btn, drops);
+});
+
+
+window.google={ script:{ run:(function(){
+  function mk(ok,fail,uo){
+    var api={ withSuccessHandler:function(f){ return mk(f,fail,uo); }, withFailureHandler:function(f){ return mk(ok,f,uo); }, withUserObject:function(o){ return mk(ok,fail,o); } };
+    return new Proxy(api,{ get:function(t,name){ if(name in t) return t[name]; if(typeof name!=='string') return undefined;
+      return function(){ var args=Array.prototype.slice.call(arguments);
+        // form 요소가 넘어오면 GAS 처럼 {name:value} 로 바꾼다
+        args=args.map(function(a){ if(a && typeof HTMLFormElement!=='undefined' && a instanceof HTMLFormElement){ var o={}; Array.prototype.forEach.call(a.elements,function(el){ if(el.name) o[el.name]=el.value; }); return o; } return a; });
+        setTimeout(function(){ var fn=window[name]; if(typeof fn!=='function'){ fail&&fail(new Error('데모에 없는 함수: '+name)); return; }
+          try{ var r=fn.apply(null,args); r=(r===undefined)?null:JSON.parse(JSON.stringify(r)); ok&&ok(r,uo); }catch(e){ console.warn('demo rpc',name,e); fail&&fail({ message:String(e&&e.message||e) },uo); } },60); }; } });
+  }
+  return mk(null,null,null);
+})(), host:{ close:function(){}, setHeight:function(){}, setWidth:function(){}, editor:{ focus:function(){} } }, url:{ getLocation:function(cb){ cb({ parameter:{}, parameters:{}, hash:'' }); } } } };
+
+</script>
+
+<meta charset="utf-8">
+<base target="_top">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#F5F6F8; --surface:#FFFFFF; --ink:#1B2430; --muted:#5C687A;
+  --line:#DBE0E7; --accent:#1D5FBF; --accent-ink:#174C99;
+  --ok:#1B7F5A; --warn:#C2410C; --chip:#EEF3FA; --code:#F1F3F6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"맑은 고딕","Malgun Gothic",-apple-system,sans-serif;
+  font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 60px}
+header{padding:18px 0 12px;border-bottom:2px solid var(--ink);margin-bottom:18px;
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+h1{font-size:19px;margin:0;font-weight:700}
+.who{font-size:13px;color:var(--muted);margin-left:auto}
+.steps{display:flex;gap:0;margin-bottom:20px;flex-wrap:wrap}
+.step{flex:1;min-width:150px;padding:9px 12px;font-size:14px;
+  border-bottom:3px solid var(--line);color:var(--muted);cursor:default}
+.step.on{border-bottom-color:var(--accent);color:var(--ink);font-weight:700}
+.step.done{border-bottom-color:var(--ok);color:var(--ink)}
+.step .n{display:block;font-size:11px;letter-spacing:.1em;color:var(--muted)}
+.panel{display:none;background:var(--surface);border:1px solid var(--line);padding:20px 22px}
+.panel.on{display:block}
+h2{font-size:16px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13.5px;margin:0 0 16px}
+label{font-size:13.5px;color:var(--muted);display:block;margin-bottom:4px}
+select,input[type=text]{font-family:inherit;font-size:15px;padding:6px 10px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);min-width:160px}
+button{font-family:inherit;font-size:14.5px;padding:8px 18px;border:1px solid var(--accent);
+  background:var(--accent);color:#fff;cursor:pointer;font-weight:700}
+button.ghost{background:var(--surface);color:var(--accent-ink)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:14px 0}
+.card{border:1px solid var(--line);padding:12px 14px;background:var(--surface)}
+.card b{display:block;font-size:14px;margin-bottom:5px}
+.card .v{font-size:13.5px;color:var(--muted);line-height:1.6}
+.drop{border:1.5px dashed var(--line);padding:16px;text-align:left;background:var(--surface);
+  transition:border-color .12s,background .12s}
+.drop.over{border-color:var(--accent);background:var(--chip);border-style:solid}
+.drop.has{border-style:solid;border-color:var(--ok)}
+.drop.err{border-color:var(--warn)}
+.drop b{font-size:14px;display:block;margin-bottom:4px}
+.drop .st{font-size:13px;color:var(--muted)}
+.drop .st.ok{color:var(--ok)} .drop .st.err{color:var(--warn)}
+input[type=file]{font-size:12.5px;margin-top:8px;width:100%}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+th{text-align:left;font-weight:700;padding:7px 10px;border-bottom:2px solid var(--ink);
+  white-space:nowrap;font-size:13.5px}
+th.n,td.n{text-align:right;font-variant-numeric:tabular-nums}
+td{padding:6px 10px;border-bottom:1px solid var(--line)}
+tr.sum td{border-top:2px solid var(--ink);font-weight:700}
+.gate{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin:14px 0}
+.g{border:1px solid var(--line);padding:11px 14px;background:var(--surface)}
+.g b{font-size:14px} .g .d{font-size:12.5px;color:var(--muted);display:block;margin-top:3px}
+.tag{font-size:12px;font-weight:700;padding:1px 8px;border-radius:99px;margin-left:6px}
+.tag.ok{background:#E4F3EC;color:var(--ok)}
+.tag.no{background:#FBEAE1;color:var(--warn)}
+.tag.wait{background:var(--chip);color:var(--muted)}
+.dropall{border:2px dashed var(--line);padding:18px;text-align:center;color:var(--muted);
+  font-size:14px;margin-bottom:14px;background:var(--surface)}
+.dropall.over{border-color:var(--accent);background:var(--chip);color:var(--accent-ink);font-weight:700}
+.log{background:var(--code);padding:10px 12px;font-size:12.5px;color:var(--muted);
+  max-height:150px;overflow:auto;margin-top:12px;white-space:pre-wrap;font-family:Consolas,monospace}
+.nav{display:flex;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.nav .sp{margin-left:auto}
+.scroll{overflow-x:auto}
+.note{font-size:13px;color:var(--muted);margin-top:8px}
+.err{color:var(--warn);font-weight:700}
+</style>
+<title>자사몰 수탁정산 (데모) — 이어진 포트폴리오</title></head>
+<body>
+<div id="demobar">
+  <b>데모</b>
+  <span>자사몰 수탁정산 앱 그대로 — 결제대행 건별(가상 40건)과 주문·취소·배송 파일(가상)을 엔진에 태워 정산·전표까지 생성합니다. 저장은 이 페이지 안에서만.</span>
+  <a href="../../">← 포트폴리오</a>
+</div>
+<style>
+#demobar{position:sticky;top:0;z-index:9999;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  background:#fff8e1;border-bottom:1px solid #f0dfa8;padding:9px 16px;font-size:12.5px;color:#6b5b21;
+  font-family:system-ui,-apple-system,'Malgun Gothic',sans-serif}
+#demobar b{background:#6b5b21;color:#fff8e1;padding:2px 8px;border-radius:10px;font-size:11.5px}
+#demobar a{margin-left:auto;color:#6b5b21;font-weight:700;text-decoration:none}
+</style>
+
+<div class="wrap">
+<header>
+  <h1>공홈 수탁정산</h1>
+  <span class="sub" style="margin:0">카페24 업로드 + PG 자동 → 정산·전표입력 생성</span>
+  <span class="who" id="who">…</span>
+</header>
+
+<div class="steps">
+  <div class="step on" id="s1"><span class="n">STEP 1</span>월·데이터 확인</div>
+  <div class="step" id="s2"><span class="n">STEP 2</span>카페24 업로드</div>
+  <div class="step" id="s3"><span class="n">STEP 3</span>검증·조정</div>
+  <div class="step" id="s4"><span class="n">STEP 4</span>산출물</div>
+</div>
+
+<!-- STEP 1 -->
+<div class="panel on" id="p1">
+  <h2>정산 대상 확인</h2>
+  <p class="sub">PG 결제내역과 전월 이월은 자동으로 불러옵니다.</p>
+  <div class="row">
+    <div><label>정산 월</label><input type="text" id="ym" placeholder="2026-08"></div>
+    <div><label>브랜드</label>
+      <select id="brand">
+        <option>브랜드A</option><option>브랜드B</option>
+      </select></div>
+    <div><button id="btnLoad">불러오기</button></div>
+  </div>
+  <div class="cards" id="c1"></div>
+  <div class="nav"><span class="sp"></span><button id="n1" disabled>다음 — 파일 업로드</button></div>
+</div>
+
+<!-- STEP 2 -->
+<div class="panel" id="p2">
+  <h2>카페24 다운로드 업로드</h2>
+  <p class="sub">주문·취소·배송은 필수입니다. <b>예치금이 있으면 [PG 보완]에 반드시 올리세요</b> — Baserow가 주지 못하는 결제수단입니다.
+     <b>파일을 상자에 끌어다 놓거나</b>, 아래 넓은 영역에 4개를 한꺼번에 떨어뜨려도 됩니다 — 파일명으로 알아서 배치합니다.</p>
+  <div id="dropAll" class="dropall">여기에 파일 여러 개를 한 번에 끌어다 놓기</div>
+  <div class="cards" id="drops"></div>
+  <div class="log" id="log2"></div>
+  <div class="nav"><button class="ghost" onclick="go(1)">이전</button><span class="sp"></span>
+    <button id="n2" disabled>다음 — 계산·검증</button></div>
+</div>
+
+<!-- STEP 3 -->
+<div class="panel" id="p3">
+  <h2>검증 게이트</h2>
+  <p class="sub">모두 통과해야 산출물이 열립니다. 미해결 건은 아래에서 분류하세요.</p>
+  <div class="gate" id="gates"></div>
+  <div id="totals"></div>
+  <div id="unresolved"></div>
+  <div class="nav"><button class="ghost" onclick="go(2)">이전</button><span class="sp"></span>
+    <button id="n3" disabled>다음 — 산출물</button></div>
+</div>
+
+<!-- STEP 4 -->
+<div class="panel" id="p4">
+  <h2>산출물</h2>
+  <p class="sub">기존 양식과 같은 시트 구성으로 내려받습니다.</p>
+  <div class="cards" id="outs"></div>
+  <div class="row" style="margin-top:14px">
+    <button id="dlA">정산파일 내려받기</button>
+    <button id="dlB">전표입력 내려받기</button>
+    <button class="ghost" id="saveCarry">차기이월 저장 (다음 달 이월)</button>
+  </div>
+  <div class="log" id="log4"></div>
+  <div class="nav"><button class="ghost" onclick="go(3)">이전</button></div>
+</div>
+</div>
+
+<script>
+/**
+ * 공홈 수탁정산 계산 엔진 (순수 JS — 브라우저·Node 겸용)
+ *
+ * 입력: { month, pg, order, claim, carryin, delivery, manual, codefix }
+ * 출력: { settle1(정산_1차), sales(매출), carryout(차기이월), totals }
+ *
+ * 로직 정본은 LOGIC.md. 7월 브랜드A 파일의 배열수식을 1:1로 옮긴 것이라
+ * 수식 셀 주소를 주석에 남겨둔다(엑셀 원본과 대조할 때 필요).
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.StgEngine = factory();
+}(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  // 엑셀 ROUND: 음수도 절대값 기준 반올림 (JS Math.round는 -0.5를 0으로 보낸다)
+  function xround(v, d) {
+    d = d || 0;
+    var m = Math.pow(10, d), x = (Number(v) || 0) * m;
+    return (x < 0 ? -1 : 1) * Math.round(Math.abs(x)) / m;
+  }
+  var N = function (v) { return Number(v) || 0; };
+  var S = function (v) { return v === null || v === undefined ? '' : String(v).trim(); };
+  // 엑셀에서 빈 셀은 0 — 환불번호 등 키 비교에 쓴다
+  var isBlank = function (v) { return v === null || v === undefined || String(v).trim() === '' || String(v).trim() === '0'; };
+
+  function sumBy(arr, keyFn, valFn) {
+    var m = new Map();
+    arr.forEach(function (r) {
+      var k = keyFn(r);
+      if (k === '') return;
+      m.set(k, (m.get(k) || 0) + N(valFn(r)));
+    });
+    return m;
+  }
+  // 등장 순서 누적 순번 (엑셀 COUNTIF(TAKE(...,SEQUENCE),...))
+  function seqNo(arr, keyFn) {
+    var seen = new Map();
+    return arr.map(function (r) {
+      var k = keyFn(r), n = (seen.get(k) || 0) + 1;
+      seen.set(k, n);
+      return n;
+    });
+  }
+
+  /** 주문내역 → 인정 결제액 (주문내역 W열) */
+  function deriveOrder(order, pgSet, month) {
+    var no = seqNo(order, function (r) { return S(r.주문번호); });            // Y
+    // AA: 환불완료일이 당월이 아니면 보정 대상
+    var needFix = order.map(function (r) {
+      var d = S(r.환불완료일);
+      if (d === '') return false;
+      return d.substring(5, 7) !== S(month);
+    });
+    // AB: 보정 대상 환불번호 안에서 판매가 비례 안분
+    var fixDenom = new Map();
+    order.forEach(function (r, i) {
+      if (!needFix[i]) return;
+      var k = S(r.환불번호);
+      fixDenom.set(k, (fixDenom.get(k) || 0) + N(r.판매가));
+    });
+    var AB = order.map(function (r, i) {
+      var k = S(r.환불번호), den = fixDenom.get(k) || 0;
+      if (!den) return 0;
+      return xround(N(r.판매가) / den * N(r.환불금액), 0);
+    });
+    // AE/AF/AG/AH: 환불번호별 잔차 (카페24 환불금액 − 안분 합)
+    var refundAmt = new Map(), abSum = new Map();
+    order.forEach(function (r, i) {
+      if (!needFix[i]) return;
+      var k = S(r.환불번호);
+      if (!refundAmt.has(k)) refundAmt.set(k, N(r.환불금액));
+      abSum.set(k, (abSum.get(k) || 0) + AB[i]);
+    });
+    var residual = new Map();
+    refundAmt.forEach(function (v, k) { residual.set(k, v - (abSum.get(k) || 0)); });
+    // AC: 주문번호 첫 행에만 잔차 가산
+    var AC = order.map(function (r, i) {
+      var head = no[i] === 1 ? (residual.get(S(r.환불번호)) || 0) : 0;
+      return head + AB[i];
+    });
+
+    // X: 주문상태 필터 — '교환 완료'만 제외
+    var X = order.map(function (r) { return S(r.주문상태) !== '교환 완료'; });
+    // AJ: 예치금 보정
+    var AJ = order.map(function (r, i) {
+      if (needFix[i]) return N(r.예치금환불액);
+      return S(r.예치금환불액) !== '' ? 0 : N(r.예치금최종);
+    });
+
+    // AO~AU: 예치금을 품목에 안분 (상태 통과 + 예치금 있는 품목만)
+    var idx = [];
+    order.forEach(function (r, i) { if (X[i] && AJ[i] !== 0) idx.push(i); });
+    var AP = idx.map(function (i) {
+      var rn = order[i].환불번호;
+      return isBlank(rn) ? S(order[i].품목별주문번호).substring(0, 16) : S(rn);
+    });
+    var AQ = idx.map(function (i) { return N(order[i].판매가); });
+    var AR = idx.map(function (i) { return AJ[i]; });
+    var denom = new Map();
+    AP.forEach(function (k, j) { denom.set(k, (denom.get(k) || 0) + AQ[j]); });
+    var AS = AP.map(function (k, j) {
+      var d = denom.get(k) || 0;
+      return d ? xround(AQ[j] / d * AR[j], 0) : 0;
+    });
+    var atNo = seqNo(AP.map(function (k) { return { k: k }; }), function (r) { return r.k; });
+    // AW/AX/AY/AZ: AP별 잔차
+    var arByAp = new Map(), asByAp = new Map();
+    AP.forEach(function (k, j) {
+      if (!arByAp.has(k)) arByAp.set(k, AR[j]);
+      asByAp.set(k, (asByAp.get(k) || 0) + AS[j]);
+    });
+    var res2 = new Map();
+    arByAp.forEach(function (v, k) { res2.set(k, v - (asByAp.get(k) || 0)); });
+    var AU = AP.map(function (k, j) {
+      return (atNo[j] === 1 ? (res2.get(k) || 0) : 0) + AS[j];
+    });
+    var depositByItem = new Map();
+    idx.forEach(function (i, j) {
+      var k = S(order[i].품목별주문번호);
+      depositByItem.set(k, (depositByItem.get(k) || 0) + AU[j]);
+    });
+
+    // W: PG에 결제가 실제로 들어온 주문만 인정
+    return order.map(function (r, i) {
+      if (!pgSet.has(S(r.주문번호))) return null;
+      return (depositByItem.get(S(r.품목별주문번호)) || 0) + N(r.품목별결제금액) + AC[i];
+    });
+  }
+
+  /** 취소내역 → 인정 취소액 (취소내역 O열) */
+  function deriveClaim(claim, pgSet) {
+    var no = seqNo(claim, function (r) { return S(r.환불번호); });              // P
+    var R = claim.map(function (r) { return N(r.예치금환불액) + N(r.환불금액); });
+    var denom = new Map();
+    claim.forEach(function (r) {
+      var k = S(r.환불번호);
+      denom.set(k, (denom.get(k) || 0) + N(r.판매가));
+    });
+    var Sv = claim.map(function (r, i) {
+      var d = denom.get(S(r.환불번호)) || 0;
+      return d ? xround(N(r.판매가) / d * R[i], 0) : 0;
+    });
+    var total = new Map(), sSum = new Map();
+    claim.forEach(function (r, i) {
+      var k = S(r.환불번호);
+      if (!total.has(k)) total.set(k, R[i]);
+      sSum.set(k, (sSum.get(k) || 0) + Sv[i]);
+    });
+    var residual = new Map();
+    total.forEach(function (v, k) { residual.set(k, v - (sSum.get(k) || 0)); });
+    return claim.map(function (r, i) {
+      if (!pgSet.has(S(r.주문번호))) return null;
+      var head = no[i] === 1 ? (residual.get(S(r.환불번호)) || 0) : 0;
+      return -(head + Sv[i]);
+    });
+  }
+
+  /** 정산_1차 — 품목별 주문번호 단위 (엔진의 심장) */
+  function settle(src) {
+    var month = S(src.month);
+    var pgSet = new Set(src.pg.map(function (r) { return S(r.주문번호); }));
+    var orderAmt = deriveOrder(src.order, pgSet, month);
+    var claimAmt = deriveClaim(src.claim, pgSet);
+
+    // 3원천 통합 (취소 수량은 음수)
+    var rowsAll = [];
+    src.claim.forEach(function (r, i) {
+      rowsAll.push({ item: S(r.품목별주문번호), ord: S(r.주문번호), code: S(r.상품코드),
+                     name: S(r.상품명), qty: -N(r.수량), amt: claimAmt[i], src: 'claim' });
+    });
+    src.order.forEach(function (r, i) {
+      rowsAll.push({ item: S(r.품목별주문번호), ord: S(r.주문번호), code: S(r.상품코드),
+                     name: S(r.상품명), qty: N(r.수량), amt: orderAmt[i], src: 'order' });
+    });
+    src.carryin.forEach(function (r) {
+      rowsAll.push({ item: S(r.품목별주문번호), ord: S(r.주문번호), code: S(r.상품코드),
+                     name: S(r.상품명), qty: N(r.수량), amt: N(r.결제취소액), src: 'carryin' });
+    });
+
+    var codefix = new Map();
+    (src.codefix || []).forEach(function (r) {
+      if (S(r.원코드)) codefix.set(S(r.원코드), S(r.보정코드));
+    });
+    // 배송내역에 있는 품목 = 당월 배송시작 → 매출 인식 대상
+    var delivered = new Map();
+    (src.delivery || []).forEach(function (r) {
+      var k = S(r.품목별주문번호);
+      delivered.set(k, (delivered.get(k) || 0) + 1);
+    });
+
+    var first = new Map();
+    rowsAll.forEach(function (r) { if (!first.has(r.item)) first.set(r.item, r); });
+    var qty = sumBy(rowsAll, function (r) { return r.item; }, function (r) { return r.qty; });
+    var byCarry = sumBy(rowsAll.filter(function (r) { return r.src === 'carryin'; }),
+                        function (r) { return r.item; }, function (r) { return r.amt; });
+    var byClaim = sumBy(rowsAll.filter(function (r) { return r.src === 'claim'; }),
+                        function (r) { return r.item; }, function (r) { return r.amt; });
+    var byOrder = sumBy(rowsAll.filter(function (r) { return r.src === 'order'; }),
+                        function (r) { return r.item; }, function (r) { return r.amt; });
+
+    var items = Array.from(first.keys()).sort();
+    var settle1 = items.map(function (item) {
+      var f = first.get(item);
+      var code = f.code;
+      var n = qty.get(item) || 0;
+      var carry = byCarry.get(item) || 0;
+      var cl = byClaim.get(item) || 0;
+      var od = byOrder.get(item) || 0;
+      var R = carry + cl + od;                       // 정산대상액_1차
+      var Sx = n === 0 ? R : 0;                      // 기타매출_2차
+      var T = R - Sx;                                // 정산대상액_2차
+      var U = T < 0 ? T : (delivered.get(item) || 0) * T;   // 매출_1차 (배송시작 기준)
+      var V = R - U - Sx;                            // 차기이월
+      return {
+        품목별주문번호: item, 주문번호: f.ord, 상품코드: code,
+        상품코드보정: codefix.has(code) ? codefix.get(code) : code,
+        상품명: f.name, 수량: n, 전월이월: carry, 취소액: cl, 결제액: od,
+        정산대상액1차: R, 기타매출2차: Sx, 정산대상액2차: T, 매출1차: U, 차기이월: V
+      };
+    });
+    return { settle1: settle1, orderAmt: orderAmt, claimAmt: claimAmt };
+  }
+
+  /**
+   * PG ↔ 카페24 대조 (PG결제 시트 D6~I6)
+   * 주문번호별 차액이 ±6,000 이내면 자동 강제조정(기타매출로), 넘으면 수기 판단 대상
+   */
+  var ADJUST_LIMIT = 6000;
+  function pgRecon(src, settle1) {
+    var pgBy = sumBy(src.pg, function (r) { return S(r.주문번호); }, function (r) { return r.PG결제액; });
+    var calcBy = new Map();
+    settle1.forEach(function (x) {
+      var k = S(x.주문번호);
+      calcBy.set(k, (calcBy.get(k) || 0) + N(x.결제액) + N(x.취소액));
+    });
+    var rows = Array.from(pgBy.keys()).sort().map(function (ord) {
+      var pg = pgBy.get(ord) || 0, cf = calcBy.get(ord) || 0;
+      var gap = pg - cf;
+      var adj = (gap !== 0 && Math.abs(gap) <= ADJUST_LIMIT) ? gap : 0;
+      return { 주문번호: ord, PG결제액: pg, 카페24: cf, 차액: gap, 강제조정: adj, 미해결: gap - adj };
+    });
+    return {
+      rows: rows,
+      adjust: rows.filter(function (r) { return r.강제조정 !== 0; }),
+      unresolved: rows.filter(function (r) { return r.미해결 !== 0; })
+    };
+  }
+
+  /** 매출·차기이월·합계 */
+  function build(src) {
+    var r = settle(src);
+    var s1 = r.settle1;
+    var recon = pgRecon(src, s1);
+    var brand = function (name) {
+      var n = name.toLowerCase();
+      if (n.indexOf('glgk') >= 0) return 'GL';
+      if (n.indexOf('sann') >= 0) return 'SN';
+      return '';
+    };
+    var sales = s1.filter(function (x) { return x.매출1차 !== 0; }).map(function (x) {
+      return {
+        브랜드: brand(x.상품명), 품목별주문번호: x.품목별주문번호, 주문번호: x.주문번호,
+        상품코드: x.상품코드보정, 상품명: x.상품명, 수량: x.수량,
+        매출V: x.매출1차, 매출공급가: xround(x.매출1차 / 1.1, 0),
+        프리오더: x.상품명.toUpperCase().indexOf('PRE') >= 0
+      };
+    });
+    (src.manual || []).forEach(function (m) {
+      var amt = N(m.결제취소액);
+      sales.push({
+        브랜드: brand(S(m.상품명)), 품목별주문번호: S(m.품목별주문번호), 주문번호: S(m.주문번호),
+        상품코드: S(m.상품코드), 상품명: S(m.상품명), 수량: N(m.수량),
+        매출V: amt, 매출공급가: xround(amt / 1.1, 0),
+        프리오더: S(m.상품명).toUpperCase().indexOf('PRE') >= 0
+      });
+    });
+    var carryout = s1.filter(function (x) { return x.차기이월 !== 0; }).map(function (x) {
+      return {
+        품목별주문번호: x.품목별주문번호, 주문번호: x.주문번호, 상품코드: x.상품코드보정,
+        상품명: x.상품명, 수량: x.수량, 차액: x.차기이월,
+        프리오더: x.상품명.toUpperCase().indexOf('PRE') >= 0 ? 'PRE' : ''
+      };
+    });
+    // 기타매출 = PG 강제조정 + 수기조정 '기타매출' 분류 + 정산_1차 기타매출2차
+    var etc = [];
+    recon.adjust.forEach(function (a) {
+      etc.push({ 주문번호: a.주문번호, 기타매출V: a.강제조정, 출처: 'PG강제조정' });
+    });
+    // PG대조 미해결 건 중 수기조정에서 '기타매출'로 분류한 것 (수기조정 J~L → PG결제 R6·S6)
+    var cls = new Map();
+    (src.manualcls || []).forEach(function (m) {
+      if (S(m.주문번호)) cls.set(S(m.주문번호), S(m.조정));
+    });
+    recon.unresolved.forEach(function (u) {
+      if (cls.get(u.주문번호) === '기타매출') {
+        etc.push({ 주문번호: u.주문번호, 기타매출V: u.미해결, 출처: '수기조정' });
+      }
+    });
+    s1.forEach(function (x) {
+      if (x.기타매출2차 !== 0) {
+        etc.push({ 주문번호: x.주문번호, 기타매출V: x.기타매출2차, 출처: '기타매출2차' });
+      }
+    });
+
+    var sum = function (a, f) { return a.reduce(function (t, x) { return t + N(f(x)); }, 0); };
+    return {
+      settle1: s1, sales: sales, carryout: carryout, etc: etc, recon: recon,
+      totals: {
+        전월이월: sum(s1, function (x) { return x.전월이월; }),
+        당월결제취소: sum(s1, function (x) { return x.취소액 + x.결제액; }),
+        정산대상액1차: sum(s1, function (x) { return x.정산대상액1차; }),
+        기타매출2차: sum(s1, function (x) { return x.기타매출2차; }),
+        매출V: sum(sales, function (x) { return x.매출V; }),
+        매출공급가: sum(sales, function (x) { return x.매출공급가; }),
+        차기이월: sum(s1, function (x) { return x.차기이월; }),
+        프리오더V: sum(sales.filter(function (x) { return x.프리오더; }), function (x) { return x.매출V; })
+      }
+    };
+  }
+
+  /**
+   * 전표입력 CALC — 주문번호 × PG사 단위로 (A)+(B)를 분배
+   * 입력: prev(전월 미확정: 주문번호·미확정액·PG사·결제수단)
+   *       pgtx(당월 PG 건별: 주문번호·결제액·PG사·결제수단)
+   *       sales/etc/carry (주문번호별 금액)
+   */
+  function buildVoucher(v) {
+    var prev = v.prev || [], pgtx = v.pgtx || [];
+
+    // 계좌환불은 PG사·결제수단이 원거래 것으로 보정된다 (RAW K·L열)
+    var pgFirst = new Map(), pmFirst = new Map();
+    prev.forEach(function (r) {
+      var k = S(r.주문번호);
+      if (!pgFirst.has(k)) { pgFirst.set(k, S(r.PG사)); pmFirst.set(k, S(r.결제수단)); }
+    });
+    pgtx.forEach(function (r) {
+      var k = S(r.주문번호);
+      if (!pgFirst.has(k)) { pgFirst.set(k, S(r.PG사)); pmFirst.set(k, S(r.결제수단)); }
+    });
+    var pmOwn = new Map();
+    pgtx.forEach(function (r) {
+      var k = S(r.주문번호);
+      if (!pmOwn.has(k)) pmOwn.set(k, S(r.결제수단));
+    });
+    var tx = pgtx.map(function (r) {
+      var k = S(r.주문번호);
+      return {
+        주문번호: k, 결제액: N(r.결제액),
+        PG사: S(r.PG사) === '계좌환불' ? (pgFirst.get(k) || '') : S(r.PG사),
+        결제수단: S(r.결제수단) === '계좌환불' ? (pmOwn.get(k) || '') : S(r.결제수단)
+      };
+    });
+
+    // 키 = 주문번호|PG사, 등장 순서는 prev → pgtx (엑셀 VSTACK+UNIQUE와 동일)
+    var order = [], seen = new Set(), amt = new Map(), pm = new Map();
+    function touch(ord, pg, method, val) {
+      var k = ord + '' + pg;
+      if (!seen.has(k)) { seen.add(k); order.push({ k: k, 주문번호: ord, PG사: pg }); }
+      amt.set(k, (amt.get(k) || 0) + val);
+      var mk = ord + '' + pg;
+      if (!pm.has(mk)) pm.set(mk, method);
+    }
+    prev.forEach(function (r) { touch(S(r.주문번호), S(r.PG사), S(r.결제수단), N(r.미확정액)); });
+    tx.forEach(function (r) { touch(r.주문번호, r.PG사, r.결제수단, r.결제액); });
+
+    var salesBy = sumBy(v.sales || [], function (r) { return S(r.주문번호); }, function (r) { return r.매출V; });
+    var etcBy = sumBy(v.etc || [], function (r) { return S(r.주문번호); }, function (r) { return r.기타매출V; });
+    var carryBy = sumBy(v.carry || [], function (r) { return S(r.주문번호); }, function (r) { return r.차액; });
+    var byOrd = new Map();
+    order.forEach(function (o) { byOrd.set(o.주문번호, (byOrd.get(o.주문번호) || 0) + (amt.get(o.k) || 0)); });
+
+    var rows = order.map(function (o) {
+      var d = amt.get(o.k) || 0;
+      var den = byOrd.get(o.주문번호) || 0;
+      var ratio = d === 0 ? 0 : d / den;
+      var I = (salesBy.get(o.주문번호) || 0) * ratio;
+      var J = (etcBy.get(o.주문번호) || 0) * ratio;
+      var K = (carryBy.get(o.주문번호) || 0) * ratio;
+      var ono = o.주문번호;
+      var mm = ono.charAt(0) === 'P' ? ono.substring(5, 7) : ono.substring(4, 6);
+      return {
+        주문월: mm, 주문번호: ono, 미확정액: d, PG사: o.PG사,
+        결제수단: pm.get(o.k) || '', 분배비: ratio,
+        상품매출: I, 기타매출: J, 차기이월: K,
+        상품매출_V: xround(I / 1.1, 0), 기타매출_V: xround(J / 1.1, 0),
+        차기이월_V: xround(K / 1.1, 0)
+      };
+    });
+
+    // PG사 × 결제수단 × 결제월 매트릭스
+    function matrix(field) {
+      var months = Array.from(new Set(rows.map(function (r) { return r.주문월; }))).sort();
+      var keys = new Map();
+      rows.forEach(function (r) {
+        var k = r.PG사 + '' + r.결제수단;
+        if (!keys.has(k)) keys.set(k, { PG사: r.PG사, 결제수단: r.결제수단, 합계: 0, 월: {} });
+        var e = keys.get(k);
+        e.합계 += r[field];
+        e.월[r.주문월] = (e.월[r.주문월] || 0) + r[field];
+      });
+      return { months: months, rows: Array.from(keys.values()).sort(function (a, b) {
+        return (a.PG사 + a.결제수단).localeCompare(b.PG사 + b.결제수단); }) };
+    }
+    var sum = function (f) { return rows.reduce(function (t, r) { return t + N(r[f]); }, 0); };
+    return {
+      calc: rows, prevRaw: prev, pgtxRaw: tx,
+      matrixV: matrix('상품매출'), matrixSupply: matrix('상품매출_V'),
+      totals: {
+        정산대상액: sum('미확정액'),
+        상품매출: sum('상품매출'), 기타매출: sum('기타매출'), 차기이월: sum('차기이월'),
+        상품매출_공급가: sum('상품매출_V'), 기타매출_공급가: sum('기타매출_V'),
+        차기이월_공급가: sum('차기이월_V')
+      }
+    };
+  }
+
+  return { build: build, settle: settle, buildVoucher: buildVoucher, xround: xround };
+}));
+
+</script>
+
+<script>
+/**
+ * 산출물 시트 구성 — 엔진 결과 → 어진 양식과 같은 시트·열 배치
+ *
+ * 여기서는 "무엇을 어느 칸에 쓸지"만 정한다. 실제 파일 쓰기는 환경별로:
+ *   로컬 검증 = write_xlsx.py (openpyxl)   /   웹앱 = SheetJS
+ * 두 경로가 같은 스펙을 받으므로 산출물이 갈리지 않는다.
+ *
+ * 스펙: { name, rows: [[셀...]], numCols: [1-based 열], widths: [], freeze: 'A3' }
+ *   - 숫자 열은 #,##0;(#,##0), 합계행은 rows에 그대로 넣되 sumRow로 표시
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.StgSheets = factory();
+}(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+  var N = function (v) { return Number(v) || 0; };
+  var pad = function (n) { return new Array(n).fill(null); };
+
+  function build(src, out, vou, meta) {
+    meta = meta || {};
+    var ym = meta.ym || '';          // 예: '26.07'
+    var brand = meta.brand || '';
+    var sheets = [];
+
+    // ── 매출
+    var salesRows = [];
+    salesRows.push([null, '상품매출_' + ym, null, null, null, null,
+      { f: 'SUM(G3:G' + (out.sales.length + 2) + ')' },
+      { f: 'SUM(H3:H' + (out.sales.length + 2) + ')' },
+      { f: 'SUM(I3:I' + (out.sales.length + 2) + ')' }]);
+    salesRows.push([null, '브랜드', '품목별 주문번호', '주문번호', '상품코드', '주문상품명',
+      '수량', '매출(+V)', '매출(-V)', null, '전월이월', out.totals.전월이월]);
+    out.sales.forEach(function (r, i) {
+      var row = [null, r.브랜드, r.품목별주문번호, r.주문번호, r.상품코드, r.상품명,
+                 r.수량, r.매출V, r.매출공급가];
+      if (i === 0) { row[9] = null; row[10] = '당월결제·취소'; row[11] = out.totals.당월결제취소; }
+      salesRows.push(row);
+    });
+    sheets.push({ name: '매출', rows: salesRows, numCols: [7, 8, 9, 12],
+      widths: [3, 8, 22, 20, 16, 34, 7, 14, 14, 3, 14, 16], freeze: 'C3', headerRow: 2 });
+
+    // ── 정산_1차
+    var s1 = [['품목별 주문번호', '주문번호', '상품코드', '상품코드(보정)', '주문상품명', '수량',
+               '전월이월', '취소액', '결제액', '정산대상액_1차', '기타매출_2차', '정산대상액_2차',
+               '매출_1차', '차기이월']];
+    out.settle1.forEach(function (r) {
+      s1.push([r.품목별주문번호, r.주문번호, r.상품코드, r.상품코드보정, r.상품명, r.수량,
+               r.전월이월, r.취소액, r.결제액, r.정산대상액1차, r.기타매출2차,
+               r.정산대상액2차, r.매출1차, r.차기이월]);
+    });
+    sheets.push({ name: '정산_1차', rows: s1, numCols: [6, 7, 8, 9, 10, 11, 12, 13, 14],
+      widths: [22, 20, 16, 16, 34, 7, 14, 14, 15, 16, 14, 16, 15, 13], freeze: 'C2', headerRow: 1 });
+
+    // ── PG결제 (대조)
+    var pg = [['주문번호', 'PG결제액', '카페24 주문·취소', '차액', '강제조정(±6,000)', '미해결', '판단']];
+    var clsMap = {};
+    (src.manualcls || []).forEach(function (m) { if (m.주문번호) clsMap[String(m.주문번호)] = m.조정; });
+    out.recon.rows.forEach(function (r) {
+      pg.push([r.주문번호, r.PG결제액, r.카페24, r.차액, r.강제조정, r.미해결,
+               r.미해결 !== 0 ? (clsMap[r.주문번호] || '확인 필요') : '']);
+    });
+    sheets.push({ name: 'PG결제', rows: pg, numCols: [2, 3, 4, 5, 6],
+      widths: [20, 15, 18, 13, 17, 13, 12], freeze: 'B2', headerRow: 1 });
+
+    // ── 차기이월 (다음 달 전월이월이 된다)
+    var co = [['품목별 주문번호', '주문번호', '상품코드', '주문상품명', '수량', '차액', '프리오더']];
+    out.carryout.forEach(function (r) {
+      co.push([r.품목별주문번호, r.주문번호, r.상품코드, r.상품명, r.수량, r.차액, r.프리오더]);
+    });
+    sheets.push({ name: '차기이월', rows: co, numCols: [5, 6],
+      widths: [22, 20, 16, 34, 7, 14, 10], freeze: 'C2', headerRow: 1 });
+
+    // ── 기타매출 (3원천 추적용)
+    var etc = [['주문번호', '기타매출(+V)', '출처']];
+    out.etc.forEach(function (r) { etc.push([r.주문번호, r.기타매출V, r.출처]); });
+    sheets.push({ name: '기타매출', rows: etc, numCols: [2],
+      widths: [20, 15, 14], freeze: 'A2', headerRow: 1 });
+
+    // ── 원천 탭 (그대로 보관 — 추적 가능해야 한다)
+    function raw(name, arr, cols, numIdx, widths) {
+      var rows = [cols.slice()];
+      (arr || []).forEach(function (r) { rows.push(cols.map(function (c) { return r[c]; })); });
+      sheets.push({ name: name, rows: rows, numCols: numIdx, widths: widths,
+        freeze: 'B2', headerRow: 1 });
+    }
+    raw('주문내역', src.order,
+        ['품목별주문번호', '주문번호', '주문상태', '상품코드', '상품명', '수량', '판매가',
+         '예치금최초', '예치금최종', '총결제금액', '품목별결제금액', '예치금환불액', '환불금액',
+         '환불완료일', '결제수단', '환불번호'],
+        [6, 7, 8, 9, 10, 11, 12, 13], [22, 20, 14, 16, 34, 7, 12, 12, 12, 14, 15, 14, 13, 20, 14, 16]);
+    raw('취소내역', src.claim,
+        ['품목별주문번호', '주문번호', '주문상태', '상품코드', '상품명', '수량', '판매가',
+         '예치금환불액', '환불금액', '환불완료일', '환불번호'],
+        [6, 7, 8, 9], [22, 20, 14, 16, 34, 7, 12, 14, 13, 20, 16]);
+    raw('배송내역', src.delivery, ['품목별주문번호', '주문상태', '배송시작일'], [],
+        [22, 14, 22]);
+    raw('전월이월', src.carryin,
+        ['품목별주문번호', '주문번호', '상품코드', '상품명', '수량', '결제취소액'],
+        [5, 6], [22, 20, 16, 34, 7, 14]);
+
+    // ── 전표입력 RAW
+    var vr = [];
+    vr.push([null, '(A) 전월 기준 누적 미확정금액', null, null, vou.totals.정산대상액 - N(meta.B),
+             null, '(B) 당월 신규 결제·취소액', null, null, N(meta.B),
+             null, null, '(C) 상품매출', vou.totals.상품매출,
+             null, '(D) 기타매출', vou.totals.기타매출,
+             null, '(E) 차기이월', vou.totals.차기이월]);
+    vr.push([]);
+    vr.push([null, '주문번호', '미확정액', 'PG사', '결제수단',
+             null, '주문번호', '결제액', 'PG사', '결제수단',
+             null, null, '주문번호', '매출(+V)',
+             null, '주문번호', '기타매출(+V)',
+             null, '주문번호', '차액']);
+    var vsrcRows = Math.max(
+      (vou.prevRaw || []).length, (vou.pgtxRaw || []).length,
+      out.sales.length, out.etc.length, out.carryout.length);
+    for (var i = 0; i < vsrcRows; i++) {
+      var a = (vou.prevRaw || [])[i], b = (vou.pgtxRaw || [])[i];
+      var c = out.sales[i], d = out.etc[i], e = out.carryout[i];
+      vr.push([null,
+        a ? a.주문번호 : null, a ? N(a.미확정액) : null, a ? a.PG사 : null, a ? a.결제수단 : null,
+        null,
+        b ? b.주문번호 : null, b ? N(b.결제액) : null, b ? b.PG사 : null, b ? b.결제수단 : null,
+        null, null,
+        c ? c.주문번호 : null, c ? N(c.매출V) : null,
+        null,
+        d ? d.주문번호 : null, d ? N(d.기타매출V) : null,
+        null,
+        e ? e.주문번호 : null, e ? N(e.차액) : null]);
+    }
+    var voucher = [{ name: 'RAW', rows: vr, numCols: [3, 8, 14, 17, 20],
+      widths: [3, 20, 14, 12, 18, 3, 20, 14, 12, 18, 12, 3, 20, 14, 3, 20, 15, 3, 20, 14],
+      freeze: 'A4', headerRow: 3 }];
+
+    // ── 전표입력 CALC
+    var cc = [];
+    cc.push([null, null, '(A)+(B) 정산대상액', null, null, vou.totals.정산대상액,
+             null, null, vou.totals.상품매출, vou.totals.기타매출, vou.totals.차기이월,
+             vou.totals.상품매출_공급가, vou.totals.기타매출_공급가, vou.totals.차기이월_공급가]);
+    cc.push([]);
+    cc.push([null, '주문월', '주문번호', '미확정액', 'PG사', '결제수단', '분배비', null,
+             '상품매출', '기타매출', '차기이월', '상품매출(-V)', '기타매출(-V)', '차기이월(-V)']);
+    vou.calc.forEach(function (r) {
+      cc.push([null, r.주문월, r.주문번호, r.미확정액, r.PG사, r.결제수단, r.분배비, null,
+               r.상품매출, r.기타매출, r.차기이월, r.상품매출_V, r.기타매출_V, r.차기이월_V]);
+    });
+    voucher.push({ name: 'CALC', rows: cc, numCols: [4, 9, 10, 11, 12, 13, 14],
+      widths: [3, 8, 20, 14, 12, 20, 10, 3, 15, 13, 13, 15, 14, 14],
+      freeze: 'D4', headerRow: 3 });
+
+    // ── 매트릭스 (PG사 × 결제수단 × 결제월)
+    var mx = [];
+    var mo = vou.matrixV.months;
+    mx.push(['상품매출 (+V)']);
+    mx.push(['PG사', '결제수단', '합계'].concat(mo));
+    mx.push(['', '', vou.totals.상품매출].concat(mo.map(function (m) {
+      return vou.matrixV.rows.reduce(function (t, r) { return t + N(r.월[m]); }, 0);
+    })));
+    vou.matrixV.rows.forEach(function (r) {
+      mx.push([r.PG사, r.결제수단, r.합계].concat(mo.map(function (m) { return N(r.월[m]); })));
+    });
+    mx.push([]);
+    mx.push(['상품매출 (-V)']);
+    mx.push(['PG사', '결제수단', '합계'].concat(mo));
+    vou.matrixSupply.rows.forEach(function (r) {
+      mx.push([r.PG사, r.결제수단, r.합계].concat(mo.map(function (m) { return N(r.월[m]); })));
+    });
+    voucher.push({ name: '매트릭스', rows: mx,
+      numCols: [3].concat(mo.map(function (_, i) { return 4 + i; })),
+      widths: [12, 22, 16].concat(mo.map(function () { return 14; })),
+      freeze: 'C3', headerRow: 2 });
+
+    return {
+      settlement: { file: ym + '_' + brand + '_공홈.xlsx', sheets: sheets },
+      voucher: { file: '전표입력_' + ym + '_' + brand + '_공홈.xlsx', sheets: voucher }
+    };
+  }
+
+  return { build: build };
+}));
+
+</script>
+
+<script>
+/* 공홈 수탁정산 — 화면 로직 (계산은 StgEngine, 시트 구성은 StgSheets) */
+var ST = { ym:'', brand:'', pg:[], carryin:[], files:{}, out:null, vou:null, spec:null, cls:{} };
+
+var FILES = [
+  { key:'order',    label:'주문내역',   need:true,
+    map:{ '품목별주문번호':['품목별 주문번호','품목별주문번호'], '주문번호':['주문번호','주문 번호'],
+          '주문상태':['주문 상태','주문상태'], '상품코드':['자체 상품코드','자체상품코드','상품코드'],
+          '상품명':['주문상품명','상품명'], '수량':['수량'], '판매가':['판매가'],
+          '예치금최초':['예치금(최초)'], '예치금최종':['예치금(최종)'],
+          '품목별결제금액':['품목별 결제금액'], '예치금환불액':['사용한 예치금 환불 금액'],
+          '환불금액':['환불금액'], '환불완료일':['환불완료일'], '결제수단':['결제수단'],
+          '환불번호':['환불번호'] } },
+  { key:'claim',    label:'취소·환불내역', need:true,
+    map:{ '품목별주문번호':['품목별 주문번호','품목별주문번호'], '주문번호':['주문번호','주문 번호'],
+          '주문상태':['주문 상태','주문상태'], '상품코드':['자체 상품코드','상품코드'],
+          '상품명':['주문상품명','상품명'], '수량':['수량'], '판매가':['판매가'],
+          '예치금환불액':['사용한 예치금 환불 금액'], '환불금액':['환불금액'],
+          '환불완료일':['환불완료일'], '환불번호':['환불번호'] } },
+  { key:'delivery', label:'배송내역 (배송시작일)', need:true,
+    map:{ '품목별주문번호':['품목별 주문번호','품목별주문번호'], '주문상태':['주문 상태','주문상태'],
+          '배송시작일':['배송시작일','배송 일자'] } },
+  { key:'pgextra',  label:'PG 보완 — 예치금·과거 카카오페이', need:false,
+    map:{ '주문번호':['주문번호','주문 번호'], '결제액':['결제액','결제·취소액','PG결제액','금액'],
+          'PG사':['PG사'], '결제수단':['결제수단'] } },
+  { key:'carryin',  label:'전월이월 (DB에 있으면 생략)', need:false,
+    map:{ '품목별주문번호':['품목별 주문번호','품목별주문번호'], '주문번호':['주문번호'],
+          '상품코드':['자체 상품코드','상품코드'], '상품명':['주문상품명','상품명'],
+          '수량':['수량'], '결제취소액':['결제·취소액','결제취소액','미확정액'] } }
+];
+
+function $(id){ return document.getElementById(id); }
+function fmt(n){ return (Math.round(Number(n)||0)).toLocaleString('en-US'); }
+function log(el, s){ var e=$(el); e.textContent += s + '\n'; e.scrollTop = e.scrollHeight; }
+
+function go(n){
+  [1,2,3,4].forEach(function(i){
+    $('p'+i).className = 'panel' + (i===n?' on':'');
+    $('s'+i).className = 'step' + (i===n?' on':(i<n?' done':''));
+  });
+  window.scrollTo(0,0);
+}
+
+google.script.run.withSuccessHandler(function(r){
+  $('who').textContent = (r.version ? r.version + ' · ' : '') + r.email;
+  window.__ver = r.version || '';
+}).whoami();
+
+// 기본 월 = 전월
+(function(){
+  var d = new Date(); d.setMonth(d.getMonth()-1);
+  $('ym').value = d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2);
+})();
+
+// ── STEP 1
+$('btnLoad').onclick = function(){
+  ST.ym = $('ym').value.trim(); ST.brand = $('brand').value;
+  $('c1').innerHTML = '<div class="card"><b>불러오는 중…</b><span class="v">PG 건별 조회 (수만 행이면 30초 정도)</span></div>';
+  $('btnLoad').disabled = true;
+  google.script.run
+    .withSuccessHandler(function(pg){
+      ST.pg = pg;
+      google.script.run.withSuccessHandler(function(co){
+        ST.carryin = co.rows || [];
+        var byPg = {};
+        pg.forEach(function(r){ byPg[r.PG사] = (byPg[r.PG사]||0) + r.결제액; });
+        var sum = pg.reduce(function(t,r){ return t + r.결제액; },0);
+        var h = '<div class="card"><b>PG 결제내역 (자동)</b><span class="v">' +
+          Object.keys(byPg).map(function(k){ return k+' '+fmt(byPg[k]); }).join('<br>') +
+          '<br><b style="display:inline">합계 ' + fmt(sum) + '원 · ' + fmt(pg.length) + '건</b></span></div>';
+        h += '<div class="card"><b>전월 이월 (자동)</b><span class="v">' +
+          (ST.carryin.length ? (function(){
+              var it = ST.carryin.filter(function(r){ return (r.kind||'item')==='item'; });
+              var pgk = ST.carryin.filter(function(r){ return r.kind==='pg'; });
+              return fmt(it.length)+'건 · ' + fmt(it.reduce(function(t,r){return t+r.결제취소액;},0)) + '원' +
+                     (pgk.length ? '<br>PG별 이월 '+fmt(pgk.length)+'건 (전표용)' : '');
+            })()
+           : '<span class="err">DB에 없음</span> — STEP 2에서 파일로 올리세요') +
+          (co.note ? '<br>'+co.note : '') + '</span></div>';
+        h += '<div class="card"><b>대상</b><span class="v">' + ST.ym + ' · ' + ST.brand +
+             '<br>매출 인식 기준: 배송시작일<br>PG는 이 브랜드 것만 걸러옵니다' +
+             (window.__ver ? '<br>앱 ' + window.__ver : '') + '</span></div>';
+        h += '<div class="card"><b>DB가 주지 않는 것</b><span class="v">' +
+             '예치금 — 카페24 자체 기능이라 PG API에 없음<br>' +
+             '카카오페이 — 2026-08부터 미사용, 과거 월은 수집분 없음<br>' +
+             '<b style="display:inline">해당분은 STEP 2의 [PG 보완]에 올리세요</b></span></div>';
+        $('c1').innerHTML = h;
+        $('n1').disabled = false; $('btnLoad').disabled = false;
+      }).withFailureHandler(function(e){
+        ST.carryin = [];
+        $('c1').innerHTML = '<div class="card"><b>PG</b><span class="v">'+fmt(pg.length)+'건 로드</span></div>' +
+          '<div class="card"><b>전월 이월</b><span class="v"><span class="err">' +
+          ((e && e.message) ? e.message : '불러오지 못했습니다') +
+          '</span><br>STEP 2에서 파일로 올리세요</span></div>';
+        $('n1').disabled = false; $('btnLoad').disabled = false;
+      }).loadCarryover(ST.brand, prevYm(ST.ym));
+    })
+    .withFailureHandler(function(e){
+      var msg = (e && e.message) ? e.message : (typeof e === 'string' ? e : JSON.stringify(e));
+      $('c1').innerHTML = '<div class="card"><b class="err">불러오기 실패</b><span class="v">' + msg +
+        '<br><br>진단: 주소 끝에 <b>?diag=1&amp;ym=' + ST.ym + '</b> 를 붙여 열면 서버 상태가 보입니다.</span></div>';
+      $('btnLoad').disabled = false;
+    })
+    .loadPg(ST.ym, ST.brand);
+};
+function prevYm(ym){
+  var p = ym.split('-'), d = new Date(+p[0], +p[1]-1, 1);
+  d.setMonth(d.getMonth()-1);
+  return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2);
+}
+$('n1').onclick = function(){ renderDrops(); go(2); };
+
+// ── STEP 2 : 업로드
+function renderDrops(){
+  $('drops').innerHTML = FILES.map(function(f){
+    return '<div class="drop" id="d_'+f.key+'"><b>'+f.label+(f.need?'':' <span style="color:var(--muted)">(선택)</span>')+'</b>' +
+      '<span class="st" id="st_'+f.key+'">'+(f.key==='carryin'&&ST.carryin.length?'DB에서 불러옴 — 업로드 시 대체':'대기')+'</span>' +
+      '<input type="file" accept=".xlsx,.xls,.csv" data-k="'+f.key+'"></div>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('#drops input[type=file]'), function(inp){
+    inp.onchange = function(){ readFile(inp.dataset.k, inp.files[0]); };
+  });
+  bindDnd();
+  checkStep2();
+}
+
+/* 드래그앤드롭 — 상자별로 받거나, 아래 넓은 영역에 여러 개를 한꺼번에 */
+function bindDnd(){
+  FILES.forEach(function(f){
+    var box = $('d_'+f.key);
+    if(!box) return;
+    stopDefaults(box);
+    box.addEventListener('dragenter', function(){ box.classList.add('over'); });
+    box.addEventListener('dragover',  function(){ box.classList.add('over'); });
+    box.addEventListener('dragleave', function(){ box.classList.remove('over'); });
+    box.addEventListener('drop', function(e){
+      box.classList.remove('over');
+      var fl = e.dataTransfer.files;
+      if(fl && fl.length) readFile(f.key, fl[0]);
+    });
+  });
+  var all = $('dropAll');
+  if(all){
+    stopDefaults(all);
+    all.addEventListener('dragenter', function(){ all.classList.add('over'); });
+    all.addEventListener('dragover',  function(){ all.classList.add('over'); });
+    all.addEventListener('dragleave', function(){ all.classList.remove('over'); });
+    all.addEventListener('drop', function(e){
+      all.classList.remove('over');
+      var fl = Array.prototype.slice.call(e.dataTransfer.files || []);
+      if(!fl.length) return;
+      var unknown = [];
+      fl.forEach(function(file){
+        var k = guessKey(file.name);
+        if(k) readFile(k, file); else unknown.push(file.name);
+      });
+      if(unknown.length) log('log2','파일명으로 종류를 알 수 없음: '+unknown.join(', ')+' — 위 상자에 직접 놓으세요');
+    });
+  }
+  // 페이지 밖으로 파일을 놓쳤을 때 브라우저가 파일을 열어버리는 것 방지
+  stopDefaults(document.body);
+}
+function stopDefaults(el){
+  ['dragenter','dragover','dragleave','drop'].forEach(function(ev){
+    el.addEventListener(ev, function(e){ e.preventDefault(); e.stopPropagation(); });
+  });
+}
+function guessKey(name){
+  var n = String(name);
+  if(/예치금|카카오|PG보완|pgextra/i.test(n)) return 'pgextra';
+  if(/전월|이월|carry/i.test(n)) return 'carryin';
+  if(/배송|deliver|출고/i.test(n)) return 'delivery';
+  if(/취소|환불|claim|cancel/i.test(n)) return 'claim';
+  if(/주문|order/i.test(n)) return 'order';
+  return null;
+}
+
+function readFile(key, file){
+  if(!file) return;
+  var spec = FILES.filter(function(f){ return f.key===key; })[0];
+  var st = $('st_'+key), box = $('d_'+key);
+  st.textContent = '읽는 중…'; st.className='st'; box.className='drop';
+  var fr = new FileReader();
+  fr.onload = function(e){
+    try{
+      var wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+      var ws = wb.Sheets[wb.SheetNames[0]];
+      var aoa = XLSX.utils.sheet_to_json(ws, {header:1, raw:true, defval:null});
+      var hi = findHeader(aoa, spec.map);
+      if(hi < 0) throw new Error('헤더를 찾지 못했습니다. 첫 시트에 "품목별 주문번호" 열이 있어야 합니다.');
+      var cols = mapCols(aoa[hi], spec.map);
+      var missing = Object.keys(spec.map).filter(function(k){ return cols[k]===undefined; });
+      var rows = [];
+      for(var r=hi+1; r<aoa.length; r++){
+        var raw = aoa[r]; if(!raw) continue;
+        var first = raw[cols[Object.keys(spec.map)[0]]];
+        if(first===null||first===undefined||String(first).trim()==='') continue;
+        var o = {};
+        Object.keys(spec.map).forEach(function(k){
+          var v = cols[k]===undefined ? null : raw[cols[k]];
+          o[k] = (v instanceof Date) ? isoDate(v) : v;
+        });
+        rows.push(o);
+      }
+      ST.files[key] = rows;
+      st.textContent = fmt(rows.length)+'행 읽음' + (missing.length? ' · 없는 열: '+missing.join(', ') : '');
+      st.className = 'st ' + (missing.length ? 'err':'ok');
+      box.className = 'drop ' + (missing.length ? 'err':'has');
+      log('log2', spec.label+': '+rows.length+'행'+(missing.length?' (열 누락 '+missing.join(',')+')':''));
+    }catch(err){
+      st.textContent = err.message; st.className='st err'; box.className='drop err';
+      log('log2', spec.label+' 실패: '+err.message);
+    }
+    checkStep2();
+  };
+  fr.readAsArrayBuffer(file);
+}
+function isoDate(d){
+  var p=function(n){return ('0'+n).slice(-2);};
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
+}
+function findHeader(aoa, map){
+  var want = Object.keys(map).slice(0,3).map(function(k){ return map[k]; });
+  for(var i=0;i<Math.min(aoa.length,20);i++){
+    var row=(aoa[i]||[]).map(function(c){ return String(c==null?'':c).trim(); });
+    var hit = want.filter(function(alts){
+      return alts.some(function(a){ return row.indexOf(a)>=0; });
+    }).length;
+    if(hit>=2) return i;
+  }
+  return -1;
+}
+function mapCols(header, map){
+  var h=(header||[]).map(function(c){ return String(c==null?'':c).trim(); }), out={};
+  Object.keys(map).forEach(function(k){
+    for(var i=0;i<map[k].length;i++){
+      var j=h.indexOf(map[k][i]);
+      if(j>=0){ out[k]=j; return; }
+    }
+  });
+  return out;
+}
+function checkStep2(){
+  var ok = FILES.filter(function(f){ return f.need; })
+                .every(function(f){ return ST.files[f.key] && ST.files[f.key].length; });
+  $('n2').disabled = !ok;
+}
+
+// ── STEP 3 : 계산·검증
+$('n2').onclick = function(){
+  go(3);
+  setTimeout(compute, 30);
+};
+function compute(){
+  $('gates').innerHTML = '<div class="g"><b>계산 중…</b></div>';
+  // Baserow가 못 주는 PG(예치금=카페24 자체, 과거 카카오페이)는 업로드분으로 보완한다
+  ST.pgAll = ST.pg.concat((ST.files.pgextra||[]).map(function(r){
+    return { 주문번호:String(r.주문번호||'').trim(), 결제액:Number(r.결제액)||0,
+             PG사:r.PG사||'', 결제수단:r.결제수단||'' };
+  }));
+  var dbItem = ST.carryin.filter(function(r){ return (r.kind||'item') === 'item'; });
+  var dbPg   = ST.carryin.filter(function(r){ return r.kind === 'pg'; });
+  var carryin = (ST.files.carryin && ST.files.carryin.length) ? ST.files.carryin : dbItem;
+  var src = {
+    month: ST.ym.split('-')[1],
+    pg: ST.pgAll.map(function(r){ return { 주문번호:r.주문번호, PG결제액:r.결제액 }; }),
+    order: ST.files.order || [], claim: ST.files.claim || [],
+    delivery: ST.files.delivery || [], carryin: carryin,
+    manual: [], codefix: [],
+    manualcls: Object.keys(ST.cls).map(function(k){ return { 주문번호:k, 조정:ST.cls[k] }; })
+  };
+  var out = StgEngine.build(src);
+  // 전표 (A)블록은 주문번호×PG 단위. DB에 PG별 이월이 있으면 그걸 쓰고,
+  // 없으면 품목별을 주문번호로 접어 쓴다(PG사 공란 → 전표가 원본과 갈릴 수 있으니 경고)
+  var prev = dbPg.length
+    ? dbPg.map(function(r){ return { 주문번호:r.주문번호, 미확정액:r.결제취소액,
+                                     PG사:r.PG사||'', 결제수단:r.결제수단||'' }; })
+    : carryin.map(function(r){ return { 주문번호:r.주문번호, 미확정액:r.결제취소액,
+                                        PG사:r.PG사||'', 결제수단:r.결제수단||'' }; });
+  ST.prevHasPg = dbPg.length > 0;
+  var vou = StgEngine.buildVoucher({
+    prev: prev, pgtx: ST.pgAll, sales: out.sales, etc: out.etc, carry: out.carryout
+  });
+  ST.out = out; ST.vou = vou; ST.src = src;
+
+  var A = carryin.reduce(function(t,r){ return t + (Number(r.결제취소액)||0); },0);
+  var B = ST.pgAll.reduce(function(t,r){ return t + r.결제액; },0);
+  var keep = Math.round(vou.totals.정산대상액 - (vou.totals.상품매출+vou.totals.기타매출+vou.totals.차기이월));
+  var pgGap = out.recon.unresolved.filter(function(u){ return !ST.cls[u.주문번호]; });
+  // 카페24 주문엔 있는데 PG 어디에도 없는 주문 = 수집 누락 신호
+  // 카페24엔 결제금액이 있는데 PG 어디에도 없는 주문 = 수집 누락 신호.
+  // 취소완료·입금전취소처럼 실제 돈이 오간 적 없는 주문(합 0원)은 원본 로직도 제외하므로 세지 않는다.
+  var pgSet = {}; ST.pgAll.forEach(function(r){ pgSet[r.주문번호]=1; });
+  var missAmt = {};
+  (src.order||[]).forEach(function(r){
+    var o=String(r.주문번호||'').trim();
+    if(!o || pgSet[o]) return;
+    missAmt[o] = (missAmt[o]||0) + (Number(r.품목별결제금액)||0);
+  });
+  var pgMiss = Object.keys(missAmt).filter(function(o){ return Math.round(missAmt[o]) !== 0; });
+  var pgMissAmt = pgMiss.reduce(function(t,o){ return t + missAmt[o]; }, 0);
+  var pgMissZero = Object.keys(missAmt).length - pgMiss.length;
+
+  var gates = [
+    { n:'PG ↔ 카페24 대조', ok: pgGap.length===0,
+      d: '자동조정 '+out.recon.adjust.length+'건(±6,000) · 미해결 '+out.recon.unresolved.length+
+         '건 중 미분류 '+fmt(pgGap.length)+'건'+(pgGap.length?' — 분류하지 않아도 매출·이월에 반영되지 않습니다':'') },
+    { n:'보존 검증', ok: keep===0,
+      d:'(A)+(B) − (매출+기타+이월) = '+fmt(keep)+'원' },
+    { n:'이월 체인', ok: Math.round(A)===Math.round(vou.totals.정산대상액-B),
+      d:'전월 차기이월 '+fmt(A)+' = 당월 (A) '+fmt(vou.totals.정산대상액-B) },
+    { n:'배송시작일 인식', ok:true,
+      d:'매출 '+fmt(out.sales.length)+'행 · 이월 '+fmt(out.carryout.length)+'행' },
+    { n:'PG 커버리지', ok: pgMiss.length === 0,
+      d: pgMiss.length
+          ? ('PG에 없는데 결제금액이 있는 주문 '+fmt(pgMiss.length)+'건 '+fmt(pgMissAmt)+'원 — 예치금·과거 카카오페이를 올렸나요?')
+          : ('DB '+fmt(ST.pg.length)+'건'+(ST.files.pgextra?' + 업로드 '+fmt(ST.files.pgextra.length)+'건':'')+
+             ' 커버 · 미결제 주문 '+fmt(pgMissZero)+'건은 제외(합 0원)') },
+    { n:'전월이월 PG 꼬리표', ok: ST.prevHasPg || A === 0,
+      d: ST.prevHasPg ? '주문번호×PG별 이월 사용 — 전표 분배 정확'
+                      : 'PG사 없는 이월을 씁니다. 전표의 PG별 분배가 원본과 갈릴 수 있어요' }
+  ];
+  $('gates').innerHTML = gates.map(function(g){
+    return '<div class="g"><b>'+g.n+'</b><span class="tag '+(g.ok?'ok':'no')+'">'+(g.ok?'PASS':'확인')+'</span>'+
+           '<span class="d">'+g.d+'</span></div>';
+  }).join('');
+
+  $('totals').innerHTML =
+    '<div class="scroll"><table><tr><th>항목</th><th class="n">+V (원)</th><th class="n">공급가 (원)</th></tr>'+
+    '<tr><td>(A) 전월 이월</td><td class="n">'+fmt(A)+'</td><td class="n"></td></tr>'+
+    '<tr><td>(B) 당월 결제·취소</td><td class="n">'+fmt(B)+'</td><td class="n"></td></tr>'+
+    '<tr class="sum"><td>정산대상액</td><td class="n">'+fmt(vou.totals.정산대상액)+'</td><td class="n"></td></tr>'+
+    '<tr><td>상품매출</td><td class="n">'+fmt(vou.totals.상품매출)+'</td><td class="n">'+fmt(vou.totals.상품매출_공급가)+'</td></tr>'+
+    '<tr><td>기타매출</td><td class="n">'+fmt(vou.totals.기타매출)+'</td><td class="n">'+fmt(vou.totals.기타매출_공급가)+'</td></tr>'+
+    '<tr><td>차기이월</td><td class="n">'+fmt(vou.totals.차기이월)+'</td><td class="n">'+fmt(vou.totals.차기이월_공급가)+'</td></tr>'+
+    '</table></div>';
+
+  if(out.recon.unresolved.length){
+    $('unresolved').innerHTML = '<h2 style="margin-top:18px">PG 대조 미해결 '+out.recon.unresolved.length+'건</h2>'+
+      '<p class="sub">±6,000원 초과 차액입니다. 분류하면 게이트가 열립니다.</p><div class="scroll"><table>'+
+      '<tr><th>주문번호</th><th class="n">PG</th><th class="n">카페24</th><th class="n">차액</th><th>분류</th></tr>'+
+      out.recon.unresolved.map(function(u){
+        return '<tr><td>'+u.주문번호+'</td><td class="n">'+fmt(u.PG결제액)+'</td><td class="n">'+fmt(u.카페24)+
+          '</td><td class="n">'+fmt(u.미해결)+'</td><td><select data-o="'+u.주문번호+'" class="clsSel">'+
+          ['','기타매출','차기이월','보류'].map(function(o){
+            return '<option'+(ST.cls[u.주문번호]===o?' selected':'')+'>'+o+'</option>'; }).join('')+
+          '</select></td></tr>';
+      }).join('')+'</table></div>';
+    Array.prototype.forEach.call(document.querySelectorAll('.clsSel'), function(s){
+      s.onchange = function(){
+        if(s.value) ST.cls[s.dataset.o]=s.value; else delete ST.cls[s.dataset.o];
+        compute();
+      };
+    });
+  } else $('unresolved').innerHTML = '';
+
+  // 산출물 차단은 '보존 검증'과 'PG 커버리지'만. PG 미분류는 정산_1차에 들어가지 않아
+  // 보존 검증을 깨지 않는다(7월 원본도 4건 중 1건만 분류하고 마감했다) → 경고로만 표시
+  $('n3').disabled = !(gates[1].ok && gates[4].ok);
+}
+
+// ── STEP 4 : 산출물
+$('n3').onclick = function(){
+  var B = ST.pg.reduce(function(t,r){ return t + r.결제액; },0);
+  ST.spec = StgSheets.build(ST.src, ST.out, ST.vou,
+    { ym: ST.ym.replace('-','.').slice(2), brand: ST.brand, B: B });
+  $('outs').innerHTML =
+    '<div class="card"><b>정산파일</b><span class="v">'+ST.spec.settlement.file+'<br>시트 '+
+      ST.spec.settlement.sheets.length+'개</span></div>'+
+    '<div class="card"><b>전표입력</b><span class="v">'+ST.spec.voucher.file+'<br>CALC '+
+      fmt(ST.vou.calc.length)+'행 · 매트릭스 포함</span></div>'+
+    '<div class="card"><b>검증</b><span class="v">(A)+(B) '+fmt(ST.vou.totals.정산대상액)+
+      '<br>= 매출+기타+이월 (원 단위 일치)</span></div>';
+  go(4);
+};
+function toXlsx(spec){
+  var wb = XLSX.utils.book_new();
+  spec.sheets.forEach(function(sh){
+    var rows = sh.rows.map(function(r){
+      return (r||[]).map(function(c){ return (c && c.f) ? null : c; });
+    });
+    var ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = (sh.widths||[]).map(function(w){ return {wch:w}; });
+    XLSX.utils.book_append_sheet(wb, ws, sh.name.slice(0,31));
+  });
+  return wb;
+}
+$('dlA').onclick = function(){ XLSX.writeFile(toXlsx(ST.spec.settlement), ST.spec.settlement.file); };
+$('dlB').onclick = function(){ XLSX.writeFile(toXlsx(ST.spec.voucher), ST.spec.voucher.file); };
+$('saveCarry').onclick = function(){
+  $('saveCarry').disabled = true;
+  // 이월은 두 단위로 저장한다. 정산은 품목별로, 전표는 주문번호×PG별로 쓰기 때문.
+  // (전월이월 탭엔 PG사가 없고 전표 (A)블록에만 있다 — 둘 다 없으면 다음 달이 어긋난다)
+  var byItem = ST.out.carryout.map(function(r){
+    return { kind:'item', 품목별주문번호:r.품목별주문번호, 주문번호:r.주문번호,
+             상품코드:r.상품코드, 상품명:r.상품명, 수량:r.수량, 차액:r.차액, PG사:'', 결제수단:'' };
+  });
+  var byPg = ST.vou.calc.filter(function(r){ return Math.round(r.차기이월) !== 0; })
+    .map(function(r){
+      return { kind:'pg', 품목별주문번호:'', 주문번호:r.주문번호, 상품코드:'', 상품명:'',
+               수량:0, 차액:r.차기이월, PG사:r.PG사, 결제수단:r.결제수단 };
+    });
+  var rows = byItem.concat(byPg);
+  log('log4','차기이월 저장 중… 품목별 '+byItem.length+'건 + PG별 '+byPg.length+'건');
+  google.script.run
+    .withSuccessHandler(function(n){ log('log4','저장 완료 '+n+'건 — 다음 달 (A)로 잡힙니다'); $('saveCarry').disabled=false; })
+    .withFailureHandler(function(e){ log('log4','실패: '+e.message); $('saveCarry').disabled=false; })
+    .saveCarryover(ST.brand, ST.ym, rows);
+};
+</script>
+
+</body>
+</html>

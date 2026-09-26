@@ -163,7 +163,7 @@
   <ul class="toc" id="toc">
     <li><a href="#s-summary">요약</a></li>
     <li><a href="#s-flag">대표 프로젝트<small>8</small></a></li>
-    <li><a href="#s-demo">동작하는 데모<small>10</small></a></li>
+    <li><a href="#s-demo">동작하는 데모<small>17</small></a></li>
     <li><a href="#s-way">일하는 방식</a></li>
     <li><a href="#s-ai">AI를 쓰는 방식</a></li>
     <li><a href="#s-now">지금 진행 중<small>8</small></a></li>
@@ -173,7 +173,7 @@
     <li><a href="#s-faq">자주 받는 질문</a></li>
   </ul>
   <div class="ct">주식회사 차일디 재무회계팀 매니저<br>1년 6개월 · 재직 중<br><a href="mailto:lee-ding@naver.com">lee-ding@naver.com</a></div>
-  <span class="upd"><i></i>2026년 9월 기준 갱신 · 데모 10개</span>
+  <span class="upd"><i></i>2026년 9월 기준 갱신 · 데모 17개</span>
 </aside>
 
 <main>
@@ -184,7 +184,7 @@
     <div><b class="num">37<small>개</small></b><span>월 대사 채널 — 위탁 34 + 결제대행 3</span></div>
     <div><b class="num">31<small>채널</small></b><span>정산 자동수집 — API 28 + 결제대행 3</span></div>
     <div><b>원 단위</b><span>대사 재현 정확도 — 34채널 전수 검증</span></div>
-    <div><b class="num">62<small>건</small></b><span>프로젝트 — 데모 10개 공개</span></div>
+    <div><b class="num">62<small>건</small></b><span>프로젝트 — 데모 17개 공개</span></div>
   </div>
 
   <section id="s-summary">
@@ -336,11 +336,39 @@
   </section>
 
   <section id="s-demo">
-    <div class="shead"><h2>동작하는 데모</h2><p>샘플 데이터로 실제 화면을 그대로 공개합니다 — 화면·계산·판정 로직은 실제 구현과 동일</p></div>
+    <div class="shead"><h2>동작하는 데모</h2><p>샘플 데이터로 실제 화면을 그대로 공개합니다 — 화면·계산·판정 로직은 실제 구현과 동일. 실운영 앱은 서버 코드까지 브라우저에서 그대로 실행</p></div>
     <div class="gal">
       <a class="shot" href="demo/one-close/">
         <div class="img"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱 화면" loading="lazy"></div>
         <div class="b"><h3>월 매입 마감 앱 <span class="chip">NEW</span></h3><p>입고 검수 → ERP 입고현황 적재 → 수입신고 B/L 연결·과세환율 → 부대비용 배부 → 취득원가 확정, 서버 판정 로직 그대로</p><div class="d">데이터 <b>가상 품번 10행 · 수입 1건</b></div></div>
+      </a>
+      <a class="shot" href="demo/linesheet-collector/">
+        <div class="img"><img src="assets/shots/linesheet-collector.jpg" alt="생산 라인시트 수집기 화면" loading="lazy"></div>
+        <div class="b"><h3>생산 라인시트 수집기 <span class="chip">NEW</span></h3><p>커스텀 양식 업로드·건별 조회·작업표·사이즈 매트릭스·이미지 메모 — 서버 25개 파일을 브라우저에서 실행</p><div class="d">데이터 <b>가상 품번 36건</b></div></div>
+      </a>
+      <a class="shot" href="demo/linesheet-hub/">
+        <div class="img"><img src="assets/shots/linesheet-hub.jpg" alt="라인시트 허브 화면" loading="lazy"></div>
+        <div class="b"><h3>라인시트 허브 <span class="chip">NEW</span></h3><p>통일양식 업로드 → 검증 → 버전 적재 → 이전 버전 diff·변경사유, 코드사전</p><div class="d">데이터 <b>브랜드 2 · 버전 3</b></div></div>
+      </a>
+      <a class="shot" href="demo/linesheet-fin/">
+        <div class="img"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계 화면" loading="lazy"></div>
+        <div class="b"><h3>라인시트 재무 집계 <span class="chip">NEW</span></h3><p>매입 약정 기준 집계·매출·대장·유효성, 스냅샷 압축으로 왕복 0회</p><div class="d">데이터 <b>가상 품번 95 · 사이즈 380</b></div></div>
+      </a>
+      <a class="shot" href="demo/wita-settlement/">
+        <div class="img"><img src="assets/shots/wita-settlement.jpg" alt="위탁 정산 관리 화면" loading="lazy"></div>
+        <div class="b"><h3>위탁 정산 관리 <span class="chip">NEW</span></h3><p>채널 룰(헤더행·소계·산식·파라미터) 편집과 채널별 계산·집계·검증식</p><div class="d">데이터 <b>채널 26 · 가상 결과</b></div></div>
+      </a>
+      <a class="shot" href="demo/stg-settlement/">
+        <div class="img"><img src="assets/shots/stg-settlement.jpg" alt="자사몰 수탁정산 화면" loading="lazy"></div>
+        <div class="b"><h3>자사몰 수탁정산 <span class="chip">NEW</span></h3><p>결제대행 건별 + 주문·취소·배송 파일 → 엔진 계산 → 검증 게이트 → 정산·전표 파일</p><div class="d">데이터 <b>가상 주문 36 · PG 40</b></div></div>
+      </a>
+      <a class="shot" href="demo/expense-dashboard/">
+        <div class="img"><img src="assets/shots/expense-dashboard.jpg" alt="지출내역 대시보드 화면" loading="lazy"></div>
+        <div class="b"><h3>지출내역 대시보드 <span class="chip">NEW</span></h3><p>결재 문서의 지출 표를 붙여넣으면 용도·부서별 구성이 즉시</p><div class="d">데이터 <b>가상 48건</b></div></div>
+      </a>
+      <a class="shot" href="demo/meeting-memo/">
+        <div class="img"><img src="assets/shots/meeting-memo.jpg" alt="회의 메모 컨테이너 화면" loading="lazy"></div>
+        <div class="b"><h3>회의 메모 컨테이너 <span class="chip">NEW</span></h3><p>협의 시트에 붙는 안건·메모 입력 사이드바</p><div class="d">데이터 <b>안건 7</b></div></div>
       </a>
       <a class="shot" href="demo/fund-cycle/">
         <div class="img"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드 화면" loading="lazy"></div>

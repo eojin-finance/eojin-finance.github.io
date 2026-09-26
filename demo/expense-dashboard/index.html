@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="UTF-8">
+<title>지출내역 대시보드 (데모) — 이어진 포트폴리오</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f172a; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; color: #e2e8f0; min-height: 100vh; padding: 28px 20px; }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .top .sub { font-size: 13px; color: #94a3b8; }
+  .top .title { font-size: 24px; font-weight: bold; color: #f8fafc; }
+  .btn { background: #334155; color: #e2e8f0; border: 0; padding: 10px 18px; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: inherit; }
+  .btn:hover { background: #475569; }
+  .btn.primary { background: #2563eb; color: #fff; }
+  /* 대기(붙여넣기 안내) 화면 */
+  #dropzone { border: 2px dashed #334155; border-radius: 16px; padding: 70px 30px; text-align: center; margin-top: 30px; transition: border-color .2s, background .2s; }
+  #dropzone.flash { border-color: #60a5fa; background: rgba(37, 99, 235, .08); }
+  #dropzone .big { font-size: 42px; margin-bottom: 18px; }
+  #dropzone h2 { font-size: 20px; color: #f1f5f9; margin-bottom: 14px; }
+  #dropzone p { font-size: 14px; color: #94a3b8; line-height: 1.9; }
+  #dropzone kbd { background: #1e293b; border: 1px solid #475569; border-radius: 5px; padding: 2px 8px; font-family: inherit; font-size: 13px; color: #e2e8f0; }
+  #dropzone .step { display: inline-block; background: #1e293b; border-radius: 999px; padding: 3px 11px; font-size: 12px; color: #60a5fa; margin-right: 6px; }
+  #pasteErr { color: #f87171; font-size: 13px; margin-top: 16px; display: none; }
+  /* 대시보드 */
+  #dash { display: none; }
+  .cards { display: flex; gap: 14px; margin-bottom: 24px; }
+  .card { flex: 1; background: #1e293b; border-radius: 12px; padding: 18px; }
+  .card .lbl { font-size: 12px; color: #94a3b8; }
+  .card .val { font-size: 26px; font-weight: bold; }
+  .panel { background: #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 18px; }
+  .panel h3 { font-size: 15px; color: #f1f5f9; margin-bottom: 14px; }
+  .panel h3 small { font-size: 11px; color: #64748b; font-weight: normal; }
+  .row2 { display: flex; gap: 18px; margin-bottom: 18px; }
+  .row2 .panel { flex: 1; margin-bottom: 0; }
+  .bar-row { display: flex; align-items: center; margin-bottom: 9px; font-size: 13px; }
+  .bar-row .name { width: 110px; color: #cbd5e1; }
+  .bar-row .track { flex: 1; background: #0f172a; border-radius: 6px; height: 22px; overflow: hidden; }
+  .bar-row .fill { height: 100%; border-radius: 6px; }
+  .bar-row .amt { width: 160px; text-align: right; color: #f1f5f9; }
+  .bar-row .amt small { color: #94a3b8; }
+  .vrow { display: flex; justify-content: space-between; margin-bottom: 9px; font-size: 13px; border-bottom: 1px solid #334155; padding-bottom: 7px; }
+  table.detail { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.detail th { padding: 7px 6px; border-bottom: 1px solid #334155; color: #94a3b8; text-align: left; font-weight: normal; }
+  table.detail td { padding: 7px 6px; border-bottom: 1px solid #1f2c44; color: #e2e8f0; }
+  .foot { text-align: center; color: #475569; font-size: 11px; margin-top: 18px; }
+  /* 필터 바 */
+  #filterBar { background: #1e293b; border-radius: 12px; padding: 14px 18px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px; }
+  #filterBar .frow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  #filterBar .flabel { font-size: 12px; color: #64748b; margin-right: 2px; min-width: 28px; }
+  .chip { background: #0f172a; border: 1px solid #334155; color: #cbd5e1; border-radius: 999px; padding: 4px 12px; font-size: 12.5px; cursor: pointer; font-family: inherit; transition: all .12s; }
+  .chip:hover { border-color: #60a5fa; }
+  .chip.on { background: #2563eb; border-color: #2563eb; color: #fff; font-weight: bold; }
+  .chip .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
+  #fSearch { background: #0f172a; border: 1px solid #334155; color: #e2e8f0; border-radius: 8px; padding: 5px 12px; font-size: 13px; font-family: inherit; width: 170px; }
+  #fSearch:focus { outline: none; border-color: #60a5fa; }
+  .fdivider { width: 1px; height: 20px; background: #334155; margin: 0 4px; }
+  #fEmpty { background: #1e293b; border-radius: 12px; padding: 40px; text-align: center; color: #94a3b8; font-size: 14px; display: none; margin-bottom: 18px; }
+  @media print {
+    body { background: #0f172a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 10px; }
+    .btn, #filterBar, #fEmpty, .foot { display: none !important; }
+    .panel, .row2 { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div id="demobar">
+  <b>데모</b>
+  <span>실제 운영 화면 그대로. 결재 문서의 지출내역 표를 붙여넣으면 용도·부서별 구성이 바로 그려집니다 — 데모는 가상 48건.</span>
+  <a href="../../">← 포트폴리오</a>
+</div>
+<style>
+#demobar{position:sticky;top:0;z-index:9999;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  background:#fff8e1;border-bottom:1px solid #f0dfa8;padding:9px 16px;font-size:12.5px;color:#6b5b21;
+  font-family:system-ui,-apple-system,'Malgun Gothic',sans-serif;margin:-28px -20px 24px}
+#demobar b{background:#6b5b21;color:#fff8e1;padding:2px 8px;border-radius:10px;font-size:11.5px}
+#demobar a{margin-left:auto;color:#6b5b21;font-weight:700;text-decoration:none}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="sub">샘플기업 재무회계팀</div>
+      <div class="title">📊 지출내역 대시보드</div>
+    </div>
+    <button class="btn" id="resetBtn" style="display:none;">↩ 다시 붙여넣기</button>
+  </div>
+
+  <div id="dropzone">
+    <div class="big">📋</div>
+    <h2>결재 문서의 지출내역을 붙여넣어 주세요</h2>
+    <p>
+      <span class="step">1</span>결재 문서 화면에서 <b>지출내역 표 전체를 드래그</b> 후 <kbd>Ctrl</kbd>+<kbd>C</kbd><br>
+      <span class="step">2</span>이 화면으로 돌아와 <kbd>Ctrl</kbd>+<kbd>V</kbd> — 그게 끝!<br><br>
+      <span style="color:#64748b;font-size:12px;">표가 접혀 있으면 "지출내역" 제목을 눌러 펼친 뒤 복사하세요 · 데이터는 외부로 전송되지 않습니다 (브라우저 안에서만 분석)</span>
+    </p>
+    <p id="pasteErr"></p>
+    <p style="margin-top:22px"><button class="btn primary" id="demoLoad" type="button">가상 지출내역 48건 불러오기</button> <span style="font-size:12.5px;color:#94a3b8;margin-left:8px">같은 양식(탭 구분 표)을 직접 붙여넣어도 됩니다</span></p>
+  </div>
+
+  <div id="dash">
+    <div id="filterBar"></div>
+    <div id="fEmpty">조건에 맞는 지출 건이 없습니다 — 필터를 조정해 보세요.</div>
+    <div class="cards">
+      <div class="card"><div class="lbl">총 사용액</div><div class="val" style="color:#60a5fa;" id="cTotal"></div></div>
+      <div class="card"><div class="lbl">건수</div><div class="val" style="color:#34d399;" id="cCount"></div></div>
+      <div class="card"><div class="lbl">건당 평균</div><div class="val" style="color:#fbbf24;" id="cAvg"></div></div>
+    </div>
+    <div class="panel"><h3>용도별 구성 <small>(비중%)</small></h3><div id="useBars"></div></div>
+    <div class="panel"><h3>사용부서별 구성 <small>(막대 길이 = 부서 합계 · 색 = 용도)</small></h3><div id="deptBars"></div><div id="useLegend" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;font-size:11.5px;color:#94a3b8;"></div></div>
+    <div class="panel"><h3>부서 × 용도 매트릭스</h3><div style="overflow-x:auto;"><table class="detail" id="crossTable"></table></div></div>
+    <div class="row2">
+      <div class="panel"><h3>일별 사용</h3><div id="dateBars"></div></div>
+      <div class="panel"><h3>거래처 TOP</h3><div id="vendorList"></div></div>
+    </div>
+    <div class="panel"><h3>건별 상세 <small>(금액순)</small></h3>
+      <table class="detail"><thead><tr><th>용도</th><th>내용</th><th>거래처</th><th>일자</th><th style="text-align:right;">금액</th></tr></thead><tbody id="detailBody"></tbody></table>
+    </div>
+  </div>
+
+  <div class="foot">데이터는 이 브라우저 안에서만 분석되며 어디에도 저장·전송되지 않습니다 · 샘플기업 재무회계팀</div>
+</div>
+
+<script>
+(function () {
+  var PAL = ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#f472b6', '#38bdf8', '#facc15'];
+  var dz = document.getElementById('dropzone');
+  var dash = document.getElementById('dash');
+  var errEl = document.getElementById('pasteErr');
+  var resetBtn = document.getElementById('resetBtn');
+
+  function num(s) { var n = parseInt(String(s).replace(/[^0-9-]/g, ''), 10); return isNaN(n) ? 0 : n; }
+  function fmt(n) { return n.toLocaleString('ko-KR'); }
+  function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  // ── 클립보드 HTML에서 지출내역 표 찾기
+  function findTable(doc) {
+    var t = doc.querySelector('table[mapping_key="table2"]');
+    if (t) return t;
+    var tables = Array.prototype.slice.call(doc.querySelectorAll('table'));
+    // 헤더에 용도·거래처·합계가 함께 있는 표
+    for (var i = 0; i < tables.length; i++) {
+      var tx = tables[i].innerText || '';
+      if (tx.indexOf('용도') > -1 && tx.indexOf('거래처') > -1 && tx.indexOf('합계') > -1) return tables[i];
+    }
+    return tables.length === 1 ? tables[0] : null;
+  }
+
+  // ── 표 → 데이터 (컴팩트 10컬럼: 순번 용도 내용 거래처 거래일자 공급가액 부가세 합계 사용부서 프로젝트)
+  function parseTable(tbl) {
+    var rows = Array.prototype.slice.call(tbl.rows);
+    var data = [];
+    rows.forEach(function (r) {
+      var c = Array.prototype.map.call(r.cells, function (td) { return td.innerText.trim(); });
+      if (c.length < 8) return;                            // 셀 부족 행 스킵
+      if (c.join('').indexOf('공급가액') > -1) return;      // 헤더 행 스킵
+      var d = { use: c[1], desc: c[2], vendor: c[3], date: c[4], amt: num(c[7]), dept: c[8] || '-' };
+      if (!d.use && !d.amt) return;
+      data.push(d);
+    });
+    return data;
+  }
+
+  // ── 탭 구분 텍스트 폴백 (text/plain)
+  function parsePlain(text) {
+    var data = [];
+    text.split(/\r?\n/).forEach(function (line) {
+      var c = line.split('\t').map(function (s) { return s.trim(); });
+      if (c.length < 8) return;
+      if (c.join('').indexOf('공급가액') > -1) return;
+      var d = { use: c[1], desc: c[2], vendor: c[3], date: c[4], amt: num(c[7]), dept: c[8] || '-' };
+      if (!d.use && !d.amt) return;
+      data.push(d);
+    });
+    return data;
+  }
+
+  function showErr(msg) {
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+    dz.classList.add('flash');
+    setTimeout(function () { dz.classList.remove('flash'); }, 600);
+  }
+
+  function srt(o) { return Object.keys(o).map(function (k) { return [k, o[k]]; }).sort(function (a, b) { return Math.abs(b[1]) - Math.abs(a[1]); }); }
+
+  // ── 렌더
+  function render(data) {
+    var total = 0, byUse = {}, byDate = {}, byVendor = {};
+    data.forEach(function (d) {
+      total += d.amt;
+      byUse[d.use] = (byUse[d.use] || 0) + d.amt;
+      byDate[d.date] = (byDate[d.date] || 0) + d.amt;
+      byVendor[d.vendor] = (byVendor[d.vendor] || 0) + d.amt;
+    });
+    document.getElementById('cTotal').textContent = fmt(total) + '원';
+    document.getElementById('cCount').textContent = data.length + '건';
+    document.getElementById('cAvg').textContent = fmt(Math.round(total / data.length)) + '원';
+
+    var uses = srt(byUse), vendors = srt(byVendor).slice(0, 5);
+    var dates = Object.keys(byDate).sort().map(function (k) { return [k, byDate[k]]; });
+    var maxU = Math.max.apply(null, uses.map(function (u) { return Math.abs(u[1]); }));
+    var maxD = Math.max.apply(null, dates.map(function (u) { return Math.abs(u[1]); }));
+
+    var h = '';
+    var useColor = {};
+    uses.forEach(function (u, i) {
+      useColor[u[0]] = PAL[i % PAL.length];
+      var pct = (Math.abs(u[1]) / total * 100).toFixed(1);
+      var w = Math.max(Math.abs(u[1]) / maxU * 100, 2);
+      h += '<div class="bar-row"><div class="name">' + esc(u[0]) + '</div><div class="track"><div class="fill" style="width:' + w + '%;background:' + useColor[u[0]] + ';"></div></div><div class="amt">' + fmt(u[1]) + '원 <small>(' + pct + '%)</small></div></div>';
+    });
+    document.getElementById('useBars').innerHTML = h;
+
+    // ── 사용부서별 (스택 막대: 부서 합계 + 용도 분할)
+    var byDept = {}, cross = {};
+    data.forEach(function (d) {
+      byDept[d.dept] = (byDept[d.dept] || 0) + d.amt;
+      if (!cross[d.dept]) cross[d.dept] = {};
+      cross[d.dept][d.use] = (cross[d.dept][d.use] || 0) + d.amt;
+    });
+    var depts = srt(byDept);
+    // 부서별 절대값 합 (스택 폭 기준)
+    var deptAbs = {};
+    depts.forEach(function (dp) {
+      var s = 0; var m = cross[dp[0]];
+      Object.keys(m).forEach(function (u) { s += Math.abs(m[u]); });
+      deptAbs[dp[0]] = s;
+    });
+    var maxDept = Math.max.apply(null, depts.map(function (dp) { return deptAbs[dp[0]]; }));
+    h = '';
+    depts.forEach(function (dp) {
+      var dept = dp[0], sum = dp[1];
+      var pct = (Math.abs(sum) / total * 100).toFixed(1);
+      var segs = '';
+      uses.forEach(function (u) {
+        var v = cross[dept][u[0]];
+        if (!v) return;
+        var w = Math.abs(v) / maxDept * 100;
+        var segPct = (Math.abs(v) / deptAbs[dept] * 100).toFixed(1);
+        segs += '<div title="' + esc(u[0]) + ': ' + fmt(v) + '원 (' + segPct + '%)" style="width:' + w + '%;height:100%;background:' + useColor[u[0]] + ';"></div>';
+      });
+      h += '<div class="bar-row"><div class="name">' + esc(dept) + '</div><div class="track" style="display:flex;">' + segs + '</div><div class="amt">' + fmt(sum) + '원 <small>(' + pct + '%)</small></div></div>';
+    });
+    document.getElementById('deptBars').innerHTML = h;
+    // 용도 범례
+    h = '';
+    uses.forEach(function (u) {
+      h += '<span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:3px;background:' + useColor[u[0]] + ';display:inline-block;"></span>' + esc(u[0]) + '</span>';
+    });
+    document.getElementById('useLegend').innerHTML = h;
+
+    // ── 부서 × 용도 매트릭스
+    h = '<thead><tr><th>부서 \\ 용도</th>';
+    uses.forEach(function (u) {
+      h += '<th style="text-align:right;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:' + useColor[u[0]] + ';margin-right:4px;"></span>' + esc(u[0]) + '</th>';
+    });
+    h += '<th style="text-align:right;color:#f1f5f9;">합계</th></tr></thead><tbody>';
+    depts.forEach(function (dp) {
+      var dept = dp[0];
+      h += '<tr><td style="color:#cbd5e1;">' + esc(dept) + '</td>';
+      uses.forEach(function (u) {
+        var v = cross[dept][u[0]];
+        h += '<td style="text-align:right;color:' + (v ? '#e2e8f0' : '#475569') + ';">' + (v ? fmt(v) : '-') + '</td>';
+      });
+      h += '<td style="text-align:right;font-weight:bold;color:#f1f5f9;">' + fmt(dp[1]) + '</td></tr>';
+    });
+    // 합계 행
+    h += '<tr><td style="color:#94a3b8;font-weight:bold;">합계</td>';
+    uses.forEach(function (u) {
+      h += '<td style="text-align:right;font-weight:bold;color:#f1f5f9;">' + fmt(u[1]) + '</td>';
+    });
+    h += '<td style="text-align:right;font-weight:bold;color:#60a5fa;">' + fmt(total) + '</td></tr></tbody>';
+    document.getElementById('crossTable').innerHTML = h;
+
+    h = '';
+    dates.forEach(function (u) {
+      var w = Math.max(Math.abs(u[1]) / maxD * 100, 2);
+      h += '<div class="bar-row" style="font-size:12px;"><div class="name" style="width:80px;">' + esc(u[0].slice(5)) + '</div><div class="track" style="height:18px;"><div class="fill" style="width:' + w + '%;background:#38bdf8;"></div></div><div class="amt" style="width:110px;">' + fmt(u[1]) + '</div></div>';
+    });
+    document.getElementById('dateBars').innerHTML = h;
+
+    h = '';
+    vendors.forEach(function (u, i) {
+      var pct = (Math.abs(u[1]) / total * 100).toFixed(1);
+      h += '<div class="vrow"><div style="color:#cbd5e1;">' + (i + 1) + '. ' + esc(u[0]) + '</div><div>' + fmt(u[1]) + '원 <small style="color:#64748b;">(' + pct + '%)</small></div></div>';
+    });
+    document.getElementById('vendorList').innerHTML = h;
+
+    h = '';
+    data.slice().sort(function (a, b) { return b.amt - a.amt; }).forEach(function (d) {
+      h += '<tr><td style="color:#cbd5e1;">' + esc(d.use) + '</td><td>' + esc(d.desc) + '</td><td style="color:#cbd5e1;">' + esc(d.vendor) + '</td><td style="color:#94a3b8;">' + esc(d.date) + '</td><td style="text-align:right;color:#f1f5f9;">' + fmt(d.amt) + '원</td></tr>';
+    });
+    document.getElementById('detailBody').innerHTML = h;
+
+    dz.style.display = 'none';
+    dash.style.display = 'block';
+    resetBtn.style.display = 'inline-block';
+  }
+
+  // ── 필터 상태
+  var rawData = [];
+  var fUse = {}, fDept = {}, fQ = '';
+
+  function chipHtml(kind, name, color) {
+    return '<button class="chip" data-kind="' + kind + '" data-val="' + esc(name) + '">' + (color ? '<span class="dot" style="background:' + color + ';"></span>' : '') + esc(name) + '</button>';
+  }
+
+  function buildFilterBar(data) {
+    var uses = {}, depts = {};
+    data.forEach(function (d) { uses[d.use] = (uses[d.use] || 0) + Math.abs(d.amt); depts[d.dept] = (depts[d.dept] || 0) + Math.abs(d.amt); });
+    var useArr = srt(uses), deptArr = srt(depts);
+    var h = '<div class="frow"><span class="flabel">용도</span>';
+    useArr.forEach(function (u, i) { h += chipHtml('use', u[0], PAL[i % PAL.length]); });
+    h += '</div><div class="frow"><span class="flabel">부서</span>';
+    deptArr.forEach(function (u) { h += chipHtml('dept', u[0], null); });
+    h += '<span class="fdivider"></span><input id="fSearch" type="text" placeholder="🔍 내용·거래처 검색">';
+    h += '<button class="chip" id="fReset" style="margin-left:auto;color:#94a3b8;">필터 초기화</button></div>';
+    var bar = document.getElementById('filterBar');
+    bar.innerHTML = h;
+    fUse = {}; fDept = {}; fQ = '';
+    bar.addEventListener('click', function (e) {
+      var c = e.target.closest('.chip');
+      if (!c) return;
+      if (c.id === 'fReset') {
+        fUse = {}; fDept = {}; fQ = '';
+        document.getElementById('fSearch').value = '';
+        bar.querySelectorAll('.chip.on').forEach(function (x) { x.classList.remove('on'); });
+        applyFilter();
+        return;
+      }
+      var kind = c.getAttribute('data-kind'), val = c.getAttribute('data-val');
+      var store = kind === 'use' ? fUse : fDept;
+      if (store[val]) { delete store[val]; c.classList.remove('on'); }
+      else { store[val] = true; c.classList.add('on'); }
+      applyFilter();
+    });
+    document.getElementById('fSearch').addEventListener('input', function (e) {
+      fQ = e.target.value.trim().toLowerCase();
+      applyFilter();
+    });
+  }
+
+  function applyFilter() {
+    var useOn = Object.keys(fUse).length, deptOn = Object.keys(fDept).length;
+    var filtered = rawData.filter(function (d) {
+      if (useOn && !fUse[d.use]) return false;
+      if (deptOn && !fDept[d.dept]) return false;
+      if (fQ && (d.desc + ' ' + d.vendor).toLowerCase().indexOf(fQ) === -1) return false;
+      return true;
+    });
+    var empty = document.getElementById('fEmpty');
+    var panels = document.querySelectorAll('#dash .cards, #dash .panel, #dash .row2');
+    if (!filtered.length) {
+      empty.style.display = 'block';
+      panels.forEach(function (p) { p.style.display = 'none'; });
+      return;
+    }
+    empty.style.display = 'none';
+    panels.forEach(function (p) { p.style.display = ''; });
+    document.querySelectorAll('#dash .row2').forEach(function (p) { p.style.display = 'flex'; });
+    document.querySelector('#dash .cards').style.display = 'flex';
+    render(filtered);
+  }
+
+  // ── paste 핸들러 (화면 아무 데서나 Ctrl+V)
+  document.addEventListener('paste', function (e) {
+    e.preventDefault();
+    errEl.style.display = 'none';
+    var html = e.clipboardData.getData('text/html');
+    var data = [];
+    if (html) {
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      var tbl = findTable(doc);
+      if (tbl) data = parseTable(tbl);
+    }
+    if (!data.length) {
+      var plain = e.clipboardData.getData('text/plain');
+      if (plain) data = parsePlain(plain);
+    }
+    if (!data.length) {
+      showErr('지출내역을 인식하지 못했어요. 결재 문서에서 지출내역 "표 전체"를 드래그해 복사한 뒤 다시 붙여넣어 주세요.');
+      return;
+    }
+    rawData = data;
+    buildFilterBar(data);
+    render(data);
+  });
+
+  resetBtn.addEventListener('click', function () {
+    dash.style.display = 'none';
+    resetBtn.style.display = 'none';
+    dz.style.display = 'block';
+    errEl.style.display = 'none';
+  });
+})();
+</script>
+<script>
+(function(){ var T="순번\t용도\t내용\t거래처\t거래일자\t공급가액\t부가세\t합계\t사용부서\t프로젝트\n1\t교육훈련비\t온라인 강의\t패스트캠퍼스\t2026.09.13\t20,909\t2,091\t23,000\t마케팅팀\t\n2\t교육훈련비\t온라인 강의\t패스트캠퍼스\t2026.09.17\t7,727\t773\t8,500\t마케팅팀\t\n3\t차량유지비\t주유\tSK주유소\t2026.09.03\t227,273\t22,727\t250,000\t개발팀\t\n4\t복리후생비\t야근식대\t배달의민족\t2026.09.08\t10,909\t1,091\t12,000\t재무회계팀\t\n5\t지급수수료\t클라우드 사용료\t노션랩스\t2026.09.18\t7,727\t773\t8,500\t개발팀\t\n6\t소모품비\t택배 박스\t쿠팡\t2026.09.04\t900,000\t90,000\t990,000\tA사업본부 MD팀\t\n7\t여비교통비\t외근 택시\t역삼주차장\t2026.09.12\t40,909\t4,091\t45,000\t마케팅팀\t\n8\t복리후생비\t생일 케이크\t스타벅스 선릉점\t2026.09.16\t40,909\t4,091\t45,000\t인사팀\t\n9\t접대비\t거래처 식사\t한우마을\t2026.09.10\t109,091\t10,909\t120,000\tB사업본부 MD팀\t\n10\t여비교통비\t출장 KTX\t코레일\t2026.09.17\t61,818\t6,182\t68,000\t인사팀\t\n11\t광고선전비\t인플루언서 협찬\t소품샵\t2026.09.04\t10,909\t1,091\t12,000\tA사업본부 MD팀\t\n12\t교육훈련비\t세미나 참가\t패스트캠퍼스\t2026.09.16\t20,909\t2,091\t23,000\t마케팅팀\t\n13\t교육훈련비\t세미나 참가\t한국생산성본부\t2026.09.23\t109,091\t10,909\t120,000\t인사팀\t\n14\t여비교통비\t출장 KTX\t역삼주차장\t2026.09.09\t10,909\t1,091\t12,000\t마케팅팀\t\n15\t복리후생비\t생일 케이크\t스타벅스 선릉점\t2026.09.21\t61,818\t6,182\t68,000\t개발팀\t\n16\t교육훈련비\t세미나 참가\t패스트캠퍼스\t2026.09.15\t7,727\t773\t8,500\t마케팅팀\t\n17\t접대비\t명절 선물\t한우마을\t2026.09.07\t7,727\t773\t8,500\tB사업본부 MD팀\t\n18\t차량유지비\t주유\tSK주유소\t2026.09.16\t227,273\t22,727\t250,000\t인사팀\t\n19\t차량유지비\t주유\t하이패스\t2026.09.09\t900,000\t90,000\t990,000\t디자인팀\t\n20\t차량유지비\t하이패스 충전\tSK주유소\t2026.09.22\t109,091\t10,909\t120,000\tA사업본부 MD팀\t\n21\t여비교통비\t외근 택시\t역삼주차장\t2026.09.05\t20,909\t2,091\t23,000\tB사업본부 MD팀\t\n22\t복리후생비\t팀 회식\t스타벅스 선릉점\t2026.09.19\t436,364\t43,636\t480,000\t디자인팀\t\n23\t복리후생비\t간식 구매\t스타벅스 선릉점\t2026.09.14\t20,909\t2,091\t23,000\tA사업본부 MD팀\t\n24\t복리후생비\t생일 케이크\t배달의민족\t2026.09.25\t436,364\t43,636\t480,000\t개발팀\t\n25\t차량유지비\t하이패스 충전\tSK주유소\t2026.09.16\t10,909\t1,091\t12,000\tB사업본부 MD팀\t\n26\t여비교통비\t외근 택시\t카카오택시\t2026.09.15\t40,909\t4,091\t45,000\t물류팀\t\n27\t복리후생비\t팀 회식\t한솥도시락 역삼점\t2026.09.01\t10,909\t1,091\t12,000\t물류팀\t\n28\t복리후생비\t생일 케이크\t본죽 강남점\t2026.09.07\t10,909\t1,091\t12,000\t디자인팀\t\n29\t교육훈련비\t온라인 강의\t패스트캠퍼스\t2026.09.16\t109,091\t10,909\t120,000\t인사팀\t\n30\t접대비\t명절 선물\t한우마을\t2026.09.16\t436,364\t43,636\t480,000\tA사업본부 MD팀\t\n31\t여비교통비\t출장 KTX\t코레일\t2026.09.24\t109,091\t10,909\t120,000\tA사업본부 MD팀\t\n32\t복리후생비\t간식 구매\t본죽 강남점\t2026.09.17\t40,909\t4,091\t45,000\t재무회계팀\t\n33\t광고선전비\t촬영 소품\t크리에이터A\t2026.09.23\t10,909\t1,091\t12,000\t물류팀\t\n34\t소모품비\t사무용품\t문구나라\t2026.09.25\t109,091\t10,909\t120,000\t물류팀\t\n35\t지급수수료\t클라우드 사용료\t노션랩스\t2026.09.26\t40,909\t4,091\t45,000\tB사업본부 MD팀\t\n36\t지급수수료\t협업툴 구독\t산돌\t2026.09.16\t900,000\t90,000\t990,000\t재무회계팀\t\n37\t복리후생비\t간식 구매\t본죽 강남점\t2026.09.16\t61,818\t6,182\t68,000\t물류팀\t\n38\t접대비\t거래처 식사\t한우마을\t2026.09.12\t109,091\t10,909\t120,000\t마케팅팀\t\n39\t지급수수료\t협업툴 구독\t아마존웹서비스\t2026.09.07\t436,364\t43,636\t480,000\t인사팀\t\n40\t복리후생비\t간식 구매\t한솥도시락 역삼점\t2026.09.21\t436,364\t43,636\t480,000\t마케팅팀\t\n41\t차량유지비\t주유\t하이패스\t2026.09.16\t40,909\t4,091\t45,000\t물류팀\t\n42\t여비교통비\t출장 KTX\t역삼주차장\t2026.09.15\t227,273\t22,727\t250,000\t마케팅팀\t\n43\t소모품비\t사무용품\t오피스디포\t2026.09.05\t20,909\t2,091\t23,000\t인사팀\t\n44\t소모품비\t프린터 토너\t오피스디포\t2026.09.22\t436,364\t43,636\t480,000\tA사업본부 MD팀\t\n45\t복리후생비\t야근식대\t본죽 강남점\t2026.09.26\t7,727\t773\t8,500\t개발팀\t\n46\t지급수수료\t협업툴 구독\t아마존웹서비스\t2026.09.01\t40,909\t4,091\t45,000\t디자인팀\t\n47\t지급수수료\t폰트 라이선스\t노션랩스\t2026.09.09\t109,091\t10,909\t120,000\tA사업본부 MD팀\t\n48\t복리후생비\t생일 케이크\t본죽 강남점\t2026.09.15\t109,091\t10,909\t120,000\tA사업본부 MD팀\t";
+  document.getElementById('demoLoad').addEventListener('click', function(){
+    var dt=new DataTransfer(); dt.setData('text/plain', T);
+    document.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+  });
+})();
+</script>
+</body>
+</html>

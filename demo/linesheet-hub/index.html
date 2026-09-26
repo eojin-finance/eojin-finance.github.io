@@ -1,0 +1,2965 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<script>
+window.__SHEETS={};
+window.__PROPS={};
+
+function Sheet(name,rows){ this.name=name; this.rows=rows||[]; }
+Sheet.prototype.getName=function(){ return this.name; };
+Sheet.prototype.getLastRow=function(){ for(var i=this.rows.length-1;i>=0;i--){ var r=this.rows[i]||[]; if(r.some(function(v){return v!==''&&v!==null&&v!==undefined;})) return i+1; } return 0; };
+Sheet.prototype.getMaxRows=function(){ return Math.max(1000,this.rows.length+100); };
+Sheet.prototype.getMaxColumns=function(){ return Math.max(26,this.getLastColumn()); };
+Sheet.prototype.getLastColumn=function(){ return this.rows.reduce(function(m,r){ return Math.max(m,(r||[]).length); },0); };
+Sheet.prototype.getDataRange=function(){ return this.getRange(1,1,Math.max(1,this.getLastRow()),Math.max(1,this.getLastColumn())); };
+Sheet.prototype.setFrozenRows=function(){ return this; }; Sheet.prototype.setFrozenColumns=function(){ return this; };
+Sheet.prototype.setColumnWidth=function(){ return this; }; Sheet.prototype.setColumnWidths=function(){ return this; }; Sheet.prototype.autoResizeColumns=function(){ return this; };
+Sheet.prototype.clear=function(){ this.rows=[]; return this; }; Sheet.prototype.clearContents=function(){ this.rows=[]; return this; };
+Sheet.prototype.appendRow=function(a){ this.rows[this.getLastRow()]=a.slice(); return this; };
+Sheet.prototype.deleteRow=function(i){ this.rows.splice(i-1,1); return this; };
+Sheet.prototype.deleteRows=function(i,n){ this.rows.splice(i-1,n||1); return this; };
+Sheet.prototype.insertRowsAfter=function(){ return this; }; Sheet.prototype.insertRowBefore=function(){ return this; };
+Sheet.prototype.hideColumns=function(){ return this; }; Sheet.prototype.getSheetId=function(){ return 0; };
+Sheet.prototype.getRange=function(r,c,nr,nc){ var sh=this;
+  if(typeof r==='string'){ var m=r.match(/^([A-Z]+)(\d+)(?::([A-Z]+)(\d+))?$/); if(m){ var col=function(s){ var n=0; for(var i=0;i<s.length;i++) n=n*26+(s.charCodeAt(i)-64); return n; };
+    var c1=col(m[1]), r1=+m[2], c2=m[3]?col(m[3]):c1, r2=m[4]?+m[4]:r1; return sh.getRange(r1,c1,r2-r1+1,c2-c1+1); } }
+  nr=nr===undefined?1:nr; nc=nc===undefined?1:nc;
+  var R={ getValues:function(){ var out=[]; for(var i=0;i<nr;i++){ var row=sh.rows[r-1+i]||[]; var o=[]; for(var j=0;j<nc;j++){ var v=row[c-1+j]; o.push(v===undefined?'':v); } out.push(o); } return out; },
+    getDisplayValues:function(){ return this.getValues().map(function(r){ return r.map(function(v){ return v===null||v===undefined?'':String(v); }); }); },
+    getValue:function(){ return this.getValues()[0][0]; }, getDisplayValue:function(){ return String(this.getValues()[0][0]); },
+    getNumRows:function(){ return nr; }, getNumColumns:function(){ return nc; }, getRow:function(){ return r; }, getColumn:function(){ return c; },
+    setValues:function(vals){ vals.forEach(function(row,i){ var ri=r-1+i; if(!sh.rows[ri]) sh.rows[ri]=[]; row.forEach(function(v,j){ sh.rows[ri][c-1+j]=v; }); }); return R; },
+    setValue:function(v){ return R.setValues([[v]]); },
+    clearContent:function(){ for(var i=0;i<nr;i++){ var ri=r-1+i; if(!sh.rows[ri]) continue; for(var j=0;j<nc;j++) sh.rows[ri][c-1+j]=''; } return R; },
+    clear:function(){ return R.clearContent(); },
+    setNumberFormat:function(){ return R; }, setNumberFormats:function(){ return R; }, setFontWeight:function(){ return R; }, setBackground:function(){ return R; }, setBackgrounds:function(){ return R; },
+    setFontColor:function(){ return R; }, setWrap:function(){ return R; }, setHorizontalAlignment:function(){ return R; }, setVerticalAlignment:function(){ return R; }, setBorder:function(){ return R; }, setFontSize:function(){ return R; },
+    setDataValidation:function(){ return R; }, setNote:function(){ return R; }, setFormula:function(){ return R; }, setFormulas:function(){ return R; }, getFormulas:function(){ return R.getValues().map(function(r){ return r.map(function(){ return ''; }); }); },
+    getA1Notation:function(){ return ''; }, offset:function(){ return R; }, merge:function(){ return R; } };
+  return R; };
+function Spread(id,sheets){ this.id=id; this.sheets=[]; var self=this; Object.keys(sheets||{}).forEach(function(n){ self.sheets.push(new Sheet(n,sheets[n])); }); }
+Spread.prototype.getId=function(){ return this.id; }; Spread.prototype.getUrl=function(){ return '#'; }; Spread.prototype.getName=function(){ return '데모 저장소'; };
+Spread.prototype.getSheets=function(){ return this.sheets; };
+Spread.prototype.getSheetByName=function(n){ return this.sheets.filter(function(s){ return s.name===n; })[0]||null; };
+Spread.prototype.insertSheet=function(n){ var s=new Sheet(n); this.sheets.push(s); return s; };
+Spread.prototype.deleteSheet=function(s){ this.sheets=this.sheets.filter(function(x){ return x!==s; }); };
+Spread.prototype.getActiveSheet=function(){ return this.sheets[0]; };
+var __SS=new Spread('DEMO', window.__SHEETS||{});
+var PROPS=window.__PROPS||{}; var CACHE={};
+function kst_(d,fmt){ if(!(d instanceof Date)||isNaN(d.getTime())) return ''; var u=new Date(d.getTime()+9*3600*1000); var p2=function(n){ return ('0'+n).slice(-2); };
+  return String(fmt).replace(/yyyy/g,u.getUTCFullYear()).replace(/yy/g,String(u.getUTCFullYear()).slice(2)).replace(/MM/g,p2(u.getUTCMonth()+1)).replace(/dd/g,p2(u.getUTCDate())).replace(/HH/g,p2(u.getUTCHours())).replace(/mm/g,p2(u.getUTCMinutes())).replace(/ss/g,p2(u.getUTCSeconds())); }
+var SpreadsheetApp={ openById:function(){ return __SS; }, openByUrl:function(){ return __SS; }, create:function(){ return __SS; }, flush:function(){}, getActiveSpreadsheet:function(){ return __SS; }, getActive:function(){ return __SS; }, getUi:function(){ return { alert:function(){}, createMenu:function(){ return { addItem:function(){ return this; }, addToUi:function(){} }; } }; } };
+var PropertiesService={ getScriptProperties:function(){ return { getProperty:function(k){ return k in PROPS?PROPS[k]:null; }, setProperty:function(k,v){ PROPS[k]=String(v); return this; }, deleteProperty:function(k){ delete PROPS[k]; return this; }, getProperties:function(){ return PROPS; }, setProperties:function(o){ Object.keys(o).forEach(function(k){ PROPS[k]=String(o[k]); }); return this; } }; } };
+PropertiesService.getUserProperties=PropertiesService.getScriptProperties; PropertiesService.getDocumentProperties=PropertiesService.getScriptProperties;
+var Session={ getActiveUser:function(){ return { getEmail:function(){ return 'demo@example.com'; } }; }, getEffectiveUser:function(){ return { getEmail:function(){ return 'demo@example.com'; } }; }, getScriptTimeZone:function(){ return 'Asia/Seoul'; }, getTemporaryActiveUserKey:function(){ return 'demo'; } };
+var Utilities={ formatDate:kst_, sleep:function(){}, getUuid:function(){ return 'uuid-'+Math.random().toString(36).slice(2); },
+  base64Encode:function(s){ try{ return btoa(unescape(encodeURIComponent(String(s)))); }catch(e){ return ''; } }, base64Decode:function(b){ return b; }, base64EncodeWebSafe:function(s){ return Utilities.base64Encode(s); },
+  newBlob:function(d,m,n){ return { getBytes:function(){ return []; }, getDataAsString:function(){ return String(d||''); }, getName:function(){ return n||''; }, setName:function(){ return this; }, getContentType:function(){ return m||''; } }; },
+  parseCsv:function(t){ return String(t).split(/\r?\n/).map(function(l){ return l.split(','); }); }, formatString:function(){ return Array.prototype.join.call(arguments,' '); },
+  computeDigest:function(){ return [0]; }, DigestAlgorithm:{ MD5:1, SHA_256:2 }, Charset:{ UTF_8:1 }, zip:function(){ return Utilities.newBlob(''); }, unzip:function(){ return []; } };
+var LockService={ getScriptLock:function(){ return { tryLock:function(){ return true; }, waitLock:function(){}, releaseLock:function(){}, hasLock:function(){ return true; } }; } };
+LockService.getDocumentLock=LockService.getScriptLock; LockService.getUserLock=LockService.getScriptLock;
+var CacheService={ getScriptCache:function(){ return { get:function(k){ return k in CACHE?CACHE[k]:null; }, put:function(k,v){ CACHE[k]=v; }, remove:function(k){ delete CACHE[k]; }, removeAll:function(ks){ (ks||[]).forEach(function(k){ delete CACHE[k]; }); },
+  putAll:function(m){ Object.keys(m||{}).forEach(function(k){ CACHE[k]=m[k]; }); }, getAll:function(ks){ var o={}; (ks||[]).forEach(function(k){ if(k in CACHE) o[k]=CACHE[k]; }); return o; } }; } };
+CacheService.getUserCache=CacheService.getScriptCache; CacheService.getDocumentCache=CacheService.getScriptCache;
+var Logger={ log:function(){} };
+var MimeType={ GOOGLE_SHEETS:'sheet', CSV:'text/csv', PLAIN_TEXT:'text/plain', MICROSOFT_EXCEL:'xlsx', JPEG:'image/jpeg', PNG:'image/png', PDF:'pdf', FOLDER:'folder' };
+var _noFiles={ hasNext:function(){ return false; }, next:function(){ return null; } };
+var _file={ getId:function(){ return 'f'; }, getUrl:function(){ return '#'; }, getName:function(){ return 'file'; }, setTrashed:function(){ return this; }, getBlob:function(){ return Utilities.newBlob(''); }, setSharing:function(){ return this; }, getDownloadUrl:function(){ return '#'; }, getMimeType:function(){ return ''; }, getSize:function(){ return 0; }, getLastUpdated:function(){ return new Date(); }, makeCopy:function(){ return _file; }, moveTo:function(){ return _file; } };
+var _folder={ createFile:function(){ return _file; }, getFilesByName:function(){ return _noFiles; }, getFiles:function(){ return _noFiles; }, getFolders:function(){ return _noFiles; }, getFoldersByName:function(){ return _noFiles; }, createFolder:function(){ return _folder; }, getId:function(){ return 'd'; }, getUrl:function(){ return '#'; }, getName:function(){ return '폴더'; }, addFile:function(){ return _folder; }, removeFile:function(){ return _folder; } };
+var DriveApp={ getFilesByName:function(){ return _noFiles; }, getFiles:function(){ return _noFiles; }, createFile:function(){ return _file; }, getFileById:function(){ return _file; }, getFolderById:function(){ return _folder; }, getRootFolder:function(){ return _folder; }, getFoldersByName:function(){ return _noFiles; }, createFolder:function(){ return _folder; }, Access:{ ANYONE_WITH_LINK:1, ANYONE:2 }, Permission:{ VIEW:1, EDIT:2 } };
+var Drive={ Files:{ insert:function(){ return { id:'tmp' }; }, remove:function(){}, create:function(){ return { id:'tmp' }; }, list:function(){ return { files:[], items:[] }; }, get:function(){ return { id:'tmp' }; } }, Permissions:{ create:function(){}, insert:function(){} } };
+var UrlFetchApp={ fetch:function(url){ return { getResponseCode:function(){ return 503; }, getContentText:function(){ return '{"error":"데모에서는 외부 연결이 꺼져 있습니다"}'; }, getBlob:function(){ return Utilities.newBlob(''); }, getHeaders:function(){ return {}; } }; }, fetchAll:function(){ return []; } };
+var HtmlService={ createHtmlOutput:function(){ return { setTitle:function(){ return this; }, getContent:function(){ return ''; }, addMetaTag:function(){ return this; }, setXFrameOptionsMode:function(){ return this; } }; }, createTemplateFromFile:function(){ return { evaluate:function(){ return HtmlService.createHtmlOutput(); } }; }, createHtmlOutputFromFile:function(){ return HtmlService.createHtmlOutput(); }, XFrameOptionsMode:{ ALLOWALL:1 }, SandboxMode:{ IFRAME:1 } };
+var ContentService={ createTextOutput:function(){ return { setMimeType:function(){ return this; } }; }, MimeType:{ JSON:'json', TEXT:'text' } };
+var ScriptApp={ getProjectTriggers:function(){ return []; }, newTrigger:function(){ var t={ timeBased:function(){ return t; }, everyDays:function(){ return t; }, everyHours:function(){ return t; }, everyMinutes:function(){ return t; }, atHour:function(){ return t; }, nearMinute:function(){ return t; }, create:function(){} }; return t; }, deleteTrigger:function(){}, getService:function(){ return { getUrl:function(){ return '#'; } }; }, getScriptId:function(){ return 'demo'; }, getOAuthToken:function(){ return 'demo'; } };
+var MailApp={ sendEmail:function(){} }; var GmailApp={ sendEmail:function(){}, createDraft:function(){} };
+var XmlService={ parse:function(){ return { getRootElement:function(){ return { getChildren:function(){ return []; }, getText:function(){ return ''; }, getName:function(){ return ''; } }; } }; } };
+var Charts={}; var SlidesApp={}; var DocumentApp={};
+
+/**
+ * 라인시트 허브 — 전사 라인시트 정본 저장소 (뼈대 v0)
+ * 구조: 통일양식 xlsx 업로드 → 검증 → 버전 적재 → 이전 버전 diff → 발주계획/예상매입 출력
+ * 이미지: Drive 폴더에 SKU 파일명(예: HR261OZU02BLK.jpg) 업로드 → 파일명 자동 매칭
+ */
+
+var LSHUB = {
+  STORE_PROP: 'LSHUB_STORE_ID',
+  IMGROOT_PROP: 'LSHUB_IMG_ROOT',
+  SHEETS: {
+    core: { name: '코어RAW', headers: ['버전키', '브랜드', '시즌', '품번', '컬러코드', '컬러명', 'SKU', '상품명', '카테고리', '아이템', '소복종', '성별', '라인', '생산처', '생산방식', '원산지', '소재', 'PO차수', '목표납기', '입고예정월', '발주수량', '원가', '예상판매가', '진행상태', '담당MD', '비고'] },
+    size: { name: '사이즈RAW', headers: ['버전키', '브랜드', '시즌', '품번', '컬러코드', 'SKU', '사이즈', '수량', '바코드'] },
+    channel: { name: '채널확장RAW', headers: ['버전키', '브랜드', '시즌', '품번', '컬러코드', '채널', '사입가', '기타비용', 'KC비용', '공급가', '물류비율', '프로모션율', '로열티율', 'ON판매가', '인라인수량', '온라인수량'] },
+    nego: { name: '원가협상RAW', headers: ['버전키', '브랜드', '시즌', '품번', '컬러코드', '견적가', '확정원가', '확정일', '비고'] },
+    versions: { name: '버전로그', headers: ['버전키', '브랜드', '시즌', '버전번호', '업로드일시', '업로더', '파일명', 'SKU수', '총수량', '원가총액', '판매가총액', '검증결과', '상태'] },
+    changes: { name: '변경로그', headers: ['버전키', '브랜드', '시즌', '변경유형', 'SKU', '항목', '이전값', '새값', '기록일시', '사유', '입력자', '입력일시'] },
+    dict: { name: '코드사전', headers: ['유형', '코드', '이름', '비고', '등록일', '등록자'] },
+    alias: { name: '별칭매핑', headers: ['유형', '별칭', '표준코드', '비고'] },
+    pivotMonth: { name: '피벗_월별매입', headers: ['브랜드', '시즌', '버전키', '입고예정월', 'SKU수', '발주수량', '원가금액', '판매가금액'] },
+    pivotVendor: { name: '피벗_생산처', headers: ['브랜드', '시즌', '버전키', '생산처', '입고예정월', '발주수량', '원가금액'] },
+    pivotItem: { name: '피벗_아이템', headers: ['브랜드', '시즌', '버전키', '아이템', 'SKU수', '발주수량', '원가금액', '판매가금액'] }
+  }
+};
+
+function doGet(e) {
+  ensureStore_();
+  if (e && e.parameter && e.parameter.loadfile) {
+    return adminLoadFromDrive_(e.parameter);
+  }
+  if (e && e.parameter && e.parameter.loadbatch) {
+    return adminLoadBatch_(String(e.parameter.loadbatch));
+  }
+  if (e && e.parameter && e.parameter.seeddict) {
+    return ContentService.createTextOutput(JSON.stringify(seedDictFromDrive_(String(e.parameter.seeddict))))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  if (e && e.parameter && e.parameter.dictdump) {
+    var want = String(e.parameter.dictdump);
+    var rows = readRows_('dict');
+    var codesOut = [];
+    for (var di = 0; di < rows.length; di++) {
+      if (String(rows[di]['유형']) === want) codesOut.push(String(rows[di]['코드']));
+    }
+    var ali = readRows_('alias');
+    var aOut = [];
+    for (var ai = 0; ai < ali.length; ai++) {
+      if (String(ali[ai]['유형']) === want) aOut.push(String(ali[ai]['별칭']) + '>' + String(ali[ai]['표준코드']));
+    }
+    return ContentService.createTextOutput(JSON.stringify({ type: want, codes: codesOut, alias: aOut }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  if (e && e.parameter && e.parameter.normtest) {
+    var pairs = String(e.parameter.normtest).split(',');
+    var res = [];
+    for (var ni = 0; ni < pairs.length; ni++) {
+      var sp = pairs[ni].split(':');
+      var r0 = normalizeCode_(sp[0], sp[1]);
+      res.push({ type: sp[0], input: sp[1], out: r0.value, matched: r0.matched, via: r0.via });
+    }
+    var al = aliasMap_();
+    var types = Object.keys(al);
+    var counts = {};
+    for (var ti = 0; ti < types.length; ti++) counts[types[ti]] = Object.keys(al[types[ti]]).length;
+    return ContentService.createTextOutput(JSON.stringify({ tests: res, aliasCounts: counts,
+      dictTypes: Object.keys(dictIndex_()) })).setMimeType(ContentService.MimeType.JSON);
+  }
+  if (e && e.parameter && e.parameter.peek) {
+    var seg = String(e.parameter.peek).split(':');
+    var pb = seg[0], ps = seg[1];
+    var core = readRows_('core');
+    var szs = readRows_('size');
+    var vkey = latestVersionKey_(pb, ps);
+    var samp = [], vend = {}, cols = {}, sizeset = {};
+    for (var pi = 0; pi < core.length; pi++) {
+      if (String(core[pi]['버전키']) !== vkey) continue;
+      if (samp.length < 5) samp.push({ sku: core[pi]['SKU'], cc: core[pi]['컬러코드'], cname: core[pi]['컬러명'],
+                                       vendor: core[pi]['생산처'], origin: core[pi]['원산지'], item: core[pi]['아이템'] });
+      vend[String(core[pi]['생산처'])] = 1;
+      cols[String(core[pi]['컬러코드'])] = 1;
+    }
+    for (var si = 0; si < szs.length; si++) {
+      if (String(szs[si]['버전키']) === vkey) sizeset[String(szs[si]['사이즈'])] = 1;
+    }
+    return ContentService.createTextOutput(JSON.stringify({ verKey: vkey, sample: samp,
+      vendors: Object.keys(vend), colors: Object.keys(cols).sort(), sizes: Object.keys(sizeset).sort() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  if (e && e.parameter && e.parameter.perf) {
+    var t = [];
+    function mark(name, fn) {
+      var t0 = new Date().getTime();
+      var err = '';
+      try { fn(); } catch (x) { err = String(x && x.message ? x.message : x).slice(0, 60); }
+      t.push({ step: name, ms: new Date().getTime() - t0, err: err });
+    }
+    var brand = String((e.parameter.b || 'HR')), season = String((e.parameter.s || '26SS'));
+    mark('getBundle', function () { getBundle('', ''); });
+    mark('getDashboard', function () { getDashboard(''); });
+    mark('getSeasonSummary', function () { getSeasonSummary(brand, season); });
+    mark('getVersionHistory', function () { getVersionHistory(brand, season); });
+    mark('getMonthlyVersions', function () { getMonthlyVersions(brand, season); });
+    mark('getGallery', function () { getGallery(brand, season); });
+    mark('getStyleDetail', function () { getStyleDetail(brand, season, 'HR261OJK06'); });
+    mark('getRawView', function () { getRawView(brand, season); });
+    mark('getPivots', function () { getPivots(); });
+    mark('getChangeManager', function () { getChangeManager(); });
+    mark('readRows_core', function () { readDataRowsCount_('core'); });
+    mark('readRows_size', function () { readDataRowsCount_('size'); });
+    mark('readRows_changes', function () { readDataRowsCount_('changes'); });
+    var total = 0;
+    for (var i = 0; i < t.length; i++) total += t[i].ms;
+    return ContentService.createTextOutput(JSON.stringify({ perf: t, totalMs: total }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  if (e && e.parameter && e.parameter.status) {
+    var vs = readRows_('versions');
+    var out = [];
+    for (var i = 0; i < vs.length; i++) {
+      out.push({ v: String(vs[i]['버전키']), sku: Number(vs[i]['SKU수']) || 0,
+                 qty: Number(vs[i]['총수량']) || 0, cost: Number(vs[i]['원가총액']) || 0,
+                 at: String(vs[i]['업로드일시']) });
+    }
+    return ContentService.createTextOutput(JSON.stringify({ versions: out }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  var t = HtmlService.createTemplateFromFile('index');
+  return t.evaluate()
+    .setTitle('라인시트 허브')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/** 관리용 배치 적재: ?loadbatch=BRAND:SEASON:fileId,BRAND:SEASON:fileId,... */
+function adminLoadBatch_(spec) {
+  var parts = spec.split(',');
+  var results = [];
+  for (var i = 0; i < parts.length; i++) {
+    var seg = parts[i].split(':');
+    if (seg.length < 3) { results.push({ spec: parts[i], ok: false, error: 'BRAND:SEASON:ID 형식 아님' }); continue; }
+    var brand = seg[0].trim(), season = seg[1].trim(), fid = seg[2].trim();
+    try {
+      var f = DriveApp.getFileById(fid);
+      var b64 = Utilities.base64Encode(f.getBlob().getBytes());
+      var raw = uploadLinesheet({ fileName: f.getName(), fileBase64: b64, brand: brand, season: season });
+      var p = JSON.parse(raw);
+      var d = p.data || {};
+      results.push({ brand: brand, season: season, ok: !!(p.ok && d.ok),
+        verKey: d.summary ? d.summary.verKey : null,
+        sku: d.summary ? d.summary.skuCount : null,
+        qty: d.summary ? d.summary.totQty : null,
+        cost: d.summary ? d.summary.totCost : null,
+        warns: d.issues ? d.issues.filter(function (x) { return x.level === 'warn'; }).length : null,
+        errors: d.issues ? d.issues.filter(function (x) { return x.level === 'error'; }).slice(0, 3) : null,
+        error: p.error || null });
+    } catch (err) {
+      results.push({ brand: brand, season: season, ok: false, error: String(err && err.message ? err.message : err) });
+    }
+  }
+  try { rebuildPivots_(); } catch (e2) {}
+  return ContentService.createTextOutput(JSON.stringify({ batch: results }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+/** 관리용: Drive의 통일양식 파일을 직접 적재 (?loadfile=<fileId>&brand=HR&season=26SS) */
+function adminLoadFromDrive_(p) {
+  var out;
+  try {
+    var f = DriveApp.getFileById(String(p.loadfile));
+    var b64 = Utilities.base64Encode(f.getBlob().getBytes());
+    var raw = uploadLinesheet({ fileName: f.getName(), fileBase64: b64, brand: String(p.brand || ''), season: String(p.season || '') });
+    out = raw;
+  } catch (err) {
+    out = JSON.stringify({ ok: false, error: String(err && err.message ? err.message : err) });
+  }
+  return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
+}
+
+function include(name) {
+  return HtmlService.createHtmlOutputFromFile(name).getContent();
+}
+
+function getStore_() {
+  var id = PropertiesService.getScriptProperties().getProperty(LSHUB.STORE_PROP);
+  if (!id) throw new Error('스토어가 초기화되지 않았습니다.');
+  return SpreadsheetApp.openById(id);
+}
+
+function ensureStore_() {
+  var props = PropertiesService.getScriptProperties();
+  var id = props.getProperty(LSHUB.STORE_PROP);
+  var ss;
+  if (id) {
+    try { ss = SpreadsheetApp.openById(id); } catch (e) { ss = null; }
+  }
+  if (!ss) {
+    ss = SpreadsheetApp.create('라인시트 허브 스토어');
+    props.setProperty(LSHUB.STORE_PROP, ss.getId());
+  }
+  var keys = Object.keys(LSHUB.SHEETS);
+  for (var i = 0; i < keys.length; i++) {
+    var spec = LSHUB.SHEETS[keys[i]];
+    var sh = ss.getSheetByName(spec.name);
+    if (!sh) {
+      sh = ss.insertSheet(spec.name);
+      sh.getRange(1, 1, 1, spec.headers.length).setValues([spec.headers]).setFontWeight('bold');
+      sh.setFrozenRows(1);
+    } else {
+      // 스키마 확장: 헤더가 짧으면 새 열 이름을 덧붙임 (기존 데이터 보존)
+      var cur = sh.getRange(1, 1, 1, Math.max(sh.getLastColumn(), 1)).getValues()[0];
+      if (cur.filter(String).length < spec.headers.length) {
+        sh.getRange(1, 1, 1, spec.headers.length).setValues([spec.headers]).setFontWeight('bold');
+      }
+    }
+  }
+  var def = ss.getSheetByName('시트1') || ss.getSheetByName('Sheet1');
+  if (def && ss.getSheets().length > 1) ss.deleteSheet(def);
+  seedDictIfEmpty_(ss);
+  return ss;
+}
+
+/* ── 캐시 계층 ───────────────────────────────────────
+   READ_MEMO_ : 한 번의 실행 안에서 같은 시트를 재차 읽지 않는다 (core를 API마다 읽던 문제)
+   CacheService: 실행 간 캐시. 데이터가 바뀌면 CACHE_VER를 올려 전체 무효화        */
+var READ_MEMO_ = {};
+var CACHE_VER_PROP = 'LSHUB_CACHE_VER';
+var _cacheVer = null;
+
+function cacheVer_() {
+  if (_cacheVer === null) {
+    _cacheVer = PropertiesService.getScriptProperties().getProperty(CACHE_VER_PROP) || '1';
+  }
+  return _cacheVer;
+}
+
+function bumpCacheVer_() {
+  var n = String(Number(cacheVer_()) + 1);
+  PropertiesService.getScriptProperties().setProperty(CACHE_VER_PROP, n);
+  _cacheVer = n;
+  READ_MEMO_ = {};
+}
+
+/** 캐시된 JSON 응답 (payload가 100KB 넘으면 캐시 생략) */
+function cached_(key, fn) {
+  var ck = 'v' + cacheVer_() + '_' + key;
+  var c = CacheService.getScriptCache();
+  var hit = null;
+  try { hit = c.get(ck); } catch (e) {}
+  if (hit) return hit;
+  var out;
+  try {
+    out = JSON.stringify({ ok: true, data: fn() });
+  } catch (err) {
+    return JSON.stringify({ ok: false, error: String(err && err.message ? err.message : err) });
+  }
+  if (out.length < 95000) {
+    try { c.put(ck, out, 21600); } catch (e) {}
+  }
+  return out;
+}
+
+function readRows_(sheetKey) {
+  if (READ_MEMO_[sheetKey]) return READ_MEMO_[sheetKey];
+  var spec = LSHUB.SHEETS[sheetKey];
+  var sh = getStore_().getSheetByName(spec.name);
+  var last = sh.getLastRow();
+  if (last < 2) {
+    READ_MEMO_[sheetKey] = [];
+    return READ_MEMO_[sheetKey];
+  }
+  var vals = sh.getRange(2, 1, last - 1, spec.headers.length).getValues();
+  var out = [];
+  for (var i = 0; i < vals.length; i++) {
+    var o = {};
+    for (var c = 0; c < spec.headers.length; c++) {
+      var v = vals[i][c];
+      if (v instanceof Date) v = Utilities.formatDate(v, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss');
+      o[spec.headers[c]] = v;
+    }
+    out.push(o);
+  }
+  READ_MEMO_[sheetKey] = out;
+  return out;
+}
+
+function readDataRowsCount_(sheetKey) {
+  return readRows_(sheetKey).length;
+}
+
+/** google.script.run 직렬화 함정(Date 포함 시 null 반환) 회피 — 모든 API는 JSON 문자열로 응답 */
+function apiWrap_(fn) {
+  try {
+    return JSON.stringify({ ok: true, data: fn() });
+  } catch (e) {
+    return JSON.stringify({ ok: false, error: String(e && e.message ? e.message : e) });
+  }
+}
+
+function appendRows_(sheetKey, rows) {
+  if (!rows.length) return;
+  var spec = LSHUB.SHEETS[sheetKey];
+  var sh = getStore_().getSheetByName(spec.name);
+  var data = [];
+  for (var i = 0; i < rows.length; i++) {
+    var row = [];
+    for (var c = 0; c < spec.headers.length; c++) {
+      var val = rows[i][spec.headers[c]] !== undefined ? rows[i][spec.headers[c]] : '';
+      // 060, 003 처럼 앞자리 0이 있는 코드는 시트가 숫자로 바꿔버린다 → 리터럴 강제
+      if (typeof val === 'string' && /^0\d+$/.test(val)) val = "'" + val;
+      row.push(val);
+    }
+    data.push(row);
+  }
+  sh.getRange(sh.getLastRow() + 1, 1, data.length, spec.headers.length).setValues(data);
+  delete READ_MEMO_[sheetKey];
+  bumpCacheVer_();
+}
+
+function actorEmail_() {
+  return Session.getActiveUser().getEmail() || '(unknown)';
+}
+
+function nowStr_() {
+  return Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss');
+}
+
+/** 대시보드 데이터: (시즌 필터) 브랜드별 최신 버전 요약 + 전체 합산 + 최근 변경 */
+function getDashboard(season) {
+  return cached_('dash_' + String(season || ''), function () { return getDashboard_(season); });
+}
+
+function getDashboard_(season) {
+  ensureStore_();
+  var versions = readRows_('versions');
+  var seasons = {};
+  var latest = {};
+  for (var i = 0; i < versions.length; i++) {
+    var v = versions[i];
+    seasons[String(v['시즌'])] = true;
+    if (season && String(v['시즌']) !== String(season)) continue;
+    var key = v['브랜드'] + '|' + v['시즌'];
+    if (!latest[key] || Number(v['버전번호']) > Number(latest[key]['버전번호'])) latest[key] = v;
+  }
+  var cards = [];
+  var total = { sku: 0, qty: 0, cost: 0, rp: 0, brands: 0 };
+  var lk = Object.keys(latest);
+  for (var m = 0; m < lk.length; m++) {
+    var c = latest[lk[m]];
+    cards.push(c);
+    total.sku += Number(c['SKU수']) || 0;
+    total.qty += Number(c['총수량']) || 0;
+    total.cost += Number(c['원가총액']) || 0;
+    total.rp += Number(c['판매가총액']) || 0;
+    total.brands++;
+  }
+  var changes = readRows_('changes');
+  var recent = [];
+  for (var r = changes.length - 1; r >= 0 && recent.length < 30; r--) {
+    if (season && String(changes[r]['시즌']) !== String(season)) continue;
+    recent.push(changes[r]);
+  }
+  return {
+    cards: cards,
+    total: total,
+    seasons: Object.keys(seasons).sort(),
+    recentChanges: recent,
+    dict: getDictSummary_(),
+    storeUrl: getStore_().getUrl(),
+    imgRoot: PropertiesService.getScriptProperties().getProperty(LSHUB.IMGROOT_PROP) || ''
+  };
+}
+
+/** 첫 화면 묶음 — 대시보드 진입 시 왕복 5회를 1회로 */
+function getBundle(brand, season) {
+  return cached_('bundle_' + String(brand || '') + '_' + String(season || ''), function () {
+    var out = { dash: getDashboard_(season) };
+    var b = String(brand || ''), s = String(season || '');
+    if (!b && out.dash.cards.length) {
+      b = String(out.dash.cards[0]['브랜드']);
+      s = String(out.dash.cards[0]['시즌']);
+    }
+    out.brand = b;
+    out.season = s;
+    if (b && s) {
+      out.sum = getSeasonSummary_(b, s);
+      out.mv = JSON.parse(getMonthlyVersions(b, s)).data;
+      out.hist = JSON.parse(getVersionHistory(b, s)).data;
+      out.gal = JSON.parse(getGallery(b, s)).data;
+    }
+    return out;
+  });
+}
+
+/** 버전 히스토리 — vN→vN+1 변화량 + 변경 내역·사유 (한 화면) */
+function getVersionHistory(brand, season) {
+  return cached_('hist_' + brand + '_' + season, function () {
+    var versions = readRows_('versions').filter(function (v) {
+      return String(v['브랜드']) === String(brand) && String(v['시즌']) === String(season);
+    });
+    versions.sort(function (a, b) { return Number(a['버전번호']) - Number(b['버전번호']); });
+    var changes = readRows_('changes');
+    var byVer = {};
+    for (var i = 0; i < changes.length; i++) {
+      var ch = changes[i];
+      if (String(ch['브랜드']) !== String(brand) || String(ch['시즌']) !== String(season)) continue;
+      var k = String(ch['버전키']);
+      if (!byVer[k]) byVer[k] = { added: 0, removed: 0, changed: [], first: false };
+      var type = String(ch['변경유형']);
+      if (type === '신규') byVer[k].added++;
+      else if (type === '삭제') byVer[k].removed++;
+      else if (type === '최초적재') byVer[k].first = true;
+      else if (type === '변경') {
+        byVer[k].changed.push({ sku: String(ch['SKU']), field: String(ch['항목']),
+          oldV: String(ch['이전값']), newV: String(ch['새값']),
+          reason: String(ch['사유'] || ''), by: String(ch['입력자'] || '') });
+      }
+    }
+    var out = [];
+    for (var j = 0; j < versions.length; j++) {
+      var v = versions[j];
+      var k2 = String(v['버전키']);
+      var prev = j > 0 ? versions[j - 1] : null;
+      out.push({
+        verKey: k2, verNo: Number(v['버전번호']), at: String(v['업로드일시']), by: String(v['업로더']),
+        sku: Number(v['SKU수']) || 0, qty: Number(v['총수량']) || 0, cost: Number(v['원가총액']) || 0, rp: Number(v['판매가총액']) || 0,
+        dSku: prev ? (Number(v['SKU수']) - Number(prev['SKU수'])) : null,
+        dQty: prev ? (Number(v['총수량']) - Number(prev['총수량'])) : null,
+        dCost: prev ? (Number(v['원가총액']) - Number(prev['원가총액'])) : null,
+        diff: byVer[k2] || { added: 0, removed: 0, changed: [], first: j === 0 }
+      });
+    }
+    out.reverse(); // 최신 먼저
+    return { versions: out };
+  });
+}
+
+
+/** 코드사전 — 드롭다운·검증의 정본. 유형: 브랜드/시즌/카테고리/아이템/생산방식/원산지/진행상태/생산처/컬러/사이즈군 */
+
+var DICT_SEED = {
+  '브랜드': [['HR', 'A본부'], ['GL', 'BETA'], ['SN', 'GAMMA'], ['OH', '브랜드 OH'], ['OD', '브랜드 OD'], ['OA', '브랜드 OA'], ['EL', '브랜드 EL'], ['EK', '브랜드 EK']],
+  '시즌': [['26SS', ''], ['26SM', ''], ['26FW', ''], ['27SS', ''], ['27FW', '']],
+  '카테고리': [['APP', '의류'], ['ACC', '용품']],
+  '아이템': [['OUTER', ''], ['TOP', ''], ['INNER', ''], ['BOTTOM', ''], ['SET', ''], ['ONEPIECE', ''], ['VEST', ''], ['ACC', ''], ['BAG', ''], ['CAP', ''], ['SOCKS', ''], ['SHOES', ''], ['ETC', '']],
+  '생산방식': [['완사입', ''], ['임가공', ''], ['CMT', '']],
+  '원산지': [['중국', ''], ['한국', ''], ['베트남', '']],
+  '진행상태': [['기획', ''], ['가확정', ''], ['확정', ''], ['발주', ''], ['생산중', ''], ['입고완료', ''], ['캔슬', '']]
+};
+
+function seedDictIfEmpty_(ss) {
+  var sh = ss.getSheetByName(LSHUB.SHEETS.dict.name);
+  if (sh.getLastRow() > 1) return;
+  var rows = [];
+  var types = Object.keys(DICT_SEED);
+  var now = nowStr_();
+  for (var t = 0; t < types.length; t++) {
+    var list = DICT_SEED[types[t]];
+    for (var i = 0; i < list.length; i++) {
+      rows.push([types[t], list[i][0], list[i][1], '초기시드', now, 'system']);
+    }
+  }
+  sh.getRange(2, 1, rows.length, 6).setValues(rows);
+}
+
+function getDict_() {
+  var rows = readRows_('dict');
+  var map = {};
+  for (var i = 0; i < rows.length; i++) {
+    var t = String(rows[i]['유형']);
+    if (!map[t]) map[t] = {};
+    map[t][String(rows[i]['코드'])] = String(rows[i]['이름'] || '');
+  }
+  return map;
+}
+
+function getDictSummary_() {
+  var map = getDict_();
+  var out = {};
+  var ks = Object.keys(map);
+  for (var i = 0; i < ks.length; i++) out[ks[i]] = Object.keys(map[ks[i]]).length;
+  return out;
+}
+
+function getDictEntries(type) {
+  return apiWrap_(function () {
+    var rows = readRows_('dict');
+    var out = [];
+    for (var i = 0; i < rows.length; i++) {
+      if (String(rows[i]['유형']) === type) out.push({ code: String(rows[i]['코드']), name: String(rows[i]['이름'] || ''), note: String(rows[i]['비고'] || '') });
+    }
+    return out;
+  });
+}
+
+function addDictEntry(payload) {
+  return apiWrap_(function () { return addDictEntry_(payload); });
+}
+
+function addDictEntry_(payload) {
+  var type = String(payload.type || '').trim();
+  var code = String(payload.code || '').trim();
+  var name = String(payload.name || '').trim();
+  if (!type || !code) throw new Error('유형과 코드는 필수입니다.');
+  var map = getDict_();
+  if (map[type] && map[type][code] !== undefined) throw new Error('이미 등록된 코드입니다: ' + type + '/' + code);
+  appendRows_('dict', [{ '유형': type, '코드': code, '이름': name, '비고': String(payload.note || ''), '등록일': nowStr_(), '등록자': actorEmail_() }]);
+  return { ok: true };
+}
+
+
+/** 코드 정규화 — BI Connect 마스터코드를 정본으로 삼는다.
+ * 코드사전(BI 626종) + 별칭매핑(우리 표기 → BI 표준)으로 업로드 값을 자동 표준화.
+ * 사이즈/컬러/생산처/원산지는 저장값 자체를 표준화하고, 아이템은 원문 유지(검증만 별칭 허용).
+ */
+
+/** 앞자리 0이 있는 코드(060, 003)는 아포스트로피로 강제해야 숫자로 변질되지 않는다.
+ *  setNumberFormat('@')만으로는 setValues의 값 파싱을 막지 못함 */
+function txtCode_(v) {
+  var s = String(v === null || v === undefined ? '' : v);
+  if (/^0\d/.test(s)) return "'" + s;   // 060, 003, 053 …
+  return s;
+}
+
+/** Drive의 dict_seed.json으로 코드사전·별칭매핑 전면 재작성 */
+function seedDictFromDrive_(fileId) {
+  var f = DriveApp.getFileById(fileId);
+  var payload = JSON.parse(f.getBlob().getDataAsString('UTF-8'));
+  var ss = getStore_();
+  var now = nowStr_();
+  var who = actorEmail_();
+
+  var dictSpec = LSHUB.SHEETS.dict;
+  var dsh = ss.getSheetByName(dictSpec.name);
+  if (dsh.getLastRow() > 1) dsh.getRange(2, 1, dsh.getLastRow() - 1, dictSpec.headers.length).clearContent();
+  var drows = [];
+  for (var i = 0; i < payload.codes.length; i++) {
+    var c = payload.codes[i];
+    drows.push([c[0], txtCode_(c[1]), c[2], c[3] || '', now, who]);
+  }
+  if (drows.length) {
+    var drange = dsh.getRange(2, 1, drows.length, dictSpec.headers.length);
+    drange.setNumberFormat('@');   // 060, 003 같은 앞자리 0 보존 (숫자로 변환되면 별칭이 무력화됨)
+    drange.setValues(drows);
+  }
+
+  var aliSpec = LSHUB.SHEETS.alias;
+  var ash = ss.getSheetByName(aliSpec.name);
+  if (ash.getLastRow() > 1) ash.getRange(2, 1, ash.getLastRow() - 1, aliSpec.headers.length).clearContent();
+  var arows = [];
+  for (var j = 0; j < payload.alias.length; j++) {
+    var a = payload.alias[j];
+    arows.push([a[0], txtCode_(a[1]), txtCode_(a[2]), a[3] || '']);
+  }
+  if (arows.length) {
+    var arange = ash.getRange(2, 1, arows.length, aliSpec.headers.length);
+    arange.setNumberFormat('@');
+    arange.setValues(arows);
+  }
+
+  delete READ_MEMO_['dict'];
+  delete READ_MEMO_['alias'];
+  bumpCacheVer_();
+  return { codes: drows.length, alias: arows.length, at: now };
+}
+
+var _ALIAS = null;
+function aliasMap_() {
+  if (_ALIAS) return _ALIAS;
+  var rows = readRows_('alias');
+  var m = {};
+  for (var i = 0; i < rows.length; i++) {
+    var t = String(rows[i]['유형']);
+    if (!m[t]) m[t] = {};
+    m[t][normKey_(rows[i]['별칭'])] = String(rows[i]['표준코드']);
+  }
+  _ALIAS = m;
+  return m;
+}
+
+function normKey_(s) {
+  return String(s === null || s === undefined ? '' : s).replace(/[\s\-_\/()㈜]+/g, '').toUpperCase();
+}
+
+var _DICTIDX = null;
+function dictIndex_() {
+  if (_DICTIDX) return _DICTIDX;
+  var rows = readRows_('dict');
+  var byType = {};
+  for (var i = 0; i < rows.length; i++) {
+    var t = String(rows[i]['유형']);
+    if (!byType[t]) byType[t] = { code: {}, name: {} };
+    byType[t].code[normKey_(rows[i]['코드'])] = { code: String(rows[i]['코드']), name: String(rows[i]['이름'] || '') };
+    if (rows[i]['이름']) byType[t].name[normKey_(rows[i]['이름'])] = String(rows[i]['코드']);
+  }
+  _DICTIDX = byType;
+  return byType;
+}
+
+/** raw → BI 표준코드 (없으면 원문 반환). 반환: {value, matched, via} */
+function normalizeCode_(type, raw) {
+  var v = String(raw === null || raw === undefined ? '' : raw).trim();
+  if (!v) return { value: '', matched: true, via: 'empty' };
+  var k = normKey_(v);
+  var dict = dictIndex_()[type];
+  if (dict && dict.code[k]) return { value: dict.code[k].code, matched: true, via: 'code' };
+  var al = aliasMap_()[type];
+  if (al && al[k]) {
+    var std = al[k];
+    return { value: std, matched: true, via: 'alias' };
+  }
+  if (dict && dict.name[k]) return { value: dict.name[k], matched: true, via: 'name' };
+  return { value: v, matched: false, via: 'none' };
+}
+
+/** 생산처는 코드(P0017)가 아니라 사람이 읽는 정식명으로 저장 */
+function normalizeVendorName_(raw) {
+  var r = normalizeCode_('생산처', raw);
+  if (!r.matched) return { value: String(raw || '').trim(), matched: false };
+  var dict = dictIndex_()['생산처'];
+  var hit = dict && dict.code[normKey_(r.value)];
+  return { value: hit ? hit.name : r.value, matched: true };
+}
+
+/** 원산지는 코드(CN)를 한글명(중국)으로 저장 */
+function normalizeOriginName_(raw) {
+  var r = normalizeCode_('원산지', raw);
+  if (!r.matched) return { value: String(raw || '').trim(), matched: false };
+  var dict = dictIndex_()['원산지'];
+  var hit = dict && dict.code[normKey_(r.value)];
+  return { value: hit ? hit.name : r.value, matched: true };
+}
+
+
+/** 통일양식 xlsx 업로드 → 파싱 → 검증 → 적재 → diff */
+
+var STYLE_RE_STR = '^[A-Z]{2}[0-9]{3}[A-Z]{2,3}[0-9]{2}$';
+
+/** base64 xlsx → 임시 구글시트 변환 → 시트별 2차원 배열 */
+function convertXlsx_(fileName, base64) {
+  var blob = Utilities.newBlob(Utilities.base64Decode(base64), MimeType.MICROSOFT_EXCEL, fileName);
+  var meta = { name: '[임시변환] ' + fileName, mimeType: 'application/vnd.google-apps.spreadsheet' };
+  var file = Drive.Files.create(meta, blob);
+  try {
+    var ss = SpreadsheetApp.openById(file.id);
+    var out = {};
+    var sheets = ss.getSheets();
+    for (var i = 0; i < sheets.length; i++) {
+      var sh = sheets[i];
+      var lr = sh.getLastRow(), lc = sh.getLastColumn();
+      out[sh.getName()] = (lr > 0 && lc > 0) ? sh.getRange(1, 1, lr, lc).getValues() : [];
+    }
+    return out;
+  } finally {
+    try { Drive.Files.remove(file.id); } catch (e) {}
+  }
+}
+
+function headerIndex_(headerRow) {
+  var idx = {};
+  for (var c = 0; c < headerRow.length; c++) {
+    var h = String(headerRow[c] || '').replace(/\s+/g, '').replace(/\(자동\)/g, '').replace(/\(VAT-\)/g, '');
+    if (h) idx[h] = c;
+  }
+  return idx;
+}
+
+function cellStr_(row, idx, name) {
+  var c = idx[name];
+  if (c === undefined || c >= row.length) return '';
+  var v = row[c];
+  if (v === null || v === undefined) return '';
+  if (v instanceof Date) return Utilities.formatDate(v, 'Asia/Seoul', 'yyyy-MM-dd');
+  return String(v).trim();
+}
+
+function cellNum_(row, idx, name) {
+  var s = cellStr_(row, idx, name);
+  if (s === '') return 0;
+  var n = Number(String(s).replace(/,/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+
+/** 업로드 진입점 — payload: {fileName, fileBase64, brand, season} */
+function uploadLinesheet(payload) {
+  return apiWrap_(function () { return uploadLinesheet_(payload); });
+}
+
+function uploadLinesheet_(payload) {
+  var brand = String(payload.brand || '').trim();
+  var season = String(payload.season || '').trim();
+  if (!brand || !season) throw new Error('브랜드와 시즌을 먼저 선택해 주세요.');
+  if (!payload.fileBase64) throw new Error('파일이 전송되지 않았습니다. 다시 선택해 주세요.');
+
+  var book = convertXlsx_(String(payload.fileName || 'upload.xlsx'), payload.fileBase64);
+  if (!book['코어']) throw new Error('통일양식이 아닙니다: "코어" 시트가 없습니다.');
+  if (!book['사이즈']) throw new Error('통일양식이 아닙니다: "사이즈" 시트가 없습니다.');
+
+  var parsed = parseCore_(book['코어'], brand, season);
+  var sizes = parseSizes_(book['사이즈'], brand, season);
+  var channel = book['채널확장'] ? parseChannel_(book['채널확장'], brand, season) : [];
+  var nego = book['원가협상'] ? parseNego_(book['원가협상'], brand, season) : [];
+
+  var reverted = resolveColorConflicts_(parsed, sizes);
+  var issues = validateAll_(parsed, sizes, brand, season);
+  for (var rv = 0; rv < reverted.length; rv++) {
+    issues.push({ level: 'warn', where: '코어', msg: '컬러코드 정규화 보류(원본 유지): ' + reverted[rv] + ' — 서로 다른 컬러가 한 SKU로 합쳐질 위험. 코드사전 확정 필요' });
+  }
+  var blocking = issues.filter(function (x) { return x.level === 'error'; });
+  if (blocking.length) {
+    return { ok: false, issues: issues, summary: null };
+  }
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    var verNo = nextVersion_(brand, season);
+    var verKey = brand + '_' + season + '_v' + verNo;
+    var diff = diffAgainstPrevious_(brand, season, parsed);
+    stampAndAppend_(verKey, parsed, sizes, channel, nego);
+    var totQty = 0, totCost = 0, totRp = 0;
+    for (var i = 0; i < parsed.length; i++) {
+      totQty += parsed[i]['발주수량'];
+      totCost += parsed[i]['발주수량'] * parsed[i]['원가'];
+      totRp += parsed[i]['발주수량'] * parsed[i]['예상판매가'];
+    }
+    appendRows_('versions', [{
+      '버전키': verKey, '브랜드': brand, '시즌': season, '버전번호': verNo,
+      '업로드일시': nowStr_(), '업로더': actorEmail_(), '파일명': String(payload.fileName || ''),
+      'SKU수': parsed.length, '총수량': totQty, '원가총액': totCost, '판매가총액': totRp,
+      '검증결과': issues.length ? (issues.length + '건 경고') : '이상없음', '상태': '적재완료'
+    }]);
+    logChanges_(verKey, brand, season, diff);
+    try { rebuildPivots_(); } catch (e) {} // 피벗 실체화 (실패해도 적재는 유지)
+    return { ok: true, issues: issues, summary: { verKey: verKey, verNo: verNo, skuCount: parsed.length, totQty: totQty, totCost: totCost, totRp: totRp, diff: diff } };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** 정규화(별칭 치환)로 SKU가 충돌하면 그 품번의 컬러코드를 원본으로 되돌린다.
+ *  같은 SKU에 서로 다른 원본 코드가 모이는 경우만 롤백 → 데이터 병합 사고 방지 */
+function resolveColorConflicts_(parsed, sizes) {
+  var bySku = {};
+  for (var i = 0; i < parsed.length; i++) {
+    var k = parsed[i]['SKU'];
+    if (!bySku[k]) bySku[k] = [];
+    bySku[k].push(parsed[i]);
+  }
+  var revertPairs = {};
+  var reverted = [];
+  var ks = Object.keys(bySku);
+  for (var j = 0; j < ks.length; j++) {
+    var rows = bySku[ks[j]];
+    if (rows.length < 2) continue;
+    var raws = {};
+    for (var r = 0; r < rows.length; r++) raws[String(rows[r]['_ccRaw'] || rows[r]['컬러코드'])] = 1;
+    if (Object.keys(raws).length < 2) continue;   // 원본도 같으면 진짜 중복 → 그대로 검증에서 잡힘
+    for (var q = 0; q < rows.length; q++) {
+      var raw = String(rows[q]['_ccRaw'] || '');
+      if (raw && raw !== rows[q]['컬러코드']) {
+        revertPairs[rows[q]['품번'] + '|' + rows[q]['컬러코드']] = raw;
+        reverted.push(rows[q]['품번'] + ' ' + rows[q]['컬러코드'] + '←' + raw);
+        rows[q]['컬러코드'] = raw;
+        rows[q]['SKU'] = rows[q]['품번'] + raw;
+      }
+    }
+  }
+  if (reverted.length) {
+    for (var s2 = 0; s2 < sizes.length; s2++) {
+      var key2 = sizes[s2]['품번'] + '|' + sizes[s2]['컬러코드'];
+      var rawc = revertPairs[key2];
+      var ownRaw = String(sizes[s2]['_ccRaw'] || '');
+      if (rawc && ownRaw && ownRaw === rawc) {
+        sizes[s2]['컬러코드'] = ownRaw;
+        sizes[s2]['SKU'] = sizes[s2]['품번'] + ownRaw;
+      }
+    }
+  }
+  return reverted;
+}
+
+function parseCore_(grid, brand, season) {
+  if (grid.length < 2) throw new Error('코어 시트에 데이터가 없습니다.');
+  var idx = headerIndex_(grid[0]);
+  if (idx['품번'] === undefined || idx['컬러코드'] === undefined) throw new Error('코어 시트 헤더(품번/컬러코드)를 찾을 수 없습니다. 1행 헤더를 수정하지 마세요.');
+  var out = [];
+  for (var r = 1; r < grid.length; r++) {
+    var pn = cellStr_(grid[r], idx, '품번');
+    if (!pn) continue;
+    out.push({
+      '브랜드': cellStr_(grid[r], idx, '브랜드') || brand,
+      '시즌': cellStr_(grid[r], idx, '시즌') || season,
+      '품번': pn,
+      '컬러코드': normalizeCode_('컬러', cellStr_(grid[r], idx, '컬러코드')).value,
+      '_ccRaw': cellStr_(grid[r], idx, '컬러코드'),
+      '컬러명': cellStr_(grid[r], idx, '컬러명'),
+      'SKU': pn + normalizeCode_('컬러', cellStr_(grid[r], idx, '컬러코드')).value,
+      '상품명': cellStr_(grid[r], idx, '상품명'),
+      '카테고리': cellStr_(grid[r], idx, '카테고리'),
+      '아이템': cellStr_(grid[r], idx, '아이템'),
+      '소복종': cellStr_(grid[r], idx, '소복종'),
+      '성별': cellStr_(grid[r], idx, '성별'),
+      '라인': cellStr_(grid[r], idx, '라인'),
+      '생산처': normalizeVendorName_(cellStr_(grid[r], idx, '생산처')).value,
+      '생산방식': cellStr_(grid[r], idx, '생산방식'),
+      '원산지': normalizeOriginName_(cellStr_(grid[r], idx, '원산지')).value,
+      '소재': cellStr_(grid[r], idx, '소재'),
+      'PO차수': cellStr_(grid[r], idx, 'PO차수'),
+      '목표납기': cellStr_(grid[r], idx, '목표납기'),
+      '입고예정월': cellStr_(grid[r], idx, '입고예정월'),
+      '발주수량': cellNum_(grid[r], idx, '발주수량'),
+      '원가': cellNum_(grid[r], idx, '원가'),
+      '예상판매가': cellNum_(grid[r], idx, '예상판매가'),
+      '진행상태': cellStr_(grid[r], idx, '진행상태'),
+      '담당MD': cellStr_(grid[r], idx, '담당MD'),
+      '비고': cellStr_(grid[r], idx, '비고')
+    });
+  }
+  return out;
+}
+
+function parseSizes_(grid, brand, season) {
+  if (grid.length < 2) return [];
+  var idx = headerIndex_(grid[0]);
+  var out = [];
+  for (var r = 1; r < grid.length; r++) {
+    var pn = cellStr_(grid[r], idx, '품번');
+    if (!pn) continue;
+    out.push({
+      '브랜드': brand, '시즌': season, '품번': pn,
+      '컬러코드': normalizeCode_('컬러', cellStr_(grid[r], idx, '컬러코드')).value,
+      '_ccRaw': cellStr_(grid[r], idx, '컬러코드'),
+      'SKU': pn + normalizeCode_('컬러', cellStr_(grid[r], idx, '컬러코드')).value,
+      '사이즈': normalizeCode_('사이즈', cellStr_(grid[r], idx, '사이즈')).value,
+      '수량': cellNum_(grid[r], idx, '수량'),
+      '바코드': cellStr_(grid[r], idx, '바코드')
+    });
+  }
+  return out;
+}
+
+function parseChannel_(grid, brand, season) {
+  if (grid.length < 2) return [];
+  var idx = headerIndex_(grid[0]);
+  var out = [];
+  for (var r = 1; r < grid.length; r++) {
+    var pn = cellStr_(grid[r], idx, '품번');
+    if (!pn) continue;
+    out.push({
+      '브랜드': brand, '시즌': season, '품번': pn, '컬러코드': cellStr_(grid[r], idx, '컬러코드'),
+      '채널': cellStr_(grid[r], idx, '채널'),
+      '사입가': cellNum_(grid[r], idx, '사입가'), '기타비용': cellNum_(grid[r], idx, '기타비용'),
+      'KC비용': cellNum_(grid[r], idx, 'KC비용'), '공급가': cellNum_(grid[r], idx, '공급가'),
+      '물류비율': cellNum_(grid[r], idx, '물류비율'), '프로모션율': cellNum_(grid[r], idx, '프로모션율'),
+      '로열티율': cellNum_(grid[r], idx, '로열티율'), 'ON판매가': cellNum_(grid[r], idx, 'ON판매가'),
+      '인라인수량': cellNum_(grid[r], idx, '인라인수량'), '온라인수량': cellNum_(grid[r], idx, '온라인수량')
+    });
+  }
+  return out;
+}
+
+function parseNego_(grid, brand, season) {
+  if (grid.length < 2) return [];
+  var idx = headerIndex_(grid[0]);
+  var out = [];
+  for (var r = 1; r < grid.length; r++) {
+    var pn = cellStr_(grid[r], idx, '품번');
+    if (!pn) continue;
+    out.push({
+      '브랜드': brand, '시즌': season, '품번': pn, '컬러코드': cellStr_(grid[r], idx, '컬러코드'),
+      '견적가': cellNum_(grid[r], idx, '견적가_네고전'), '확정원가': cellNum_(grid[r], idx, '확정원가_FIX'),
+      '확정일': cellStr_(grid[r], idx, '확정일'), '비고': cellStr_(grid[r], idx, '비고')
+    });
+  }
+  return out;
+}
+
+function stampAndAppend_(verKey, parsed, sizes, channel, nego) {
+  function stamp(rows) {
+    for (var i = 0; i < rows.length; i++) rows[i]['버전키'] = verKey;
+    return rows;
+  }
+  appendRows_('core', stamp(parsed));
+  appendRows_('size', stamp(sizes));
+  appendRows_('channel', stamp(channel));
+  appendRows_('nego', stamp(nego));
+}
+
+function nextVersion_(brand, season) {
+  var versions = readRows_('versions');
+  var max = 0;
+  for (var i = 0; i < versions.length; i++) {
+    if (versions[i]['브랜드'] === brand && versions[i]['시즌'] === season) {
+      var n = Number(versions[i]['버전번호']);
+      if (n > max) max = n;
+    }
+  }
+  return max + 1;
+}
+
+
+/** 업로드 검증 — error(차단) / warn(경고) */
+
+function validateAll_(parsed, sizes, brand, season) {
+  var issues = [];
+  var dict = getDict_();
+  var styleRe = new RegExp(STYLE_RE_STR);
+
+  if (!parsed.length) {
+    issues.push({ level: 'error', where: '코어', msg: '데이터 행이 없습니다.' });
+    return issues;
+  }
+
+  // 1) SKU 중복
+  var seen = {};
+  for (var i = 0; i < parsed.length; i++) {
+    var sku = parsed[i]['SKU'];
+    if (seen[sku]) issues.push({ level: 'error', where: '코어', msg: 'SKU 중복: ' + sku });
+    seen[sku] = true;
+  }
+
+  // 2) 품번 규칙 + 브랜드 일치
+  for (var r = 0; r < parsed.length; r++) {
+    var p = parsed[r];
+    if (!styleRe.test(p['품번'])) issues.push({ level: 'error', where: '코어', msg: '품번 규칙 위반: ' + p['품번'] + ' (브랜드2+연도2+시즌1+복종1+소복종2+넘버링2)' });
+    else if (p['품번'].substring(0, 2) !== brand) issues.push({ level: 'error', where: '코어', msg: '품번의 브랜드(' + p['품번'].substring(0, 2) + ')가 선택한 브랜드(' + brand + ')와 다릅니다: ' + p['품번'] });
+    if (!p['컬러코드']) issues.push({ level: 'error', where: '코어', msg: '컬러코드 누락: ' + p['품번'] });
+    if (!(p['발주수량'] > 0)) issues.push({ level: 'error', where: '코어', msg: '발주수량이 0 이하: ' + p['SKU'] });
+    if (!(p['원가'] > 0)) issues.push({ level: 'warn', where: '코어', msg: '원가 미입력: ' + p['SKU'] });
+    if (!(p['예상판매가'] > 0)) issues.push({ level: 'warn', where: '코어', msg: '예상판매가 미입력: ' + p['SKU'] });
+    if (!p['생산처']) issues.push({ level: 'warn', where: '코어', msg: '생산처 미입력: ' + p['SKU'] });
+    if (!p['입고예정월']) issues.push({ level: 'warn', where: '코어', msg: '입고예정월 미입력: ' + p['SKU'] });
+  }
+
+  // 3) 코드사전 대조
+  function checkDict(field, dictType) {
+    var bad = {};
+    for (var i = 0; i < parsed.length; i++) {
+      var v = parsed[i][field];
+      if (!v) continue;
+      if (!normalizeCode_(dictType, v).matched) bad[v] = (bad[v] || 0) + 1;
+    }
+    var ks = Object.keys(bad);
+    for (var k = 0; k < ks.length; k++) {
+      issues.push({ level: 'warn', where: '코어', msg: '코드사전에 없는 ' + dictType + ': "' + ks[k] + '" (' + bad[ks[k]] + '행) — 사전 등록 후 재업로드 권장' });
+    }
+  }
+  checkDict('생산처', '생산처');
+  checkDict('생산방식', '생산방식');
+  checkDict('원산지', '원산지');
+  checkDict('카테고리', '카테고리');
+  checkDict('아이템', '아이템');
+  checkDict('진행상태', '진행상태');
+  checkDict('컬러코드', '컬러');
+
+  // 4) 사이즈 합계 = 발주수량 대사
+  var sizeSum = {};
+  for (var s = 0; s < sizes.length; s++) {
+    var key = sizes[s]['SKU'];
+    sizeSum[key] = (sizeSum[key] || 0) + sizes[s]['수량'];
+  }
+  for (var c = 0; c < parsed.length; c++) {
+    var pc = parsed[c];
+    var sum = sizeSum[pc['SKU']] || 0;
+    if (sum !== pc['발주수량']) {
+      issues.push({ level: 'error', where: '사이즈', msg: '사이즈 합계 불일치: ' + pc['SKU'] + ' 발주 ' + pc['발주수량'] + ' vs 사이즈합 ' + sum });
+    }
+  }
+  // 사이즈 시트에만 있는 SKU
+  var coreSet = {};
+  for (var m = 0; m < parsed.length; m++) coreSet[parsed[m]['SKU']] = true;
+  var orphan = {};
+  for (var z = 0; z < sizes.length; z++) {
+    if (!coreSet[sizes[z]['SKU']]) orphan[sizes[z]['SKU']] = true;
+  }
+  var oks = Object.keys(orphan);
+  for (var o = 0; o < oks.length; o++) {
+    issues.push({ level: 'error', where: '사이즈', msg: '코어에 없는 SKU가 사이즈 시트에 있습니다: ' + oks[o] });
+  }
+  return issues;
+}
+
+
+/** 버전 diff — 이전 최신 버전 대비 신규/삭제/변경 감지 */
+
+var DIFF_FIELDS = ['발주수량', '원가', '예상판매가', '목표납기', '입고예정월', '생산처', '진행상태'];
+
+function latestVersionKey_(brand, season) {
+  var versions = readRows_('versions');
+  var best = null;
+  for (var i = 0; i < versions.length; i++) {
+    var v = versions[i];
+    if (v['브랜드'] === brand && v['시즌'] === season) {
+      if (!best || Number(v['버전번호']) > Number(best['버전번호'])) best = v;
+    }
+  }
+  return best ? String(best['버전키']) : null;
+}
+
+function diffAgainstPrevious_(brand, season, parsed) {
+  var prevKey = latestVersionKey_(brand, season);
+  var diff = { isFirst: !prevKey, added: [], removed: [], changed: [], prevKey: prevKey };
+  if (!prevKey) return diff;
+
+  var core = readRows_('core');
+  var prev = {};
+  for (var i = 0; i < core.length; i++) {
+    if (String(core[i]['버전키']) === prevKey) prev[String(core[i]['SKU'])] = core[i];
+  }
+  var cur = {};
+  for (var j = 0; j < parsed.length; j++) cur[parsed[j]['SKU']] = parsed[j];
+
+  var curKeys = Object.keys(cur);
+  for (var a = 0; a < curKeys.length; a++) {
+    var sku = curKeys[a];
+    if (!prev[sku]) { diff.added.push(sku); continue; }
+    for (var f = 0; f < DIFF_FIELDS.length; f++) {
+      var field = DIFF_FIELDS[f];
+      var oldV = normVal_(prev[sku][field]);
+      var newV = normVal_(cur[sku][field]);
+      if (oldV !== newV) diff.changed.push({ sku: sku, field: field, oldV: oldV, newV: newV });
+    }
+  }
+  var prevKeys = Object.keys(prev);
+  for (var b = 0; b < prevKeys.length; b++) {
+    if (!cur[prevKeys[b]]) diff.removed.push(prevKeys[b]);
+  }
+  return diff;
+}
+
+function normVal_(v) {
+  if (v === null || v === undefined) return '';
+  if (v instanceof Date) return Utilities.formatDate(v, 'Asia/Seoul', 'yyyy-MM-dd');
+  var n = Number(v);
+  if (!isNaN(n) && String(v).trim() !== '') return String(n);
+  return String(v).trim();
+}
+
+function logChanges_(verKey, brand, season, diff) {
+  var rows = [];
+  var now = nowStr_();
+  function push(type, sku, field, oldV, newV) {
+    rows.push({ '버전키': verKey, '브랜드': brand, '시즌': season, '변경유형': type, 'SKU': sku, '항목': field, '이전값': oldV, '새값': newV, '기록일시': now });
+  }
+  for (var i = 0; i < diff.added.length; i++) push('신규', diff.added[i], '', '', '');
+  for (var j = 0; j < diff.removed.length; j++) push('삭제', diff.removed[j], '', '', '');
+  for (var k = 0; k < diff.changed.length; k++) {
+    var c = diff.changed[k];
+    push('변경', c.sku, c.field, c.oldV, c.newV);
+  }
+  if (diff.isFirst) push('최초적재', '(전체)', '', '', '');
+  appendRows_('changes', rows);
+}
+
+/** 버전별 월별 매입 집계 — 그래프 버전 비교용 */
+function getMonthlyVersions(brand, season) {
+  return cached_('mv_' + brand + '_' + season, function () {
+    var versions = readRows_('versions').filter(function (v) {
+      return String(v['브랜드']) === String(brand) && String(v['시즌']) === String(season);
+    });
+    versions.sort(function (a, b) { return Number(a['버전번호']) - Number(b['버전번호']); });
+    var core = readRows_('core');
+    var byVer = {};
+    for (var i = 0; i < core.length; i++) {
+      var r = core[i];
+      if (String(r['브랜드']) !== String(brand) || String(r['시즌']) !== String(season)) continue;
+      var vk = String(r['버전키']);
+      if (!byVer[vk]) byVer[vk] = { byMonth: {}, tot: 0 };
+      var q = Number(r['발주수량']) || 0;
+      var cost = (Number(r['원가']) || 0) * q;
+      var mon = String(r['입고예정월'] || '(미정)');
+      var md = mon.match(/^(\d{4})-(\d{2})/);
+      if (md) mon = md[1] + '-' + md[2];
+      byVer[vk].byMonth[mon] = (byVer[vk].byMonth[mon] || 0) + cost;
+      byVer[vk].tot += cost;
+    }
+    var out = [];
+    for (var j = 0; j < versions.length; j++) {
+      var vk2 = String(versions[j]['버전키']);
+      out.push({ verKey: vk2, verNo: Number(versions[j]['버전번호']),
+                 byMonth: (byVer[vk2] || {}).byMonth || {}, tot: (byVer[vk2] || {}).tot || 0 });
+    }
+    return { versions: out };
+  });
+}
+
+/** RAW 조회 — 최신 버전 코어 전체 (조회 탭) */
+function getRawView(brand, season) {
+  return cached_('raw_' + brand + '_' + season, function () {
+    var key = latestVersionKey_(brand, season);
+    if (!key) return { exists: false };
+    var core = readRows_('core');
+    var out = [];
+    var FIELDS = ['품번', '컬러코드', '컬러명', '상품명', '카테고리', '아이템', '생산처', '생산방식', '원산지', '목표납기', '입고예정월', '발주수량', '원가', '예상판매가', '진행상태', '비고'];
+    for (var i = 0; i < core.length; i++) {
+      if (String(core[i]['버전키']) !== key) continue;
+      var row = [];
+      for (var f = 0; f < FIELDS.length; f++) {
+        var v = core[i][FIELDS[f]];
+        if (FIELDS[f] === '입고예정월') {
+          var md = String(v).match(/^(\d{4})-(\d{2})/);
+          if (md) v = md[1] + '-' + md[2];
+        }
+        if (FIELDS[f] === '목표납기') {
+          var dd = String(v).match(/^(\d{4}-\d{2}-\d{2})/);
+          if (dd) v = dd[1];
+        }
+        row.push(v === null || v === undefined ? '' : v);
+      }
+      out.push(row);
+    }
+    return { exists: true, verKey: key, cols: FIELDS, rows: out };
+  });
+}
+
+/** 특정 브랜드×시즌 최신 버전의 요약 (발주계획·예상매입 미리보기) */
+function getSeasonSummary(brand, season) {
+  return cached_('sum_' + brand + '_' + season, function () { return getSeasonSummary_(brand, season); });
+}
+
+function getSeasonSummary_(brand, season) {
+  var key = latestVersionKey_(brand, season);
+  if (!key) return { exists: false };
+  var core = readRows_('core');
+  var rows = [];
+  for (var i = 0; i < core.length; i++) {
+    if (String(core[i]['버전키']) === key) rows.push(core[i]);
+  }
+  var byVendorMonth = {};
+  var byMonth = {};
+  var byItem = {};
+  var byVendor = {};
+  var totQty = 0, totCost = 0, totRp = 0;
+  for (var r = 0; r < rows.length; r++) {
+    var q = Number(rows[r]['발주수량']) || 0;
+    var cost = (Number(rows[r]['원가']) || 0) * q;
+    var rp = (Number(rows[r]['예상판매가']) || 0) * q;
+    totQty += q; totCost += cost; totRp += rp;
+    var mon = String(rows[r]['입고예정월'] || '(미정)');
+    var md = mon.match(/^(\d{4})-(\d{2})/);
+    if (md) mon = md[1] + '-' + md[2];
+    var ven = String(rows[r]['생산처'] || '(미정)');
+    var item = String(rows[r]['아이템'] || '(미분류)');
+    byMonth[mon] = (byMonth[mon] || 0) + cost;
+    byItem[item] = (byItem[item] || 0) + cost;
+    byVendor[ven] = (byVendor[ven] || 0) + cost;
+    var vk = ven + '|' + mon;
+    byVendorMonth[vk] = (byVendorMonth[vk] || 0) + cost;
+  }
+  return { exists: true, verKey: key, skuCount: rows.length, totQty: totQty, totCost: totCost, totRp: totRp,
+           byMonth: byMonth, byVendorMonth: byVendorMonth, byItem: byItem, byVendor: byVendor };
+}
+
+
+/** 변경관리 — 버전 diff에 사유를 달아 관리하는 워크플로
+ * 사유 대상: 변경유형이 신규/삭제/변경인 행. '최초적재'는 제외.
+ * 자금 대시보드의 Claude_변경기록(사유·담당·등록일시·상태) 규약과 동일 사상.
+ */
+
+function getChangeManager() {
+  return cached_('chmgr', function () {
+    var rows = readRows_('changes');
+    var out = [];
+    var pending = 0;
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var type = String(r['변경유형']);
+      if (type === '최초적재') continue;
+      var reason = String(r['사유'] || '');
+      if (!reason) pending++;
+      out.push({
+        verKey: String(r['버전키']), brand: String(r['브랜드']), season: String(r['시즌']),
+        type: type, sku: String(r['SKU']), field: String(r['항목']),
+        oldV: String(r['이전값']), newV: String(r['새값']), at: String(r['기록일시']),
+        reason: reason, reasonBy: String(r['입력자'] || ''), reasonAt: String(r['입력일시'] || '')
+      });
+    }
+    out.reverse(); // 최신 먼저
+    return { rows: out, pendingCount: pending };
+  });
+}
+
+/** payload: { items: [{verKey, sku, field, type}], reason }  — 선택 건 일괄 사유 입력 */
+function saveChangeReasons(payload) {
+  return apiWrap_(function () {
+    var reason = String(payload.reason || '').trim();
+    if (!reason) throw new Error('사유를 입력해 주세요.');
+    var items = payload.items || [];
+    if (!items.length) throw new Error('사유를 달 변경 건을 선택해 주세요.');
+    var want = {};
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      want[String(it.verKey) + '|' + String(it.sku) + '|' + String(it.field) + '|' + String(it.type)] = true;
+    }
+    var spec = LSHUB.SHEETS.changes;
+    var sh = getStore_().getSheetByName(spec.name);
+    var last = sh.getLastRow();
+    if (last < 2) return { updated: 0 };
+    var vals = sh.getRange(2, 1, last - 1, spec.headers.length).getValues();
+    var who = actorEmail_();
+    var now = nowStr_();
+    var updated = 0;
+    for (var r = 0; r < vals.length; r++) {
+      var key = String(vals[r][0]) + '|' + String(vals[r][4]) + '|' + String(vals[r][5]) + '|' + String(vals[r][3]);
+      if (want[key]) {
+        vals[r][9] = reason;
+        vals[r][10] = who;
+        vals[r][11] = now;
+        updated++;
+      }
+    }
+    if (updated) sh.getRange(2, 1, vals.length, spec.headers.length).setValues(vals);
+    delete READ_MEMO_['changes'];
+    bumpCacheVer_();
+    return { updated: updated };
+  });
+}
+
+function invalidateReadMemo_() {} // (뼈대 단계: 캐시 없음 — ONE CLOSE 패턴 자리)
+
+
+/** 피벗 실체화 — 연동 기준점.
+ * 스토어 시트의 피벗_월별매입 / 피벗_생산처 / 피벗_아이템 3장을 최신 버전 기준으로 재집계.
+ * 자금 대시보드(생산대금_상세: 본부×업체×입고월×금액)·ONE CLOSE 발주계획이 이 시트를 읽는다.
+ * 업로드 성공 시 자동 재집계 + 피벗 탭에서 수동 재집계 가능.
+ */
+
+var PIVOT_TS_PROP = 'LSHUB_PIVOT_TS';
+
+function rebuildPivots() {
+  return apiWrap_(function () { return rebuildPivots_(); });
+}
+
+function rebuildPivots_() {
+  var versions = readRows_('versions');
+  var latest = {};
+  for (var i = 0; i < versions.length; i++) {
+    var v = versions[i];
+    var key = v['브랜드'] + '|' + v['시즌'];
+    if (!latest[key] || Number(v['버전번호']) > Number(latest[key]['버전번호'])) latest[key] = v;
+  }
+  var latestKeys = {};
+  var lk = Object.keys(latest);
+  for (var j = 0; j < lk.length; j++) latestKeys[String(latest[lk[j]]['버전키'])] = true;
+
+  var core = readRows_('core');
+  var mMonth = {}, mVendor = {}, mItem = {};
+  for (var r = 0; r < core.length; r++) {
+    var row = core[r];
+    var vk = String(row['버전키']);
+    if (!latestKeys[vk]) continue;
+    var brand = String(row['브랜드']), season = String(row['시즌']);
+    var q = Number(row['발주수량']) || 0;
+    var cost = (Number(row['원가']) || 0) * q;
+    var rp = (Number(row['예상판매가']) || 0) * q;
+    var mon = String(row['입고예정월'] || '(미정)');
+    var md = mon.match(/^(\d{4})-(\d{2})/);
+    if (md) mon = md[1] + '-' + md[2];
+    var ven = String(row['생산처'] || '(미정)');
+    var item = String(row['아이템'] || '(미분류)');
+
+    var k1 = [brand, season, vk, mon].join('|');
+    if (!mMonth[k1]) mMonth[k1] = [brand, season, vk, mon, 0, 0, 0, 0];
+    mMonth[k1][4]++; mMonth[k1][5] += q; mMonth[k1][6] += cost; mMonth[k1][7] += rp;
+
+    var k2 = [brand, season, vk, ven, mon].join('|');
+    if (!mVendor[k2]) mVendor[k2] = [brand, season, vk, ven, mon, 0, 0];
+    mVendor[k2][5] += q; mVendor[k2][6] += cost;
+
+    var k3 = [brand, season, vk, item].join('|');
+    if (!mItem[k3]) mItem[k3] = [brand, season, vk, item, 0, 0, 0, 0];
+    mItem[k3][4]++; mItem[k3][5] += q; mItem[k3][6] += cost; mItem[k3][7] += rp;
+  }
+
+  function writePivot(sheetKey, map) {
+    var spec = LSHUB.SHEETS[sheetKey];
+    var sh = getStore_().getSheetByName(spec.name);
+    var keys = Object.keys(map).sort();
+    var data = [];
+    for (var i = 0; i < keys.length; i++) data.push(map[keys[i]]);
+    var last = sh.getLastRow();
+    if (last > 1) sh.getRange(2, 1, last - 1, spec.headers.length).clearContent();
+    if (data.length) sh.getRange(2, 1, data.length, spec.headers.length).setValues(data);
+    return data.length;
+  }
+
+  var n1 = writePivot('pivotMonth', mMonth);
+  var n2 = writePivot('pivotVendor', mVendor);
+  var n3 = writePivot('pivotItem', mItem);
+  var ts = nowStr_();
+  PropertiesService.getScriptProperties().setProperty(PIVOT_TS_PROP, ts);
+  bumpCacheVer_();
+  return { month: n1, vendor: n2, item: n3, updatedAt: ts };
+}
+
+function getPivots() {
+  return cached_('pivots', function () {
+    return {
+      month: readRows_('pivotMonth'),
+      vendor: readRows_('pivotVendor'),
+      item: readRows_('pivotItem'),
+      updatedAt: PropertiesService.getScriptProperties().getProperty(PIVOT_TS_PROP) || '(아직 집계 전)'
+    };
+  });
+}
+
+
+/** 상품 이미지 — Drive 폴더 + SKU 파일명 매칭
+ * 규칙: 이미지 루트폴더/시즌/SKU.jpg (예: 26SS/HR261OZU02BLK.jpg). 품번.jpg면 전 컬러 공통.
+ * 웹앱 표시는 서버에서 bytes → base64 데이터URI로 서빙 (thumbnail authuser 403 함정 회피)
+ */
+
+function setImageRoot(folderId) {
+  return apiWrap_(function () {
+    var id = String(folderId || '').trim();
+    if (!id) throw new Error('폴더 ID가 비어 있습니다.');
+    DriveApp.getFolderById(id).getName(); // 접근 검증
+    PropertiesService.getScriptProperties().setProperty(LSHUB.IMGROOT_PROP, id);
+    return { saved: true };
+  });
+}
+
+var LSHUB_DEFAULT_IMG_ROOT = ''; // 라인시트 이미지 (lej 드라이브)
+
+function findSeasonFolder_(season) {
+  var rootId = PropertiesService.getScriptProperties().getProperty(LSHUB.IMGROOT_PROP) || LSHUB_DEFAULT_IMG_ROOT;
+  if (!rootId) return null;
+  var root = DriveApp.getFolderById(rootId);
+  var it = root.getFoldersByName(season);
+  return it.hasNext() ? it.next() : root;
+}
+
+/** 시즌 폴더의 이미지 파일명 인덱스 (SKU/품번 → fileId) */
+function getImageIndex(season) {
+  var ck = 'imgidx_v' + cacheVer_() + '_' + season;
+  var c = CacheService.getScriptCache();
+  var hit = null;
+  try { hit = c.get(ck); } catch (e) {}
+  if (hit) return JSON.parse(hit);
+  var res = buildImageIndex_(season);
+  try { c.put(ck, JSON.stringify(res), 21600); } catch (e) {}
+  return res;
+}
+
+function buildImageIndex_(season) {
+  var folder = findSeasonFolder_(season);
+  if (!folder) return { configured: false, map: {} };
+  var map = {};
+  var files = folder.getFiles();
+  var n = 0;
+  while (files.hasNext() && n < 3000) {
+    var f = files.next();
+    var name = f.getName();
+    var m = name.match(/^([A-Z0-9]+)\.(jpg|jpeg|png|webp)$/i);
+    if (m) map[m[1].toUpperCase()] = f.getId();
+    n++;
+  }
+  return { configured: true, folderName: folder.getName(), count: Object.keys(map).length, map: map };
+}
+
+/** 단건 이미지 서빙 — 데이터 URI. full=true면 원본(3MB 이하), 아니면 썸네일 */
+function getImageData(fileId, full) {
+  return apiWrap_(function () {
+    var f = DriveApp.getFileById(String(fileId));
+    var blob = f.getBlob();
+    if (full && blob.getBytes().length <= 3 * 1024 * 1024) {
+      // 원본 서빙
+    } else {
+      var th = f.getThumbnail();
+      if (th) blob = th;
+    }
+    return 'data:' + blob.getContentType() + ';base64,' + Utilities.base64Encode(blob.getBytes());
+  });
+}
+
+/** 갤러리 — 최신 버전 품번 목록 + 이미지 파일 인덱스 */
+function getGallery(brand, season) {
+  return cached_('gal_' + brand + '_' + season, function () {
+    var sum = getSeasonSummary_(brand, season);
+    if (!sum.exists) return { exists: false };
+    var core = readRows_('core');
+    var styles = {};
+    var order = [];
+    for (var i = 0; i < core.length; i++) {
+      var row = core[i];
+      if (String(row['버전키']) !== sum.verKey) continue;
+      var pn = String(row['품번']);
+      if (!styles[pn]) {
+        styles[pn] = { pn: pn, name: String(row['상품명']), item: String(row['아이템']), colors: [], qty: 0, cost: 0, rp: 0 };
+        order.push(pn);
+      }
+      var q = Number(row['발주수량']) || 0;
+      styles[pn].colors.push(String(row['컬러코드']));
+      styles[pn].qty += q;
+      styles[pn].cost += q * (Number(row['원가']) || 0);
+      styles[pn].rp += q * (Number(row['예상판매가']) || 0);
+    }
+    var idx = getImageIndex(season);
+    var list = [];
+    for (var j = 0; j < order.length; j++) {
+      var st = styles[order[j]];
+      st.fileId = idx.map[st.pn] || '';
+      list.push(st);
+    }
+    list.sort(function (a, b) { return b.cost - a.cost; });
+    return { exists: true, verKey: sum.verKey, styles: list, imgCount: idx.count || 0 };
+  });
+}
+
+/** 품번 상세 — 컬러별 수량·단가 + 생산 정보 + 사이즈 분포 (라이트박스용) */
+function getStyleDetail(brand, season, pn) {
+  return cached_('det_' + brand + '_' + season + '_' + pn, function () {
+    var sum = getSeasonSummary_(brand, season);
+    if (!sum.exists) return { exists: false };
+    var core = readRows_('core');
+    var colors = [];
+    var meta = null;
+    var totQty = 0, totCost = 0, totRp = 0;
+    for (var i = 0; i < core.length; i++) {
+      var r = core[i];
+      if (String(r['버전키']) !== sum.verKey || String(r['품번']) !== String(pn)) continue;
+      var q = Number(r['발주수량']) || 0;
+      var c = Number(r['원가']) || 0;
+      var p = Number(r['예상판매가']) || 0;
+      totQty += q; totCost += q * c; totRp += q * p;
+      colors.push({ cc: String(r['컬러코드']), cname: String(r['컬러명']), qty: q, cost: c, rp: p, status: String(r['진행상태']) });
+      if (!meta) {
+        meta = { name: String(r['상품명']), cat: String(r['카테고리']), item: String(r['아이템']),
+                 vendor: String(r['생산처']), method: String(r['생산방식']), origin: String(r['원산지']),
+                 material: String(r['소재']), due: String(r['목표납기']), ym: String(r['입고예정월']), note: String(r['비고']) };
+      }
+    }
+    if (!meta) return { exists: false };
+    var md = meta.ym.match(/^(\d{4})-(\d{2})/);
+    if (md) meta.ym = md[1] + '-' + md[2];
+    var dd = meta.due.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (dd) meta.due = dd[1];
+    var sizeRows = readRows_('size');
+    var sizes = {};
+    var sizeOrder = [];
+    for (var s = 0; s < sizeRows.length; s++) {
+      var sr = sizeRows[s];
+      if (String(sr['버전키']) !== sum.verKey || String(sr['품번']) !== String(pn)) continue;
+      var sname = String(sr['사이즈']);
+      if (sizes[sname] === undefined) { sizes[sname] = 0; sizeOrder.push(sname); }
+      sizes[sname] += Number(sr['수량']) || 0;
+    }
+    var sizeList = [];
+    for (var z = 0; z < sizeOrder.length; z++) sizeList.push({ size: sizeOrder[z], qty: sizes[sizeOrder[z]] });
+    return { exists: true, pn: String(pn), meta: meta, colors: colors, sizes: sizeList,
+             totQty: totQty, totCost: totCost, totRp: totRp,
+             mup: totCost > 0 ? Math.round(totRp / totCost * 100) / 100 : 0 };
+  });
+}
+
+/** 웹앱에서 개별 업로드 (누락 보충용) — payload: {season, sku, fileBase64, mime} */
+function uploadImage(payload) {
+  var season = String(payload.season || '').trim();
+  var sku = String(payload.sku || '').trim().toUpperCase();
+  if (!season || !sku) throw new Error('시즌과 SKU가 필요합니다.');
+  if (!payload.fileBase64) throw new Error('이미지가 전송되지 않았습니다.');
+  var folder = findSeasonFolder_(season);
+  if (!folder) throw new Error('이미지 루트 폴더가 설정되지 않았습니다. 관리 탭에서 폴더 ID를 등록하세요.');
+  var ext = (String(payload.mime || 'image/jpeg').indexOf('png') >= 0) ? 'png' : 'jpg';
+  var blob = Utilities.newBlob(Utilities.base64Decode(payload.fileBase64), String(payload.mime || 'image/jpeg'), sku + '.' + ext);
+  // 같은 이름 기존 파일은 버전 보존 위해 이름 변경
+  var it = folder.getFilesByName(sku + '.' + ext);
+  while (it.hasNext()) {
+    var old = it.next();
+    old.setName(sku + '_old_' + Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyyMMddHHmmss') + '.' + ext);
+  }
+  var f = folder.createFile(blob);
+  return { ok: true, fileId: f.getId() };
+}
+
+
+/** 적재본 엑셀 내보내기 — 최신 버전의 코어+사이즈를 임시 시트로 만들어 xlsx로 변환 */
+
+function exportSeasonXlsx(brand, season) {
+  return apiWrap_(function () {
+    var key = latestVersionKey_(brand, season);
+    if (!key) throw new Error('내보낼 데이터가 없습니다.');
+    var core = readRows_('core').filter(function (r) { return String(r['버전키']) === key; });
+    var sizes = readRows_('size').filter(function (r) { return String(r['버전키']) === key; });
+    if (!core.length) throw new Error('코어 데이터가 비어 있습니다.');
+
+    var ss = SpreadsheetApp.create('[내보내기] ' + key);
+    try {
+      var coreCols = ['브랜드', '시즌', '품번', '컬러코드', '컬러명', 'SKU', '상품명', '카테고리', '아이템', '소복종', '성별', '라인',
+                      '생산처', '생산방식', '원산지', '소재', 'PO차수', '목표납기', '입고예정월', '발주수량', '원가', '예상판매가', '진행상태', '담당MD', '비고'];
+      var sh1 = ss.getSheets()[0];
+      sh1.setName('코어');
+      var data1 = [coreCols];
+      for (var i = 0; i < core.length; i++) {
+        var row = [];
+        for (var c = 0; c < coreCols.length; c++) row.push(core[i][coreCols[c]] !== undefined ? core[i][coreCols[c]] : '');
+        data1.push(row);
+      }
+      sh1.getRange(1, 1, data1.length, coreCols.length).setValues(data1);
+      sh1.setFrozenRows(1);
+
+      var sizeCols = ['품번', '컬러코드', 'SKU', '사이즈', '수량', '바코드'];
+      var sh2 = ss.insertSheet('사이즈');
+      var data2 = [sizeCols];
+      for (var j = 0; j < sizes.length; j++) {
+        var row2 = [];
+        for (var c2 = 0; c2 < sizeCols.length; c2++) row2.push(sizes[j][sizeCols[c2]] !== undefined ? sizes[j][sizeCols[c2]] : '');
+        data2.push(row2);
+      }
+      sh2.getRange(1, 1, data2.length, sizeCols.length).setValues(data2);
+      sh2.setFrozenRows(1);
+      SpreadsheetApp.flush();
+
+      var url = 'https://docs.google.com/spreadsheets/d/' + ss.getId() + '/export?format=xlsx';
+      var resp = UrlFetchApp.fetch(url, { headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() } });
+      var b64 = Utilities.base64Encode(resp.getBlob().getBytes());
+      return { fileName: '라인시트_' + key + '.xlsx', base64: b64 };
+    } finally {
+      try { Drive.Files.remove(ss.getId()); } catch (e) {}
+    }
+  });
+}
+
+
+/** 통일양식 v1 임베드 (base64) — 다운로드용. build: 2026-08-19 */
+var HUB_TEMPLATE_B64 = '';
+
+function getHubTemplate() {
+  return apiWrap_(function () {
+    return { fileName: '라인시트_통일양식_v1.xlsx', base64: HUB_TEMPLATE_B64 };
+  });
+}
+
+var __BOOKS=[["HR", "26FW", {"코어": [["품번", "컬러코드", "컬러명", "상품명", "카테고리", "아이템", "소복종", "성별", "라인", "생산처", "생산방식", "원산지", "소재", "PO차수", "목표납기", "입고예정월", "발주수량", "원가", "예상판매가", "진행상태", "담당MD", "비고"], ["HR262OJK01", "BEI", "베이지", "자켓 1", "APP", "OUTER", "", "공용", "베이직", "가상봉제B", "완사입", "한국", "면 100%", "1", "2026-11-15", "2026-11", 300, 19000, 57000, "확정", "MD-데모", ""], ["HR262OJK01", "IVY", "아이보리", "자켓 1", "APP", "OUTER", "", "남", "베이직", "가상봉제A", "임가공", "베트남", "면 100%", "1", "2026-11-15", "2026-11", 300, 31000, 93000, "확정", "MD-데모", ""], ["HR262OPT02", "WHT", "화이트", "팬츠 2", "APP", "BOTTOM", "", "공용", "베이직", "가상봉제A", "임가공", "베트남", "면 100%", "1", "2026-11-15", "2026-11", 360, 38000, 114000, "확정", "MD-데모", ""], ["HR262OPT02", "BLK", "블랙", "팬츠 2", "APP", "BOTTOM", "", "공용", "베이직", "가상봉제A", "완사입", "중국", "면 100%", "1", "2026-09-15", "2026-09", 360, 31000, 93000, "확정", "MD-데모", ""], ["HR262OSW03", "BLK", "블랙", "니트 3", "APP", "TOP", "", "여", "베이직", "가상무역C", "임가공", "한국", "면 100%", "1", "2026-09-15", "2026-09", 180, 24000, 72000, "확정", "MD-데모", ""], ["HR262OSW03", "WHT", "화이트", "니트 3", "APP", "TOP", "", "공용", "베이직", "가상무역C", "임가공", "중국", "면 100%", "1", "2026-09-15", "2026-09", 180, 24000, 72000, "확정", "MD-데모", ""], ["HR262OSH04", "CHC", "차콜", "셔츠 4", "APP", "TOP", "", "여", "베이직", "가상봉제A", "임가공", "베트남", "면 100%", "1", "2026-10-15", "2026-10", 300, 31000, 93000, "확정", "MD-데모", ""], ["HR262OSH04", "BLK", "블랙", "셔츠 4", "APP", "TOP", "", "남", "베이직", "가상봉제A", "완사입", "베트남", "면 100%", "1", "2026-10-15", "2026-10", 180, 24000, 72000, "확정", "MD-데모", ""], ["HR262OTS05", "BLK", "블랙", "티셔츠 5", "APP", "TOP", "", "공용", "베이직", "가상봉제A", "완사입", "중국", "면 100%", "1", "2026-09-15", "2026-09", 300, 9000, 27000, "확정", "MD-데모", ""], ["HR262OTS05", "NVY", "네이비", "티셔츠 5", "APP", "TOP", "", "공용", "베이직", "가상니트D", "임가공", "중국", "면 100%", "1", "2026-10-15", "2026-10", 120, 19000, 57000, "확정", "MD-데모", ""], ["HR262OSK06", "IVY", "아이보리", "스커트 6", "APP", "BOTTOM", "", "여", "베이직", "가상무역C", "완사입", "베트남", "면 100%", "1", "2026-09-15", "2026-09", 240, 15000, 45000, "확정", "MD-데모", ""], ["HR262OSK06", "WHT", "화이트", "스커트 6", "APP", "BOTTOM", "", "공용", "베이직", "가상봉제A", "완사입", "중국", "면 100%", "1", "2026-09-15", "2026-09", 120, 12000, 36000, "확정", "MD-데모", ""], ["HR262OOP07", "BEI", "베이지", "원피스 7", "APP", "ONEPIECE", "", "남", "베이직", "가상니트D", "완사입", "한국", "면 100%", "1", "2026-11-15", "2026-11", 180, 31000, 93000, "확정", "MD-데모", ""], ["HR262OOP07", "CHC", "차콜", "원피스 7", "APP", "ONEPIECE", "", "여", "베이직", "가상봉제A", "임가공", "베트남", "면 100%", "1", "2026-11-15", "2026-11", 180, 19000, 57000, "확정", "MD-데모", ""], ["HR262OVT08", "WHT", "화이트", "베스트 8", "APP", "VEST", "", "여", "베이직", "가상봉제A", "완사입", "중국", "면 100%", "1", "2026-11-15", "2026-11", 240, 38000, 114000, "확정", "MD-데모", ""], ["HR262OVT08", "BLK", "블랙", "베스트 8", "APP", "VEST", "", "공용", "베이직", "가상봉제A", "완사입", "중국", "면 100%", "1", "2026-11-15", "2026-11", 300, 38000, 114000, "확정", "MD-데모", ""]], "사이즈": [["품번", "컬러코드", "사이즈", "수량", "바코드"], ["HR262OJK01", "BEI", "90", 75, ""], ["HR262OJK01", "BEI", "95", 105, ""], ["HR262OJK01", "BEI", "100", 75, ""], ["HR262OJK01", "BEI", "105", 45, ""], ["HR262OJK01", "IVY", "90", 75, ""], ["HR262OJK01", "IVY", "95", 105, ""], ["HR262OJK01", "IVY", "100", 75, ""], ["HR262OJK01", "IVY", "105", 45, ""], ["HR262OPT02", "WHT", "90", 90, ""], ["HR262OPT02", "WHT", "95", 125, ""], ["HR262OPT02", "WHT", "100", 90, ""], ["HR262OPT02", "WHT", "105", 55, ""], ["HR262OPT02", "BLK", "90", 90, ""], ["HR262OPT02", "BLK", "95", 125, ""], ["HR262OPT02", "BLK", "100", 90, ""], ["HR262OPT02", "BLK", "105", 55, ""], ["HR262OSW03", "BLK", "90", 45, ""], ["HR262OSW03", "BLK", "95", 62, ""], ["HR262OSW03", "BLK", "100", 45, ""], ["HR262OSW03", "BLK", "105", 28, ""], ["HR262OSW03", "WHT", "90", 45, ""], ["HR262OSW03", "WHT", "95", 62, ""], ["HR262OSW03", "WHT", "100", 45, ""], ["HR262OSW03", "WHT", "105", 28, ""], ["HR262OSH04", "CHC", "90", 75, ""], ["HR262OSH04", "CHC", "95", 105, ""], ["HR262OSH04", "CHC", "100", 75, ""], ["HR262OSH04", "CHC", "105", 45, ""], ["HR262OSH04", "BLK", "90", 45, ""], ["HR262OSH04", "BLK", "95", 62, ""], ["HR262OSH04", "BLK", "100", 45, ""], ["HR262OSH04", "BLK", "105", 28, ""], ["HR262OTS05", "BLK", "90", 75, ""], ["HR262OTS05", "BLK", "95", 105, ""], ["HR262OTS05", "BLK", "100", 75, ""], ["HR262OTS05", "BLK", "105", 45, ""], ["HR262OTS05", "NVY", "90", 30, ""], ["HR262OTS05", "NVY", "95", 42, ""], ["HR262OTS05", "NVY", "100", 30, ""], ["HR262OTS05", "NVY", "105", 18, ""], ["HR262OSK06", "IVY", "90", 60, ""], ["HR262OSK06", "IVY", "95", 84, ""], ["HR262OSK06", "IVY", "100", 60, ""], ["HR262OSK06", "IVY", "105", 36, ""], ["HR262OSK06", "WHT", "90", 30, ""], ["HR262OSK06", "WHT", "95", 42, ""], ["HR262OSK06", "WHT", "100", 30, ""], ["HR262OSK06", "WHT", "105", 18, ""], ["HR262OOP07", "BEI", "90", 45, ""], ["HR262OOP07", "BEI", "95", 62, ""], ["HR262OOP07", "BEI", "100", 45, ""], ["HR262OOP07", "BEI", "105", 28, ""], ["HR262OOP07", "CHC", "90", 45, ""], ["HR262OOP07", "CHC", "95", 62, ""], ["HR262OOP07", "CHC", "100", 45, ""], ["HR262OOP07", "CHC", "105", 28, ""], ["HR262OVT08", "WHT", "90", 60, ""], ["HR262OVT08", "WHT", "95", 84, ""], ["HR262OVT08", "WHT", "100", 60, ""], ["HR262OVT08", "WHT", "105", 36, ""], ["HR262OVT08", "BLK", "90", 75, ""], ["HR262OVT08", "BLK", "95", 105, ""], ["HR262OVT08", "BLK", "100", 75, ""], ["HR262OVT08", "BLK", "105", 45, ""]]}], ["HR", "26FW", {"코어": [["품번", "컬러코드", "컬러명", "상품명", "카테고리", "아이템", "소복종", "성별", "라인", "생산처", "생산방식", "원산지", "소재", "PO차수", "목표납기", "입고예정월", "발주수량", "원가", "예상판매가", "진행상태", "담당MD", "비고"], ["HR262OJK01", "BEI", "베이지", "자켓 1", "APP", "OUTER", "", "공용", "베이직", "가상봉제B", "완사입", "한국", "면 100%", "1", "2026-11-15", "2026-11", 310, 19000, 57000, "확정", "MD-데모", ""], ["HR262OJK01", "IVY", "아이보리", "자켓 1", "APP", "OUTER", "", "남", "베이직", "가상봉제A", "임가공", "베트남", "면 100%", "1", "2026-11-15", "2026-11", 310, 31000, 93000, "확정", "MD-데모", ""], ["HR262OPT02", "WHT", "화이트", "팬츠 2", "APP", "BOTTOM", "", "공용", "베이직", "가상봉제A", "임가공", "베트남", "면 100%", "1", "2026-11-15", "2026-11", 360, 38000, 114000, "확정", "MD-데모", ""], ["HR262OPT02", "BLK", "블랙", "팬츠 2", "APP", "BOTTOM", "", "공용", "베이직", "가상봉제A", "완사입", "중국", "면 100%", "1", "2026-09-15", "2026-09", 360, 31000, 93000, "확정", "MD-데모", ""], ["HR262OSW03", "BLK", "블랙", "니트 3", "APP", "TOP", "", "여", "베이직", "가상무역C", "임가공", "한국", "면 100%", "1", "2026-09-15", "2026-09", 180, 24000, 72000, "확정", "MD-데모", ""], ["HR262OSW03", "WHT", "화이트", "니트 3", "APP", "TOP", "", "공용", "베이직", "가상무역C", "임가공", "중국", "면 100%", "1", "2026-09-15", "2026-09", 180, 24000, 72000, "확정", "MD-데모", ""], ["HR262OSH04", "CHC", "차콜", "셔츠 4", "APP", "TOP", "", "여", "베이직", "가상봉제A", "임가공", "베트남", "면 100%", "1", "2026-10-15", "2026-10", 310, 31000, 93000, "확정", "MD-데모", ""], ["HR262OSH04", "BLK", "블랙", "셔츠 4", "APP", "TOP", "", "남", "베이직", "가상봉제A", "완사입", "베트남", "면 100%", "1", "2026-10-15", "2026-10", 190, 24000, 72000, "확정", "MD-데모", ""], ["HR262OTS05", "BLK", "블랙", "티셔츠 5", "APP", "TOP", "", "공용", "베이직", "가상봉제A", "완사입", "중국", "면 100%", "1", "2026-09-15", "2026-09", 300, 9000, 27000, "확정", "MD-데모", ""], ["HR262OTS05", "NVY", "네이비", "티셔츠 5", "APP", "TOP", "", "공용", "베이직", "가상니트D", "임가공", "중국", "면 100%", "1", "2026-10-15", "2026-10", 120, 19000, 57000, "확정", "MD-데모", ""], ["HR262OSK06", "IVY", "아이보리", "스커트 6", "APP", "BOTTOM", "", "여", "베이직", "가상무역C", "완사입", "베트남", "면 100%", "1", "2026-09-15", "2026-09", 240, 15000, 45000, "확정", "MD-데모", ""], ["HR262OSK06", "WHT", "화이트", "스커트 6", "APP", "BOTTOM", "", "공용", "베이직", "가상봉제A", "완사입", "중국", "면 100%", "1", "2026-09-15", "2026-09", 120, 12000, 36000, "확정", "MD-데모", ""], ["HR262OOP07", "BEI", "베이지", "원피스 7", "APP", "ONEPIECE", "", "남", "베이직", "가상니트D", "완사입", "한국", "면 100%", "1", "2026-11-15", "2026-11", 190, 31000, 93000, "확정", "MD-데모", ""], ["HR262OOP07", "CHC", "차콜", "원피스 7", "APP", "ONEPIECE", "", "여", "베이직", "가상봉제A", "임가공", "베트남", "면 100%", "1", "2026-11-15", "2026-11", 190, 19000, 57000, "확정", "MD-데모", ""], ["HR262OVT08", "WHT", "화이트", "베스트 8", "APP", "VEST", "", "여", "베이직", "가상봉제A", "완사입", "중국", "면 100%", "1", "2026-11-15", "2026-11", 240, 38000, 114000, "확정", "MD-데모", ""], ["HR262OVT08", "BLK", "블랙", "베스트 8", "APP", "VEST", "", "공용", "베이직", "가상봉제A", "완사입", "중국", "면 100%", "1", "2026-11-15", "2026-11", 300, 38000, 114000, "확정", "MD-데모", ""]], "사이즈": [["품번", "컬러코드", "사이즈", "수량", "바코드"], ["HR262OJK01", "BEI", "90", 77, ""], ["HR262OJK01", "BEI", "95", 108, ""], ["HR262OJK01", "BEI", "100", 77, ""], ["HR262OJK01", "BEI", "105", 48, ""], ["HR262OJK01", "IVY", "90", 77, ""], ["HR262OJK01", "IVY", "95", 108, ""], ["HR262OJK01", "IVY", "100", 77, ""], ["HR262OJK01", "IVY", "105", 48, ""], ["HR262OPT02", "WHT", "90", 90, ""], ["HR262OPT02", "WHT", "95", 125, ""], ["HR262OPT02", "WHT", "100", 90, ""], ["HR262OPT02", "WHT", "105", 55, ""], ["HR262OPT02", "BLK", "90", 90, ""], ["HR262OPT02", "BLK", "95", 125, ""], ["HR262OPT02", "BLK", "100", 90, ""], ["HR262OPT02", "BLK", "105", 55, ""], ["HR262OSW03", "BLK", "90", 45, ""], ["HR262OSW03", "BLK", "95", 62, ""], ["HR262OSW03", "BLK", "100", 45, ""], ["HR262OSW03", "BLK", "105", 28, ""], ["HR262OSW03", "WHT", "90", 45, ""], ["HR262OSW03", "WHT", "95", 62, ""], ["HR262OSW03", "WHT", "100", 45, ""], ["HR262OSW03", "WHT", "105", 28, ""], ["HR262OSH04", "CHC", "90", 77, ""], ["HR262OSH04", "CHC", "95", 108, ""], ["HR262OSH04", "CHC", "100", 77, ""], ["HR262OSH04", "CHC", "105", 48, ""], ["HR262OSH04", "BLK", "90", 47, ""], ["HR262OSH04", "BLK", "95", 66, ""], ["HR262OSH04", "BLK", "100", 47, ""], ["HR262OSH04", "BLK", "105", 30, ""], ["HR262OTS05", "BLK", "90", 75, ""], ["HR262OTS05", "BLK", "95", 105, ""], ["HR262OTS05", "BLK", "100", 75, ""], ["HR262OTS05", "BLK", "105", 45, ""], ["HR262OTS05", "NVY", "90", 30, ""], ["HR262OTS05", "NVY", "95", 42, ""], ["HR262OTS05", "NVY", "100", 30, ""], ["HR262OTS05", "NVY", "105", 18, ""], ["HR262OSK06", "IVY", "90", 60, ""], ["HR262OSK06", "IVY", "95", 84, ""], ["HR262OSK06", "IVY", "100", 60, ""], ["HR262OSK06", "IVY", "105", 36, ""], ["HR262OSK06", "WHT", "90", 30, ""], ["HR262OSK06", "WHT", "95", 42, ""], ["HR262OSK06", "WHT", "100", 30, ""], ["HR262OSK06", "WHT", "105", 18, ""], ["HR262OOP07", "BEI", "90", 47, ""], ["HR262OOP07", "BEI", "95", 66, ""], ["HR262OOP07", "BEI", "100", 47, ""], ["HR262OOP07", "BEI", "105", 30, ""], ["HR262OOP07", "CHC", "90", 47, ""], ["HR262OOP07", "CHC", "95", 66, ""], ["HR262OOP07", "CHC", "100", 47, ""], ["HR262OOP07", "CHC", "105", 30, ""], ["HR262OVT08", "WHT", "90", 60, ""], ["HR262OVT08", "WHT", "95", 84, ""], ["HR262OVT08", "WHT", "100", 60, ""], ["HR262OVT08", "WHT", "105", 36, ""], ["HR262OVT08", "BLK", "90", 75, ""], ["HR262OVT08", "BLK", "95", 105, ""], ["HR262OVT08", "BLK", "100", 75, ""], ["HR262OVT08", "BLK", "105", 45, ""]]}], ["GL", "26FW", {"코어": [["품번", "컬러코드", "컬러명", "상품명", "카테고리", "아이템", "소복종", "성별", "라인", "생산처", "생산방식", "원산지", "소재", "PO차수", "목표납기", "입고예정월", "발주수량", "원가", "예상판매가", "진행상태", "담당MD", "비고"], ["GL262OJK01", "BEI", "베이지", "자켓 1", "APP", "OUTER", "", "남", "베이직", "가상니트D", "완사입", "베트남", "면 100%", "1", "2026-10-15", "2026-10", 360, 31000, 93000, "확정", "MD-데모", ""], ["GL262OJK01", "NVY", "네이비", "자켓 1", "APP", "OUTER", "", "여", "베이직", "가상봉제B", "완사입", "한국", "면 100%", "1", "2026-11-15", "2026-11", 300, 15000, 45000, "확정", "MD-데모", ""], ["GL262OPT02", "IVY", "아이보리", "팬츠 2", "APP", "BOTTOM", "", "여", "베이직", "가상봉제B", "완사입", "한국", "면 100%", "1", "2026-09-15", "2026-09", 300, 15000, 45000, "확정", "MD-데모", ""], ["GL262OPT02", "WHT", "화이트", "팬츠 2", "APP", "BOTTOM", "", "공용", "베이직", "가상무역C", "임가공", "중국", "면 100%", "1", "2026-11-15", "2026-11", 180, 9000, 27000, "확정", "MD-데모", ""], ["GL262OSW03", "BLK", "블랙", "니트 3", "APP", "TOP", "", "여", "베이직", "가상니트D", "완사입", "한국", "면 100%", "1", "2026-09-15", "2026-09", 360, 12000, 36000, "확정", "MD-데모", ""], ["GL262OSW03", "CHC", "차콜", "니트 3", "APP", "TOP", "", "여", "베이직", "가상봉제B", "완사입", "한국", "면 100%", "1", "2026-11-15", "2026-11", 300, 12000, 36000, "확정", "MD-데모", ""], ["GL262OSH04", "WHT", "화이트", "셔츠 4", "APP", "TOP", "", "여", "베이직", "가상니트D", "임가공", "한국", "면 100%", "1", "2026-11-15", "2026-11", 120, 19000, 57000, "확정", "MD-데모", ""], ["GL262OSH04", "IVY", "아이보리", "셔츠 4", "APP", "TOP", "", "공용", "베이직", "가상봉제A", "완사입", "한국", "면 100%", "1", "2026-09-15", "2026-09", 300, 24000, 72000, "확정", "MD-데모", ""], ["GL262OTS05", "NVY", "네이비", "티셔츠 5", "APP", "TOP", "", "여", "베이직", "가상무역C", "완사입", "베트남", "면 100%", "1", "2026-11-15", "2026-11", 240, 38000, 114000, "확정", "MD-데모", ""], ["GL262OTS05", "CHC", "차콜", "티셔츠 5", "APP", "TOP", "", "여", "베이직", "가상봉제B", "완사입", "베트남", "면 100%", "1", "2026-10-15", "2026-10", 180, 15000, 45000, "확정", "MD-데모", ""], ["GL262OSK06", "BEI", "베이지", "스커트 6", "APP", "BOTTOM", "", "공용", "베이직", "가상니트D", "완사입", "베트남", "면 100%", "1", "2026-09-15", "2026-09", 360, 9000, 27000, "확정", "MD-데모", ""], ["GL262OSK06", "BLK", "블랙", "스커트 6", "APP", "BOTTOM", "", "남", "베이직", "가상봉제B", "완사입", "중국", "면 100%", "1", "2026-11-15", "2026-11", 180, 38000, 114000, "확정", "MD-데모", ""]], "사이즈": [["품번", "컬러코드", "사이즈", "수량", "바코드"], ["GL262OJK01", "BEI", "90", 90, ""], ["GL262OJK01", "BEI", "95", 125, ""], ["GL262OJK01", "BEI", "100", 90, ""], ["GL262OJK01", "BEI", "105", 55, ""], ["GL262OJK01", "NVY", "90", 75, ""], ["GL262OJK01", "NVY", "95", 105, ""], ["GL262OJK01", "NVY", "100", 75, ""], ["GL262OJK01", "NVY", "105", 45, ""], ["GL262OPT02", "IVY", "90", 75, ""], ["GL262OPT02", "IVY", "95", 105, ""], ["GL262OPT02", "IVY", "100", 75, ""], ["GL262OPT02", "IVY", "105", 45, ""], ["GL262OPT02", "WHT", "90", 45, ""], ["GL262OPT02", "WHT", "95", 62, ""], ["GL262OPT02", "WHT", "100", 45, ""], ["GL262OPT02", "WHT", "105", 28, ""], ["GL262OSW03", "BLK", "90", 90, ""], ["GL262OSW03", "BLK", "95", 125, ""], ["GL262OSW03", "BLK", "100", 90, ""], ["GL262OSW03", "BLK", "105", 55, ""], ["GL262OSW03", "CHC", "90", 75, ""], ["GL262OSW03", "CHC", "95", 105, ""], ["GL262OSW03", "CHC", "100", 75, ""], ["GL262OSW03", "CHC", "105", 45, ""], ["GL262OSH04", "WHT", "90", 30, ""], ["GL262OSH04", "WHT", "95", 42, ""], ["GL262OSH04", "WHT", "100", 30, ""], ["GL262OSH04", "WHT", "105", 18, ""], ["GL262OSH04", "IVY", "90", 75, ""], ["GL262OSH04", "IVY", "95", 105, ""], ["GL262OSH04", "IVY", "100", 75, ""], ["GL262OSH04", "IVY", "105", 45, ""], ["GL262OTS05", "NVY", "90", 60, ""], ["GL262OTS05", "NVY", "95", 84, ""], ["GL262OTS05", "NVY", "100", 60, ""], ["GL262OTS05", "NVY", "105", 36, ""], ["GL262OTS05", "CHC", "90", 45, ""], ["GL262OTS05", "CHC", "95", 62, ""], ["GL262OTS05", "CHC", "100", 45, ""], ["GL262OTS05", "CHC", "105", 28, ""], ["GL262OSK06", "BEI", "90", 90, ""], ["GL262OSK06", "BEI", "95", 125, ""], ["GL262OSK06", "BEI", "100", 90, ""], ["GL262OSK06", "BEI", "105", 55, ""], ["GL262OSK06", "BLK", "90", 45, ""], ["GL262OSK06", "BLK", "95", 62, ""], ["GL262OSK06", "BLK", "100", 45, ""], ["GL262OSK06", "BLK", "105", 28, ""]]}]]; var __NEXT=null;
+convertXlsx_=function(){ return __NEXT; };
+window.__DEMO_LOG=[];
+function __step(n,f){ try{ var r=f(); window.__DEMO_LOG.push(['ok',n,r]); return r; }catch(e){ window.__DEMO_LOG.push(['fail',n,String(e&&e.message||e)]); console.warn('seed',n,e); } }
+(function(){
+  __step('ensureStore_', function(){ ensureStore_(); return true; });
+  __step('dict', function(){ var now=nowStr_(); var rows=[];
+    [['BLK','블랙'],['WHT','화이트'],['NVY','네이비'],['BEI','베이지'],['IVY','아이보리'],['CHC','차콜']].forEach(function(c){ rows.push({ '유형':'컬러', '코드':c[0], '이름':c[1], '비고':'데모', '등록일':now, '등록자':'demo' }); });
+    ['가상봉제A','가상봉제B','가상무역C','가상니트D'].forEach(function(v){ rows.push({ '유형':'생산처', '코드':v, '이름':v, '비고':'데모', '등록일':now, '등록자':'demo' }); });
+    appendRows_('dict', rows); try{ bumpCacheVer_(); }catch(e){} READ_MEMO_={}; return rows.length; });
+  __BOOKS.forEach(function(b,i){ __NEXT=b[2]; __step('upload '+b[0]+' '+b[1]+' #'+(i+1), function(){ var r=uploadLinesheet_({ fileName:'라인시트_'+b[0]+'_'+b[1]+'_v'+(i+1)+'.xlsx', fileBase64:'x', brand:b[0], season:b[1] }); return { ok:r.ok, sku:r.summary&&r.summary.skuCount, issues:r.issues.length }; }); });
+  __step('changeReasons', function(){ var ch=readRows_('changes'); return ch.length; });
+})();
+
+
+window.google={ script:{ run:(function(){
+  function mk(ok,fail,uo){
+    var api={ withSuccessHandler:function(f){ return mk(f,fail,uo); }, withFailureHandler:function(f){ return mk(ok,f,uo); }, withUserObject:function(o){ return mk(ok,fail,o); } };
+    return new Proxy(api,{ get:function(t,name){ if(name in t) return t[name]; if(typeof name!=='string') return undefined;
+      return function(){ var args=Array.prototype.slice.call(arguments);
+        // form 요소가 넘어오면 GAS 처럼 {name:value} 로 바꾼다
+        args=args.map(function(a){ if(a && typeof HTMLFormElement!=='undefined' && a instanceof HTMLFormElement){ var o={}; Array.prototype.forEach.call(a.elements,function(el){ if(el.name) o[el.name]=el.value; }); return o; } return a; });
+        setTimeout(function(){ var fn=window[name]; if(typeof fn!=='function'){ fail&&fail(new Error('데모에 없는 함수: '+name)); return; }
+          try{ var r=fn.apply(null,args); r=(r===undefined)?null:JSON.parse(JSON.stringify(r)); ok&&ok(r,uo); }catch(e){ console.warn('demo rpc',name,e); fail&&fail({ message:String(e&&e.message||e) },uo); } },60); }; } });
+  }
+  return mk(null,null,null);
+})(), host:{ close:function(){}, setHeight:function(){}, setWidth:function(){}, editor:{ focus:function(){} } }, url:{ getLocation:function(cb){ cb({ parameter:{}, parameters:{}, hash:'' }); } } } };
+
+</script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>라인시트 허브 (데모) — 이어진 포트폴리오</title>
+<style>
+:root { color-scheme: light dark; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  --surface:#fcfcfb; --page:#f9f9f7; --ink:#0b0b0b; --ink-2:#52514e; --muted:#6e6c65;
+  --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s2:#1baf7a; --s3:#eda100; --s6:#e34948;
+  --good:#0ca30c; --warn:#fab219; --crit:#d03b3b;
+  --good-bg:rgba(12,163,12,.08); --warn-bg:rgba(250,178,25,.12); --crit-bg:rgba(208,59,59,.08); --s1-bg:rgba(42,120,214,.10);
+  font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+  background:
+    radial-gradient(1100px 560px at 88% -12%, rgba(42,120,214,.11), transparent 62%),
+    radial-gradient(880px 520px at -8% 26%, rgba(237,161,0,.075), transparent 56%),
+    radial-gradient(760px 480px at 55% 108%, rgba(27,175,122,.06), transparent 58%),
+    var(--page);
+  background-attachment: fixed;
+  color:var(--ink); min-height:100vh;
+  padding:0 clamp(10px,3vw,36px) 48px; font-size:15px; line-height:1.65;
+}
+@media (prefers-color-scheme: dark){
+  body{ --surface:#1a1a19; --page:#0d0d0d; --ink:#fff; --ink-2:#c3c2b7; --muted:#a3a19a;
+    --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+    --s1:#3987e5; --s2:#199e70; --s3:#c98500; --s6:#e66767;
+    --good-bg:rgba(12,163,12,.16); --warn-bg:rgba(250,178,25,.16); --crit-bg:rgba(230,103,103,.14); --s1-bg:rgba(57,135,229,.16); }
+  .band{background:#15202f}
+}
+.band{
+  background:#1c2b40;
+  margin:0 calc(-1 * clamp(10px,3vw,36px)) 0;
+  padding:22px clamp(10px,3vw,36px) 18px;
+}
+.topbar{display:flex;align-items:baseline;gap:12px}
+.topbar h1{font-size:23px;font-weight:800;letter-spacing:-.01em;color:#fff}
+.band .muted{color:rgba(255,255,255,.62)}
+.muted{color:var(--muted);font-size:13.5px}
+.tabbar{display:flex;gap:2px;border-bottom:1px solid var(--grid);margin:0 calc(-1 * clamp(10px,3vw,36px)) 18px;padding:0 clamp(10px,3vw,36px);overflow-x:auto;position:sticky;top:0;z-index:20;background:rgba(252,252,251,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+@media (prefers-color-scheme: dark){ .tabbar{background:rgba(13,13,13,.86)} }
+.tb{border:none;background:transparent;padding:12px 17px;font-size:15.5px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;border-bottom:2.5px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tb.on{color:var(--ink);border-bottom-color:var(--ink)}
+.tb .cnt{display:inline-block;background:var(--crit);color:#fff;border-radius:999px;padding:0 7px;font-size:10.5px;font-weight:700;margin-left:5px;vertical-align:1px}
+.card{background:var(--surface);border:1px solid var(--ring);border-radius:14px;padding:16px 16px 14px;margin-bottom:14px;box-shadow:0 1px 2px rgba(11,11,11,.04),0 10px 30px rgba(11,11,11,.05)}
+.card-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
+.card-head h3{font-size:16px;font-weight:700}
+.sub{font-size:13px;color:var(--muted)}
+.sec-title{font-size:17px;font-weight:700;margin:24px 0 10px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--surface);border:1px solid var(--ring);border-radius:12px;padding:12px 14px;box-shadow:0 1px 2px rgba(11,11,11,.04);position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--s1)}
+.kpi.plain::before{display:none}
+.kpi .k-label{font-size:13px;color:var(--muted)}
+.kpi .k-value{font-size:28px;font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.kpi .k-sub{font-size:12.5px;color:var(--ink-2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.season-card{border:1px solid var(--ring);border-radius:12px;padding:12px 14px;cursor:pointer;background:var(--surface);transition:transform .12s ease,box-shadow .12s ease}
+.season-card:hover{border-color:var(--axis);transform:translateY(-2px);box-shadow:0 8px 22px rgba(11,11,11,.10)}
+.g-card{transition:transform .12s ease,box-shadow .12s ease}
+.g-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(11,11,11,.10)}
+.season-card .k{font-size:16px;font-weight:700}
+.season-card .m{font-size:13px;color:var(--ink-2);margin-top:4px;font-variant-numeric:tabular-nums}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select,input[type=text],textarea{border:1px solid var(--grid);border-radius:8px;padding:9px 12px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--ink)}
+textarea{width:100%;min-height:54px;resize:vertical}
+.btn{border:1px solid var(--ring);border-radius:9px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--ink);color:var(--page)}
+.btn.ghost{background:var(--surface);color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:default}
+.drop{border:2px dashed var(--grid);border-radius:12px;padding:28px;text-align:center;color:var(--muted);cursor:pointer;margin-top:10px;font-size:14px}
+.drop.on{border-color:var(--s1);background:var(--s1-bg)}
+.msg{border-radius:10px;padding:12px 16px;font-size:14px;margin-top:12px;display:none;border-left:4px solid transparent}
+.msg.ok{background:var(--good-bg);border-left-color:var(--good);display:block}
+.msg.err{background:var(--crit-bg);border-left-color:var(--crit);display:block;white-space:pre-wrap}
+.msg.warn{background:var(--warn-bg);border-left-color:var(--warn);display:block;white-space:pre-wrap}
+table.dt{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+table.dt th{text-align:left;padding:10px 12px;color:var(--muted);font-size:13px;font-weight:700;position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--grid);white-space:nowrap}
+table.dt td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--grid)}
+table.dt th.r,table.dt td.r{text-align:right}
+table.dt td.l{text-align:left}
+.tablewrap{max-height:420px;overflow:auto;border:1px solid var(--grid);border-radius:10px;margin-top:10px}
+.total-card{background:var(--s1-bg);border-color:var(--s1)}
+.vh-item{border:1px solid var(--grid);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:var(--surface)}
+.vh-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:14.5px}
+.vh-delta{margin-top:8px;font-size:13.5px;color:var(--ink-2)}
+.dchip{display:inline-block;border-radius:7px;padding:2px 9px;font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.dchip.up{background:var(--good-bg);color:var(--good)}
+.dchip.down{background:var(--crit-bg);color:var(--crit)}
+.vh-table{margin-top:10px}
+.verdict{border-left:4px solid var(--s1);background:var(--s1-bg);border-radius:10px;padding:13px 17px;font-size:15px;line-height:1.6;margin:6px 0 14px}
+.verdict b{font-weight:800}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(430px,100%),1fr));gap:14px}
+.panel{border:1px solid var(--grid);border-radius:12px;padding:14px 16px;background:var(--surface)}
+.panel-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.panel-t{font-size:14px;font-weight:800;color:var(--ink-2)}
+.mini-toggle{border:1px solid var(--grid);background:var(--page);border-radius:7px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--ink-2);cursor:pointer;font-family:inherit}
+.mini-toggle.on{background:var(--ink);color:var(--page);border-color:var(--ink)}
+.bghost{display:block;height:6px;background:var(--axis);border-radius:4px;width:0;transition:width .7s ease;margin-top:2px;opacity:.7}
+.brow.dual{grid-template-columns:74px 1fr 150px}
+.brow.dual .btrack{height:auto;padding:3px 2px}
+.brow.dual .bfill{height:10px}
+.dv{font-weight:800}
+.dv.up{color:var(--good)} .dv.down{color:var(--crit)}
+.mini-h{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.04em;margin-bottom:6px}
+.bars{display:grid;gap:7px}
+.brow{display:grid;grid-template-columns:74px 1fr 88px;gap:10px;align-items:center;font-size:13px;font-variant-numeric:tabular-nums}
+.brow .bl{color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brow .btrack{display:block;height:20px;background:var(--page);border-radius:6px;overflow:hidden;border:1px solid var(--grid)}
+.brow .bfill{display:block;height:100%;background:var(--s1);border-radius:5px 0 0 5px;width:0;transition:width .7s ease}
+.brow.peak .bfill{background:var(--s3)}
+.brow .bv{text-align:right;color:var(--ink-2);white-space:nowrap}
+.brow .bv b{color:var(--ink)}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700}
+.pill.add{background:var(--good-bg);color:var(--good)}
+.pill.del{background:var(--crit-bg);color:var(--crit)}
+.pill.chg{background:var(--warn-bg);color:var(--s3)}
+.pill.v{background:var(--s1-bg);color:var(--s1)}
+.empty{color:var(--muted);font-size:14px;padding:16px;text-align:center}
+.spin{display:none;color:var(--s1);font-weight:700;font-size:12.5px;margin-top:10px;align-items:center;gap:8px}
+.spin.on{display:flex}
+.loader{display:flex;align-items:center;justify-content:center;gap:9px;color:var(--muted);font-size:13.5px;padding:20px}
+.loader::before,.spin::before{content:"";width:15px;height:15px;flex:none;border:2px solid var(--grid);border-top-color:var(--s1);border-radius:50%;animation:lsspin .8s linear infinite}
+.loader.sm{padding:8px}
+@keyframes lsspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){ .loader::before,.spin::before{animation:none;border-top-color:var(--grid)} }
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px;margin-top:12px}
+.g-card{border:1px solid var(--ring);border-radius:10px;overflow:hidden;background:var(--surface)}
+.g-img{width:100%;aspect-ratio:1/1;object-fit:contain;background:#fff;display:block;cursor:zoom-in}
+.g-noimg{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;background:var(--page)}
+.g-body{padding:7px 9px}
+.g-pn{font-size:13px;font-weight:700}
+.g-nm{font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-mt{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.modal{position:fixed;inset:0;background:var(--page);z-index:50;display:flex}
+.modal[hidden]{display:none}
+.lb-stage{flex:1;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fff;position:relative;touch-action:none}
+@media (prefers-color-scheme: dark){ .lb-stage{background:#161615} }
+.lb-stage img{max-width:92%;max-height:92vh;object-fit:contain;display:block;cursor:grab;user-select:none;-webkit-user-drag:none;transform-origin:center center;will-change:transform}
+.lb-stage img.dragging{cursor:grabbing}
+.lb-stage .lb-empty{color:var(--muted);font-size:13px}
+.lb-zoombar{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:var(--surface);border:1px solid var(--ring);border-radius:999px;padding:5px 8px;box-shadow:0 4px 14px rgba(0,0,0,.15);align-items:center}
+.lb-zoombar button{border:none;background:transparent;font-family:inherit;font-size:16px;font-weight:800;color:var(--ink);cursor:pointer;width:30px;height:28px;border-radius:8px}
+.lb-zoombar button:hover{background:var(--grid)}
+.lb-zoombar .pct{font-size:12.5px;color:var(--muted);min-width:44px;text-align:center;font-variant-numeric:tabular-nums}
+.lb-side{width:min(400px,42vw);border-left:1px solid var(--grid);background:var(--surface);overflow-y:auto;padding:18px 20px 30px;display:flex;flex-direction:column;gap:14px}
+.lb-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lb-pos{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.lb-title{font-size:20px;font-weight:700;letter-spacing:-.01em;line-height:1.35}
+.lb-name{font-size:14.5px;color:var(--ink-2)}
+.lb-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lb-kpis .kpi{padding:10px 12px}
+.lb-kpis .k-value{font-size:22px}
+.lb-h{font-size:12.5px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin-bottom:4px}
+.lb-meta{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:14px}
+.lb-meta .k{color:var(--muted)}
+.lb-meta .v{font-weight:600}
+.sizechips{display:flex;flex-wrap:wrap;gap:6px}
+.sizechip{border:1px solid var(--grid);border-radius:8px;padding:4px 11px;font-size:13px;font-variant-numeric:tabular-nums;background:var(--page)}
+.sizechip b{font-weight:700}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);border:1px solid var(--ring);background:var(--surface);color:var(--ink);border-radius:999px;width:42px;height:42px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;opacity:.88;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.lb-nav:hover{opacity:1}
+.lb-prev{left:14px}
+.lb-next{right:14px}
+.modal-x{border:1px solid var(--ring);background:var(--surface);border-radius:8px;padding:7px 14px;font-size:13.5px;font-weight:700;cursor:pointer;color:var(--ink);font-family:inherit}
+@media (max-width:760px){ .modal{flex-direction:column} .lb-side{width:100%;border-left:none;border-top:1px solid var(--grid)} .lb-stage{min-height:46vh} }
+.chk{width:15px;height:15px;vertical-align:-2px}
+.reason-done{color:var(--good);font-size:11px}
+.filterbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div id="demobar">
+  <b>데모</b>
+  <span>전사 라인시트 정본 저장소 앱 그대로 — 가상 통일양식(브랜드 2·버전 3)을 실제 업로드·검증·diff 로직으로 적재한 상태. 이미지 갤러리는 Drive가 없어 비어 있습니다.</span>
+  <a href="../../">← 포트폴리오</a>
+</div>
+<style>
+#demobar{position:sticky;top:0;z-index:9999;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  background:#fff8e1;border-bottom:1px solid #f0dfa8;padding:9px 16px;font-size:12.5px;color:#6b5b21;
+  font-family:system-ui,-apple-system,'Malgun Gothic',sans-serif}
+#demobar b{background:#6b5b21;color:#fff8e1;padding:2px 8px;border-radius:10px;font-size:11.5px}
+#demobar a{margin-left:auto;color:#6b5b21;font-weight:700;text-decoration:none}
+</style>
+
+<div class="band">
+  <header class="topbar">
+    <h1>라인시트 허브</h1>
+    <span class="muted" id="topInfo">전사 라인시트 정본 · 발주계획/자금 연동 상류</span>
+    <span style="flex:1"></span>
+    <select id="seasonSel" onchange="setSeason()" style="background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);font-weight:700"></select>
+  </header>
+</div>
+<nav class="tabbar">
+  <button class="tb on" data-v="dash" onclick="showView('dash')">대시보드</button>
+  <button class="tb" data-v="raw" onclick="showView('raw')">조회</button>
+  <button class="tb" data-v="pivot" onclick="showView('pivot')">피벗</button>
+  <button class="tb" data-v="upload" onclick="showView('upload')">업로드</button>
+  <button class="tb" data-v="changes" onclick="showView('changes')">변경관리<span class="cnt" id="pendingCnt" style="display:none"></span></button>
+  <button class="tb" data-v="dict" onclick="showView('dict')">코드사전</button>
+  <button class="tb" data-v="admin" onclick="showView('admin')">관리</button>
+</nav>
+
+<div id="v-dash">
+  <div class="card">
+    <div class="card-head"><h3 id="cardsTitle">브랜드 현황</h3><span class="sub">카드를 누르면 요약과 갤러리를 봅니다</span></div>
+    <div class="grid" id="cards"><div class="loader">라인시트 현황 불러오는 중</div></div>
+  </div>
+  <div class="card" id="summaryCard" style="display:none">
+    <div class="card-head"><h3 id="sumTitle">시즌 요약</h3><button class="btn ghost" id="btnExport" onclick="exportXlsx()">엑셀 다운로드</button></div>
+    <div class="kpi-row" id="sumStat"></div>
+    <div class="verdict" id="sumVerdict"></div>
+    <div class="duo">
+      <div class="panel">
+        <div class="panel-head"><span class="panel-t">월별 예상 매입 (원가)</span>
+          <span style="display:flex;gap:6px;align-items:center">
+            <span id="monModes"></span>
+            <button class="mini-toggle" id="monToggle" onclick="toggleMonView()">표로 보기</button>
+          </span></div>
+        <div class="bars" id="monBars"></div>
+        <div class="muted" id="monCmpNote" style="margin-top:8px"></div>
+        <div class="tablewrap" id="monTableWrap" style="display:none;max-height:260px"><table class="dt" id="sumMonth"></table></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="panel-t">어디에 쓰나 — 구성 (원가 기준)</span></div>
+        <div class="mini-h">아이템별</div>
+        <div class="bars" id="itemBars"></div>
+        <div class="mini-h" style="margin-top:14px">생산처 상위 5</div>
+        <div class="bars" id="vendorBars"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="historyCard" style="display:none">
+    <div class="card-head"><h3 id="histTitle">버전 히스토리</h3><span class="sub">무엇이 어떻게 바뀌었고, 왜 바뀌었는지</span></div>
+    <div id="histBody"></div>
+  </div>
+  <div class="card" id="galleryCard" style="display:none">
+    <div class="card-head"><h3 id="galTitle">상품 갤러리</h3><span class="sub" id="galHint"></span></div>
+    <div class="gal" id="galGrid"></div>
+    <div style="text-align:center;margin-top:12px"><button class="btn ghost" id="galMore" onclick="moreGallery()" style="display:none">더 보기</button></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>최근 변경 이력</h3><span class="sub">사유 입력은 [변경관리] 탭에서</span></div>
+    <div class="tablewrap"><table class="dt" id="changes"></table></div>
+  </div>
+</div>
+
+<div id="v-raw" style="display:none">
+  <div class="card">
+    <div class="card-head"><h3>라인시트 조회</h3><span class="sub">최신 버전 원본을 건별로 검색합니다 · 행 클릭 = 상품 상세</span></div>
+    <div class="row" style="margin-bottom:10px">
+      <select id="rawBrand"><option value="">브랜드</option></select>
+      <select id="rawSeason"><option value="">시즌</option></select>
+      <button class="btn" onclick="loadRaw()">조회</button>
+      <span style="flex:1"></span>
+      <input type="text" id="rawQ" placeholder="품번·상품명·컬러·생산처 검색" style="width:260px" oninput="renderRaw()">
+      <span class="muted" id="rawInfo"></span>
+    </div>
+    <div class="tablewrap" style="max-height:560px"><table class="dt" id="rawTable"></table></div>
+  </div>
+</div>
+
+<div id="v-pivot" style="display:none">
+  <div class="card">
+    <div class="card-head"><h3>피벗 — 연동 기준 집계</h3>
+      <span style="display:flex;gap:8px;align-items:center">
+        <span class="muted" id="pivotTs"></span>
+        <button class="btn ghost" id="pivotRebuild" onclick="doRebuildPivots()">재집계</button>
+      </span></div>
+    <div class="hint" style="font-size:13px;color:var(--muted);margin-bottom:6px">
+      이 표들은 스토어 시트의 <b>피벗_월별매입 · 피벗_생산처 · 피벗_아이템</b> 탭에 그대로 저장됩니다(최신 버전 기준, 업로드 시 자동 재집계).
+      자금 대시보드·ONE CLOSE 연동은 화면이 아니라 이 시트를 읽습니다.</div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>월별 매입 (브랜드×시즌×입고월)</h3><span class="sub">자금 — 생산대금 스케줄 공급용</span></div>
+    <div class="tablewrap" style="max-height:380px"><table class="dt" id="pvMonth"></table></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>생산처별 (브랜드×시즌×생산처×입고월)</h3><span class="sub">자금 — 생산대금_상세(업체×입고월)와 동일 구조</span></div>
+    <div class="tablewrap" style="max-height:380px"><table class="dt" id="pvVendor"></table></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>아이템별 (브랜드×시즌×아이템)</h3><span class="sub">기획 — 구성 분석용</span></div>
+    <div class="tablewrap" style="max-height:380px"><table class="dt" id="pvItem"></table></div>
+  </div>
+</div>
+
+<div id="v-upload" style="display:none">
+  <div class="card">
+    <div class="card-head"><h3>통일양식 업로드</h3><span class="sub">오류(차단)가 있으면 적재되지 않습니다 · 재업로드는 새 버전으로 쌓이고 이전 버전과 자동 비교됩니다</span></div>
+    <div class="row">
+      <select id="upBrand"><option value="">브랜드</option></select>
+      <select id="upSeason"><option value="">시즌</option></select>
+      <button class="btn ghost" onclick="pickFile()">파일 선택</button>
+      <span class="muted" id="upFileName"></span>
+      <button class="btn" id="upGo" onclick="doUpload()" disabled>업로드</button>
+      <span style="flex:1"></span>
+      <button class="btn ghost" onclick="downloadTemplate()">통일양식 다운로드</button>
+    </div>
+    <div class="drop" id="dropzone">여기로 파일을 끌어다 놓아도 됩니다 (.xlsx)</div>
+    <input type="file" id="fileInput" accept=".xlsx" style="display:none">
+    <div class="spin" id="upSpin">업로드·검증 중...</div>
+    <div class="msg" id="upMsg"></div>
+    <div class="tablewrap" id="diffWrap" style="display:none"><table class="dt" id="diffTable"></table></div>
+    <div class="row" id="diffActions" style="display:none;margin-top:10px">
+      <button class="btn" onclick="showView('changes');loadChanges()">변경관리에서 사유 입력하기</button>
+    </div>
+  </div>
+</div>
+
+<div id="v-changes" style="display:none">
+  <div class="card">
+    <div class="card-head"><h3>변경관리</h3><span class="sub">발주계획이 바뀐 이유를 남기는 곳입니다 — 사유 없는 변경은 결재·자금 반영이 보류됩니다</span></div>
+    <div class="filterbar">
+      <select id="chFilter" onchange="renderChanges()">
+        <option value="pending">사유 미입력만</option>
+        <option value="all">전체</option>
+      </select>
+      <span class="muted" id="chInfo"></span>
+      <span style="flex:1"></span>
+      <label class="muted"><input type="checkbox" class="chk" id="chAll" onclick="toggleAll()"> 전체선택</label>
+    </div>
+    <div class="tablewrap" style="max-height:380px"><table class="dt" id="chTable"></table></div>
+    <div style="margin-top:12px">
+      <textarea id="chReason" placeholder="선택한 변경 건의 사유 (예: 코스트코 2차 발주 확정으로 수량 증가 / 원단가 인상 반영 / 발매일 연기)"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" onclick="submitReasons()">선택 건에 사유 저장</button>
+        <span class="muted" id="chSel">0건 선택됨</span>
+      </div>
+    </div>
+    <div class="msg" id="chMsg"></div>
+  </div>
+</div>
+
+<div id="v-dict" style="display:none">
+  <div class="card">
+    <div class="card-head"><h3>코드사전</h3><span class="sub">드롭다운·검증의 정본 — 신규 코드는 여기서 등록 후 양식을 다시 받아 쓰세요</span></div>
+    <div class="row">
+      <select id="dictType" onchange="loadDict()"></select>
+      <span style="flex:1"></span>
+      <input type="text" id="dcode" placeholder="코드" style="width:110px">
+      <input type="text" id="dname" placeholder="이름" style="width:150px">
+      <button class="btn" onclick="addDict()">추가</button>
+    </div>
+    <div class="msg" id="dictMsg"></div>
+    <div class="tablewrap"><table class="dt" id="dictTable"></table></div>
+  </div>
+</div>
+
+<div id="v-admin" style="display:none">
+  <div class="card">
+    <div class="card-head"><h3>이미지 폴더</h3><span class="sub">사진은 엑셀에 넣지 않습니다 — Drive 폴더에 품번.jpg(전 컬러 공통) 또는 SKU.jpg로 올리면 자동 매칭</span></div>
+    <div class="row">
+      <input type="text" id="imgFolder" placeholder="Drive 폴더 ID" style="width:330px">
+      <button class="btn" onclick="saveImgRoot()">저장</button>
+    </div>
+    <div class="msg" id="adminMsg"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>스토어</h3><span class="sub">모든 원천 데이터가 저장되는 구글시트</span></div>
+    <a id="storeLink" href="#" target="_blank" style="color:var(--s1);font-weight:700;font-size:12.5px">스토어 시트 열기</a>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>연동 로드맵</h3><span class="sub">이 허브가 공급하게 될 데이터</span></div>
+    <div style="font-size:12.5px;color:var(--ink-2);line-height:1.8">
+      ONE CLOSE 발주계획 (품번 집계 자동 생성) · 자금 대시보드 HUB_발주/입고 탭 (생산대금 스케줄 정밀화) ·
+      매출스케줄 발주수량 (정산 시뮬레이터 근거) · INS_시즌 (재고·입고 수량)
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="lightbox" hidden>
+  <div class="lb-stage" id="lbStage">
+    <div class="loader" id="lbLoad" style="position:absolute;inset:0;align-items:center">사진 원본 불러오는 중</div>
+    <img id="lbImg" alt="">
+    <button class="lb-nav lb-prev" onclick="lbNav(-1)">&#8249;</button>
+    <button class="lb-nav lb-next" onclick="lbNav(1)">&#8250;</button>
+    <div class="lb-zoombar">
+      <button onclick="pzZoom(1/1.25)" title="축소">&#8722;</button>
+      <span class="pct" id="pzPct">100%</span>
+      <button onclick="pzZoom(1.25)" title="확대">+</button>
+      <button onclick="pzReset()" title="원래대로" style="font-size:12px;width:auto;padding:0 8px">리셋</button>
+    </div>
+  </div>
+  <div class="lb-side">
+    <div class="lb-top">
+      <span class="lb-pos" id="lbPos"></span>
+      <button class="modal-x" onclick="closeLb()">닫기 (Esc)</button>
+    </div>
+    <div>
+      <div class="lb-title" id="lbPn"></div>
+      <div class="lb-name" id="lbName"></div>
+    </div>
+    <div class="lb-kpis" id="lbKpis"></div>
+    <div>
+      <div class="lb-h">생산 정보</div>
+      <div class="lb-meta" id="lbMeta"></div>
+    </div>
+    <div>
+      <div class="lb-h">컬러별 발주</div>
+      <div class="tablewrap" style="max-height:200px;margin-top:2px"><table class="dt" id="lbColors"></table></div>
+    </div>
+    <div>
+      <div class="lb-h">사이즈 분포</div>
+      <div class="sizechips" id="lbSizes"></div>
+    </div>
+    <div class="muted" id="lbNote"></div>
+  </div>
+</div>
+
+<script>
+var G = { file: null, autoOpened: false, imgCache: {}, bundleCache: {} };
+function renderBundle(b){
+  document.getElementById('summaryCard').style.display = '';
+  document.getElementById('sumTitle').textContent = b.brand + ' ' + b.season + ' 최신 (' + (b.sum.verKey || '') + ')';
+  renderSummaryStats(b.sum, b.brand, b.season);
+  renderSeasonViz(b.sum);
+  if (b.mv && b.mv.versions){ MV.list = b.mv.versions; buildMonModes(); }
+  if (b.hist) renderHistory(b.brand, b.season, b.hist);
+  if (b.gal) renderGallery(b.brand, b.season, b.gal);
+}
+var CH_DATA = [];
+var DICT_TYPES = ['브랜드','시즌','카테고리','아이템','생산방식','원산지','진행상태','생산처','컬러','사이즈군'];
+
+function showView(v){
+  var vs = ['dash','raw','pivot','upload','changes','dict','admin'];
+  for (var i=0;i<vs.length;i++) document.getElementById('v-'+vs[i]).style.display = (vs[i]===v)?'':'none';
+  var tabs = document.querySelectorAll('.tb');
+  for (var t=0;t<tabs.length;t++) tabs[t].classList.toggle('on', tabs[t].getAttribute('data-v')===v);
+  if (v==='changes') loadChanges();
+  if (v==='raw' && !G.rawInit){ G.rawInit = true; initRawSelects(); }
+  if (v==='pivot') loadPivots();
+}
+
+function pivotTable(el, rows, cols, numCols){
+  var t = '<tr>';
+  for (var c=0;c<cols.length;c++) t += '<th'+(numCols.indexOf(cols[c])>=0?' class="r"':'')+'>'+esc(cols[c])+'</th>';
+  t += '</tr>';
+  var season = G.season || '';
+  var shown = 0;
+  for (var i=0;i<rows.length;i++){
+    if (season && String(rows[i]['시즌']) !== season) continue;
+    shown++;
+    t += '<tr>';
+    for (var c2=0;c2<cols.length;c2++){
+      var v = rows[i][cols[c2]];
+      var isNum = numCols.indexOf(cols[c2]) >= 0;
+      t += '<td'+(isNum?' class="r"':'')+'>'+(isNum?num(v):esc(v))+'</td>';
+    }
+    t += '</tr>';
+  }
+  if (!shown) t += '<tr><td colspan="'+cols.length+'"><div class="empty">데이터 없음 — [재집계]를 눌러보세요</div></td></tr>';
+  el.innerHTML = t;
+}
+function loadPivots(){
+  document.getElementById('pvMonth').innerHTML = '<tr><td>'+loaderHtml('피벗 불러오는 중')+'</td></tr>';
+  document.getElementById('pvVendor').innerHTML = '';
+  document.getElementById('pvItem').innerHTML = '';
+  run('getPivots').then(function(p){
+    document.getElementById('pivotTs').textContent = '기준: ' + p.updatedAt + (G.season ? ' · ' + G.season + ' 필터' : '');
+    pivotTable(document.getElementById('pvMonth'), p.month,
+      ['브랜드','시즌','입고예정월','SKU수','발주수량','원가금액','판매가금액'], ['SKU수','발주수량','원가금액','판매가금액']);
+    pivotTable(document.getElementById('pvVendor'), p.vendor,
+      ['브랜드','시즌','생산처','입고예정월','발주수량','원가금액'], ['발주수량','원가금액']);
+    pivotTable(document.getElementById('pvItem'), p.item,
+      ['브랜드','시즌','아이템','SKU수','발주수량','원가금액','판매가금액'], ['SKU수','발주수량','원가금액','판매가금액']);
+  }).catch(function(e){ alert('피벗 로드 실패: '+e.message); });
+}
+function doRebuildPivots(){
+  var btn = document.getElementById('pivotRebuild');
+  btn.disabled = true; btn.textContent = '집계 중...';
+  run('rebuildPivots').then(function(r){
+    btn.disabled = false; btn.textContent = '재집계';
+    loadPivots();
+  }).catch(function(e){ btn.disabled = false; btn.textContent = '재집계'; alert(e.message); });
+}
+
+var RAW = { rows: [], cols: [], verKey: '', brand: '', season: '' };
+function rawCell(row, name){
+  var i = RAW.cols.indexOf(name);
+  return i < 0 ? '' : row[i];
+}
+function initRawSelects(){
+  run('getDictEntries','브랜드').then(function(list){
+    var h = '<option value="">브랜드</option>';
+    for (var i=0;i<list.length;i++) h += '<option value="'+esc(list[i].code)+'">'+esc(list[i].code)+' '+esc(list[i].name)+'</option>';
+    document.getElementById('rawBrand').innerHTML = h;
+    if (G.curBrand) document.getElementById('rawBrand').value = G.curBrand;
+  });
+  run('getDictEntries','시즌').then(function(list){
+    var h = '<option value="">시즌</option>';
+    for (var i=0;i<list.length;i++) h += '<option value="'+esc(list[i].code)+'">'+esc(list[i].code)+'</option>';
+    document.getElementById('rawSeason').innerHTML = h;
+    if (G.curSeason) document.getElementById('rawSeason').value = G.curSeason;
+  });
+}
+function loadRaw(){
+  var brand = document.getElementById('rawBrand').value;
+  var season = document.getElementById('rawSeason').value;
+  if (!brand || !season){ alert('브랜드와 시즌을 선택하세요.'); return; }
+  document.getElementById('rawTable').innerHTML = '<tr><td>'+loaderHtml('원본 불러오는 중')+'</td></tr>';
+  RAW.brand = brand; RAW.season = season;
+  run('getRawView', brand, season).then(function(d){
+    if (!d.exists){
+      document.getElementById('rawTable').innerHTML = '<tr><td><div class="empty">이 브랜드×시즌은 아직 업로드되지 않았습니다.</div></td></tr>';
+      document.getElementById('rawInfo').textContent = '';
+      return;
+    }
+    RAW.rows = d.rows; RAW.verKey = d.verKey; RAW.cols = d.cols || [];
+    renderRaw();
+  }).catch(function(e){ alert('조회 실패: '+e.message); });
+  // 상세뷰 연결용 갤러리 데이터도 준비
+  if (G.curBrand !== brand || G.curSeason !== season){
+    G.curBrand = brand; G.curSeason = season;
+    run('getGallery', brand, season).then(function(g){ if (g.exists) GAL.list = g.styles; }).catch(function(){});
+  }
+}
+function renderRaw(){
+  if (!RAW.rows.length) return;
+  var q = document.getElementById('rawQ').value.trim().toUpperCase();
+  var rows = RAW.rows;
+  if (q){
+    rows = rows.filter(function(r){ return r.join('|').toUpperCase().indexOf(q) >= 0; });
+  }
+  document.getElementById('rawInfo').textContent = RAW.verKey + ' · ' + rows.length + '건' + (q ? ' (필터)' : '');
+  var t = '<tr><th>품번</th><th>컬러</th><th>상품명</th><th>아이템</th><th>생산처</th><th>납기</th><th>입고월</th><th class="r">수량</th><th class="r">원가</th><th class="r">판매가</th><th>상태</th></tr>';
+  var LIM = 400;
+  for (var i=0;i<Math.min(rows.length, LIM);i++){
+    var r = rows[i];
+    t += '<tr style="cursor:pointer" onclick="openRawDetail(\''+esc(rawCell(r,'품번'))+'\')">'
+      + '<td><b>'+esc(rawCell(r,'품번'))+'</b></td><td>'+esc(rawCell(r,'컬러코드'))+' <span class="muted">'+esc(rawCell(r,'컬러명'))+'</span></td>'
+      + '<td>'+esc(rawCell(r,'상품명'))+'</td><td>'+esc(rawCell(r,'아이템'))+'</td><td>'+esc(rawCell(r,'생산처'))+'</td>'
+      + '<td>'+esc(rawCell(r,'목표납기'))+'</td><td>'+esc(rawCell(r,'입고예정월'))+'</td>'
+      + '<td class="r">'+num(rawCell(r,'발주수량'))+'</td><td class="r">'+num(rawCell(r,'원가'))+'</td><td class="r">'+num(rawCell(r,'예상판매가'))+'</td>'
+      + '<td>'+esc(rawCell(r,'진행상태'))+'</td></tr>';
+  }
+  if (rows.length > LIM) t += '<tr><td colspan="11" class="empty">'+num(rows.length-LIM)+'건 더 있음 — 검색으로 좁혀주세요</td></tr>';
+  document.getElementById('rawTable').innerHTML = t;
+}
+function openRawDetail(pn){
+  for (var i=0;i<GAL.list.length;i++){
+    if (GAL.list[i].pn === pn){ openLightbox(i); return; }
+  }
+  // 갤러리 목록이 아직이면 최소 정보로 열기
+  GAL.list = [{ pn: pn, name: '', item: '', colors: [], qty: 0, cost: 0, rp: 0, fileId: '' }];
+  openLightbox(0);
+}
+function esc(s){ return String(s===null||s===undefined?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function num(n){ return Number(n||0).toLocaleString('ko-KR'); }
+function eok(n){ var v=Number(n||0); return (v>=100000000||v<=-100000000) ? (v/100000000).toFixed(1)+'억' : num(Math.round(v/10000))+'만'; }
+function run(name){
+  var args = Array.prototype.slice.call(arguments,1);
+  return new Promise(function(res,rej){
+    var onOk = function(raw){
+      if (typeof raw !== 'string'){ rej(new Error(name+' 응답이 비어 있습니다. 새로고침 후 다시 시도해 주세요.')); return; }
+      var p;
+      try { p = JSON.parse(raw); } catch(e){ rej(new Error(name+' 응답 해석 실패')); return; }
+      if (p && p.ok) res(p.data); else rej(new Error(p && p.error ? p.error : '알 수 없는 오류'));
+    };
+    var r = google.script.run.withSuccessHandler(onOk).withFailureHandler(function(e){ rej(new Error(e && e.message ? e.message : String(e))); });
+    r[name].apply(r,args);
+  });
+}
+
+function loaderHtml(msg){ return '<div class="loader">'+msg+'</div>'; }
+function setSeason(){
+  G.season = document.getElementById('seasonSel').value;
+  G.autoOpened = false;
+  document.getElementById('summaryCard').style.display = 'none';
+  document.getElementById('historyCard').style.display = 'none';
+  document.getElementById('galleryCard').style.display = 'none';
+  loadDash();
+}
+function loadDash(){
+  run('getBundle', '', G.season || '').then(function(bundle){
+    var d = bundle.dash;
+    if (bundle.brand && bundle.season){
+      G.bundleCache[bundle.brand + '|' + bundle.season] = bundle;
+    }
+    // 시즌 선택기 채우기 (최초 1회)
+    var sel = document.getElementById('seasonSel');
+    if (!sel.options.length || sel.options.length !== d.seasons.length + 1){
+      var sh = '<option value="">전체 시즌</option>';
+      for (var s=0;s<d.seasons.length;s++) sh += '<option value="'+esc(d.seasons[s])+'">'+esc(d.seasons[s])+'</option>';
+      sel.innerHTML = sh;
+      sel.value = G.season || '';
+    }
+    document.getElementById('cardsTitle').textContent = (G.season ? G.season + ' ' : '') + '브랜드 현황';
+    var cards = document.getElementById('cards');
+    if (!d.cards.length){
+      cards.innerHTML = '<div class="empty">이 시즌에 업로드된 라인시트가 없습니다. [업로드] 탭에서 시작하세요.</div>';
+    }
+    if (d.cards.length){
+      // 전체 합산 카드
+      var h = '<div class="season-card total-card">'
+        + '<div class="k">'+(G.season ? esc(G.season)+' 전체' : '전체')+' <span class="pill v">브랜드 '+d.total.brands+'</span></div>'
+        + '<div class="m">SKU '+num(d.total.sku)+' · '+num(d.total.qty)+'장</div>'
+        + '<div class="m"><b>매입 '+eok(d.total.cost)+'</b> · 매출 '+eok(d.total.rp)+'</div></div>';
+      for (var i=0;i<d.cards.length;i++){
+        var c = d.cards[i];
+        h += '<div class="season-card" onclick="loadSummary(\''+esc(c['브랜드'])+'\',\''+esc(c['시즌'])+'\')">'
+          + '<div class="k">'+esc(c['브랜드'])+' '+esc(c['시즌'])+' <span class="pill v">v'+esc(c['버전번호'])+'</span></div>'
+          + '<div class="m">SKU '+num(c['SKU수'])+' · '+num(c['총수량'])+'장 · 원가 '+eok(c['원가총액'])+'</div>'
+          + '<div class="m" style="color:var(--muted)">'+esc(c['업로드일시'])+' · '+esc(String(c['업로더']).split('@')[0])+'</div></div>';
+      }
+      cards.innerHTML = h;
+      if (!G.autoOpened){
+        G.autoOpened = true;
+        loadSummary(String(d.cards[0]['브랜드']), String(d.cards[0]['시즌']));
+      }
+    }
+    var tb = '<tr><th>버전</th><th>유형</th><th>SKU</th><th>항목</th><th class="r">이전</th><th class="r">변경</th><th>사유</th></tr>';
+    for (var j=0;j<d.recentChanges.length;j++){
+      var ch = d.recentChanges[j];
+      var cls = ch['변경유형']==='신규'?'add':(ch['변경유형']==='삭제'?'del':'chg');
+      tb += '<tr><td>'+esc(ch['버전키'])+'</td><td><span class="pill '+cls+'">'+esc(ch['변경유형'])+'</span></td><td>'+esc(ch['SKU'])+'</td><td>'+esc(ch['항목'])+'</td><td class="r">'+esc(ch['이전값'])+'</td><td class="r">'+esc(ch['새값'])+'</td><td>'+(ch['사유']?esc(ch['사유']):'<span style="color:var(--crit)">미입력</span>')+'</td></tr>';
+    }
+    document.getElementById('changes').innerHTML = tb;
+    document.getElementById('storeLink').href = d.storeUrl;
+    document.getElementById('imgFolder').value = d.imgRoot || '';
+    refreshPendingBadge();
+  }).catch(function(e){ alert('대시보드 로드 실패: '+e.message); });
+}
+
+function refreshPendingBadge(){
+  run('getChangeManager').then(function(m){
+    var b = document.getElementById('pendingCnt');
+    if (m.pendingCount > 0){ b.style.display=''; b.textContent = m.pendingCount; }
+    else b.style.display = 'none';
+  }).catch(function(){});
+}
+
+function b64download(fileName, b64){
+  var bin = atob(b64);
+  var arr = new Uint8Array(bin.length);
+  for (var i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+  var blob = new Blob([arr], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+}
+function downloadTemplate(){
+  run('getHubTemplate').then(function(t){ b64download(t.fileName, t.base64); })
+    .catch(function(e){ alert('양식 다운로드 실패: '+e.message); });
+}
+function exportXlsx(){
+  if (!G.curBrand) return;
+  var btn = document.getElementById('btnExport');
+  btn.disabled = true; btn.textContent = '생성 중...';
+  run('exportSeasonXlsx', G.curBrand, G.curSeason)
+    .then(function(t){ b64download(t.fileName, t.base64); })
+    .catch(function(e){ alert('내보내기 실패: '+e.message); })
+    .then(function(){ btn.disabled = false; btn.textContent = '엑셀 다운로드'; });
+}
+function loadSummary(brand, season){
+  G.curBrand = brand; G.curSeason = season;
+  var cachedB = G.bundleCache[brand + '|' + season];
+  if (cachedB && cachedB.sum){
+    renderBundle(cachedB);
+    return;
+  }
+  var card0 = document.getElementById('summaryCard');
+  card0.style.display = '';
+  document.getElementById('sumTitle').textContent = brand+' '+season;
+  document.getElementById('sumStat').innerHTML = loaderHtml('요약 계산 중');
+  document.getElementById('sumMonth').innerHTML = '';
+  run('getSeasonSummary', brand, season).then(function(s){
+    if (!s.exists) return;
+    var card = document.getElementById('summaryCard');
+    card.style.display = '';
+    document.getElementById('sumTitle').textContent = brand+' '+season+' 최신 ('+s.verKey+')';
+    renderSummaryStats(s, brand, season);
+    renderSeasonViz(s);
+  });
+  loadMonthlyVersions(brand, season);
+  loadHistory(brand, season);
+  loadGallery(brand, season);
+}
+
+function renderSummaryStats(s, brand, season){
+    document.getElementById('sumStat').innerHTML =
+      '<div class="kpi"><div class="k-label">SKU</div><div class="k-value">'+num(s.skuCount)+'</div></div>'
+      + '<div class="kpi"><div class="k-label">총 발주수량</div><div class="k-value">'+num(s.totQty)+'</div></div>'
+      + '<div class="kpi"><div class="k-label">예상 매입 (원가)</div><div class="k-value">'+eok(s.totCost)+'</div><div class="k-sub">'+num(s.totCost)+'원</div></div>'
+      + '<div class="kpi"><div class="k-label">예상 매출 (판매가)</div><div class="k-value">'+eok(s.totRp)+'</div><div class="k-sub">'+num(s.totRp)+'원</div></div>';
+}
+
+function loadMonthlyVersions(brand, season){
+  MV.list = [];
+  document.getElementById('monModes').innerHTML = '';
+  document.getElementById('monCmpNote').textContent = '';
+  run('getMonthlyVersions', brand, season).then(function(mv){
+    MV.list = mv.versions;
+    buildMonModes();
+  }).catch(function(){});
+}
+
+var MV = { list: [], mode: 'latest' };
+function buildMonModes(){
+  var el = document.getElementById('monModes');
+  if (MV.list.length < 2){ el.innerHTML = ''; return; }
+  var prev = MV.list[MV.list.length-2], cur = MV.list[MV.list.length-1];
+  el.innerHTML = '<button class="mini-toggle" id="mm-prev" onclick="setMonMode(\'prev\')">v'+prev.verNo+'</button> '
+    + '<button class="mini-toggle" id="mm-latest" onclick="setMonMode(\'latest\')">v'+cur.verNo+'</button> '
+    + '<button class="mini-toggle" id="mm-cmp" onclick="setMonMode(\'cmp\')">비교</button>';
+  setMonMode('cmp');
+}
+function setMonMode(m){
+  MV.mode = m;
+  var ids = ['prev','latest','cmp'];
+  for (var i=0;i<ids.length;i++){
+    var b = document.getElementById('mm-'+ids[i]);
+    if (b) b.classList.toggle('on', ids[i]===m);
+  }
+  renderMonMode();
+}
+function renderMonMode(){
+  if (MV.list.length < 2) return;
+  var prev = MV.list[MV.list.length-2], cur = MV.list[MV.list.length-1];
+  var el = document.getElementById('monBars');
+  var note = document.getElementById('monCmpNote');
+  if (MV.mode === 'prev' || MV.mode === 'latest'){
+    var v = MV.mode === 'prev' ? prev : cur;
+    var months = Object.keys(v.byMonth).sort();
+    var entries = [];
+    var peak = null;
+    for (var i=0;i<months.length;i++){
+      entries.push([months[i], v.byMonth[months[i]]]);
+      if (!peak || v.byMonth[months[i]] > peak[1]) peak = [months[i], v.byMonth[months[i]]];
+    }
+    barRows(el, entries, v.tot, peak ? peak[0] : null);
+    note.textContent = 'v'+v.verNo+' 기준 · 총 '+eok(v.tot);
+    return;
+  }
+  // 비교 모드: 이전=회색 얇은 막대, 최신=파란 막대, 증감액 강조
+  var all = {};
+  var mk = Object.keys(prev.byMonth).concat(Object.keys(cur.byMonth));
+  for (var a=0;a<mk.length;a++) all[mk[a]] = true;
+  var monthsAll = Object.keys(all).sort();
+  var max = 0;
+  for (var b=0;b<monthsAll.length;b++){
+    max = Math.max(max, prev.byMonth[monthsAll[b]]||0, cur.byMonth[monthsAll[b]]||0);
+  }
+  var h = '';
+  for (var c=0;c<monthsAll.length;c++){
+    var mth = monthsAll[c];
+    var ov = prev.byMonth[mth]||0, nv = cur.byMonth[mth]||0;
+    var d = nv - ov;
+    var dTxt = d === 0 ? '<span class="muted">—</span>'
+      : '<span class="dv '+(d>0?'up':'down')+'">'+(d>0?'+':'−')+eok(Math.abs(d))+'</span>';
+    h += '<div class="brow dual"><span class="bl">'+esc(mth)+'</span>'
+      + '<span class="btrack">'
+      + '<span class="bfill" data-w="'+(max>0?Math.round(nv/max*100):0)+'"></span>'
+      + '<span class="bghost" data-w="'+(max>0?Math.round(ov/max*100):0)+'"></span>'
+      + '</span>'
+      + '<span class="bv"><b>'+eok(nv)+'</b> '+dTxt+'</span></div>';
+  }
+  el.innerHTML = h;
+  setTimeout(function(){
+    var fills = el.querySelectorAll('.bfill,.bghost');
+    for (var f=0;f<fills.length;f++) fills[f].style.width = fills[f].getAttribute('data-w')+'%';
+  }, 60);
+  var totD = cur.tot - prev.tot;
+  note.innerHTML = '파란 막대 = v'+cur.verNo+' · 회색 = v'+prev.verNo+' · 총 증감 '
+    + (totD===0 ? '없음' : '<span class="dv '+(totD>0?'up':'down')+'">'+(totD>0?'+':'−')+eok(Math.abs(totD))+'</span>')
+    + ' (v'+prev.verNo+' '+eok(prev.tot)+' → v'+cur.verNo+' '+eok(cur.tot)+')';
+}
+
+function loadHistory(brand, season){
+  var card = document.getElementById('historyCard');
+  card.style.display = '';
+  document.getElementById('histTitle').textContent = '버전 히스토리 — ' + brand + ' ' + season;
+  document.getElementById('histBody').innerHTML = loaderHtml('버전 이력 불러오는 중');
+  run('getVersionHistory', brand, season).then(function(hst){
+    renderHistory(brand, season, hst);
+  }).catch(function(e){
+    document.getElementById('histBody').innerHTML = '<div class="empty">'+esc(e.message)+'</div>';
+  });
+}
+
+function renderHistory(brand, season, hst){
+  var card = document.getElementById('historyCard');
+  card.style.display = '';
+  document.getElementById('histTitle').textContent = '버전 히스토리 — ' + brand + ' ' + season;
+  {
+    var vs = hst.versions;
+    if (!vs.length){ card.style.display = 'none'; return; }
+    var h = '';
+    for (var i=0;i<vs.length;i++){
+      var v = vs[i];
+      var head = '<div class="vh-head"><span class="pill v">v'+v.verNo+'</span> '
+        + '<b>SKU '+num(v.sku)+' · '+num(v.qty)+'장 · 원가 '+eok(v.cost)+'</b>'
+        + '<span class="muted" style="margin-left:8px">'+esc(v.at)+' · '+esc(String(v.by).split('@')[0])+'</span></div>';
+      var delta = '';
+      if (v.dSku !== null){
+        delta = '<div class="vh-delta">이전 버전 대비: '
+          + chip(v.dSku, 'SKU') + chip(v.dQty, '장') + chip(v.dCost, '원가', true)
+          + ' <span class="muted">신규 '+v.diff.added+' · 삭제 '+v.diff.removed+' · 변경 '+v.diff.changed.length+'</span></div>';
+      } else if (v.diff.first){
+        delta = '<div class="vh-delta"><span class="pill add">최초 적재</span></div>';
+      }
+      var chg = '';
+      if (v.diff.changed.length){
+        var pv = 'v' + (v.verNo - 1);
+        var cv = 'v' + v.verNo;
+        var real = [];
+        var cosmetic = 0;
+        for (var c0=0;c0<v.diff.changed.length;c0++){
+          var raw = v.diff.changed[c0];
+          var o = normVal(raw.oldV), n2 = normVal(raw.newV);
+          if (o === n2){ cosmetic++; continue; }
+          real.push({ sku: raw.sku, field: raw.field, o: o, n: n2, reason: raw.reason, by: raw.by });
+        }
+        if (cosmetic) delta = delta.replace('</div>', ' · <span class="muted">표기만 변경 '+cosmetic+'건 제외</span></div>');
+        if (real.length){
+          chg = '<table class="dt vh-table"><tr><th>SKU</th><th>변경항목</th><th class="r">'+pv+'</th><th class="r">'+cv+'</th><th class="r">증감</th><th>변경사유</th></tr>';
+          var lim = Math.min(real.length, 10);
+          for (var c=0;c<lim;c++){
+            var ch = real[c];
+            chg += '<tr><td>'+esc(ch.sku)+'</td><td>'+esc(ch.field)+'</td>'
+              + '<td class="r" style="color:var(--muted)">'+esc(ch.o)+'</td><td class="r"><b>'+esc(ch.n)+'</b></td>'
+              + '<td class="r">'+deltaCell(ch.o, ch.n)+'</td>'
+              + '<td>'+(ch.reason ? esc(ch.reason)+' <span class="muted">('+esc(String(ch.by).split('@')[0])+')</span>' : '<span style="color:var(--crit)">미입력</span>')+'</td></tr>';
+          }
+          if (real.length > lim) chg += '<tr><td colspan="6" class="empty">외 '+(real.length-lim)+'건 — [변경관리] 탭에서 전체 확인</td></tr>';
+          chg += '</table>';
+        }
+      }
+      h += '<div class="vh-item">'+head+delta+chg+'</div>';
+    }
+    document.getElementById('histBody').innerHTML = h;
+  }
+}
+function normVal(x){
+  x = String(x === null || x === undefined ? '' : x).trim();
+  x = x.replace(/ 00:00:00$/, '');
+  var d = x.match(/^(\d{4}-\d{2})-01$/);
+  return x;
+}
+function deltaCell(o, n){
+  var no = Number(String(o).replace(/,/g, ''));
+  var nn = Number(String(n).replace(/,/g, ''));
+  if (!isNaN(no) && !isNaN(nn) && String(o) !== '' && String(n) !== ''){
+    var d = nn - no;
+    if (d === 0) return '';
+    return '<span class="'+(d>0?'':'')+'" style="color:var('+(d>0?'--good':'--crit')+');font-weight:800">'+(d>0?'+':'−')+num(Math.abs(d))+'</span>';
+  }
+  var do1 = Date.parse(o), dn1 = Date.parse(n);
+  if (!isNaN(do1) && !isNaN(dn1)){
+    var days = Math.round((dn1 - do1) / 86400000);
+    if (days === 0) return '';
+    return '<span style="color:var('+(days>0?'--crit':'--good')+');font-weight:800">'+(days>0?'+':'−')+Math.abs(days)+'일</span>';
+  }
+  return '';
+}
+function chip(v, unit, isMoney){
+  if (v === null || v === 0) return '';
+  var up = v > 0;
+  var txt = (up ? '+' : '−') + (isMoney ? eok(Math.abs(v)) : num(Math.abs(v))) + (isMoney ? '' : unit);
+  return '<span class="dchip '+(up?'up':'down')+'">'+txt+(isMoney?' '+unit:'')+'</span> ';
+}
+
+function barRows(el, entries, total, peakKey){
+  var h = '';
+  var max = 0;
+  for (var i=0;i<entries.length;i++) if (entries[i][1] > max) max = entries[i][1];
+  for (var j=0;j<entries.length;j++){
+    var k = entries[j][0], v = entries[j][1];
+    var pct = total > 0 ? Math.round(v/total*100) : 0;
+    h += '<div class="brow'+(k===peakKey?' peak':'')+'"><span class="bl" title="'+esc(k)+'">'+esc(k)+'</span>'
+      + '<span class="btrack"><span class="bfill" data-w="'+(max>0?Math.round(v/max*100):0)+'"></span></span>'
+      + '<span class="bv"><b>'+eok(v)+'</b> · '+pct+'%</span></div>';
+  }
+  el.innerHTML = h;
+  setTimeout(function(){
+    var fills = el.querySelectorAll('.bfill');
+    for (var f=0;f<fills.length;f++) fills[f].style.width = fills[f].getAttribute('data-w')+'%';
+  }, 60);
+}
+
+function renderSeasonViz(s){
+  var months = Object.keys(s.byMonth).sort();
+  var mEntries = [];
+  var peak = null;
+  for (var i=0;i<months.length;i++){
+    mEntries.push([months[i], s.byMonth[months[i]]]);
+    if (!peak || s.byMonth[months[i]] > peak[1]) peak = [months[i], s.byMonth[months[i]]];
+  }
+  // 판정문장: 피크 + 상위 연속 4개월 비중
+  var verdict = '';
+  if (peak){
+    var sorted = mEntries.slice().sort(function(a,b){ return b[1]-a[1]; });
+    var top4 = sorted.slice(0, Math.min(4, sorted.length));
+    var top4sum = 0;
+    var top4names = [];
+    for (var t4=0;t4<top4.length;t4++){ top4sum += top4[t4][1]; top4names.push(top4[t4][0]); }
+    top4names.sort();
+    var share = s.totCost > 0 ? Math.round(top4sum/s.totCost*100) : 0;
+    verdict = '매입 피크는 <b>'+esc(peak[0])+' ('+eok(peak[1])+')</b> — '
+      + esc(top4names[0])+'~'+esc(top4names[top4names.length-1])+' 구간 '+top4.length+'개월에 전체의 <b>'+share+'%</b>가 집중됩니다. 이 구간 자금 소요 대비가 필요합니다.';
+  }
+  document.getElementById('sumVerdict').innerHTML = verdict;
+  barRows(document.getElementById('monBars'), mEntries, s.totCost, peak ? peak[0] : null);
+  // 표 (토글 뒤)
+  var t = '<tr><th>입고예정월</th><th class="r">예상 매입액(원가)</th></tr>';
+  for (var m=0;m<mEntries.length;m++) t += '<tr><td>'+esc(mEntries[m][0])+'</td><td class="r">'+num(mEntries[m][1])+'</td></tr>';
+  document.getElementById('sumMonth').innerHTML = t;
+  // 아이템 구성 (상위 6 + 기타)
+  var items = [];
+  var ik = Object.keys(s.byItem || {});
+  for (var a=0;a<ik.length;a++) items.push([ik[a], s.byItem[ik[a]]]);
+  items.sort(function(x,y){ return y[1]-x[1]; });
+  var top = items.slice(0,6);
+  var etc = 0;
+  for (var b=6;b<items.length;b++) etc += items[b][1];
+  if (etc > 0) top.push(['기타', etc]);
+  barRows(document.getElementById('itemBars'), top, s.totCost, null);
+  // 생산처 상위 5
+  var vens = [];
+  var vk = Object.keys(s.byVendor || {});
+  for (var c=0;c<vk.length;c++) vens.push([vk[c], s.byVendor[vk[c]]]);
+  vens.sort(function(x,y){ return y[1]-x[1]; });
+  barRows(document.getElementById('vendorBars'), vens.slice(0,5), s.totCost, null);
+}
+
+function toggleMonView(){
+  var tw = document.getElementById('monTableWrap');
+  var bars = document.getElementById('monBars');
+  var show = tw.style.display === 'none';
+  tw.style.display = show ? '' : 'none';
+  bars.style.display = show ? 'none' : '';
+  document.getElementById('monToggle').textContent = show ? '차트로 보기' : '표로 보기';
+}
+
+var GAL = { list: [], shown: 0, PAGE: 24, queue: [], active: 0 };
+function loadGallery(brand, season){
+  run('getGallery', brand, season).then(function(g){
+    renderGallery(brand, season, g);
+  }).catch(function(e){ alert('갤러리 로드 실패: '+e.message); });
+  document.getElementById('galleryCard').style.display = '';
+  document.getElementById('galGrid').innerHTML = loaderHtml('갤러리 준비 중');
+}
+
+function renderGallery(brand, season, g){
+    var card = document.getElementById('galleryCard');
+    if (!g.exists){ card.style.display='none'; return; }
+    card.style.display = '';
+    document.getElementById('galTitle').textContent = '상품 갤러리';
+    document.getElementById('galHint').textContent = '품번 '+g.styles.length+'개 · 사진 '+g.imgCount+'장 · 원가 큰 순 · 사진 클릭 = 확대';
+    GAL.list = g.styles; GAL.shown = 0; GAL.queue = [];
+    document.getElementById('galGrid').innerHTML = '';
+    moreGallery();
+}
+function moreGallery(){
+  var grid = document.getElementById('galGrid');
+  var step = GAL.shown === 0 ? 10 : GAL.PAGE; // 처음엔 한 줄 정도만
+  var end = Math.min(GAL.shown + step, GAL.list.length);
+  for (var i = GAL.shown; i < end; i++){
+    var st = GAL.list[i];
+    var div = document.createElement('div');
+    div.className = 'g-card';
+    var imgHtml = st.fileId
+      ? '<div class="g-noimg" id="gimg'+i+'"><span class="loader sm"></span></div>'
+      : '<div class="g-noimg">사진 없음</div>';
+    div.innerHTML = imgHtml
+      + '<div class="g-body"><div class="g-pn">'+esc(st.pn)+'</div>'
+      + '<div class="g-nm">'+esc(st.name)+'</div>'
+      + '<div class="g-mt">'+esc(st.item)+' · 컬러 '+st.colors.length+' · '+num(st.qty)+'장 · '+eok(st.cost)+'</div></div>';
+    div.style.cursor = 'pointer';
+    (function(idx){ div.onclick = function(){ openLightbox(idx); }; })(i);
+    grid.appendChild(div);
+    if (st.fileId) GAL.queue.push({ i: i, st: st });
+  }
+  GAL.shown = end;
+  document.getElementById('galMore').style.display = (GAL.shown < GAL.list.length) ? '' : 'none';
+  pumpImages();
+}
+function pumpImages(){
+  while (GAL.active < 3 && GAL.queue.length){
+    (function(job){
+      GAL.active++;
+      run('getImageData', job.st.fileId, false).then(function(uri){
+        G.imgCache[job.st.fileId] = uri;
+        var holder = document.getElementById('gimg'+job.i);
+        if (holder){
+          var img = document.createElement('img');
+          img.className = 'g-img';
+          img.src = uri;
+          img.alt = job.st.pn;
+          holder.replaceWith(img);
+        }
+      }).catch(function(){
+        var holder = document.getElementById('gimg'+job.i);
+        if (holder) holder.textContent = '로드 실패';
+      }).then(function(){ GAL.active--; pumpImages(); });
+    })(GAL.queue.shift());
+  }
+}
+var LB = { idx: -1, seq: 0 };
+function openLightbox(i){
+  LB.idx = i;
+  LB.brand = G.curBrand; LB.season = G.curSeason;
+  document.getElementById('lightbox').hidden = false;
+  renderLb();
+}
+function renderLb(){
+  var st = GAL.list[LB.idx];
+  if (!st){ closeLb(); return; }
+  LB.seq++;
+  var mySeq = LB.seq;
+  var img = document.getElementById('lbImg');
+  var stageLoad = document.getElementById('lbLoad');
+  pzReset();
+  img.src = G.imgCache[st.fileId] || '';
+  img.style.display = G.imgCache[st.fileId] ? '' : 'none';
+  stageLoad.style.display = (st.fileId && !G.imgCache[st.fileId]) ? '' : 'none';
+  if (!st.fileId){ stageLoad.style.display = 'none'; img.style.display = 'none'; }
+  document.getElementById('lbPos').textContent = (LB.idx+1) + ' / ' + GAL.list.length + ' · 원가 큰 순';
+  document.getElementById('lbPn').textContent = st.pn;
+  document.getElementById('lbName').textContent = st.name;
+  document.getElementById('lbKpis').innerHTML =
+    '<div class="kpi"><div class="k-label">총 수량</div><div class="k-value">'+num(st.qty)+'</div></div>'
+    + '<div class="kpi"><div class="k-label">원가금액</div><div class="k-value">'+eok(st.cost)+'</div></div>';
+  document.getElementById('lbMeta').innerHTML = '<div class="loader sm" style="grid-column:1/-1">상세 불러오는 중</div>';
+  document.getElementById('lbColors').innerHTML = '';
+  document.getElementById('lbSizes').innerHTML = '';
+  document.getElementById('lbNote').textContent = '';
+  if (st.fileId){
+    run('getImageData', st.fileId, true).then(function(uri){
+      if (mySeq !== LB.seq) return;
+      G.imgCache[st.fileId] = uri;
+      img.src = uri;
+      img.style.display = '';
+      stageLoad.style.display = 'none';
+    }).catch(function(){
+      if (mySeq !== LB.seq) return;
+      stageLoad.style.display = 'none';
+    });
+  }
+  run('getStyleDetail', LB.brand, LB.season, st.pn).then(function(d){
+    if (mySeq !== LB.seq || !d.exists) return;
+    document.getElementById('lbKpis').innerHTML =
+      '<div class="kpi"><div class="k-label">총 수량</div><div class="k-value">'+num(d.totQty)+'</div></div>'
+      + '<div class="kpi"><div class="k-label">원가금액</div><div class="k-value">'+eok(d.totCost)+'</div><div class="k-sub">'+num(d.totCost)+'원</div></div>'
+      + '<div class="kpi"><div class="k-label">판매가금액</div><div class="k-value">'+eok(d.totRp)+'</div><div class="k-sub">'+num(d.totRp)+'원</div></div>'
+      + '<div class="kpi"><div class="k-label">배수</div><div class="k-value">'+d.mup+'</div></div>';
+    var m = d.meta;
+    document.getElementById('lbMeta').innerHTML =
+      '<span class="k">분류</span><span class="v">'+esc(m.cat)+' · '+esc(m.item)+'</span>'
+      + '<span class="k">생산처</span><span class="v">'+esc(m.vendor||'-')+'</span>'
+      + '<span class="k">방식/원산지</span><span class="v">'+esc(m.method||'-')+' · '+esc(m.origin||'-')+'</span>'
+      + (m.material ? '<span class="k">소재</span><span class="v">'+esc(m.material)+'</span>' : '')
+      + '<span class="k">목표납기</span><span class="v">'+esc(m.due||'-')+'</span>'
+      + '<span class="k">입고예정월</span><span class="v">'+esc(m.ym||'-')+'</span>';
+    var t = '<tr><th>컬러</th><th class="r">수량</th><th class="r">원가</th><th class="r">판매가</th></tr>';
+    for (var i=0;i<d.colors.length;i++){
+      var c = d.colors[i];
+      t += '<tr><td><b>'+esc(c.cc)+'</b> <span class="muted">'+esc(c.cname)+'</span></td><td class="r">'+num(c.qty)+'</td><td class="r">'+num(c.cost)+'</td><td class="r">'+num(c.rp)+'</td></tr>';
+    }
+    document.getElementById('lbColors').innerHTML = t;
+    var sh = '';
+    for (var s=0;s<d.sizes.length;s++){
+      sh += '<span class="sizechip">'+esc(d.sizes[s].size)+' <b>'+num(d.sizes[s].qty)+'</b></span>';
+    }
+    document.getElementById('lbSizes').innerHTML = sh || '<span class="muted">사이즈 데이터 없음</span>';
+    if (m.note) document.getElementById('lbNote').textContent = '비고: ' + m.note;
+  }).catch(function(){});
+}
+function lbNav(d){
+  if (LB.idx < 0) return;
+  var n = LB.idx + d;
+  if (n < 0 || n >= GAL.list.length) return;
+  LB.idx = n;
+  renderLb();
+}
+/* 이미지 팬·줌: 휠=커서 기준 확대/축소, 드래그=이동, 더블클릭=리셋 */
+var PZ = { s: 1, tx: 0, ty: 0, drag: null };
+function pzApply(){
+  document.getElementById('lbImg').style.transform = 'translate('+PZ.tx+'px,'+PZ.ty+'px) scale('+PZ.s+')';
+  document.getElementById('pzPct').textContent = Math.round(PZ.s * 100) + '%';
+}
+function pzReset(){ PZ.s = 1; PZ.tx = 0; PZ.ty = 0; pzApply(); }
+function pzZoom(factor, cx, cy){
+  var ns = Math.min(8, Math.max(0.3, PZ.s * factor));
+  var k = ns / PZ.s;
+  if (cx !== undefined){
+    var rect = document.getElementById('lbStage').getBoundingClientRect();
+    var px = cx - rect.left - rect.width / 2;
+    var py = cy - rect.top - rect.height / 2;
+    PZ.tx = px - (px - PZ.tx) * k;
+    PZ.ty = py - (py - PZ.ty) * k;
+  } else {
+    PZ.tx *= k; PZ.ty *= k;
+  }
+  PZ.s = ns;
+  pzApply();
+}
+(function(){
+  var stage = document.getElementById('lbStage');
+  var img = document.getElementById('lbImg');
+  stage.addEventListener('wheel', function(e){
+    if (document.getElementById('lightbox').hidden) return;
+    e.preventDefault();
+    pzZoom(e.deltaY < 0 ? 1.18 : 1/1.18, e.clientX, e.clientY);
+  }, { passive: false });
+  img.addEventListener('mousedown', function(e){
+    e.preventDefault();
+    PZ.drag = { x: e.clientX - PZ.tx, y: e.clientY - PZ.ty };
+    img.classList.add('dragging');
+  });
+  window.addEventListener('mousemove', function(e){
+    if (!PZ.drag) return;
+    PZ.tx = e.clientX - PZ.drag.x;
+    PZ.ty = e.clientY - PZ.drag.y;
+    pzApply();
+  });
+  window.addEventListener('mouseup', function(){
+    PZ.drag = null;
+    img.classList.remove('dragging');
+  });
+  img.addEventListener('dblclick', function(e){ e.preventDefault(); pzReset(); });
+  // 터치: 한 손가락 드래그
+  img.addEventListener('touchstart', function(e){
+    if (e.touches.length === 1){
+      PZ.drag = { x: e.touches[0].clientX - PZ.tx, y: e.touches[0].clientY - PZ.ty };
+    }
+  }, { passive: true });
+  window.addEventListener('touchmove', function(e){
+    if (!PZ.drag || e.touches.length !== 1) return;
+    PZ.tx = e.touches[0].clientX - PZ.drag.x;
+    PZ.ty = e.touches[0].clientY - PZ.drag.y;
+    pzApply();
+  }, { passive: true });
+  window.addEventListener('touchend', function(){ PZ.drag = null; });
+})();
+function closeLb(){
+  document.getElementById('lightbox').hidden = true;
+  LB.idx = -1;
+}
+document.addEventListener('keydown', function(e){
+  if (document.getElementById('lightbox').hidden) return;
+  if (e.key === 'Escape') closeLb();
+  if (e.key === 'ArrowLeft') lbNav(-1);
+  if (e.key === 'ArrowRight') lbNav(1);
+});
+
+function pickFile(){ document.getElementById('fileInput').click(); }
+function setFile(f){
+  if (!f || f.name.slice(-5).toLowerCase() !== '.xlsx'){ alert('.xlsx 파일만 올릴 수 있습니다.'); return; }
+  G.file = f;
+  document.getElementById('upFileName').textContent = f.name;
+  document.getElementById('upGo').disabled = false;
+}
+document.getElementById('fileInput').addEventListener('change', function(e){ setFile(e.target.files[0]); });
+var dz = document.getElementById('dropzone');
+dz.addEventListener('click', pickFile);
+dz.addEventListener('dragover', function(e){ e.preventDefault(); dz.classList.add('on'); });
+dz.addEventListener('dragleave', function(){ dz.classList.remove('on'); });
+dz.addEventListener('drop', function(e){ e.preventDefault(); dz.classList.remove('on'); setFile(e.dataTransfer.files[0]); });
+
+function doUpload(){
+  var brand = document.getElementById('upBrand').value;
+  var season = document.getElementById('upSeason').value;
+  var msg = document.getElementById('upMsg');
+  msg.className = 'msg';
+  if (!brand || !season){ msg.className='msg err'; msg.textContent='브랜드와 시즌을 먼저 선택하세요.'; return; }
+  if (!G.file){ msg.className='msg err'; msg.textContent='파일을 선택하세요.'; return; }
+  document.getElementById('upSpin').style.display='block';
+  document.getElementById('upGo').disabled = true;
+  var reader = new FileReader();
+  reader.onload = function(){
+    var b64 = String(reader.result).split(',')[1];
+    run('uploadLinesheet', { fileName: G.file.name, fileBase64: b64, brand: brand, season: season })
+      .then(function(res){ renderUploadResult(res); })
+      .catch(function(e){ msg.className='msg err'; msg.textContent='업로드 실패: '+e.message; })
+      .then(function(){ document.getElementById('upSpin').style.display='none'; document.getElementById('upGo').disabled=false; });
+  };
+  reader.readAsDataURL(G.file);
+}
+
+function renderUploadResult(res){
+  var msg = document.getElementById('upMsg');
+  var lines = [];
+  for (var i=0;i<res.issues.length;i++){
+    lines.push('['+(res.issues[i].level==='error'?'차단':'경고')+'] '+res.issues[i].where+' — '+res.issues[i].msg);
+  }
+  if (!res.ok){
+    msg.className='msg err';
+    msg.textContent = '검증 실패 — 아래 항목을 고친 뒤 다시 올려주세요.\n' + lines.join('\n');
+    return;
+  }
+  var s = res.summary;
+  var d = s.diff;
+  var changeCount = d.isFirst ? 0 : (d.added.length + d.removed.length + d.changed.length);
+  msg.className = res.issues.length ? 'msg warn' : 'msg ok';
+  msg.textContent = '적재 완료: '+s.verKey+' (SKU '+num(s.skuCount)+', 수량 '+num(s.totQty)+', 원가 '+num(s.totCost)+'원)'
+    + (changeCount ? '\n이전 버전과 차이 '+changeCount+'건 — 아래 내역을 확인하고 변경관리에서 사유를 입력해 주세요.' : '')
+    + (res.issues.length ? '\n경고 '+res.issues.length+'건:\n'+lines.join('\n') : '');
+  var wrap = document.getElementById('diffWrap');
+  document.getElementById('diffActions').style.display = changeCount ? '' : 'none';
+  if (d.isFirst || !changeCount){ wrap.style.display='none'; loadDash(); refreshPendingBadge(); return; }
+  var t = '<tr><th>구분</th><th>SKU</th><th>항목</th><th class="r">이전</th><th class="r">변경</th></tr>';
+  for (var a=0;a<d.added.length;a++) t += '<tr><td><span class="pill add">신규</span></td><td>'+esc(d.added[a])+'</td><td colspan="3"></td></tr>';
+  for (var r=0;r<d.removed.length;r++) t += '<tr><td><span class="pill del">삭제</span></td><td>'+esc(d.removed[r])+'</td><td colspan="3"></td></tr>';
+  for (var c=0;c<d.changed.length;c++){
+    var ch = d.changed[c];
+    t += '<tr><td><span class="pill chg">변경</span></td><td>'+esc(ch.sku)+'</td><td>'+esc(ch.field)+'</td><td class="r">'+esc(ch.oldV)+'</td><td class="r">'+esc(ch.newV)+'</td></tr>';
+  }
+  document.getElementById('diffTable').innerHTML = t;
+  wrap.style.display = '';
+  loadDash();
+  refreshPendingBadge();
+}
+
+function loadChanges(){
+  document.getElementById('chTable').innerHTML = '<tr><td>'+loaderHtml('변경 이력 불러오는 중')+'</td></tr>';
+  run('getChangeManager').then(function(m){
+    CH_DATA = m.rows;
+    renderChanges();
+    var b = document.getElementById('pendingCnt');
+    if (m.pendingCount > 0){ b.style.display=''; b.textContent = m.pendingCount; } else b.style.display='none';
+  }).catch(function(e){
+    document.getElementById('chMsg').className='msg err';
+    document.getElementById('chMsg').textContent = e.message;
+  });
+}
+function renderChanges(){
+  var mode = document.getElementById('chFilter').value;
+  var rows = CH_DATA.filter(function(r){ return mode==='all' ? true : !r.reason; });
+  document.getElementById('chInfo').textContent = rows.length + '건' + (mode==='pending' ? ' (사유 미입력)' : '');
+  var t = '<tr><th style="width:34px">선택</th><th>버전</th><th>구분</th><th>SKU</th><th>항목</th><th class="r">이전</th><th class="r">변경</th><th>사유</th></tr>';
+  for (var i=0;i<rows.length;i++){
+    var r = rows[i];
+    var cls = r.type==='신규'?'add':(r.type==='삭제'?'del':'chg');
+    var reasonCell = r.reason
+      ? '<span class="reason-done">'+esc(r.reason)+' <span class="muted">('+esc(String(r.reasonBy).split('@')[0])+')</span></span>'
+      : '<span style="color:var(--crit)">미입력</span>';
+    t += '<tr><td><input type="checkbox" class="chk chrow" data-i="'+i+'" onclick="updateSel()"'+(r.reason?' disabled':'')+'></td>'
+      + '<td>'+esc(r.verKey)+'</td><td><span class="pill '+cls+'">'+esc(r.type)+'</span></td>'
+      + '<td>'+esc(r.sku)+'</td><td>'+esc(r.field)+'</td><td class="r">'+esc(r.oldV)+'</td><td class="r">'+esc(r.newV)+'</td>'
+      + '<td>'+reasonCell+'</td></tr>';
+  }
+  document.getElementById('chTable').innerHTML = t;
+  G.chRows = rows;
+  updateSel();
+}
+function toggleAll(){
+  var on = document.getElementById('chAll').checked;
+  var boxes = document.querySelectorAll('.chrow');
+  for (var i=0;i<boxes.length;i++) if (!boxes[i].disabled) boxes[i].checked = on;
+  updateSel();
+}
+function updateSel(){
+  var boxes = document.querySelectorAll('.chrow');
+  var n = 0;
+  for (var i=0;i<boxes.length;i++) if (boxes[i].checked) n++;
+  document.getElementById('chSel').textContent = n + '건 선택됨';
+}
+function submitReasons(){
+  var msg = document.getElementById('chMsg');
+  var boxes = document.querySelectorAll('.chrow');
+  var items = [];
+  for (var i=0;i<boxes.length;i++){
+    if (boxes[i].checked){
+      var r = G.chRows[Number(boxes[i].getAttribute('data-i'))];
+      items.push({ verKey: r.verKey, sku: r.sku, field: r.field, type: r.type });
+    }
+  }
+  run('saveChangeReasons', { items: items, reason: document.getElementById('chReason').value })
+    .then(function(res){
+      msg.className='msg ok'; msg.textContent = res.updated + '건에 사유가 저장되었습니다.';
+      document.getElementById('chReason').value='';
+      document.getElementById('chAll').checked=false;
+      loadChanges();
+    })
+    .catch(function(e){ msg.className='msg err'; msg.textContent = e.message; });
+}
+
+function initSelects(){
+  run('getDictEntries','브랜드').then(function(list){
+    var h = '<option value="">브랜드</option>';
+    for (var i=0;i<list.length;i++) h += '<option value="'+esc(list[i].code)+'">'+esc(list[i].code)+' '+esc(list[i].name)+'</option>';
+    document.getElementById('upBrand').innerHTML = h;
+  });
+  run('getDictEntries','시즌').then(function(list){
+    var h = '<option value="">시즌</option>';
+    for (var i=0;i<list.length;i++) h += '<option value="'+esc(list[i].code)+'">'+esc(list[i].code)+'</option>';
+    document.getElementById('upSeason').innerHTML = h;
+  });
+  var th = '';
+  for (var i=0;i<DICT_TYPES.length;i++) th += '<option>'+DICT_TYPES[i]+'</option>';
+  document.getElementById('dictType').innerHTML = th;
+  loadDict();
+}
+function loadDict(){
+  var type = document.getElementById('dictType').value;
+  document.getElementById('dictTable').innerHTML = '<tr><td>'+loaderHtml('코드사전 불러오는 중')+'</td></tr>';
+  run('getDictEntries', type).then(function(list){
+    var t = '<tr><th>코드</th><th>이름</th><th>비고</th></tr>';
+    for (var i=0;i<list.length;i++) t += '<tr><td class="l">'+esc(list[i].code)+'</td><td class="l">'+esc(list[i].name)+'</td><td class="l">'+esc(list[i].note)+'</td></tr>';
+    document.getElementById('dictTable').innerHTML = t;
+  });
+}
+function addDict(){
+  var msg = document.getElementById('dictMsg');
+  run('addDictEntry', { type: document.getElementById('dictType').value, code: document.getElementById('dcode').value, name: document.getElementById('dname').value })
+    .then(function(){ msg.className='msg ok'; msg.textContent='등록 완료'; document.getElementById('dcode').value=''; document.getElementById('dname').value=''; loadDict(); })
+    .catch(function(e){ msg.className='msg err'; msg.textContent=e.message; });
+}
+function saveImgRoot(){
+  var msg = document.getElementById('adminMsg');
+  run('setImageRoot', document.getElementById('imgFolder').value)
+    .then(function(){ msg.className='msg ok'; msg.textContent='이미지 폴더가 등록되었습니다.'; })
+    .catch(function(e){ msg.className='msg err'; msg.textContent=e.message; });
+}
+
+loadDash();
+initSelects();
+</script>
+</body>
+</html>
