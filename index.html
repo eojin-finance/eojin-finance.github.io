@@ -50,7 +50,7 @@
   .prog a.on { background: var(--ink); transform: scale(1.25); }
 
   /* 트랙 + 카드 */
-  .track { --pad: max(var(--sp-6), calc((100% - 980px) / 2 + var(--sp-6))); --cw: 380px; display: flex; gap: var(--sp-4); overflow-x: auto; scroll-snap-type: x mandatory; padding: var(--sp-5) var(--pad); scroll-padding-inline: var(--pad); scrollbar-width: none; }
+  .track { --pad: max(var(--sp-6), calc((100% - 980px) / 2 + var(--sp-6))); --cw: 380px; display: flex; gap: var(--sp-4); overflow-x: auto; scroll-snap-type: x mandatory; padding: var(--sp-5) var(--pad); scrollbar-width: none; }
   .track::-webkit-scrollbar { display: none; }
   /* 마지막 카드도 스냅 시작점에 설 수 있게 꼬리 여백 — 없으면 끝 카드는 끝까지 못 밀린다 */
   /* 카드는 JS가 .lane 으로 감싼다 — 러버밴드(끝에서 튕김)는 lane 의 transform 으로, 스크롤은 track 이 */
@@ -58,14 +58,14 @@
   .track.drag { cursor: grabbing; scroll-snap-type: none; }
   @media (pointer: fine) { .track { scroll-snap-type: none; } }   /* 마우스·트랙패드는 JS 가 카드 단위로 움직인다 — 네이티브 스냅과 싸우지 않게 */
   .track > .lane { display: flex; gap: var(--sp-4); will-change: transform; }
-  .track > .lane > .sp { flex: 0 0 calc(100% - var(--cw) - var(--sp-4)); }
+  .track > .lane > .sp, .track > .lane > .sp0 { flex: 0 0 0px; }
   .track.drag .cardx { pointer-events: none; }
   .cardx { transition: transform 420ms cubic-bezier(.22,1.2,.36,1), box-shadow var(--dur-2) var(--ease-std); }
   .cardx:hover { transform: translateY(-4px) scale(1.012); box-shadow: 0 18px 40px -18px rgba(0,0,0,.4); }
   .cardx:active { transform: scale(.985); transition-duration: 120ms; }
   .dots i { transition: transform 320ms cubic-bezier(.22,1.2,.36,1), background var(--dur-1) var(--ease-std); } .dots i.on { transform: scaleX(3); margin: 0 6px; }
   .hero .links a, .appbar a.cta { transition: transform var(--dur-1) var(--ease-std); display: inline-block; } .hero .links a:hover, .appbar a.cta:hover { transform: translateY(-1px); } .appbar a.cta:active { transform: scale(.94); }
-  .cardx { flex: 0 0 380px; scroll-snap-align: start; border-radius: 22px; overflow: hidden; background: var(--gray6); box-shadow: 0 10px 30px -18px rgba(0,0,0,.35); display: flex; flex-direction: column; }
+  .cardx { flex: 0 0 380px; scroll-snap-align: center; border-radius: 22px; overflow: hidden; background: var(--gray6); box-shadow: 0 10px 30px -18px rgba(0,0,0,.35); display: flex; flex-direction: column; }
   .cardx .b { padding: var(--sp-4) var(--sp-5) var(--sp-5); }
   .cardx .eb { font-size: var(--fs-11); text-transform: uppercase; letter-spacing: .06em; color: var(--ios); font-weight: 700; }
   .cardx h3 { font-size: var(--fs-18); font-weight: 600; margin-top: 4px; } .cardx p { font-size: var(--fs-13); color: var(--label2); margin-top: var(--sp-1); line-height: 1.55; }
@@ -320,7 +320,7 @@
 
 <footer>
   <div><strong style="color:var(--ink)">이어진</strong> · 패션 이커머스(브랜드 복수 운영) 재무회계팀 매니저 · 재직 중 1년 6개월 · <a href="mailto:lee-ding@naver.com">lee-ding@naver.com</a></div>
-  <div>개인 포트폴리오이며 소속 회사와 무관하게 작성했습니다. 회사 내부 데이터는 포함하지 않습니다. 2026-09 갱신 · <span id="build">build 913a43e+</span></div>
+  <div>개인 포트폴리오이며 소속 회사와 무관하게 작성했습니다. 회사 내부 데이터는 포함하지 않습니다. 2026-09 갱신 · <span id="build">build bb798a8</span></div>
 </footer>
 <a class="top" href="#" aria-label="맨 위로">↑</a>
 
@@ -331,20 +331,25 @@
   document.querySelectorAll('.track').forEach(function (t) {
     var lane = document.createElement('div'); lane.className = 'lane';
     while (t.firstChild) lane.appendChild(t.firstChild);
+    var sp0 = document.createElement('div'); sp0.className = 'sp0'; lane.insertBefore(sp0, lane.firstChild);
     var sp = document.createElement('div'); sp.className = 'sp'; lane.appendChild(sp); t.appendChild(lane);
   });
   // 트랙 제어 — 상태는 '현재 카드 번호(cur)' 하나. 휠은 한 제스처에 한 장, 드래그는 놓을 때 가장 가까운 장, 끝에서는 러버밴드.
   document.querySelectorAll('.track').forEach(function (t) {
     var lane = t.firstElementChild, over = 0, raf = null, cur = 0, lock = 0, acc = 0, armed = true, settleTimer = null, wheelTimer = null;
     var dragging = false, moved = false, startX = 0, startL = 0, lastX = 0, lastT = 0, vx = 0, animating = false, animTimer = null;
-    function cards() { return Array.prototype.filter.call(lane.children, function (c) { return !c.classList.contains('sp'); }); }
-    var sp = lane.querySelector('.sp');
-    function fitTail() { var cs = cards(), last = cs[cs.length - 1], pad = parseFloat(getComputedStyle(t).paddingLeft) || 0;
-      var w = Math.max(0, t.clientWidth - pad * 2 - last.offsetWidth - 16); sp.style.flexBasis = w + 'px'; sp.style.width = w + 'px'; }
+    function cards() { return Array.prototype.filter.call(lane.children, function (c) { return !c.classList.contains('sp') && !c.classList.contains('sp0'); }); }
+    var sp = lane.querySelector('.sp'), sp0 = lane.querySelector('.sp0');
+    function padL() { return parseFloat(getComputedStyle(t).paddingLeft) || 0; }
+    // 앞뒤 여백: 첫 카드와 마지막 카드도 화면 정중앙에 설 수 있게 (여백 = 반쪽 뷰포트 − 반쪽 카드 − 패딩 − gap)
+    function fitTail() { var cs = cards(), first = cs[0], last = cs[cs.length - 1], pad = padL(), cw = t.clientWidth;
+      var a = Math.max(0, cw / 2 - first.offsetWidth / 2 - pad - 16), b = Math.max(0, cw / 2 - last.offsetWidth / 2 - pad - 16);
+      sp0.style.flexBasis = a + 'px'; sp0.style.width = a + 'px'; sp.style.flexBasis = b + 'px'; sp.style.width = b + 'px'; }
     fitTail(); window.addEventListener('resize', fitTail); window.addEventListener('load', fitTail);
-    function maxL() { var cs = cards(); return Math.min(t.scrollWidth - t.clientWidth, cs[cs.length - 1].offsetLeft); }
-    function posOf(i) { var cs = cards(); i = Math.max(0, Math.min(cs.length - 1, i)); return Math.min(maxL(), cs[i].offsetLeft); }
-    function nearest(x) { var cs = cards(), best = 0, bd = 1e9; cs.forEach(function (c, i) { var d = Math.abs(c.offsetLeft - x); if (d < bd) { bd = d; best = i; } }); return best; }
+    function centerOf(c) { return c.offsetLeft + padL() + c.offsetWidth / 2 - t.clientWidth / 2; }   // 이 scrollLeft 면 카드가 정중앙
+    function maxL() { return Math.max(0, Math.min(t.scrollWidth - t.clientWidth, centerOf(cards()[cards().length - 1]))); }
+    function posOf(i) { var cs = cards(); i = Math.max(0, Math.min(cs.length - 1, i)); return Math.max(0, Math.min(maxL(), centerOf(cs[i]))); }
+    function nearest(x) { var cs = cards(), best = 0, bd = 1e9; cs.forEach(function (c, i) { var d = Math.abs(centerOf(c) - x); if (d < bd) { bd = d; best = i; } }); return best; }
     function goTo(i, instant) { var cs = cards(); cur = Math.max(0, Math.min(cs.length - 1, i)); animating = true; clearTimeout(animTimer); animTimer = setTimeout(function () { animating = false; }, 600);
       t.scrollTo({ left: posOf(cur), behavior: instant ? 'auto' : 'smooth' }); }
     function setOver(v) { over = v; lane.style.transform = v ? 'translateX(' + (-v) + 'px)' : ''; }
@@ -380,9 +385,9 @@
     window.addEventListener('resize', function () { goTo(cur, true); });
   });
   // 트랙 점
-  document.querySelectorAll('.track[data-dots]').forEach(function (t) { var dots = t.nextElementSibling; if (!dots || !dots.classList.contains('dots')) return; var cards = Array.prototype.filter.call(t.firstElementChild.children, function (c) { return !c.classList.contains('sp'); }); var n = cards.length;
+  document.querySelectorAll('.track[data-dots]').forEach(function (t) { var dots = t.nextElementSibling; if (!dots || !dots.classList.contains('dots')) return; var cards = Array.prototype.filter.call(t.firstElementChild.children, function (c) { return !c.classList.contains('sp') && !c.classList.contains('sp0'); }); var n = cards.length;
     dots.innerHTML = Array.apply(null, Array(n)).map(function (_, i) { return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('');
-    t.addEventListener('scroll', function () { var x = t.scrollLeft, best = 0, bd = 1e9; cards.forEach(function (c, j) { var d = Math.abs(c.offsetLeft - x); if (d < bd) { bd = d; best = j; } }); Array.prototype.forEach.call(dots.children, function (d, j) { d.classList.toggle('on', j === best); }); }, { passive: true }); });
+    t.addEventListener('scroll', function () { var pad = parseFloat(getComputedStyle(t).paddingLeft) || 0, x = t.scrollLeft + t.clientWidth / 2 - pad, best = 0, bd = 1e9; cards.forEach(function (c, j) { var d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - x); if (d < bd) { bd = d; best = j; } }); Array.prototype.forEach.call(dots.children, function (d, j) { d.classList.toggle('on', j === best); }); }, { passive: true }); });
   // 등장
   var els = Array.prototype.slice.call(document.querySelectorAll('.rv'));
   els.forEach(function (el) { var sib = Array.prototype.filter.call(el.parentNode.children, function (c) { return c.classList.contains('rv'); }); el.style.setProperty('--i', Math.min(sib.indexOf(el), 7)); });
