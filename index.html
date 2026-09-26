@@ -57,13 +57,14 @@
   .track { cursor: grab; user-select: none; overscroll-behavior-x: contain; }
   .track.drag { cursor: grabbing; scroll-snap-type: none; }
   @media (pointer: fine) { .track { scroll-snap-type: none; } }   /* 마우스·트랙패드는 JS 가 카드 단위로 움직인다 — 네이티브 스냅과 싸우지 않게 */
-  .track > .lane { display: flex; gap: var(--sp-4); will-change: transform; }
+  .track > .lane { display: flex; gap: var(--sp-4); }
   .track > .lane > .sp, .track > .lane > .sp0 { flex: 0 0 0px; }
   .track.drag .cardx { pointer-events: none; }
-  .cardx { transition: transform 420ms cubic-bezier(.22,1.2,.36,1), box-shadow var(--dur-2) var(--ease-std); }
-  .cardx:hover { transform: translateY(-4px) scale(1.012); box-shadow: 0 18px 40px -18px rgba(0,0,0,.4); }
-  .cardx:active { transform: scale(.985); transition-duration: 120ms; }
-  .dots i { transition: transform 320ms cubic-bezier(.22,1.2,.36,1), background var(--dur-1) var(--ease-std); } .dots i.on { transform: scaleX(3); margin: 0 6px; }
+  .cardx { transition: box-shadow var(--dur-2) var(--ease-std); }
+  .cardx:hover { box-shadow: 0 14px 34px -18px rgba(0,0,0,.35); }
+  .dots i { transition: background var(--dur-1) var(--ease-std); }
+  .track .rv { opacity: 1; transform: none; transition: none; }   /* 트랙 안 카드는 즉시 — 넘김 모션과 겹치지 않게 */
+  .track > .lane { will-change: transform; }
   .hero .links a, .appbar a.cta { transition: transform var(--dur-1) var(--ease-std); display: inline-block; } .hero .links a:hover, .appbar a.cta:hover { transform: translateY(-1px); } .appbar a.cta:active { transform: scale(.94); }
   .cardx { flex: 0 0 380px; scroll-snap-align: center; border-radius: 22px; overflow: hidden; background: var(--gray6); box-shadow: 0 10px 30px -18px rgba(0,0,0,.35); display: flex; flex-direction: column; }
   .cardx .b { padding: var(--sp-4) var(--sp-5) var(--sp-5); }
@@ -320,7 +321,7 @@
 
 <footer>
   <div><strong style="color:var(--ink)">이어진</strong> · 패션 이커머스(브랜드 복수 운영) 재무회계팀 매니저 · 재직 중 1년 6개월 · <a href="mailto:lee-ding@naver.com">lee-ding@naver.com</a></div>
-  <div>개인 포트폴리오이며 소속 회사와 무관하게 작성했습니다. 회사 내부 데이터는 포함하지 않습니다. 2026-09 갱신 · <span id="build">build bb798a8</span></div>
+  <div>개인 포트폴리오이며 소속 회사와 무관하게 작성했습니다. 회사 내부 데이터는 포함하지 않습니다. 2026-09 갱신 · <span id="build">build 457fa9e</span></div>
 </footer>
 <a class="top" href="#" aria-label="맨 위로">↑</a>
 
@@ -334,55 +335,50 @@
     var sp0 = document.createElement('div'); sp0.className = 'sp0'; lane.insertBefore(sp0, lane.firstChild);
     var sp = document.createElement('div'); sp.className = 'sp'; lane.appendChild(sp); t.appendChild(lane);
   });
-  // 트랙 제어 — 상태는 '현재 카드 번호(cur)' 하나. 휠은 한 제스처에 한 장, 드래그는 놓을 때 가장 가까운 장, 끝에서는 러버밴드.
+  // 트랙 제어 — 운동 모델 하나: pos 가 target 을 지수 감쇠로 따라간다. 휠·드래그·되돌림 전부 이 애니메이터가 움직인다.
   document.querySelectorAll('.track').forEach(function (t) {
-    var lane = t.firstElementChild, over = 0, raf = null, cur = 0, lock = 0, acc = 0, armed = true, settleTimer = null, wheelTimer = null;
-    var dragging = false, moved = false, startX = 0, startL = 0, lastX = 0, lastT = 0, vx = 0, animating = false, animTimer = null;
+    var lane = t.firstElementChild, sp = lane.querySelector('.sp'), sp0 = lane.querySelector('.sp0');
+    var cur = 0, pos = 0, target = 0, raf = null, lastTs = 0, dragging = false, moved = false, startX = 0, startPos = 0, lastX = 0, lastT = 0, vx = 0, acc = 0, lastWheel = 0, armed = true, settleTimer = null;
+    var TAU = 80;   // ms — 작을수록 빠르게 붙는다
     function cards() { return Array.prototype.filter.call(lane.children, function (c) { return !c.classList.contains('sp') && !c.classList.contains('sp0'); }); }
-    var sp = lane.querySelector('.sp'), sp0 = lane.querySelector('.sp0');
     function padL() { return parseFloat(getComputedStyle(t).paddingLeft) || 0; }
-    // 앞뒤 여백: 첫 카드와 마지막 카드도 화면 정중앙에 설 수 있게 (여백 = 반쪽 뷰포트 − 반쪽 카드 − 패딩 − gap)
     function fitTail() { var cs = cards(), first = cs[0], last = cs[cs.length - 1], pad = padL(), cw = t.clientWidth;
       var a = Math.max(0, cw / 2 - first.offsetWidth / 2 - pad - 16), b = Math.max(0, cw / 2 - last.offsetWidth / 2 - pad - 16);
       sp0.style.flexBasis = a + 'px'; sp0.style.width = a + 'px'; sp.style.flexBasis = b + 'px'; sp.style.width = b + 'px'; }
-    fitTail(); window.addEventListener('resize', fitTail); window.addEventListener('load', fitTail);
-    function centerOf(c) { return c.offsetLeft + padL() + c.offsetWidth / 2 - t.clientWidth / 2; }   // 이 scrollLeft 면 카드가 정중앙
+    function centerOf(c) { return c.offsetLeft + padL() + c.offsetWidth / 2 - t.clientWidth / 2; }
     function maxL() { return Math.max(0, Math.min(t.scrollWidth - t.clientWidth, centerOf(cards()[cards().length - 1]))); }
     function posOf(i) { var cs = cards(); i = Math.max(0, Math.min(cs.length - 1, i)); return Math.max(0, Math.min(maxL(), centerOf(cs[i]))); }
     function nearest(x) { var cs = cards(), best = 0, bd = 1e9; cs.forEach(function (c, i) { var d = Math.abs(centerOf(c) - x); if (d < bd) { bd = d; best = i; } }); return best; }
-    function goTo(i, instant) { var cs = cards(); cur = Math.max(0, Math.min(cs.length - 1, i)); animating = true; clearTimeout(animTimer); animTimer = setTimeout(function () { animating = false; }, 600);
-      t.scrollTo({ left: posOf(cur), behavior: instant ? 'auto' : 'smooth' }); }
-    function setOver(v) { over = v; lane.style.transform = v ? 'translateX(' + (-v) + 'px)' : ''; }
-    function rubber(d) { var c = 110; return Math.sign(d) * c * (1 - Math.exp(-Math.abs(d) / c)); }
-    function springBack() { cancelAnimationFrame(raf); var v = 0, k = 0.16, damp = 0.74;
-      (function step() { var a = -k * over; v = (v + a) * damp; var next = over + v; if (Math.abs(next) < 0.8 && Math.abs(v) < 0.8) { setOver(0); return; } setOver(next); raf = requestAnimationFrame(step); })(); }
-    // 스크롤이 멈추면(터치·스크롤바 등) 현재 카드 갱신
-    t.addEventListener('scroll', function () { if (dragging || animating) return; clearTimeout(settleTimer); settleTimer = setTimeout(function () { cur = nearest(t.scrollLeft); }, 160); }, { passive: true });
-    // 휠(가로 델타 또는 Shift+세로) — 카드 한 장씩. 세로 휠은 그대로 페이지 스크롤
+    // pos 를 화면에 반영: 범위 안은 scrollLeft, 범위 밖은 lane transform(러버밴드)
+    function apply() { var m = maxL(), over = 0; if (pos < 0) { t.scrollLeft = 0; over = pos; } else if (pos > m) { t.scrollLeft = m; over = pos - m; } else { t.scrollLeft = pos; }
+      lane.style.transform = over ? 'translateX(' + (-over) + 'px)' : ''; }
+    function tick(ts) { var dt = Math.min(48, ts - (lastTs || ts)); lastTs = ts; var k = 1 - Math.exp(-dt / TAU); pos += (target - pos) * k;
+      if (Math.abs(target - pos) < 0.4) { pos = target; apply(); raf = null; lastTs = 0; return; } apply(); raf = requestAnimationFrame(tick); }
+    function go(x) { target = x; if (!raf) { lastTs = 0; raf = requestAnimationFrame(tick); } }
+    function goTo(i) { var cs = cards(); cur = Math.max(0, Math.min(cs.length - 1, i)); go(posOf(cur)); }
+    function stop() { if (raf) cancelAnimationFrame(raf); raf = null; lastTs = 0; }
+    function rubber(d) { var c = 90; return Math.sign(d) * c * (1 - Math.exp(-Math.abs(d) / c)); }
+    fitTail(); pos = target = t.scrollLeft; window.addEventListener('load', fitTail);
+    window.addEventListener('resize', function () { fitTail(); pos = target = posOf(cur); apply(); });
+    // 스크롤바·터치 등 외부 스크롤이 멈추면 현재 카드 갱신
+    t.addEventListener('scroll', function () { if (dragging || raf) return; clearTimeout(settleTimer); settleTimer = setTimeout(function () { pos = target = t.scrollLeft; cur = nearest(pos); }, 120); }, { passive: true });
+    // 휠(가로 델타 또는 Shift+세로): 제스처당 한 장. 끝에서는 살짝 밀렸다 돌아온다.
     t.addEventListener('wheel', function (e) { var dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : (e.shiftKey ? e.deltaY : 0); if (!dx) return;
-      e.preventDefault(); t.style.scrollSnapType = 'none'; var n = cards().length, now = e.timeStamp;
-      var atStart = cur === 0 && dx < 0 && t.scrollLeft <= 1, atEnd = cur === n - 1 && dx > 0 && t.scrollLeft >= maxL() - 1;
-      if (atStart || atEnd) { cancelAnimationFrame(raf); var want = (atEnd ? 1 : -1) * Math.min(400, Math.abs(over) * 2.2 + Math.abs(dx) * 1.6); setOver(rubber(want)); clearTimeout(wheelTimer); wheelTimer = setTimeout(springBack, 90); acc = 0; return; }
-      // 제스처 경계: 80ms 이상 쉬었거나 마우스 휠 한 칸(|dx|≥100)이면 새 제스처. 트랙패드의 연속 델타·관성 꼬리는 한 제스처에 한 장만.
-      if (now - lock > 80 || Math.abs(dx) >= 100) armed = true; lock = now;
-      if (!armed) return; acc += dx; if (Math.abs(acc) < 40) return;
-      goTo(cur + (acc > 0 ? 1 : -1)); acc = 0; armed = false; }, { passive: false });
-    // 마우스 드래그(관성)
-    t.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse' || e.button !== 0) return; t.style.scrollSnapType = 'none'; dragging = true; moved = false; startX = e.clientX; startL = t.scrollLeft; lastX = e.clientX; lastT = e.timeStamp; vx = 0; cancelAnimationFrame(raf); animating = false; t.setPointerCapture(e.pointerId); });
+      e.preventDefault(); t.style.scrollSnapType = 'none'; var now = e.timeStamp, n = cards().length;
+      if (now - lastWheel > 80 || Math.abs(dx) >= 100) armed = true; lastWheel = now;
+      var atEdge = (cur === 0 && dx < 0) || (cur === n - 1 && dx > 0);
+      if (atEdge) { var m = maxL(), base = dx < 0 ? 0 : m; if (!raf) pos = base; pos = base + rubber((pos - base) + dx * 0.6); apply(); clearTimeout(settleTimer); settleTimer = setTimeout(function () { go(base); }, 70); return; }
+      if (!armed) return; acc += dx; if (Math.abs(acc) < 30) return; goTo(cur + (acc > 0 ? 1 : -1)); acc = 0; armed = false; }, { passive: false });
+    // 마우스 드래그: 손을 그대로 따라가고, 놓으면 속도만큼 앞 카드로
+    t.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse' || e.button !== 0) return; t.style.scrollSnapType = 'none'; stop(); dragging = true; moved = false; startX = lastX = e.clientX; startPos = pos = t.scrollLeft + (lane.style.transform ? pos - t.scrollLeft : 0); lastT = e.timeStamp; vx = 0; t.setPointerCapture(e.pointerId); });
     t.addEventListener('pointermove', function (e) { if (!dragging) return; var dx = e.clientX - startX; if (!moved && Math.abs(dx) > 4) { moved = true; t.classList.add('drag'); } if (!moved) return;
-      var target = startL - dx, m = maxL();
-      if (target < 0) { t.scrollLeft = 0; setOver(rubber(target)); } else if (target > m) { t.scrollLeft = m; setOver(rubber(target - m)); } else { t.scrollLeft = target; if (over) setOver(0); }
+      var raw = startPos - dx, m = maxL(); pos = raw < 0 ? rubber(raw) : raw > m ? m + rubber(raw - m) : raw; apply();
       var dt = e.timeStamp - lastT; if (dt > 0) vx = (lastX - e.clientX) / dt; lastX = e.clientX; lastT = e.timeStamp; });
     function endDrag() { if (!dragging) return; dragging = false; t.classList.remove('drag'); if (!moved) return;
-      if (over) springBack();
-      var i = nearest(t.scrollLeft + (over ? 0 : vx * 140)); if (!over && Math.abs(vx) > 0.35 && i === cur) i = cur + (vx > 0 ? 1 : -1);   // 살짝 튕겨도 한 장은 넘어가게
-      goTo(i); }
+      var i = nearest(pos + vx * 120); if (Math.abs(vx) > 0.3 && i === cur) i = cur + (vx > 0 ? 1 : -1); goTo(i); }
     t.addEventListener('pointerup', endDrag); t.addEventListener('pointercancel', endDrag);
     t.addEventListener('click', function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
-    // 키보드: 트랙 안 카드에 포커스가 있으면 ←→
     t.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') { goTo(cur + 1); e.preventDefault(); } else if (e.key === 'ArrowLeft') { goTo(cur - 1); e.preventDefault(); } });
-    // 창 크기 바뀌면 현재 카드 자리로
-    window.addEventListener('resize', function () { goTo(cur, true); });
   });
   // 트랙 점
   document.querySelectorAll('.track[data-dots]').forEach(function (t) { var dots = t.nextElementSibling; if (!dots || !dots.classList.contains('dots')) return; var cards = Array.prototype.filter.call(t.firstElementChild.children, function (c) { return !c.classList.contains('sp') && !c.classList.contains('sp0'); }); var n = cards.length;
