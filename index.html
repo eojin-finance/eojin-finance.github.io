@@ -321,7 +321,7 @@
 
 <footer>
   <div><strong style="color:var(--ink)">이어진</strong> · 패션 이커머스(브랜드 복수 운영) 재무회계팀 매니저 · 재직 중 1년 6개월 · <a href="mailto:lee-ding@naver.com">lee-ding@naver.com</a></div>
-  <div>개인 포트폴리오이며 소속 회사와 무관하게 작성했습니다. 회사 내부 데이터는 포함하지 않습니다. 2026-09 갱신 · <span id="build">build 457fa9e</span></div>
+  <div>개인 포트폴리오이며 소속 회사와 무관하게 작성했습니다. 회사 내부 데이터는 포함하지 않습니다. 2026-09 갱신 · <span id="build">build e84c744</span></div>
 </footer>
 <a class="top" href="#" aria-label="맨 위로">↑</a>
 
@@ -370,8 +370,8 @@
       if (atEdge) { var m = maxL(), base = dx < 0 ? 0 : m; if (!raf) pos = base; pos = base + rubber((pos - base) + dx * 0.6); apply(); clearTimeout(settleTimer); settleTimer = setTimeout(function () { go(base); }, 70); return; }
       if (!armed) return; acc += dx; if (Math.abs(acc) < 30) return; goTo(cur + (acc > 0 ? 1 : -1)); acc = 0; armed = false; }, { passive: false });
     // 마우스 드래그: 손을 그대로 따라가고, 놓으면 속도만큼 앞 카드로
-    t.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse' || e.button !== 0) return; t.style.scrollSnapType = 'none'; stop(); dragging = true; moved = false; startX = lastX = e.clientX; startPos = pos = t.scrollLeft + (lane.style.transform ? pos - t.scrollLeft : 0); lastT = e.timeStamp; vx = 0; t.setPointerCapture(e.pointerId); });
-    t.addEventListener('pointermove', function (e) { if (!dragging) return; var dx = e.clientX - startX; if (!moved && Math.abs(dx) > 4) { moved = true; t.classList.add('drag'); } if (!moved) return;
+    t.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse' || e.button !== 0) return; t.style.scrollSnapType = 'none'; stop(); dragging = true; moved = false; startX = lastX = e.clientX; startPos = pos = t.scrollLeft + (lane.style.transform ? pos - t.scrollLeft : 0); lastT = e.timeStamp; vx = 0; });   // 포인터 캡처는 실제로 움직인 뒤에만 — 누르자마자 잡으면 click 이 카드 링크 대신 트랙으로 가서 데모가 안 열린다
+    t.addEventListener('pointermove', function (e) { if (!dragging) return; var dx = e.clientX - startX; if (!moved && Math.abs(dx) > 4) { moved = true; t.classList.add('drag'); try { t.setPointerCapture(e.pointerId); } catch (x) {} } if (!moved) return;
       var raw = startPos - dx, m = maxL(); pos = raw < 0 ? rubber(raw) : raw > m ? m + rubber(raw - m) : raw; apply();
       var dt = e.timeStamp - lastT; if (dt > 0) vx = (lastX - e.clientX) / dt; lastX = e.clientX; lastT = e.timeStamp; });
     function endDrag() { if (!dragging) return; dragging = false; t.classList.remove('drag'); if (!moved) return;
