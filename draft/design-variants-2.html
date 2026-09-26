@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UI 시안 2차 — 애플 결</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="../assets/tokens.css">
+<style>
+  :root { --ios: #0A84FF; --ios-soft: #E5F1FF; --gray6: #F2F2F7; --gray5: #E5E5EA; --gray4: #D1D1D6; --label2: #6E6E73; --sep: rgba(60,60,67,.18);
+          --dk: #000000; --dk2: #1D1D1F; --dk3: #2C2C2E; --dkink: #F5F5F7; --dksub: #A1A1A6; --spring: cubic-bezier(.34,1.56,.64,1); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ios: #0A84FF; --ios-soft: #12283F; --gray6: #1C1C1E; --gray5: #2C2C2E; --gray4: #3A3A3C; --label2: #98989D; --sep: rgba(84,84,88,.6); } }
+  :root[data-theme="dark"] { --ios-soft: #12283F; --gray6: #1C1C1E; --gray5: #2C2C2E; --gray4: #3A3A3C; --label2: #98989D; --sep: rgba(84,84,88,.6); }
+  body { font-family: "Pretendard Variable", var(--font-sans); background: var(--bg); letter-spacing: -0.01em; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+
+  /* 선택 툴바 (글라스 — 떠 있는 층) */
+  .bar { position: sticky; top: 0; z-index: 50; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); border-bottom: 1px solid var(--line); box-shadow: var(--shadow-2); }
+  .bar .in { max-width: 1120px; margin: 0 auto; padding: var(--sp-3) var(--sp-4); display: flex; gap: var(--sp-3); align-items: center; flex-wrap: wrap; }
+  .bar .t { font-size: var(--fs-14); font-weight: var(--fw-semibold); margin-right: var(--sp-2); }
+  .seg { display: flex; gap: 2px; background: var(--surface-2); padding: 3px; border-radius: var(--r-2); }
+  .seg button { height: 32px; padding: 0 var(--sp-3); border: 0; border-radius: 6px; background: transparent; color: var(--ink-2); font-size: var(--fs-13); font-weight: var(--fw-medium); cursor: pointer; transition: background var(--dur-1) var(--ease-std), color var(--dur-1) var(--ease-std); }
+  .seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); font-weight: var(--fw-semibold); }
+  .bar .pick { margin-left: auto; font-size: var(--fs-13); color: var(--ink-2); display: flex; gap: var(--sp-2); align-items: center; }
+  .bar .pick b { color: var(--brand-ink); }
+  .btn { height: 32px; padding: 0 var(--sp-3); border-radius: var(--r-2); border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: var(--fs-13); font-weight: var(--fw-medium); cursor: pointer; }
+  .btn.p { background: var(--brand); color: var(--on-brand); border-color: transparent; }
+  .btn.p.done { background: var(--pos); }
+  .about { max-width: 1120px; margin: var(--sp-6) auto 0; padding: 0 var(--sp-4); }
+  .about .card { padding: var(--sp-4) var(--sp-5); display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2) var(--sp-6); }
+  .about h2 { font-size: var(--fs-16); grid-column: 1 / -1; display: flex; gap: var(--sp-2); align-items: center; }
+  .about h2 .rec { font-size: var(--fs-11); color: var(--pos-ink); background: var(--pos-soft); border-radius: var(--r-1); padding: 2px 6px; font-weight: var(--fw-semibold); }
+  .about p { font-size: var(--fs-13); color: var(--ink-2); }
+  .about p b { color: var(--ink); font-weight: var(--fw-semibold); }
+  @media (max-width: 720px) { .about .card { grid-template-columns: 1fr; } }
+  .stage { max-width: 1120px; margin: var(--sp-4) auto var(--sp-12); padding: 0 var(--sp-4); }
+  .frame { border: 1px solid var(--line); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-3); background: var(--surface); }
+  .v { display: none; } .v.on { display: block; animation: in var(--dur-2) var(--ease-out); }
+  @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .v h1, .v h2, .v h3, .v p { margin: 0; } .v a { color: inherit; text-decoration: none; }
+  .v img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .thumb { aspect-ratio: 16/10; overflow: hidden; background: var(--surface-2); }
+
+  /* ════════ A · 제품 페이지 (Apple.com 결: 중앙 큰 타이포 + 글라스 앱바 + 섹션마다 한 문장) ════════ */
+  .vA { background: #fff; color: var(--dk2); }
+  .vA .appbar { position: sticky; top: 0; z-index: 5; background: rgba(255,255,255,.72); backdrop-filter: blur(20px) saturate(1.8); border-bottom: 1px solid var(--sep); }
+  .vA .appbar .in { max-width: 980px; margin: 0 auto; height: 48px; display: flex; align-items: center; gap: var(--sp-6); padding: 0 var(--sp-5); font-size: var(--fs-12); }
+  .vA .appbar .n { font-weight: var(--fw-semibold); font-size: var(--fs-14); margin-right: auto; }
+  .vA .appbar a { color: var(--dk2); opacity: .8; } .vA .appbar a.cta { background: var(--ios); color: #fff; border-radius: 999px; padding: 4px 12px; opacity: 1; }
+  .vA .hero { text-align: center; padding: 96px var(--sp-6) 56px; max-width: 760px; margin: 0 auto; }
+  .vA .hero .eb { font-size: var(--fs-14); color: var(--label2); font-weight: var(--fw-medium); }
+  .vA .hero h1 { font-size: 56px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.07; margin-top: var(--sp-3); }
+  .vA .hero p { font-size: var(--fs-22); color: var(--label2); line-height: 1.4; margin-top: var(--sp-5); font-weight: 400; }
+  .vA .hero .links { margin-top: var(--sp-6); display: flex; gap: var(--sp-6); justify-content: center; font-size: var(--fs-16); }
+  .vA .hero .links a { color: var(--ios); } .vA .hero .links a::after { content: ' ›'; }
+  .vA .stats { display: flex; justify-content: center; gap: 56px; padding: var(--sp-8) 0; border-top: 1px solid var(--sep); border-bottom: 1px solid var(--sep); margin: 0 var(--sp-6); }
+  .vA .stats b { display: block; font-size: 40px; font-weight: 600; letter-spacing: -0.03em; } .vA .stats span { font-size: var(--fs-13); color: var(--label2); }
+  .vA .sec { max-width: 980px; margin: 0 auto; padding: 80px var(--sp-6) 0; text-align: center; }
+  .vA .sec h2 { font-size: 40px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; }
+  .vA .sec .sub { font-size: var(--fs-18); color: var(--label2); margin-top: var(--sp-3); max-width: 34em; margin-left: auto; margin-right: auto; }
+  .vA .sec .big { margin-top: var(--sp-8); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px -30px rgba(0,0,0,.35); }
+  .vA .sec .big .thumb { aspect-ratio: 16/9; }
+  .vA .cap { font-size: var(--fs-13); color: var(--label2); margin-top: var(--sp-3); }
+  .vA .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); margin-top: var(--sp-8); text-align: left; }
+  .vA .three div { background: var(--gray6); border-radius: 20px; padding: var(--sp-6); }
+  .vA .three b { display: block; font-size: var(--fs-18); font-weight: 600; margin-bottom: var(--sp-2); } .vA .three p { font-size: var(--fs-14); color: var(--label2); }
+  .vA .foot { padding: 80px 0 40px; font-size: var(--fs-12); color: var(--label2); text-align: center; }
+
+  /* ════════ B · iOS 설정 리스트 (인셋 그룹 + 셰브런 + 시트) ════════ */
+  .vB { background: var(--gray6); color: var(--dk2); min-height: 720px; }
+  .vB .nav { position: sticky; top: 0; z-index: 5; background: rgba(242,242,247,.8); backdrop-filter: blur(20px) saturate(1.8); padding: var(--sp-4) var(--sp-5) var(--sp-2); }
+  .vB .nav .lg { font-size: 34px; font-weight: 700; letter-spacing: -0.03em; }
+  .vB .nav .sm { font-size: var(--fs-13); color: var(--label2); }
+  .vB .wrap { max-width: 720px; margin: 0 auto; padding: 0 var(--sp-4) var(--sp-12); }
+  .vB .hd { font-size: var(--fs-13); color: var(--label2); text-transform: uppercase; letter-spacing: .04em; margin: var(--sp-8) var(--sp-4) var(--sp-2); }
+  .vB .grp { background: #fff; border-radius: 12px; overflow: hidden; }
+  .vB .row { display: flex; align-items: center; gap: var(--sp-3); padding: 11px var(--sp-4); border-bottom: 1px solid var(--sep); font-size: var(--fs-16); cursor: pointer; transition: background var(--dur-1) var(--ease-std); }
+  .vB .row:last-child { border-bottom: 0; } .vB .row:active { background: var(--gray5); }
+  .vB .row .ic { width: 30px; height: 30px; border-radius: 8px; background: var(--ios); color: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--fs-12); font-weight: 700; flex: 0 0 auto; }
+  .vB .row .ic.g { background: #34C759; } .vB .row .ic.o { background: #FF9500; } .vB .row .ic.p { background: #AF52DE; } .vB .row .ic.k { background: #8E8E93; }
+  .vB .row .t { flex: 1; } .vB .row .t small { display: block; font-size: var(--fs-12); color: var(--label2); }
+  .vB .row .val { color: var(--label2); font-size: var(--fs-14); font-variant-numeric: tabular-nums; } .vB .row .chev { color: var(--gray4); font-size: var(--fs-18); }
+  .vB .prof { display: flex; gap: var(--sp-4); align-items: center; padding: var(--sp-4); }
+  .vB .prof .av { width: 60px; height: 60px; border-radius: 999px; background: linear-gradient(135deg, var(--ios), #5AC8FA); color: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--fs-22); font-weight: 700; }
+  .vB .prof b { font-size: var(--fs-22); font-weight: 600; display: block; } .vB .prof span { font-size: var(--fs-13); color: var(--label2); }
+  .vB .stat { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; padding: var(--sp-4) 0; }
+  .vB .stat b { display: block; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; } .vB .stat span { font-size: var(--fs-11); color: var(--label2); }
+  .vB .sheet { position: absolute; inset: 0; display: none; align-items: flex-end; background: rgba(0,0,0,.35); z-index: 20; }
+  .vB .sheet.on { display: flex; }
+  .vB .sheet .panel { width: 100%; max-width: 720px; margin: 0 auto; background: #fff; border-radius: 16px 16px 0 0; padding: var(--sp-3) var(--sp-5) var(--sp-8); max-height: 80%; overflow: auto; animation: up var(--dur-3) var(--ease-out); }
+  @keyframes up { from { transform: translateY(40px); opacity: .6; } to { transform: none; opacity: 1; } }
+  .vB .sheet .grab { width: 36px; height: 5px; background: var(--gray4); border-radius: 999px; margin: 0 auto var(--sp-4); }
+  .vB .sheet h3 { font-size: var(--fs-22); font-weight: 600; } .vB .sheet p { font-size: var(--fs-14); color: var(--label2); margin-top: var(--sp-3); line-height: 1.6; }
+  .vB .sheet .k { display: flex; gap: var(--sp-6); margin-top: var(--sp-4); } .vB .sheet .k b { display: block; font-size: var(--fs-18); } .vB .sheet .k span { font-size: var(--fs-12); color: var(--label2); }
+  .vB .sheet .close { margin-top: var(--sp-5); width: 100%; height: 44px; border-radius: 12px; border: 0; background: var(--gray6); font-size: var(--fs-16); font-weight: 600; cursor: pointer; }
+  .vB .frame-rel { position: relative; }
+
+  /* ════════ C · 홈 스크린 위젯 벤토 (스프링 hover, 앱 아이콘 데모) ════════ */
+  .vC { background: var(--gray6); color: var(--dk2); padding: var(--sp-8) var(--sp-6) var(--sp-10); }
+  .vC .in { max-width: 980px; margin: 0 auto; }
+  .vC .top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--sp-6); }
+  .vC .top h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.03em; } .vC .top p { font-size: var(--fs-14); color: var(--label2); margin-top: var(--sp-1); }
+  .vC .top .pill { background: #fff; border-radius: 999px; padding: 8px 14px; font-size: var(--fs-13); box-shadow: var(--shadow-1); }
+  .vC .grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 150px; gap: var(--sp-4); }
+  .vC .w { background: #fff; border-radius: 22px; padding: var(--sp-5); box-shadow: 0 2px 10px -4px rgba(0,0,0,.12); transition: transform var(--dur-2) var(--spring), box-shadow var(--dur-2) var(--ease-std); overflow: hidden; position: relative; }
+  .vC .w:hover { transform: scale(1.02); box-shadow: 0 12px 30px -12px rgba(0,0,0,.25); }
+  .vC .w.s2 { grid-column: span 2; } .vC .w.t2 { grid-row: span 2; } .vC .w.s4 { grid-column: span 4; }
+  .vC .w .lb { font-size: var(--fs-12); color: var(--label2); font-weight: 600; }
+  .vC .w .bg { font-size: 44px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin-top: var(--sp-2); }
+  .vC .w .bg small { font-size: var(--fs-14); font-weight: 500; color: var(--label2); letter-spacing: 0; }
+  .vC .w .ds { font-size: var(--fs-13); color: var(--label2); margin-top: var(--sp-2); }
+  .vC .w.blue { background: var(--ios); color: #fff; } .vC .w.blue .lb, .vC .w.blue .ds, .vC .w.blue .bg small { color: rgba(255,255,255,.75); }
+  .vC .w.dark { background: var(--dk2); color: #fff; } .vC .w.dark .lb, .vC .w.dark .ds { color: var(--dksub); }
+  .vC .w.img { padding: 0; } .vC .w.img .thumb { aspect-ratio: auto; height: 100%; }
+  .vC .w.img .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: var(--sp-5); background: linear-gradient(transparent, rgba(0,0,0,.65)); color: #fff; font-weight: 600; }
+  .vC .w.img .cap small { display: block; font-weight: 400; opacity: .8; font-size: var(--fs-12); }
+  .vC .apps { display: flex; gap: var(--sp-6); margin-top: var(--sp-8); flex-wrap: wrap; }
+  .vC .app { width: 84px; text-align: center; font-size: var(--fs-12); color: var(--dk2); }
+  .vC .app .ico { width: 64px; height: 64px; border-radius: 16px; margin: 0 auto var(--sp-2); overflow: hidden; box-shadow: var(--shadow-1); transition: transform var(--dur-2) var(--spring); }
+  .vC .app:hover .ico { transform: scale(1.08); }
+  .vC .app .ico img { width: 100%; height: 100%; object-fit: cover; object-position: left top; }
+  .vC .w h3 { font-size: var(--fs-16); font-weight: 600; } .vC .w p { font-size: var(--fs-13); color: var(--label2); margin-top: var(--sp-1); }
+
+  /* ════════ D · 가로 스크롤 스냅 갤러리 (App Store 스토리 카드) ════════ */
+  .vD { background: #fff; color: var(--dk2); padding: var(--sp-10) 0 var(--sp-10); }
+  .vD .in { max-width: 980px; margin: 0 auto; padding: 0 var(--sp-6); }
+  .vD h1 { font-size: 44px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; max-width: 12em; }
+  .vD .sub { font-size: var(--fs-18); color: var(--label2); margin-top: var(--sp-4); max-width: 34em; }
+  .vD .row { margin-top: var(--sp-10); }
+  .vD .row h2 { font-size: var(--fs-22); font-weight: 700; letter-spacing: -0.02em; padding: 0 var(--sp-6); max-width: 980px; margin: 0 auto; }
+  .vD .row .sm { font-size: var(--fs-13); color: var(--label2); padding: 0 var(--sp-6); max-width: 980px; margin: var(--sp-1) auto 0; }
+  .vD .track { display: flex; gap: var(--sp-4); overflow-x: auto; scroll-snap-type: x mandatory; padding: var(--sp-4) calc((100% - 980px) / 2 + var(--sp-6)); scrollbar-width: none; }
+  .vD .track::-webkit-scrollbar { display: none; }
+  .vD .cardx { flex: 0 0 380px; scroll-snap-align: start; border-radius: 22px; overflow: hidden; background: var(--gray6); box-shadow: 0 10px 30px -18px rgba(0,0,0,.35); transition: transform var(--dur-2) var(--ease-out); }
+  .vD .cardx:hover { transform: translateY(-4px); }
+  .vD .cardx .thumb { aspect-ratio: 16/10; }
+  .vD .cardx .b { padding: var(--sp-4) var(--sp-5) var(--sp-5); }
+  .vD .cardx .eb { font-size: var(--fs-11); text-transform: uppercase; letter-spacing: .06em; color: var(--ios); font-weight: 700; }
+  .vD .cardx h3 { font-size: var(--fs-18); font-weight: 600; margin-top: 4px; } .vD .cardx p { font-size: var(--fs-13); color: var(--label2); margin-top: var(--sp-1); }
+  .vD .cardx.text { background: var(--dk2); color: #fff; padding: var(--sp-6); display: flex; flex-direction: column; justify-content: flex-end; }
+  .vD .cardx.text .eb { color: #5AC8FA; } .vD .cardx.text h3 { font-size: var(--fs-22); } .vD .cardx.text p { color: var(--dksub); }
+  .vD .cardx.text .k { display: flex; gap: var(--sp-5); margin-top: var(--sp-4); } .vD .cardx.text .k b { display: block; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; } .vD .cardx.text .k span { font-size: var(--fs-11); color: var(--dksub); }
+  .vD .dots { display: flex; gap: 6px; justify-content: center; margin-top: var(--sp-2); } .vD .dots i { width: 6px; height: 6px; border-radius: 999px; background: var(--gray4); } .vD .dots i.on { background: var(--dk2); }
+
+  /* ════════ E · 다크 프로 (Pro 페이지: 검정 + 큰 숫자 + 글라스 바) ════════ */
+  .vE { background: var(--dk); color: var(--dkink); }
+  .vE .appbar { position: sticky; top: 0; z-index: 5; background: rgba(0,0,0,.6); backdrop-filter: blur(20px) saturate(1.8); border-bottom: 1px solid rgba(255,255,255,.1); }
+  .vE .appbar .in { max-width: 980px; margin: 0 auto; height: 48px; display: flex; align-items: center; gap: var(--sp-6); padding: 0 var(--sp-5); font-size: var(--fs-12); color: var(--dksub); }
+  .vE .appbar .n { color: var(--dkink); font-weight: 600; font-size: var(--fs-14); margin-right: auto; }
+  .vE .hero { padding: 96px var(--sp-6) 64px; max-width: 900px; margin: 0 auto; text-align: center; }
+  .vE .hero .eb { color: var(--dksub); font-size: var(--fs-14); font-weight: 500; }
+  .vE .hero h1 { font-size: 64px; font-weight: 700; letter-spacing: -0.04em; line-height: 1.02; margin-top: var(--sp-3); background: linear-gradient(180deg, #fff 30%, #9A9AA0); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .vE .hero p { font-size: var(--fs-22); color: var(--dksub); margin-top: var(--sp-5); line-height: 1.4; }
+  .vE .nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); max-width: 980px; margin: 0 auto; padding: 0 var(--sp-6); }
+  .vE .nums div { background: var(--dk2); border-radius: 20px; padding: var(--sp-6); border: 1px solid rgba(255,255,255,.06); }
+  .vE .nums b { display: block; font-size: 44px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; } .vE .nums b small { font-size: var(--fs-14); color: var(--dksub); font-weight: 500; letter-spacing: 0; margin-left: 2px; }
+  .vE .nums span { display: block; font-size: var(--fs-13); color: var(--dksub); margin-top: var(--sp-3); }
+  .vE .feat { max-width: 980px; margin: 64px auto 0; padding: 0 var(--sp-6); display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--sp-6); align-items: center; }
+  .vE .feat .thumb { border-radius: 20px; border: 1px solid rgba(255,255,255,.08); }
+  .vE .feat .eb { color: #5AC8FA; font-size: var(--fs-12); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .vE .feat h2 { font-size: 34px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.12; margin-top: var(--sp-2); }
+  .vE .feat p { font-size: var(--fs-16); color: var(--dksub); margin-top: var(--sp-4); line-height: 1.6; }
+  .vE .feat .k { display: flex; gap: var(--sp-6); margin-top: var(--sp-5); } .vE .feat .k b { display: block; font-size: var(--fs-22); font-weight: 700; } .vE .feat .k span { font-size: var(--fs-12); color: var(--dksub); }
+  .vE .feat.flip .thumb { order: 2; }
+  .vE .strip { display: flex; gap: var(--sp-4); max-width: 980px; margin: 64px auto 0; padding: 0 var(--sp-6) 80px; overflow-x: auto; scrollbar-width: none; }
+  .vE .strip a { flex: 0 0 260px; background: var(--dk2); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,.06); transition: transform var(--dur-2) var(--ease-out); }
+  .vE .strip a:hover { transform: translateY(-4px); }
+  .vE .strip .b { padding: var(--sp-3) var(--sp-4) var(--sp-4); font-size: var(--fs-14); font-weight: 600; } .vE .strip .b small { display: block; color: var(--dksub); font-weight: 400; font-size: var(--fs-12); }
+
+  @media (max-width: 860px) {
+    .vA .hero h1 { font-size: 36px; } .vA .stats { flex-wrap: wrap; gap: var(--sp-6); } .vA .three { grid-template-columns: 1fr; } .vA .sec h2 { font-size: 28px; }
+    .vC .grid { grid-template-columns: repeat(2, 1fr); } .vC .w.s4 { grid-column: span 2; }
+    .vD h1 { font-size: 32px; } .vD .track { padding: var(--sp-4) var(--sp-6); } .vD .cardx { flex-basis: 300px; }
+    .vE .hero h1 { font-size: 40px; } .vE .nums { grid-template-columns: repeat(2, 1fr); } .vE .feat, .vE .feat.flip { grid-template-columns: 1fr; } .vE .feat.flip .thumb { order: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in">
+  <span class="t">UI 시안 2차 · 애플 결</span>
+  <div class="seg" id="seg">
+    <button data-v="A">A 제품 페이지</button><button data-v="B">B 설정 리스트</button><button data-v="C">C 홈 위젯</button><button data-v="D">D 스냅 갤러리</button><button data-v="E">E 다크 프로</button>
+  </div>
+  <div class="pick">선택: <b id="picked">없음</b> <button class="btn p" id="pickBtn">이걸로</button> <button class="btn" id="copyBtn">선택 복사</button></div>
+</div></div>
+<div class="about"><div class="card" id="about"></div></div>
+
+<div class="stage"><div class="frame">
+
+<!-- ═══ A ═══ -->
+<div class="v vA" data-v="A">
+  <div class="appbar"><div class="in"><span class="n">이어진</span><a href="#">대표 프로젝트</a><a href="#">데모</a><a href="#">일하는 방식</a><a href="#">FAQ</a><a class="cta" href="mailto:lee-ding@naver.com">연락하기</a></div></div>
+  <div class="hero">
+    <div class="eb">재무회계 · 패션 이커머스</div>
+    <h1>차이는 규명하고,<br>반복은 기계에 넘깁니다.</h1>
+    <p>월결산과 매출·원가 대사를 맡아, 차이를 원인별로 분류하고 기준을 문서로 고정한 뒤 반복 확인만 자동화했습니다.</p>
+    <div class="links"><a href="#">대표 프로젝트 보기</a><a href="#">데모 6개 열기</a></div>
+  </div>
+  <div class="stats">
+    <div><b>18회</b><span>월결산</span></div><div><b>34채널</b><span>원 단위 정산 대사</span></div><div><b>원 단위</b><span>충당금 확정본 재현</span></div><div><b>6+7</b><span>동작하는 데모</span></div>
+  </div>
+  <div class="sec">
+    <h2>재고 평가충당금, 판단 기준부터 재현 가능하게.</h2>
+    <p class="sub">산정 판단을 15개 항목으로 분해해 근거를 표로 확정하고, 최종본이 이전 확정본을 원 단위까지 재현하는지 확인한 뒤에만 확정했습니다.</p>
+    <a class="big" href="../demo/nrv-simulator/"><div class="thumb"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div></a>
+    <div class="cap">NRV 시뮬레이터 — 가정을 움직이면 전 품번 충당금이 즉시 재계산됩니다</div>
+  </div>
+  <div class="sec">
+    <h2>위탁 34채널, 검증식 하나로.</h2>
+    <p class="sub">정산서 입금액 = ERP 실판매 − 수수료 − 반품 ± 상시차이. 채널이 늘어도 마감이 밀리지 않습니다.</p>
+    <div class="three">
+      <div><b>차이는 덮지 않고 분류</b><p>원인이 지정된 차이는 다음 달에 다시 조사하지 않습니다.</p></div>
+      <div><b>검증 없이 편해지지 않는다</b><p>원천 합계·재계산·이전 확정본 재현이 맞아야 확정합니다.</p></div>
+      <div><b>판단은 문서로, 반복은 기계로</b><p>대안과 채택 근거를 남기고, 반복 확인만 자동화합니다.</p></div>
+    </div>
+  </div>
+  <div class="foot">아래로 이어짐: 대표 프로젝트 4 · 운영 개선 4 · 데모 · FAQ</div>
+</div>
+
+<!-- ═══ B ═══ -->
+<div class="v vB" data-v="B"><div class="frame-rel">
+  <div class="nav"><div class="lg">포트폴리오</div><div class="sm">이어진 · 재무회계</div></div>
+  <div class="wrap">
+    <div class="grp" style="margin-top:var(--sp-4)"><div class="prof"><div class="av">이</div><div><b>이어진</b><span>패션 이커머스 재무회계 매니저 · 재직 중 1년 6개월 · lee-ding@naver.com</span></div></div>
+      <div class="stat"><div><b>18</b><span>월결산</span></div><div><b>34</b><span>대사 채널</span></div><div><b>원</b><span>단위 재현</span></div><div><b>6</b><span>운영 데모</span></div></div></div>
+    <div class="hd">대표 프로젝트</div>
+    <div class="grp">
+      <div class="row" data-sheet="s1"><div class="ic">PL</div><div class="t">월 가결산 손익<small>판관비 7대 분류 · 비경상 분리</small></div><span class="chev">›</span></div>
+      <div class="row" data-sheet="s2"><div class="ic g">NRV</div><div class="t">재고 평가충당금 로직 재설계<small>판단 15항목 · 7라운드 교차검증</small></div><span class="val">원 단위</span><span class="chev">›</span></div>
+      <div class="row" data-sheet="s3"><div class="ic o">34</div><div class="t">위탁매출 건별 정산 대사<small>검증식 하나로 34채널</small></div><span class="chev">›</span></div>
+      <div class="row" data-sheet="s4"><div class="ic p">CF</div><div class="t">결산 원천 단일화·현금흐름 검증<small>계정 81 매핑 · 통장 순증감 일치</small></div><span class="chev">›</span></div>
+    </div>
+    <div class="hd">운영 중인 데모</div>
+    <div class="grp">
+      <a class="row" href="../demo/one-close/"><div class="ic">입고</div><div class="t">월 매입 마감 앱</div><span class="val">실운영</span><span class="chev">›</span></a>
+      <a class="row" href="../demo/nrv-simulator/"><div class="ic g">NRV</div><div class="t">NRV 시뮬레이터</div><span class="val">1,420 품번</span><span class="chev">›</span></a>
+      <a class="row" href="../demo/linesheet-fin/"><div class="ic o">LS</div><div class="t">라인시트 재무 집계</div><span class="val">95 품번</span><span class="chev">›</span></a>
+      <a class="row" href="../demo/fund-cycle/"><div class="ic p">자금</div><div class="t">자금 대시보드</div><span class="val">체크섬 7</span><span class="chev">›</span></a>
+      <a class="row" href="../demo/card-notice/"><div class="ic k">카드</div><div class="t">법인카드 개편 공지</div><span class="chev">›</span></a>
+      <a class="row" href="../demo/overtime-meal/"><div class="ic k">식대</div><div class="t">야근식대 대조</div><span class="val">28명</span><span class="chev">›</span></a>
+    </div>
+    <div class="hd">더 보기</div>
+    <div class="grp"><div class="row"><div class="t">일하는 방식</div><span class="chev">›</span></div><div class="row"><div class="t">전체 프로젝트</div><span class="val">36</span><span class="chev">›</span></div><div class="row"><div class="t">자주 받는 질문</div><span class="chev">›</span></div></div>
+  </div>
+  <div class="sheet" id="sheet"><div class="panel"><div class="grab"></div><h3 id="shT"></h3><p id="shP"></p><div class="k" id="shK"></div><button class="close" id="shC">닫기</button></div></div>
+</div></div>
+
+<!-- ═══ C ═══ -->
+<div class="v vC" data-v="C"><div class="in">
+  <div class="top"><div><h1>이어진</h1><p>재무회계 · 결산 · 대사 · 자동화</p></div><span class="pill">2026.09 갱신 · lee-ding@naver.com</span></div>
+  <div class="grid">
+    <div class="w blue s2"><div class="lb">월결산</div><div class="bg">18<small>회</small></div><div class="ds">가결산 손익 · 판관비 7대 분류 · 비경상 분리</div></div>
+    <div class="w"><div class="lb">위탁 정산 대사</div><div class="bg">34<small>채널</small></div><div class="ds">원 단위 일치</div></div>
+    <div class="w"><div class="lb">충당금</div><div class="bg" style="font-size:30px">원 단위</div><div class="ds">확정본 재현</div></div>
+    <a class="w img s2 t2" href="../demo/nrv-simulator/"><div class="thumb"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div><div class="cap">NRV 시뮬레이터<small>판단 기준이 문서화·재현 가능하다</small></div></a>
+    <div class="w s2 dark"><h3 style="color:#fff">차이는 규명하고, 반복은 기계에</h3><p>업무의 절반은 차이를 규명하는 일. 원인별로 분류해 기준을 문서로 확정하고, 반복 확인만 자동화했습니다.</p></div>
+    <a class="w img" href="../demo/one-close/"><div class="thumb"><img src="../assets/shots/one-close.jpg" alt=""></div><div class="cap">매입 마감</div></a>
+    <a class="w img" href="../demo/fund-cycle/"><div class="thumb"><img src="../assets/shots/fund-cycle.jpg" alt=""></div><div class="cap">자금</div></a>
+    <div class="w s4"><h3>위탁매출 34채널 건별 정산 대사</h3><p>정산서 입금액 = ERP 실판매 − 수수료 − 반품 ± 상시차이 — 34채널 전부 원 단위로 맞는지 확인, 남은 차이 3건은 원인 규명 후 회계처리 방침 확정.</p></div>
+  </div>
+  <div class="apps">
+    <a class="app" href="../demo/one-close/"><div class="ico"><img src="../assets/shots/one-close.jpg" alt=""></div>매입 마감</a>
+    <a class="app" href="../demo/nrv-simulator/"><div class="ico"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div>NRV</a>
+    <a class="app" href="../demo/linesheet-fin/"><div class="ico"><img src="../assets/shots/linesheet-fin.jpg" alt=""></div>라인시트</a>
+    <a class="app" href="../demo/fund-cycle/"><div class="ico"><img src="../assets/shots/fund-cycle.jpg" alt=""></div>자금</a>
+    <a class="app" href="../demo/card-notice/"><div class="ico"><img src="../assets/shots/card-notice.jpg" alt=""></div>법카 공지</a>
+    <a class="app" href="../demo/overtime-meal/"><div class="ico"><img src="../assets/shots/overtime-meal.jpg" alt=""></div>야근식대</a>
+  </div>
+</div></div>
+
+<!-- ═══ D ═══ -->
+<div class="v vD" data-v="D">
+  <div class="in"><h1>차이는 규명하고, 반복은 기계에 넘깁니다.</h1><p class="sub">패션 이커머스 재무회계 매니저 이어진. 월결산·정산 대사·재고평가를 맡고, 반복 확인은 직접 자동화합니다.</p></div>
+  <div class="row"><h2>대표 프로젝트</h2><p class="sm">옆으로 넘겨 보세요</p>
+    <div class="track" data-dots="d1">
+      <div class="cardx text"><div class="eb">01 · 결산</div><h3>월 가결산 손익</h3><p>판관비 7대 분류, 지급수수료 판매성·관리성 분해, 비경상 손익을 걷어낸 정상 손익 한 장.</p><div class="k"><div><b>7</b><span>대 분류</span></div><div><b>18</b><span>회 결산</span></div></div></div>
+      <a class="cardx" href="../demo/nrv-simulator/"><div class="thumb"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div><div class="b"><div class="eb">02 · 재고</div><h3>평가충당금 로직 재설계</h3><p>판단 15항목 · 7라운드 교차검증 · 이전 확정본 원 단위 재현</p></div></a>
+      <div class="cardx text"><div class="eb">03 · 정산</div><h3>위탁 34채널 건별 대사</h3><p>정산서 입금액 = ERP 실판매 − 수수료 − 반품 ± 상시차이</p><div class="k"><div><b>34</b><span>채널</span></div><div><b>4</b><span>상시차이 유형</span></div></div></div>
+      <a class="cardx" href="../demo/fund-cycle/"><div class="thumb"><img src="../assets/shots/fund-cycle.jpg" alt=""></div><div class="b"><div class="eb">04 · 결산 원천</div><h3>원천 단일화·현금흐름 검증</h3><p>계정 81 매핑 · 직접법 현금흐름 = 통장 순증감</p></div></a>
+    </div><div class="dots" id="d1"></div>
+  </div>
+  <div class="row"><h2>운영 중인 데모</h2><p class="sm">샘플 데이터 · 계산·판정 로직은 실제와 동일</p>
+    <div class="track" data-dots="d2">
+      <a class="cardx" href="../demo/one-close/"><div class="thumb"><img src="../assets/shots/one-close.jpg" alt=""></div><div class="b"><div class="eb">실운영</div><h3>월 매입 마감 앱</h3><p>입고 검수 → B/L 연결 → 부대비용 배부 → 취득원가</p></div></a>
+      <a class="cardx" href="../demo/linesheet-fin/"><div class="thumb"><img src="../assets/shots/linesheet-fin.jpg" alt=""></div><div class="b"><div class="eb">실운영</div><h3>라인시트 재무 집계</h3><p>매입 약정 기준 집계 · 결제조건</p></div></a>
+      <a class="cardx" href="../demo/card-notice/"><div class="thumb"><img src="../assets/shots/card-notice.jpg" alt=""></div><div class="b"><div class="eb">전사 공지</div><h3>법인카드 개편</h3><p>정책 변경 전후 · 한도 근거</p></div></a>
+      <a class="cardx" href="../demo/overtime-meal/"><div class="thumb"><img src="../assets/shots/overtime-meal.jpg" alt=""></div><div class="b"><div class="eb">실운영</div><h3>야근식대 대조</h3><p>근태 vs 카드 사람별 판정</p></div></a>
+    </div><div class="dots" id="d2"></div>
+  </div>
+</div>
+
+<!-- ═══ E ═══ -->
+<div class="v vE" data-v="E">
+  <div class="appbar"><div class="in"><span class="n">이어진</span><span>대표 프로젝트</span><span>데모</span><span>일하는 방식</span><span>FAQ</span></div></div>
+  <div class="hero"><div class="eb">Finance &amp; Accounting</div><h1>차이는 규명하고,<br>반복은 기계에.</h1><p>패션 이커머스 재무회계 매니저. 월결산·정산 대사·재고평가를 맡고, 반복 확인은 직접 자동화합니다.</p></div>
+  <div class="nums">
+    <div><b>18<small>회</small></b><span>월결산 — 가결산 손익·판관비 분류</span></div>
+    <div><b>34<small>채널</small></b><span>위탁 정산 대사 — 원 단위 일치</span></div>
+    <div><b>81<small>계정</small></b><span>결산 원천 단일화 — 현금흐름 검증</span></div>
+    <div><b>6<small>+7</small></b><span>동작하는 데모</span></div>
+  </div>
+  <div class="feat"><a class="thumb" href="../demo/nrv-simulator/"><img src="../assets/shots/nrv-simulator.jpg" alt=""></a>
+    <div><div class="eb">재고 평가충당금</div><h2>판단 기준부터 재현 가능하게.</h2><p>산정 판단 15항목을 표로 확정하고 7라운드 교차검증. 최종본이 이전 확정본을 원 단위까지 재현하는지 확인한 뒤 확정.</p><div class="k"><div><b>15</b><span>판단 항목</span></div><div><b>7</b><span>라운드</span></div><div><b>원 단위</b><span>재현</span></div></div></div></div>
+  <div class="feat flip"><a class="thumb" href="../demo/one-close/"><img src="../assets/shots/one-close.jpg" alt=""></a>
+    <div><div class="eb">월 매입 마감</div><h2>원가 확정 절차를 화면 순서로.</h2><p>입고 검수 → 수입신고 B/L 연결·과세환율 → 부대비용 배부 → 취득원가. 예외만 사람이 봅니다.</p></div></div>
+  <div class="strip">
+    <a href="../demo/linesheet-fin/"><div class="thumb"><img src="../assets/shots/linesheet-fin.jpg" alt=""></div><div class="b">라인시트 재무 집계<small>매입 약정 기준</small></div></a>
+    <a href="../demo/fund-cycle/"><div class="thumb"><img src="../assets/shots/fund-cycle.jpg" alt=""></div><div class="b">자금 대시보드<small>체크섬 7종</small></div></a>
+    <a href="../demo/card-notice/"><div class="thumb"><img src="../assets/shots/card-notice.jpg" alt=""></div><div class="b">법인카드 개편 공지<small>전사 안내</small></div></a>
+    <a href="../demo/overtime-meal/"><div class="thumb"><img src="../assets/shots/overtime-meal.jpg" alt=""></div><div class="b">야근식대 대조<small>사람별 판정</small></div></a>
+  </div>
+</div>
+
+</div></div>
+
+<script>
+(function () {
+  var ABOUT = {
+    A: { t: 'A · 제품 페이지 — apple.com 결: 중앙 큰 타이포, 섹션마다 한 문장 + 큰 이미지, 글라스 앱바', rec: true,
+         why: '애플이 제품을 파는 방식 그대로 사람을 소개한다. 문장 하나, 증거 하나(데모 화면)가 번갈아 온다. 여백이 넓지만 각 섹션이 "한 주장"이라 밀도가 낮아 보이지 않는다.',
+         pro: '장점: 첫 5초에 메시지 하나가 확실히 박힘. 모바일에서도 그대로 세로로 흐른다. 지금 A안(에디토리얼)의 내용을 거의 그대로 옮길 수 있다.',
+         con: '단점: 62건 표 같은 밀도 정보는 맨 아래 접기로 내려야 한다. 이미지 품질이 곧 페이지 품질.' },
+    B: { t: 'B · 설정 리스트 — iOS 설정 앱: 인셋 그룹, 셰브런, 시트로 상세', rec: false,
+         why: '휴대폰에서 가장 익숙한 문법. 행을 누르면 바텀시트가 올라와 상세를 보여준다(눌러보세요).',
+         pro: '장점: 모바일 완벽, 정보를 계층으로 숨겨 첫 화면이 짧다. 리크루터가 스캔하기 쉽다.',
+         con: '단점: 데스크톱에선 좁고 심심하다. 포트폴리오 특유의 "보여주기"가 약해 데모 썸네일이 안 보인다.' },
+    C: { t: 'C · 홈 위젯 — iOS 홈 스크린: 위젯 크기 카드 벤토 + 앱 아이콘 데모, 스프링 hover', rec: false,
+         why: '숫자·문장·이미지를 위젯 크기로 섞어 한 화면에 요약. 데모는 앱 아이콘처럼 줄 세운다.',
+         pro: '장점: 가장 "아이폰 같다". 첫 화면 정보량이 크면서도 정돈됨.',
+         con: '단점: 위젯 크기가 정보 중요도와 어긋나기 쉽다. 긴 설명(배경·한 일·결과)이 들어갈 자리가 없어 대표 프로젝트 상세는 별도 페이지가 필요.' },
+    D: { t: 'D · 스냅 갤러리 — App Store 스토리 카드: 가로 스크롤 스냅, 섹션마다 한 줄', rec: false,
+         why: '섹션은 세로로, 항목은 가로로 넘긴다(트랙을 옆으로 밀어 보세요). 카드가 크고 라운드가 깊어 애플 스토어 느낌.',
+         pro: '장점: 데모 썸네일이 크게 보이고, 카드 수가 늘어도 세로 길이가 안 늘어난다.',
+         con: '단점: 데스크톱 트랙패드 없이는 가로 스크롤이 번거롭다. 가려진 카드는 안 읽히므로 4장 안에 끝내야 한다.' },
+    E: { t: 'E · 다크 프로 — Pro 제품 페이지: 검정, 큰 숫자 카드, 좌우 교차 피처, 글라스 바', rec: false,
+         why: '숫자와 스크린샷이 검정 위에서 가장 잘 산다. 대표 프로젝트를 이미지·텍스트 교차로 크게.',
+         pro: '장점: 자신감·전문성 인상이 가장 강하다. 데모 스크린샷(대부분 밝은 UI)이 검정 위에서 튄다.',
+         con: '단점: 회계 직무 톤에 비해 화려하다는 반응 가능. 긴 본문은 다크에서 피로 → 표·FAQ는 별도 라이트 섹션 필요.' }
+  };
+  var cur = 'A', picked = null; try { picked = localStorage.getItem('pf_pick2'); } catch (e) {}
+  var seg = document.getElementById('seg'), about = document.getElementById('about');
+  function show(v) { cur = v;
+    Array.prototype.forEach.call(document.querySelectorAll('.v'), function (el) { el.classList.toggle('on', el.getAttribute('data-v') === v); });
+    Array.prototype.forEach.call(seg.querySelectorAll('button'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
+    var a = ABOUT[v]; about.innerHTML = '<h2>' + a.t + (a.rec ? ' <span class="rec">추천</span>' : '') + '</h2><p><b>왜 이 구조인가</b> — ' + a.why + '</p><p>' + a.pro + '<br>' + a.con + '</p>';
+    document.getElementById('pickBtn').classList.toggle('done', picked === v); document.getElementById('pickBtn').textContent = picked === v ? '선택됨' : '이걸로'; window.scrollTo({ top: 0 }); }
+  seg.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) show(b.getAttribute('data-v')); });
+  document.getElementById('pickBtn').addEventListener('click', function () { picked = cur; try { localStorage.setItem('pf_pick2', picked); } catch (e) {} document.getElementById('picked').textContent = picked; show(cur); });
+  document.getElementById('copyBtn').addEventListener('click', function () { var s = '2차 시안 선택: ' + (picked || '(없음)') + ' — ' + (picked ? ABOUT[picked].t : ''); try { navigator.clipboard.writeText(s); alert('복사: ' + s); } catch (e) { prompt('복사', s); } });
+  document.addEventListener('keydown', function (e) { var k = e.key.toUpperCase(); if ('ABCDE'.indexOf(k) >= 0 && !e.metaKey && !e.ctrlKey) show(k); });
+  if (picked) document.getElementById('picked').textContent = picked;
+  show(picked || 'A');
+  // B: 시트
+  var SH = { s1: ['월 가결산 손익', '판관비를 7대 분류로 재편하고 지급수수료를 판매성·관리성으로 분해. 고정·변동비 판정 순서를 규칙으로, 비경상 항목을 걷어낸 정상 손익을 한 장 보고서로.', [['7', '대 분류'], ['18', '회 결산']]],
+             s2: ['재고 평가충당금 로직 재설계', '산정 판단 15항목을 표로 확정, 7라운드 교차검증. 최종본이 이전 확정본을 원 단위까지 재현하는지 확인한 뒤 확정.', [['15', '판단 항목'], ['7', '라운드'], ['원 단위', '재현']]],
+             s3: ['위탁매출 34채널 건별 정산 대사', '정산서 입금액 = ERP 실판매 − 수수료 − 반품 ± 상시차이. 34채널 원 단위 일치, 남은 차이 3건 원인 규명.', [['34', '채널'], ['4', '상시차이 유형']]],
+             s4: ['결산 원천 단일화·현금흐름 검증', '전표 분개라인을 정본으로 정규화, 계정 81 매핑. 직접법 현금흐름이 통장 순증감과 차이 없이 맞음.', [['81', '계정'], ['0', '차이']]] };
+  var sheet = document.getElementById('sheet');
+  Array.prototype.forEach.call(document.querySelectorAll('.vB .row[data-sheet]'), function (r) { r.addEventListener('click', function () { var d = SH[r.getAttribute('data-sheet')]; document.getElementById('shT').textContent = d[0]; document.getElementById('shP').textContent = d[1];
+    document.getElementById('shK').innerHTML = d[2].map(function (k) { return '<div><b>' + k[0] + '</b><span>' + k[1] + '</span></div>'; }).join(''); sheet.classList.add('on'); }); });
+  document.getElementById('shC').addEventListener('click', function () { sheet.classList.remove('on'); });
+  sheet.addEventListener('click', function (e) { if (e.target === sheet) sheet.classList.remove('on'); });
+  // D: 점
+  Array.prototype.forEach.call(document.querySelectorAll('.vD .track'), function (t) { var dots = document.getElementById(t.getAttribute('data-dots')); var n = t.children.length; dots.innerHTML = Array.apply(null, Array(n)).map(function (_, i) { return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('');
+    t.addEventListener('scroll', function () { var w = t.children[0].offsetWidth + 16; var i = Math.round(t.scrollLeft / w); Array.prototype.forEach.call(dots.children, function (d, j) { d.classList.toggle('on', j === i); }); }, { passive: true }); });
+})();
+</script>
+</body>
+</html>
