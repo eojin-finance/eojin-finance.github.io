@@ -163,7 +163,7 @@
   <ul class="toc" id="toc">
     <li><a href="#s-summary">요약</a></li>
     <li><a href="#s-flag">대표 프로젝트<small>8</small></a></li>
-    <li><a href="#s-demo">동작하는 데모<small>9</small></a></li>
+    <li><a href="#s-demo">동작하는 데모<small>10</small></a></li>
     <li><a href="#s-way">일하는 방식</a></li>
     <li><a href="#s-ai">AI를 쓰는 방식</a></li>
     <li><a href="#s-now">지금 진행 중<small>8</small></a></li>
@@ -173,7 +173,7 @@
     <li><a href="#s-faq">자주 받는 질문</a></li>
   </ul>
   <div class="ct">주식회사 차일디 재무회계팀 매니저<br>1년 6개월 · 재직 중<br><a href="mailto:lee-ding@naver.com">lee-ding@naver.com</a></div>
-  <span class="upd"><i></i>2026년 9월 기준 갱신</span>
+  <span class="upd"><i></i>2026년 9월 기준 갱신 · 데모 10개</span>
 </aside>
 
 <main>
@@ -184,7 +184,7 @@
     <div><b class="num">37<small>개</small></b><span>월 대사 채널 — 위탁 34 + 결제대행 3</span></div>
     <div><b class="num">31<small>채널</small></b><span>정산 자동수집 — API 28 + 결제대행 3</span></div>
     <div><b>원 단위</b><span>대사 재현 정확도 — 34채널 전수 검증</span></div>
-    <div><b class="num">62<small>건</small></b><span>프로젝트 — 데모 9개 공개</span></div>
+    <div><b class="num">62<small>건</small></b><span>프로젝트 — 데모 10개 공개</span></div>
   </div>
 
   <section id="s-summary">
@@ -266,6 +266,7 @@
           <div><span class="m">부대비용</span><span class="v">원천 적재 + 규칙 배부</span></div>
           <div><span class="m">상류 표준화</span><span class="v">라인시트 통일안 확정</span></div>
         </div>
+        <a class="go" href="demo/one-close/">데모 열기 <span aria-hidden="true">→</span></a>
       </article>
 
       <article class="flag">
@@ -337,6 +338,10 @@
   <section id="s-demo">
     <div class="shead"><h2>동작하는 데모</h2><p>샘플 데이터로 실제 화면을 그대로 공개합니다 — 화면·계산·판정 로직은 실제 구현과 동일</p></div>
     <div class="gal">
+      <a class="shot" href="demo/one-close/">
+        <div class="img"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱 화면" loading="lazy"></div>
+        <div class="b"><h3>월 매입 마감 앱 <span class="chip">NEW</span></h3><p>입고 검수 → ERP 입고현황 적재 → 수입신고 B/L 연결·과세환율 → 부대비용 배부 → 취득원가 확정, 서버 판정 로직 그대로</p><div class="d">데이터 <b>가상 품번 10행 · 수입 1건</b></div></div>
+      </a>
       <a class="shot" href="demo/fund-cycle/">
         <div class="img"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드 화면" loading="lazy"></div>
         <div class="b"><h3>자금 대시보드</h3><p>잔액 추이 · 수금 예측 · 생산대금 지급 · 정산 추적, 진입 시 품질검사 7종 자동</p><div class="d">데이터 <b>합성 15테이블</b></div></div>
@@ -486,7 +491,7 @@
           <tr><td>월별 결제대행 대사(DB vs 엑셀)</td><td>자동 수집 DB와 수기 수집 엑셀을 주문번호별 순액으로 대사, DB에서 원천탭 자동 생성으로 전환</td><td class="n">주문번호별</td></tr>
 
           <tr class="grp"><td colspan="3">재고 · 매입 · 매출원가</td></tr>
-          <tr><td>월 매입 마감 앱<span class="nw">NEW</span></td><td>발주↔입고 대사·부대비용 배부·수입 필증 검증·임원 결재를 한 흐름으로, 발주번호 체계 신설</td><td class="n">실운영</td></tr>
+          <tr><td>월 매입 마감 앱<span class="nw">NEW</span></td><td>발주↔입고 대사·부대비용 배부·수입 필증 검증·임원 결재를 한 흐름으로, 발주번호 체계 신설. 회귀 테스트 20종 동반</td><td class="n">실운영 · 데모</td></tr>
           <tr><td>입고·부대비용 대사 DB<span class="nw">NEW</span></td><td>원천만 적재하고 배부는 뷰로 계산, 세트 품번 이중계산 함정 차단</td><td class="n">원천 적재</td></tr>
           <tr><td>전사 라인시트 표준화<span class="nw">NEW</span></td><td>부서마다 다른 상품 마스터 양식을 수식 연동형 통일안으로 확정, 업로드·검증·버전 비교 허브 설계</td><td class="n">안 확정</td></tr>
           <tr><td>NRV 산정 로직 재설계</td><td>판단 15항목 분해·근거 문서화, 교차검증 후 원 단위 재현 확인</td><td class="n">7라운드</td></tr>
