@@ -1343,7 +1343,7 @@ function buildCashSim(){
       ['은행권 가중평균', bankBal? bank/bankBal/100 : 0.045],
       ['관계사 차입 (포컴퍼니)', 0.085],
       ['리스금융 팩토링 → 연환산', FACT_ANNUAL],
-      ['롯데카드 차입', 0.1588]
+      ['카드사A 차입', 0.1588]
     ];
     var o=baseOpts(P,{pct:true,legend:false}); o.indexAxis='y';
     o.scales={ x:{grid:{color:P.grid,drawTicks:false},border:{display:false},ticks:{color:P.muted,font:{size:11},callback:function(v){return fmtPct(v);},maxTicksLimit:6}},
