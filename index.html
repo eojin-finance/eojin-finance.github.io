@@ -143,6 +143,26 @@
     .top { display: flex; }
     .flag dl { max-width: none; }
   }
+
+  /* ── 모션: transform·opacity 만, 등장 200ms ease-out, 순차 등장은 항목당 30ms·8개까지 ── */
+  .rv { opacity: 0; transform: translateY(10px); transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out); }
+  .rv.in { opacity: 1; transform: none; }
+  .gal .shot, .ops > div, .cols > div, .two > div, .flags .flag { transition-delay: calc(var(--i, 0) * 30ms); }
+  .flag { position: relative; border-left-color: transparent; }
+  .flag::before { content: ''; position: absolute; left: -3px; top: 0; width: 3px; height: 100%; background: var(--ac); transform: scaleY(0); transform-origin: top;
+                  transition: transform var(--dur-3) var(--ease-out); }
+  .flag.in::before { transform: scaleY(1); }
+  .shot img { transition: transform var(--dur-3) var(--ease-std); }
+  .shot:hover img { transform: scale(1.03); }
+  .shot .pf b { position: relative; }
+  .stats b.num { font-variant-numeric: tabular-nums; }
+  .go { transition: opacity var(--dur-1) var(--ease-std), transform var(--dur-1) var(--ease-std); }
+  .go:hover { transform: translateY(-1px); }
+  .go:active { transform: scale(.97); }
+  .top { opacity: 0; transform: translateY(8px); transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out); }
+  .top.show { opacity: 1; transform: none; }
+  h1 em { background: linear-gradient(transparent 62%, var(--ac-soft) 62%); }
+  @media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; transition: none; } .flag::before { transform: none; transition: none; } .shot img { transition: none; } }
 </style>
 </head>
 <body>
@@ -169,14 +189,14 @@
   <p class="eyebrow">Finance &amp; Accounting · Portfolio</p>
   <h1>차이는 규명하고,<br>반복은 <em>기계에</em> 넘깁니다</h1>
   <p class="role">월결산 · 매출/정산 대사 · 재고평가 · 결산 프로세스 자동화 — 패션 이커머스 재무회계</p>
-  <div class="stats">
+  <div class="stats rv">
     <div><b class="num">18<small>회</small></b><span>월결산 — 가결산 손익·판관비 분류·비경상 분리</span></div>
     <div><b class="num">34<small>채널</small></b><span>위탁 정산 대사 — 원 단위 일치 확인</span></div>
     <div><b>원 단위</b><span>재고 평가충당금 — 이전 확정본 재현 검증</span></div>
     <div><b class="num">6<small>+7</small></b><span>운영 중인 데모 — 샘플 데이터로 공개</span></div>
   </div>
 
-  <section id="s-summary">
+  <section class="rv" id="s-summary">
     <div class="shead"><h2>요약</h2></div>
     <p class="lede">패션 이커머스 재무회계팀에서 월결산과 매출·원가 대사를 담당합니다. 업무의 절반은
       <strong>차이를 규명하는 일</strong>이었습니다. 차이를 원인별로 분류해 기준을 문서로 확정하고, 반복 확인 구간만 자동화했습니다.</p>
@@ -184,11 +204,11 @@
       아래에는 <strong>금액·거래처명·내부 시스템 정보가 없습니다</strong> — 구조와 건수로만 적었습니다.</p>
   </section>
 
-  <section id="s-flag">
+  <section class="rv" id="s-flag">
     <div class="shead"><h2>대표 프로젝트</h2><p>결산 근거를 남기는 일 4건</p></div>
     <div class="flags">
 
-      <article class="flag">
+      <article class="flag rv">
         <h3>월 가결산 손익 — 판관비 분류 체계와 비경상 손익 분리</h3>
         <p class="one">매달 다른 기준으로 만들어지던 손익을 한 체계로 고정했습니다.</p>
         <dl>
@@ -203,7 +223,7 @@
         </div>
       </article>
 
-      <article class="flag">
+      <article class="flag rv">
         <h3>재고 평가충당금(NRV) 산정 로직 재설계</h3>
         <p class="one">계산 결과보다 <strong>판단 기준을 재현 가능하게</strong> 만드는 것이 목표였습니다.</p>
         <dl>
@@ -219,7 +239,7 @@
         <a class="go" href="demo/nrv-simulator/">데모 열기 <span aria-hidden="true">→</span></a>
       </article>
 
-      <article class="flag">
+      <article class="flag rv">
         <h3>위탁매출 34채널 건별 정산 대사</h3>
         <p class="one">채널이 늘어도 마감이 밀리지 않는 구조로 바꿨습니다.</p>
         <dl>
@@ -234,7 +254,7 @@
         </div>
       </article>
 
-      <article class="flag">
+      <article class="flag rv">
         <h3>결산 원천 단일화와 현금흐름 검증</h3>
         <p class="one">여러 시트를 대조하는 대신, 정본을 하나로 정했습니다.</p>
         <dl>
@@ -252,69 +272,69 @@
     </div>
   </section>
 
-  <section id="s-ops">
+  <section class="rv" id="s-ops">
     <div class="shead"><h2>운영 개선</h2><p>결산 바깥에서 반복을 걷어낸 일 4건</p></div>
     <div class="ops">
-      <div><h3>월 매입 마감 앱</h3><p>발주↔입고 대사, 수입 부대비용 배부, 필증 검증, 결재를 한 흐름으로. 예외만 사람이 봅니다.</p><a href="demo/one-close/">데모 →</a></div>
-      <div><h3>자금 대시보드</h3><p>잔액·수금 예측·생산대금 지급을 한 화면에. 열 때마다 체크섬 7종으로 원천과 대조합니다.</p><a href="demo/fund-cycle/">데모 →</a></div>
-      <div><h3>상품 계획표(라인시트) 표준화</h3><p>부서마다 다른 양식을 공통 필드 13개·키 3계층으로 통일해 발주·입고·매출·자금이 같은 품번 체계를 쓰게 했습니다.</p><a href="demo/linesheet-fin/">데모 →</a></div>
-      <div><h3>법인카드·경비 통제</h3><p>실물 카드 축소와 가상카드 전환 설계, 관리 대장 정비, 근태 대조로 경비 규정 충족을 자동 판정.</p><a href="demo/overtime-meal/">데모 →</a></div>
+      <div class="rv"><h3>월 매입 마감 앱</h3><p>발주↔입고 대사, 수입 부대비용 배부, 필증 검증, 결재를 한 흐름으로. 예외만 사람이 봅니다.</p><a href="demo/one-close/">데모 →</a></div>
+      <div class="rv"><h3>자금 대시보드</h3><p>잔액·수금 예측·생산대금 지급을 한 화면에. 열 때마다 체크섬 7종으로 원천과 대조합니다.</p><a href="demo/fund-cycle/">데모 →</a></div>
+      <div class="rv"><h3>상품 계획표(라인시트) 표준화</h3><p>부서마다 다른 양식을 공통 필드 13개·키 3계층으로 통일해 발주·입고·매출·자금이 같은 품번 체계를 쓰게 했습니다.</p><a href="demo/linesheet-fin/">데모 →</a></div>
+      <div class="rv"><h3>법인카드·경비 통제</h3><p>실물 카드 축소와 가상카드 전환 설계, 관리 대장 정비, 근태 대조로 경비 규정 충족을 자동 판정.</p><a href="demo/overtime-meal/">데모 →</a></div>
     </div>
   </section>
 
-  <section id="s-demo">
+  <section class="rv" id="s-demo">
     <div class="shead"><h2>동작하는 데모</h2><p>실제 운영 중인 화면 6개 — 샘플 데이터로, 계산·판정 로직은 실제 구현과 동일</p></div>
     <div class="gal">
-      <a class="shot" href="demo/one-close/"><div class="img"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱" loading="lazy"></div>
+      <a class="shot rv" href="demo/one-close/"><div class="img"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱" loading="lazy"></div>
         <div class="b"><h3>월 매입 마감 앱</h3><p>입고 검수 → B/L 연결 → 부대비용 배부 → 취득원가</p><div class="pf"><b>증명</b> 매입 원가 확정 절차를 화면 순서로 고정했다</div></div></a>
-      <a class="shot" href="demo/nrv-simulator/"><div class="img"><img src="assets/shots/nrv-simulator.jpg" alt="NRV 시뮬레이터" loading="lazy"></div>
+      <a class="shot rv" href="demo/nrv-simulator/"><div class="img"><img src="assets/shots/nrv-simulator.jpg" alt="NRV 시뮬레이터" loading="lazy"></div>
         <div class="b"><h3>NRV 시뮬레이터</h3><p>가정을 움직이면 전 품번 충당금 즉시 재계산</p><div class="pf"><b>증명</b> 충당금 판단 기준이 문서화·재현 가능하다</div></div></a>
-      <a class="shot" href="demo/linesheet-fin/"><div class="img"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계" loading="lazy"></div>
+      <a class="shot rv" href="demo/linesheet-fin/"><div class="img"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계" loading="lazy"></div>
         <div class="b"><h3>라인시트 재무 집계</h3><p>매입 약정 기준 집계 · 결제조건 · 유효성</p><div class="pf"><b>증명</b> 상품 계획이 매입 약정·자금 소요로 바로 읽힌다</div></div></a>
-      <a class="shot" href="demo/fund-cycle/"><div class="img"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드" loading="lazy"></div>
+      <a class="shot rv" href="demo/fund-cycle/"><div class="img"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드" loading="lazy"></div>
         <div class="b"><h3>자금 대시보드</h3><p>잔액 추이 · 수금 예측 · 진입 시 체크섬 7종</p><div class="pf"><b>증명</b> 보고 숫자가 원천과 자동으로 대조된다</div></div></a>
-      <a class="shot" href="demo/card-notice/"><div class="img"><img src="assets/shots/card-notice.jpg" alt="법인카드 개편 공지" loading="lazy"></div>
+      <a class="shot rv" href="demo/card-notice/"><div class="img"><img src="assets/shots/card-notice.jpg" alt="법인카드 개편 공지" loading="lazy"></div>
         <div class="b"><h3>법인카드 개편 공지</h3><p>정책 변경 전후·한도 근거·상황별 가이드</p><div class="pf"><b>증명</b> 정책 변경을 전 구성원이 읽을 수 있게 설명했다</div></div></a>
-      <a class="shot" href="demo/overtime-meal/"><div class="img"><img src="assets/shots/overtime-meal.jpg" alt="야근식대 대조" loading="lazy"></div>
+      <a class="shot rv" href="demo/overtime-meal/"><div class="img"><img src="assets/shots/overtime-meal.jpg" alt="야근식대 대조" loading="lazy"></div>
         <div class="b"><h3>야근식대 대조</h3><p>근태 vs 카드 내역 사람별 판정, 안내문구 생성</p><div class="pf"><b>증명</b> 규정성 경비를 예외만 사람이 보게 만들었다</div></div></a>
     </div>
     <details class="more">
       <summary>분석·설계 산출물 7개 — 상시 운영은 아닌 것</summary>
       <div class="gal">
-      <a class="shot" href="demo/investor-contracts/"><div class="img"><img src="assets/shots/investor-contracts.jpg" alt="투자계약 의무 관리" loading="lazy"></div>
+      <a class="shot rv" href="demo/investor-contracts/"><div class="img"><img src="assets/shots/investor-contracts.jpg" alt="투자계약 의무 관리" loading="lazy"></div>
         <div class="b"><h3>투자계약 의무 관리</h3><p>계약 조항을 긴급/정기/이벤트 의무로 분류 — 분석 1회 산출물</p></div></a>
-      <a class="shot" href="demo/expense-dashboard/"><div class="img"><img src="assets/shots/expense-dashboard.jpg" alt="지출내역 대시보드" loading="lazy"></div>
+      <a class="shot rv" href="demo/expense-dashboard/"><div class="img"><img src="assets/shots/expense-dashboard.jpg" alt="지출내역 대시보드" loading="lazy"></div>
         <div class="b"><h3>지출내역 대시보드</h3><p>지출 표 붙여넣기 → 용도·부서 구성 — 법인카드 개편 분석용</p></div></a>
-      <a class="shot" href="demo/fund-dashboard/"><div class="img"><img src="assets/shots/fund-dashboard.jpg" alt="자금 인텔리전스" loading="lazy"></div>
+      <a class="shot rv" href="demo/fund-dashboard/"><div class="img"><img src="assets/shots/fund-dashboard.jpg" alt="자금 인텔리전스" loading="lazy"></div>
         <div class="b"><h3>자금 인텔리전스</h3><p>자금 대시보드를 현금 시나리오·손익 관점으로 재구성한 버전</p></div></a>
-      <a class="shot" href="demo/flow-diagram/"><div class="img"><img src="assets/shots/flow-diagram.jpg" alt="전사 업무 흐름도" loading="lazy"></div>
+      <a class="shot rv" href="demo/flow-diagram/"><div class="img"><img src="assets/shots/flow-diagram.jpg" alt="전사 업무 흐름도" loading="lazy"></div>
         <div class="b"><h3>전사 업무 흐름도</h3><p>계획→자금→실적 경로 한 장 — 설명용</p></div></a>
-      <a class="shot" href="demo/one-erp/"><div class="img"><img src="assets/shots/one-erp.jpg" alt="ONE ERP 목업" loading="lazy"></div>
+      <a class="shot rv" href="demo/one-erp/"><div class="img"><img src="assets/shots/one-erp.jpg" alt="ONE ERP 목업" loading="lazy"></div>
         <div class="b"><h3>ONE ERP 목업</h3><p>시스템 통합 시 화면 목업 — 설계용</p></div></a>
-      <a class="shot" href="demo/dashboard-cart/"><div class="img"><img src="assets/shots/dashboard-cart.jpg" alt="Dashboard Cart" loading="lazy"></div>
+      <a class="shot rv" href="demo/dashboard-cart/"><div class="img"><img src="assets/shots/dashboard-cart.jpg" alt="Dashboard Cart" loading="lazy"></div>
         <div class="b"><h3>Dashboard Cart</h3><p>보고 화면 설계 도구</p></div></a>
-      <a class="shot" href="demo/meeting-memo/"><div class="img"><img src="assets/shots/meeting-memo.jpg" alt="회의 메모 컨테이너" loading="lazy"></div>
+      <a class="shot rv" href="demo/meeting-memo/"><div class="img"><img src="assets/shots/meeting-memo.jpg" alt="회의 메모 컨테이너" loading="lazy"></div>
         <div class="b"><h3>회의 메모 컨테이너</h3><p>협의 시트에 붙는 메모 입력 — 1회 사용</p></div></a>
       </div>
     </details>
   </section>
 
-  <section id="s-way">
+  <section class="rv" id="s-way">
     <div class="shead"><h2>일하는 방식</h2><p>위 프로젝트에 공통으로 적용한 기준</p></div>
     <div class="cols">
-      <div><h3><b>01</b>차이는 덮지 않고 분류한다</h3><p>원인이 지정된 차이는 다음 달에 다시 조사하지 않습니다. 마감이 매달 새로 하는 조사에서, 기준에 맞춰 확인하는 작업으로 바뀝니다.</p></div>
-      <div><h3><b>02</b>검증 없이 편해지지 않는다</h3><p>자동으로 나온 숫자는 원천 합계와 대사하고, 재계산해도 같은 값인지 확인한 뒤 씁니다. 원 단위까지 재현되지 않으면 확정하지 않습니다.</p></div>
-      <div><h3><b>03</b>판단은 문서로, 반복은 기계로</h3><p>기준이 필요한 항목은 대안과 채택 근거를 남겨 사람이 판단하고, 반복 확인만 자동화합니다. 그래야 감사·상급자에게 설명이 됩니다.</p></div>
+      <div class="rv"><h3><b>01</b>차이는 덮지 않고 분류한다</h3><p>원인이 지정된 차이는 다음 달에 다시 조사하지 않습니다. 마감이 매달 새로 하는 조사에서, 기준에 맞춰 확인하는 작업으로 바뀝니다.</p></div>
+      <div class="rv"><h3><b>02</b>검증 없이 편해지지 않는다</h3><p>자동으로 나온 숫자는 원천 합계와 대사하고, 재계산해도 같은 값인지 확인한 뒤 씁니다. 원 단위까지 재현되지 않으면 확정하지 않습니다.</p></div>
+      <div class="rv"><h3><b>03</b>판단은 문서로, 반복은 기계로</h3><p>기준이 필요한 항목은 대안과 채택 근거를 남겨 사람이 판단하고, 반복 확인만 자동화합니다. 그래야 감사·상급자에게 설명이 됩니다.</p></div>
     </div>
     <div class="shead" style="margin-top: var(--sp-8)"><h2 class="sm">AI는 어디까지 쓰나</h2><p>회계 판단은 사람, 반복 확인은 기계</p></div>
     <div class="two">
-      <div><h3>AI에게 맡기는 것</h3><ul>
+      <div class="rv"><h3>AI에게 맡기는 것</h3><ul>
         <li>대사 파일 정규화·건별 매칭 같은 반복 확인</li>
         <li>초안 작성(보고서 골격, 검증 스크립트)</li>
         <li>판단 항목표에 대한 반박·교차검증(다른 모델을 검토자로)</li>
         <li>화면·시스템 조작의 반복 구간</li>
       </ul></div>
-      <div><h3>내가 결정하는 것</h3><ul>
+      <div class="rv"><h3>내가 결정하는 것</h3><ul>
         <li>회계정책·충당금률·분류 기준의 채택과 승인 요청</li>
         <li>차이의 원인 판정과 회계처리 방침</li>
         <li>원천 합계·재계산·이전 확정본 재현이 맞는지 최종 확인</li>
@@ -324,7 +344,7 @@
     <p class="note">작업 기준(파일 버전 규칙, 엑셀 품질 바, 금지 목록)을 문서로 고정해 모든 작업이 같은 기준을 따르게 하고, 사용량은 주간 운영일지로 남깁니다.</p>
   </section>
 
-  <section id="s-all">
+  <section class="rv" id="s-all">
     <div class="shead"><h2>전체 프로젝트</h2><p>영역별 — 펼쳐서 봅니다</p></div>
     <details class="grp" open>
       <summary>결산 · 경영 보고 <small>8건</small></summary>
@@ -390,7 +410,7 @@
     <p class="note">지표는 건수·구조만 적었습니다. 금액·거래처·내부 시스템 정보는 포함하지 않습니다.</p>
   </section>
 
-  <section id="s-scope">
+  <section class="rv" id="s-scope">
     <div class="shead"><h2>담당 업무 범위</h2></div>
     <div class="tw"><table>
       <thead><tr><th style="width:22%">영역</th><th>담당 내용</th><th style="width:18%">주기</th></tr></thead>
@@ -403,7 +423,7 @@
       </tbody></table></div>
   </section>
 
-  <section id="s-tools">
+  <section class="rv" id="s-tools">
     <div class="shead"><h2>사용 도구</h2></div>
     <div class="tw"><table>
       <thead><tr><th style="width:22%">구분</th><th>내용</th></tr></thead>
@@ -416,7 +436,7 @@
       </tbody></table></div>
   </section>
 
-  <section id="s-faq">
+  <section class="rv" id="s-faq">
     <div class="shead"><h2>자주 받는 질문</h2></div>
     <details class="faq"><summary>회계 담당자가 왜 직접 자동화까지 하나요?</summary>
       <p>대사 업무는 차이의 원인을 아는 사람이 규칙을 정해야 자동화가 됩니다. 외부에 맡기면 "무엇이 정상 차이인지"를 전달하는 데 더 많은 시간이 들었습니다. 그래서 기준을 정하는 일과 그 기준을 코드로 옮기는 일을 같이 했습니다.</p></details>
@@ -447,6 +467,23 @@
     links.forEach(function (a, i) { a.classList.toggle('on', i === cur); });
   }
   window.addEventListener('scroll', mark, { passive: true }); mark();
+})();
+
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var els = Array.prototype.slice.call(document.querySelectorAll('.rv'));
+  // 형제끼리 순차 등장 — 부모 안 순서로 --i 를 매긴다 (8개까지)
+  els.forEach(function (el) { var sib = Array.prototype.filter.call(el.parentNode.children, function (c) { return c.classList.contains('rv'); }); el.style.setProperty('--i', Math.min(sib.indexOf(el), 7)); });
+  if (reduce || !('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); }
+  else { var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }); }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    els.forEach(function (e) { io.observe(e); }); }
+  // 첫 화면 숫자 — 한 번만 카운트업 (320ms)
+  var nums = Array.prototype.slice.call(document.querySelectorAll('.stats b.num'));
+  nums.forEach(function (b) { var t = b.firstChild; if (!t || t.nodeType !== 3) return; var target = parseInt(t.nodeValue, 10); if (!target || reduce) return;
+    var t0 = null; function step(ts) { if (!t0) t0 = ts; var p = Math.min(1, (ts - t0) / 320); var e = 1 - Math.pow(1 - p, 3); t.nodeValue = String(Math.round(target * e)); if (p < 1) requestAnimationFrame(step); }
+    t.nodeValue = '0'; requestAnimationFrame(step); });
+  var top = document.querySelector('.top');
+  window.addEventListener('scroll', function () { if (top) top.classList.toggle('show', window.scrollY > 600); }, { passive: true });
 })();
 </script>
 </body>
