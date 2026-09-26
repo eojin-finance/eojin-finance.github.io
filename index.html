@@ -50,10 +50,10 @@
   .prog a.on { background: var(--ink); transform: scale(1.25); }
 
   /* 트랙 + 카드 */
-  .track { display: flex; gap: var(--sp-4); overflow-x: auto; scroll-snap-type: x mandatory; padding: var(--sp-5) calc((100% - 980px) / 2 + var(--sp-6)); scroll-padding-inline: calc((100% - 980px) / 2 + var(--sp-6)); scrollbar-width: none; }
+  .track { --pad: max(var(--sp-6), calc((100% - 980px) / 2 + var(--sp-6))); --cw: 380px; display: flex; gap: var(--sp-4); overflow-x: auto; scroll-snap-type: x mandatory; padding: var(--sp-5) var(--pad); scroll-padding-inline: var(--pad); scrollbar-width: none; }
   .track::-webkit-scrollbar { display: none; }
   /* 마지막 카드도 스냅 시작점에 설 수 있게 꼬리 여백 — 없으면 끝 카드는 끝까지 못 밀린다 */
-  .track::after { content: ''; flex: 0 0 calc(100% - 380px - (100% - 980px) - 48px); }
+  .track::after { content: ''; flex: 0 0 calc(100% - var(--cw) - var(--sp-4)); } /* ::after 의 100% 는 트랙 콘텐츠 폭(패딩 제외)이라 카드폭+gap 만 뺀다 */
   .cardx { flex: 0 0 380px; scroll-snap-align: start; border-radius: 22px; overflow: hidden; background: var(--gray6); box-shadow: 0 10px 30px -18px rgba(0,0,0,.35); transition: transform var(--dur-2) var(--ease-out); display: flex; flex-direction: column; }
   .cardx:hover { transform: translateY(-4px); }
   .cardx .b { padding: var(--sp-4) var(--sp-5) var(--sp-5); }
@@ -113,7 +113,7 @@
     .hero { padding: 56px var(--sp-5) 36px; } .hero h1 { font-size: 36px; } .hero p { font-size: var(--fs-18); }
     .stats { gap: var(--sp-6) var(--sp-8); } .stats b { font-size: 30px; }
     .chap { padding-top: 44px; } .chap .no { font-size: 44px; } .sh h2 { font-size: 28px; } .sh .sub { font-size: var(--fs-16); }
-    .track { padding: var(--sp-4) var(--sp-5); scroll-padding-inline: var(--sp-5); } .track::after { flex-basis: calc(100% - 300px - 40px); } .cardx, .cardx.big { flex-basis: 300px; } .cardx.text, .cardx.light { min-height: 240px; }
+    .track { --pad: var(--sp-5); --cw: 300px; } .cardx, .cardx.big { flex-basis: 300px; } .cardx.text, .cardx.light { min-height: 240px; }
     .three, .two { grid-template-columns: 1fr; } .prog { display: none; }
   }
 </style>
