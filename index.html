@@ -337,14 +337,14 @@
   document.querySelectorAll('.track').forEach(function (t) {
     var lane = t.firstElementChild, over = 0, raf = null, vx = 0, lastX = 0, lastT = 0, dragging = false, startX = 0, startL = 0, moved = false, wheelTimer = null;
     // 끝 = 마지막 카드가 스냅 자리에 선 위치 (꼬리 여백 때문에 scrollWidth 끝보다 앞이다)
-    function max() { var pad = parseFloat(getComputedStyle(t).paddingLeft) || 0, cs = cards(), last = cs[cs.length - 1]; return Math.min(t.scrollWidth - t.clientWidth, Math.max(0, last.offsetLeft - pad)); }
+    function max() { var cs = cards(), last = cs[cs.length - 1]; return Math.min(t.scrollWidth - t.clientWidth, Math.max(0, last.offsetLeft)); }   // offsetLeft 는 lane(transform) 기준이라 패딩을 빼지 않는다
     function setOver(v) { over = v; lane.style.transform = v ? 'translateX(' + (-v) + 'px)' : ''; }
     function rubber(d) { var c = 110; return Math.sign(d) * c * (1 - Math.exp(-Math.abs(d) / c)); }   // 저항: 멀리 밀수록 덜 움직인다
     function springBack() { cancelAnimationFrame(raf); var v = 0, k = 0.16, damp = 0.74;
-      (function step() { var a = -k * over; v = (v + a) * damp; var next = over + v; if (Math.abs(next) < 0.3 && Math.abs(v) < 0.3) { setOver(0); return; } setOver(next); raf = requestAnimationFrame(step); })(); }
+      (function step() { var a = -k * over; v = (v + a) * damp; var next = over + v; if (Math.abs(next) < 0.8 && Math.abs(v) < 0.8) { setOver(0); return; } setOver(next); raf = requestAnimationFrame(step); })(); }
     function cards() { return Array.prototype.filter.call(lane.children, function (c) { return !c.classList.contains('sp'); }); }
-    function snapTo(x) { var pad = parseFloat(getComputedStyle(t).paddingLeft) || 0, best = null, bd = 1e9; cards().forEach(function (c) { var d = Math.abs(c.offsetLeft - (x + pad)); if (d < bd) { bd = d; best = c; } });
-      t.classList.remove('drag'); if (best) t.scrollTo({ left: Math.min(max(), Math.max(0, best.offsetLeft - pad)), behavior: 'smooth' }); }
+    function snapTo(x) { var best = null, bd = 1e9; cards().forEach(function (c) { var d = Math.abs(c.offsetLeft - x); if (d < bd) { bd = d; best = c; } });
+      t.classList.remove('drag'); if (best) t.scrollTo({ left: Math.min(max(), Math.max(0, best.offsetLeft)), behavior: 'smooth' }); }
     t.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse' || e.button !== 0) return; dragging = true; moved = false; startX = e.clientX; startL = t.scrollLeft; lastX = e.clientX; lastT = e.timeStamp; vx = 0; cancelAnimationFrame(raf); t.setPointerCapture(e.pointerId); });
     t.addEventListener('pointermove', function (e) { if (!dragging) return; var dx = e.clientX - startX; if (Math.abs(dx) > 4 && !moved) { moved = true; t.classList.add('drag'); }
       if (!moved) return; var target = startL - dx, m = max();
@@ -355,17 +355,24 @@
       snapTo(t.scrollLeft + vx * 140); }   // 관성: 놓을 때 속도만큼 앞 카드로
     t.addEventListener('pointerup', endDrag); t.addEventListener('pointercancel', endDrag); t.addEventListener('lostpointercapture', endDrag);
     t.addEventListener('click', function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
-    // 휠(트랙패드 가로) — 끝에서 더 밀면 살짝 늘어났다 돌아온다
+    // 휠(트랙패드 가로·Shift+휠) — 한 제스처에 카드 한 장씩 넘긴다.
+    //   브라우저 기본 스크롤에 맡기면 휠 한 칸(100px)이 카드 절반보다 작아 mandatory 스냅이 제자리로 되돌려 첫 카드로 못 간다(실측).
+    var acc = 0, lock = 0;
+    function idxNow() { var pad = parseFloat(getComputedStyle(t).paddingLeft) || 0, cs = cards(), x = t.scrollLeft, best = 0, bd = 1e9; cs.forEach(function (c, i) { var d = Math.abs((c.offsetLeft) - x); if (d < bd) { bd = d; best = i; } }); return best; }
+    function goTo(i) { var cs = cards(); i = Math.max(0, Math.min(cs.length - 1, i)); t.scrollTo({ left: Math.min(max(), cs[i].offsetLeft), behavior: 'smooth' }); }
     t.addEventListener('wheel', function (e) { var dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : (e.shiftKey ? e.deltaY : 0); if (!dx) return;
-      var m = max(), atStart = t.scrollLeft <= 0 && dx < 0, atEnd = t.scrollLeft >= m - 1 && dx > 0; if (!atStart && !atEnd) return;
-      e.preventDefault(); cancelAnimationFrame(raf); var want = (atEnd ? 1 : -1) * Math.min(400, Math.abs(over) * 2.2 + Math.abs(dx) * 1.6); setOver(rubber(want));
-      clearTimeout(wheelTimer); wheelTimer = setTimeout(springBack, 90); }, { passive: false });
+      e.preventDefault();
+      var m = max(), atStart = t.scrollLeft <= 1 && dx < 0, atEnd = t.scrollLeft >= m - 1 && dx > 0;
+      if (atStart || atEnd) { cancelAnimationFrame(raf); var want = (atEnd ? 1 : -1) * Math.min(400, Math.abs(over) * 2.2 + Math.abs(dx) * 1.6); setOver(rubber(want)); clearTimeout(wheelTimer); wheelTimer = setTimeout(springBack, 90); acc = 0; return; }
+      var now = e.timeStamp; if (now < lock) return;            // 한 장 넘기는 중엔 추가 입력 무시(관성 휠 폭주 방지)
+      acc += dx; if (Math.abs(acc) < 40) return;
+      goTo(idxNow() + (acc > 0 ? 1 : -1)); acc = 0; lock = now + 380; }, { passive: false });
     // 터치(모바일)는 브라우저 기본 스크롤·스냅 — iOS 는 자체 러버밴드가 있다
   });
   // 트랙 점
   document.querySelectorAll('.track[data-dots]').forEach(function (t) { var dots = t.nextElementSibling; if (!dots || !dots.classList.contains('dots')) return; var cards = Array.prototype.filter.call(t.firstElementChild.children, function (c) { return !c.classList.contains('sp'); }); var n = cards.length;
     dots.innerHTML = Array.apply(null, Array(n)).map(function (_, i) { return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('');
-    t.addEventListener('scroll', function () { var x = t.scrollLeft + parseFloat(getComputedStyle(t).paddingLeft || 0), best = 0, bd = 1e9; cards.forEach(function (c, j) { var d = Math.abs(c.offsetLeft - x); if (d < bd) { bd = d; best = j; } }); Array.prototype.forEach.call(dots.children, function (d, j) { d.classList.toggle('on', j === best); }); }, { passive: true }); });
+    t.addEventListener('scroll', function () { var x = t.scrollLeft, best = 0, bd = 1e9; cards.forEach(function (c, j) { var d = Math.abs(c.offsetLeft - x); if (d < bd) { bd = d; best = j; } }); Array.prototype.forEach.call(dots.children, function (d, j) { d.classList.toggle('on', j === best); }); }, { passive: true }); });
   // 등장
   var els = Array.prototype.slice.call(document.querySelectorAll('.rv'));
   els.forEach(function (el) { var sib = Array.prototype.filter.call(el.parentNode.children, function (c) { return c.classList.contains('rv'); }); el.style.setProperty('--i', Math.min(sib.indexOf(el), 7)); });
