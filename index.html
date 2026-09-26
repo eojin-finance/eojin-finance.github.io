@@ -65,8 +65,7 @@
   .cardx:active { transform: scale(.985); transition-duration: 120ms; }
   .dots i { transition: transform 320ms cubic-bezier(.22,1.2,.36,1), background var(--dur-1) var(--ease-std); } .dots i.on { transform: scaleX(3); margin: 0 6px; }
   .hero .links a, .appbar a.cta { transition: transform var(--dur-1) var(--ease-std); display: inline-block; } .hero .links a:hover, .appbar a.cta:hover { transform: translateY(-1px); } .appbar a.cta:active { transform: scale(.94); }
-  .cardx { flex: 0 0 380px; scroll-snap-align: start; border-radius: 22px; overflow: hidden; background: var(--gray6); box-shadow: 0 10px 30px -18px rgba(0,0,0,.35); transition: transform var(--dur-2) var(--ease-out); display: flex; flex-direction: column; }
-  .cardx:hover { transform: translateY(-4px); }
+  .cardx { flex: 0 0 380px; scroll-snap-align: start; border-radius: 22px; overflow: hidden; background: var(--gray6); box-shadow: 0 10px 30px -18px rgba(0,0,0,.35); display: flex; flex-direction: column; }
   .cardx .b { padding: var(--sp-4) var(--sp-5) var(--sp-5); }
   .cardx .eb { font-size: var(--fs-11); text-transform: uppercase; letter-spacing: .06em; color: var(--ios); font-weight: 700; }
   .cardx h3 { font-size: var(--fs-18); font-weight: 600; margin-top: 4px; } .cardx p { font-size: var(--fs-13); color: var(--label2); margin-top: var(--sp-1); line-height: 1.55; }
@@ -321,7 +320,7 @@
 
 <footer>
   <div><strong style="color:var(--ink)">이어진</strong> · 패션 이커머스(브랜드 복수 운영) 재무회계팀 매니저 · 재직 중 1년 6개월 · <a href="mailto:lee-ding@naver.com">lee-ding@naver.com</a></div>
-  <div>개인 포트폴리오이며 소속 회사와 무관하게 작성했습니다. 회사 내부 데이터는 포함하지 않습니다. 2026-09 갱신.</div>
+  <div>개인 포트폴리오이며 소속 회사와 무관하게 작성했습니다. 회사 내부 데이터는 포함하지 않습니다. 2026-09 갱신 · <span id="build">build 913a43e+</span></div>
 </footer>
 <a class="top" href="#" aria-label="맨 위로">↑</a>
 
@@ -339,6 +338,10 @@
     var lane = t.firstElementChild, over = 0, raf = null, cur = 0, lock = 0, acc = 0, armed = true, settleTimer = null, wheelTimer = null;
     var dragging = false, moved = false, startX = 0, startL = 0, lastX = 0, lastT = 0, vx = 0, animating = false, animTimer = null;
     function cards() { return Array.prototype.filter.call(lane.children, function (c) { return !c.classList.contains('sp'); }); }
+    var sp = lane.querySelector('.sp');
+    function fitTail() { var cs = cards(), last = cs[cs.length - 1], pad = parseFloat(getComputedStyle(t).paddingLeft) || 0;
+      var w = Math.max(0, t.clientWidth - pad * 2 - last.offsetWidth - 16); sp.style.flexBasis = w + 'px'; sp.style.width = w + 'px'; }
+    fitTail(); window.addEventListener('resize', fitTail); window.addEventListener('load', fitTail);
     function maxL() { var cs = cards(); return Math.min(t.scrollWidth - t.clientWidth, cs[cs.length - 1].offsetLeft); }
     function posOf(i) { var cs = cards(); i = Math.max(0, Math.min(cs.length - 1, i)); return Math.min(maxL(), cs[i].offsetLeft); }
     function nearest(x) { var cs = cards(), best = 0, bd = 1e9; cs.forEach(function (c, i) { var d = Math.abs(c.offsetLeft - x); if (d < bd) { bd = d; best = i; } }); return best; }
@@ -352,7 +355,7 @@
     t.addEventListener('scroll', function () { if (dragging || animating) return; clearTimeout(settleTimer); settleTimer = setTimeout(function () { cur = nearest(t.scrollLeft); }, 160); }, { passive: true });
     // 휠(가로 델타 또는 Shift+세로) — 카드 한 장씩. 세로 휠은 그대로 페이지 스크롤
     t.addEventListener('wheel', function (e) { var dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : (e.shiftKey ? e.deltaY : 0); if (!dx) return;
-      e.preventDefault(); var n = cards().length, now = e.timeStamp;
+      e.preventDefault(); t.style.scrollSnapType = 'none'; var n = cards().length, now = e.timeStamp;
       var atStart = cur === 0 && dx < 0 && t.scrollLeft <= 1, atEnd = cur === n - 1 && dx > 0 && t.scrollLeft >= maxL() - 1;
       if (atStart || atEnd) { cancelAnimationFrame(raf); var want = (atEnd ? 1 : -1) * Math.min(400, Math.abs(over) * 2.2 + Math.abs(dx) * 1.6); setOver(rubber(want)); clearTimeout(wheelTimer); wheelTimer = setTimeout(springBack, 90); acc = 0; return; }
       // 제스처 경계: 80ms 이상 쉬었거나 마우스 휠 한 칸(|dx|≥100)이면 새 제스처. 트랙패드의 연속 델타·관성 꼬리는 한 제스처에 한 장만.
@@ -360,7 +363,7 @@
       if (!armed) return; acc += dx; if (Math.abs(acc) < 40) return;
       goTo(cur + (acc > 0 ? 1 : -1)); acc = 0; armed = false; }, { passive: false });
     // 마우스 드래그(관성)
-    t.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse' || e.button !== 0) return; dragging = true; moved = false; startX = e.clientX; startL = t.scrollLeft; lastX = e.clientX; lastT = e.timeStamp; vx = 0; cancelAnimationFrame(raf); animating = false; t.setPointerCapture(e.pointerId); });
+    t.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse' || e.button !== 0) return; t.style.scrollSnapType = 'none'; dragging = true; moved = false; startX = e.clientX; startL = t.scrollLeft; lastX = e.clientX; lastT = e.timeStamp; vx = 0; cancelAnimationFrame(raf); animating = false; t.setPointerCapture(e.pointerId); });
     t.addEventListener('pointermove', function (e) { if (!dragging) return; var dx = e.clientX - startX; if (!moved && Math.abs(dx) > 4) { moved = true; t.classList.add('drag'); } if (!moved) return;
       var target = startL - dx, m = maxL();
       if (target < 0) { t.scrollLeft = 0; setOver(rubber(target)); } else if (target > m) { t.scrollLeft = m; setOver(rubber(target - m)); } else { t.scrollLeft = target; if (over) setOver(0); }
