@@ -50,7 +50,7 @@
   .prog a.on { background: var(--ink); transform: scale(1.25); }
 
   /* 트랙 + 카드 */
-  .track { display: flex; gap: var(--sp-4); overflow-x: auto; scroll-snap-type: x mandatory; padding: var(--sp-5) calc((100% - 980px) / 2 + var(--sp-6)); scrollbar-width: none; }
+  .track { display: flex; gap: var(--sp-4); overflow-x: auto; scroll-snap-type: x mandatory; padding: var(--sp-5) calc((100% - 980px) / 2 + var(--sp-6)); scroll-padding-inline: calc((100% - 980px) / 2 + var(--sp-6)); scrollbar-width: none; }
   .track::-webkit-scrollbar { display: none; }
   .cardx { flex: 0 0 380px; scroll-snap-align: start; border-radius: 22px; overflow: hidden; background: var(--gray6); box-shadow: 0 10px 30px -18px rgba(0,0,0,.35); transition: transform var(--dur-2) var(--ease-out); display: flex; flex-direction: column; }
   .cardx:hover { transform: translateY(-4px); }
@@ -111,7 +111,7 @@
     .hero { padding: 56px var(--sp-5) 36px; } .hero h1 { font-size: 36px; } .hero p { font-size: var(--fs-18); }
     .stats { gap: var(--sp-6) var(--sp-8); } .stats b { font-size: 30px; }
     .chap { padding-top: 44px; } .chap .no { font-size: 44px; } .sh h2 { font-size: 28px; } .sh .sub { font-size: var(--fs-16); }
-    .track { padding: var(--sp-4) var(--sp-5); } .cardx, .cardx.big { flex-basis: 300px; } .cardx.text, .cardx.light { min-height: 240px; }
+    .track { padding: var(--sp-4) var(--sp-5); scroll-padding-inline: var(--sp-5); } .cardx, .cardx.big { flex-basis: 300px; } .cardx.text, .cardx.light { min-height: 240px; }
     .three, .two { grid-template-columns: 1fr; } .prog { display: none; }
   }
 </style>
@@ -318,12 +318,14 @@
   // 트랙 점
   document.querySelectorAll('.track[data-dots]').forEach(function (t) { var dots = t.nextElementSibling; if (!dots || !dots.classList.contains('dots')) return; var n = t.children.length;
     dots.innerHTML = Array.apply(null, Array(n)).map(function (_, i) { return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('');
-    t.addEventListener('scroll', function () { var w = t.children[0].offsetWidth + 16; var i = Math.round(t.scrollLeft / w); Array.prototype.forEach.call(dots.children, function (d, j) { d.classList.toggle('on', j === i); }); }, { passive: true }); });
+    t.addEventListener('scroll', function () { var x = t.scrollLeft + parseFloat(getComputedStyle(t).paddingLeft || 0), best = 0, bd = 1e9; Array.prototype.forEach.call(t.children, function (c, j) { var d = Math.abs(c.offsetLeft - x); if (d < bd) { bd = d; best = j; } }); Array.prototype.forEach.call(dots.children, function (d, j) { d.classList.toggle('on', j === best); }); }, { passive: true }); });
   // 등장
   var els = Array.prototype.slice.call(document.querySelectorAll('.rv'));
   els.forEach(function (el) { var sib = Array.prototype.filter.call(el.parentNode.children, function (c) { return c.classList.contains('rv'); }); el.style.setProperty('--i', Math.min(sib.indexOf(el), 7)); });
   if (reduce || !('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); }
-  else { var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }); }, { rootMargin: '0px 0px -6% 0px', threshold: 0.05 }); els.forEach(function (e) { io.observe(e); }); }
+  else { var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }); }, { rootMargin: '0px 0px -6% 0px', threshold: 0.05 }); els.forEach(function (e) { io.observe(e); });
+    // 가로 트랙은 트랙이 보이면 카드 전부 등장 — 옆으로 밀 때 카드가 늦게 뜨지 않게
+    var tio = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { Array.prototype.forEach.call(x.target.querySelectorAll('.rv'), function (c) { c.classList.add('in'); }); tio.unobserve(x.target); } }); }, { threshold: 0.05 }); document.querySelectorAll('.track').forEach(function (t) { tio.observe(t); }); }
   // 숫자 카운트업
   document.querySelectorAll('.stats b.num').forEach(function (b) { var t = b.firstChild; if (!t || t.nodeType !== 3) return; var target = parseInt(t.nodeValue, 10); if (!target || reduce) return;
     var t0 = null; function step(ts) { if (!t0) t0 = ts; var p = Math.min(1, (ts - t0) / 320); var e = 1 - Math.pow(1 - p, 3); t.nodeValue = String(Math.round(target * e)); if (p < 1) requestAnimationFrame(step); } t.nodeValue = '0'; requestAnimationFrame(step); });
