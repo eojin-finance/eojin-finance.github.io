@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>첫 페이지 디자인 시안 5</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="../assets/tokens.css">
+<style>
+  :root {
+    /* 시안별 강조색 — 여기서만 정의 */
+    --acA: #2F5D50; --acA-soft: #E7F0EC;   /* A 딥 그린 */
+    --acB: #1F3A5F; --acB-soft: #E4ECF7;   /* B 코발트 네이비 */
+    --acC: #B4532A; --acC-soft: #F8E9E1;   /* C 테라코타 */
+    --acD: #4B3F8F; --acD-soft: #ECE9F8;   /* D 바이올렛 */
+    --acE: #111111; --acE-soft: #F2F2F2; --acE-pop: #FF5A1F; /* E 흑백 + 오렌지 */
+    --paper: #F6F1E8; --paper-ink: #2B2A27;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --acA: #7FB8A3; --acA-soft: #16302A; --acB: #8EB4E8; --acB-soft: #17273D; --acC: #E8956B; --acC-soft: #3A2318;
+    --acD: #B3A6F2; --acD-soft: #251F44; --acE: #F2F2F2; --acE-soft: #1B1B1B; --acE-pop: #FF7A45; --paper: #1E1B16; --paper-ink: #ECE6DA;
+  } }
+  :root[data-theme="dark"] {
+    --acA: #7FB8A3; --acA-soft: #16302A; --acB: #8EB4E8; --acB-soft: #17273D; --acC: #E8956B; --acC-soft: #3A2318;
+    --acD: #B3A6F2; --acD-soft: #251F44; --acE: #F2F2F2; --acE-soft: #1B1B1B; --acE-pop: #FF7A45; --paper: #1E1B16; --paper-ink: #ECE6DA;
+  }
+  body { font-family: "Pretendard Variable", var(--font-sans); background: var(--bg); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  /* ── 상단 툴바 (시안 선택) ── */
+  .bar { position: sticky; top: 0; z-index: 50; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+         border-bottom: 1px solid var(--line); box-shadow: var(--shadow-2); }
+  .bar .in { max-width: 1120px; margin: 0 auto; padding: var(--sp-3) var(--sp-4); display: flex; gap: var(--sp-3); align-items: center; flex-wrap: wrap; }
+  .bar .t { font-size: var(--fs-14); font-weight: var(--fw-semibold); margin-right: var(--sp-2); }
+  .seg { display: flex; gap: var(--sp-1); background: var(--surface-2); padding: var(--sp-1); border-radius: var(--r-2); }
+  .seg button { height: 32px; padding: 0 var(--sp-3); border: 0; border-radius: var(--r-1); background: transparent; color: var(--ink-2);
+                font-size: var(--fs-13); font-weight: var(--fw-medium); cursor: pointer; transition: background var(--dur-1) var(--ease-std), color var(--dur-1) var(--ease-std); }
+  .seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); font-weight: var(--fw-semibold); }
+  .seg button .d { display: inline-block; width: 8px; height: 8px; border-radius: 999px; margin-right: 6px; vertical-align: 0; }
+  .bar .pick { margin-left: auto; font-size: var(--fs-13); color: var(--ink-2); display: flex; gap: var(--sp-2); align-items: center; }
+  .bar .pick b { color: var(--brand-ink); }
+  .btn { height: 32px; padding: 0 var(--sp-3); border-radius: var(--r-2); border: 1px solid var(--line-strong); background: var(--surface);
+         color: var(--ink); font-size: var(--fs-13); font-weight: var(--fw-medium); cursor: pointer; }
+  .btn.p { background: var(--brand); color: var(--on-brand); border-color: transparent; }
+  .btn.p.done { background: var(--pos); }
+
+  /* ── 시안 설명 카드 ── */
+  .about { max-width: 1120px; margin: var(--sp-6) auto 0; padding: 0 var(--sp-4); }
+  .about .card { padding: var(--sp-4) var(--sp-5); display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2) var(--sp-6); }
+  .about h2 { font-size: var(--fs-16); grid-column: 1 / -1; display: flex; gap: var(--sp-2); align-items: center; }
+  .about h2 .rec { font-size: var(--fs-11); color: var(--pos-ink); background: var(--pos-soft); border-radius: var(--r-1); padding: 2px 6px; font-weight: var(--fw-semibold); }
+  .about p { font-size: var(--fs-13); color: var(--ink-2); }
+  .about p b { color: var(--ink); font-weight: var(--fw-semibold); }
+  @media (max-width: 720px) { .about .card { grid-template-columns: 1fr; } }
+
+  /* ── 시안 프레임 ── */
+  .stage { max-width: 1120px; margin: var(--sp-4) auto var(--sp-12); padding: 0 var(--sp-4); }
+  .frame { border: 1px solid var(--line); border-radius: var(--r-4); overflow: hidden; box-shadow: var(--shadow-3); background: var(--surface); }
+  .v { display: none; } .v.on { display: block; animation: in var(--dur-2) var(--ease-out); }
+  @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* 공통 조각 */
+  .v h1, .v h2, .v h3, .v p { margin: 0; }
+  .v .n { font-variant-numeric: tabular-nums; }
+  .v a { color: inherit; text-decoration: none; }
+  .v img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .v .thumb { aspect-ratio: 16/10; overflow: hidden; background: var(--surface-2); }
+
+  /* ════════ A · 에디토리얼 (좌측 고정 목차 + 종이 톤 + 딥 그린) ════════ */
+  .vA { background: var(--paper); color: var(--paper-ink); }
+  .vA .wrap { display: grid; grid-template-columns: 220px 1fr; min-height: 720px; }
+  .vA aside { border-right: 1px solid var(--line); padding: var(--sp-8) var(--sp-5); position: sticky; top: 64px; align-self: start; }
+  .vA aside .name { font-size: var(--fs-18); font-weight: var(--fw-bold); letter-spacing: var(--ls-tight); }
+  .vA aside .sub { font-size: var(--fs-12); color: var(--ink-3); margin-top: var(--sp-1); }
+  .vA nav { margin-top: var(--sp-8); display: flex; flex-direction: column; gap: var(--sp-1); }
+  .vA nav a { font-size: var(--fs-13); padding: var(--sp-2) var(--sp-3); border-radius: var(--r-2); color: var(--ink-2); }
+  .vA nav a.on { background: var(--acA-soft); color: var(--acA); font-weight: var(--fw-semibold); }
+  .vA nav a:hover { background: var(--acA-soft); }
+  .vA aside .ct { margin-top: var(--sp-8); font-size: var(--fs-12); color: var(--ink-3); line-height: 1.7; }
+  .vA main { padding: var(--sp-10) var(--sp-12); max-width: 760px; }
+  .vA .eyebrow { font-size: var(--fs-11); letter-spacing: .08em; text-transform: uppercase; color: var(--acA); font-weight: var(--fw-semibold); }
+  .vA h1 { font-size: 40px; font-weight: var(--fw-bold); letter-spacing: -0.03em; line-height: 1.15; margin-top: var(--sp-3); }
+  .vA h1 em { font-style: normal; color: var(--acA); }
+  .vA .lede { font-size: var(--fs-16); line-height: 1.7; color: var(--ink-2); margin-top: var(--sp-5); max-width: 40em; }
+  .vA .stats { display: flex; gap: var(--sp-8); margin-top: var(--sp-8); padding: var(--sp-5) 0; border-top: 1px solid var(--acA); border-bottom: 1px solid var(--line); }
+  .vA .stats b { display: block; font-size: var(--fs-28); font-weight: var(--fw-bold); letter-spacing: var(--ls-display); color: var(--acA); line-height: 1.1; }
+  .vA .stats span { font-size: var(--fs-12); color: var(--ink-3); }
+  .vA h2 { font-size: var(--fs-22); font-weight: var(--fw-bold); letter-spacing: var(--ls-tight); margin-top: var(--sp-12); }
+  .vA h2 small { font-size: var(--fs-13); font-weight: var(--fw-regular); color: var(--ink-3); margin-left: var(--sp-3); }
+  .vA .case { margin-top: var(--sp-6); padding-left: var(--sp-5); border-left: 3px solid var(--acA); }
+  .vA .case h3 { font-size: var(--fs-18); font-weight: var(--fw-semibold); }
+  .vA .case .one { color: var(--ink-2); font-size: var(--fs-14); margin-top: var(--sp-1); }
+  .vA .case dl { margin: var(--sp-4) 0 0; font-size: var(--fs-14); line-height: 1.65; }
+  .vA .case dt { font-size: var(--fs-12); color: var(--acA); font-weight: var(--fw-semibold); margin-top: var(--sp-3); }
+  .vA .case dd { margin: 2px 0 0; color: var(--ink-2); }
+  .vA .demos { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); margin-top: var(--sp-5); }
+  .vA .demos a { display: block; }
+  .vA .demos .thumb { border: 1px solid var(--line); border-radius: var(--r-2); }
+  .vA .demos h3 { font-size: var(--fs-13); font-weight: var(--fw-semibold); margin-top: var(--sp-2); }
+  .vA .demos p { font-size: var(--fs-12); color: var(--ink-3); }
+
+  /* ════════ B · 대시보드 벤토 (코발트, 진한 헤더 + 격자 카드) ════════ */
+  .vB { background: var(--bg); }
+  .vB .hero { background: var(--acB); color: #fff; padding: var(--sp-10) var(--sp-8) var(--sp-12); }
+  .vB .hero .in { display: grid; grid-template-columns: 1.2fr 1fr; gap: var(--sp-8); align-items: end; }
+  .vB .hero h1 { font-size: 34px; font-weight: var(--fw-bold); letter-spacing: -0.02em; line-height: 1.2; }
+  .vB .hero .role { opacity: .8; font-size: var(--fs-14); margin-top: var(--sp-2); }
+  .vB .hero .chips { display: flex; gap: var(--sp-2); flex-wrap: wrap; margin-top: var(--sp-5); }
+  .vB .hero .chips span { font-size: var(--fs-12); padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,.35); }
+  .vB .hero .meta { font-size: var(--fs-13); opacity: .85; line-height: 1.8; text-align: right; }
+  .vB .bento { max-width: 1040px; margin: calc(-1 * var(--sp-8)) auto 0; padding: 0 var(--sp-6); display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--sp-3); }
+  .vB .tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-3); padding: var(--sp-5); box-shadow: var(--shadow-1); }
+  .vB .tile.k { grid-column: span 2; }
+  .vB .tile.k b { display: block; font-size: 36px; font-weight: var(--fw-bold); letter-spacing: var(--ls-display); line-height: 1; color: var(--acB); margin-top: var(--sp-2); }
+  .vB .tile.k b small { font-size: var(--fs-13); color: var(--ink-3); font-weight: var(--fw-regular); margin-left: 4px; }
+  .vB .tile.k .l { font-size: var(--fs-12); color: var(--ink-3); }
+  .vB .tile.k .s { font-size: var(--fs-12); color: var(--ink-3); margin-top: var(--sp-2); }
+  .vB .tile.k.hi { background: var(--acB-soft); border-color: transparent; }
+  .vB .tile.wide { grid-column: span 4; }
+  .vB .tile.tall { grid-column: span 2; grid-row: span 2; padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .vB .tile.tall .thumb { aspect-ratio: auto; flex: 1; min-height: 180px; }
+  .vB .tile.tall .b { padding: var(--sp-4); }
+  .vB .tile h3 { font-size: var(--fs-16); font-weight: var(--fw-semibold); }
+  .vB .tile .one { font-size: var(--fs-13); color: var(--ink-2); margin-top: var(--sp-1); }
+  .vB .tile .m { display: flex; gap: var(--sp-5); margin-top: var(--sp-4); font-size: var(--fs-12); color: var(--ink-3); }
+  .vB .tile .m b { display: block; font-size: var(--fs-16); color: var(--acB); font-weight: var(--fw-semibold); }
+  .vB .tile .tag { display: inline-block; font-size: var(--fs-11); font-weight: var(--fw-semibold); background: var(--warn-soft); color: var(--warn-ink); border-radius: var(--r-1); padding: 2px 6px; margin-bottom: var(--sp-2); }
+  .vB .tile.g3 { grid-column: span 2; padding: 0; overflow: hidden; }
+  .vB .tile.g3 .b { padding: var(--sp-3) var(--sp-4); }
+  .vB .tile.g3 h3 { font-size: var(--fs-14); }
+  .vB .tile.g3 p { font-size: var(--fs-12); color: var(--ink-3); }
+  .vB .foot { max-width: 1040px; margin: var(--sp-6) auto var(--sp-10); padding: 0 var(--sp-6); font-size: var(--fs-12); color: var(--ink-3); }
+
+  /* ════════ C · 타임라인 (테라코타, 시간축 + 진행 중 최상단) ════════ */
+  .vC { background: var(--surface); }
+  .vC .top { padding: var(--sp-10) var(--sp-10) var(--sp-6); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: flex-end; gap: var(--sp-6); flex-wrap: wrap; }
+  .vC h1 { font-size: 30px; font-weight: var(--fw-bold); letter-spacing: -0.02em; }
+  .vC .top p { color: var(--ink-2); font-size: var(--fs-14); margin-top: var(--sp-2); }
+  .vC .top .now { background: var(--acC-soft); color: var(--acC); border-radius: var(--r-2); padding: var(--sp-3) var(--sp-4); font-size: var(--fs-13); max-width: 360px; }
+  .vC .top .now b { display: block; font-size: var(--fs-12); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+  .vC .kp { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); }
+  .vC .kp div { padding: var(--sp-5) var(--sp-10); border-right: 1px solid var(--line); }
+  .vC .kp div:last-child { border-right: 0; }
+  .vC .kp b { display: block; font-size: var(--fs-28); font-weight: var(--fw-bold); color: var(--acC); letter-spacing: var(--ls-display); line-height: 1.1; }
+  .vC .kp span { font-size: var(--fs-12); color: var(--ink-3); }
+  .vC .tl { padding: var(--sp-8) var(--sp-10) var(--sp-10); position: relative; }
+  .vC .tl::before { content: ''; position: absolute; left: calc(var(--sp-10) + 92px); top: var(--sp-8); bottom: var(--sp-10); width: 2px; background: var(--line); }
+  .vC .ev { display: grid; grid-template-columns: 80px 40px 1fr; gap: 0 var(--sp-3); padding: var(--sp-4) 0; }
+  .vC .ev .when { font-size: var(--fs-12); color: var(--ink-3); font-weight: var(--fw-medium); padding-top: 3px; text-align: right; }
+  .vC .ev .dot { position: relative; }
+  .vC .ev .dot::before { content: ''; position: absolute; left: 7px; top: 6px; width: 12px; height: 12px; border-radius: 999px; background: var(--surface); border: 3px solid var(--acC); }
+  .vC .ev.now .dot::before { background: var(--acC); box-shadow: 0 0 0 5px var(--acC-soft); }
+  .vC .ev h3 { font-size: var(--fs-16); font-weight: var(--fw-semibold); }
+  .vC .ev h3 .st { font-size: var(--fs-11); font-weight: var(--fw-semibold); color: var(--acC); background: var(--acC-soft); border-radius: var(--r-1); padding: 2px 6px; margin-left: var(--sp-2); vertical-align: 2px; }
+  .vC .ev p { font-size: var(--fs-13); color: var(--ink-2); margin-top: 4px; max-width: 46em; }
+  .vC .ev .metr { font-size: var(--fs-12); color: var(--ink-3); margin-top: var(--sp-2); }
+  .vC .ev .metr b { color: var(--acC); font-weight: var(--fw-semibold); }
+  .vC .ev .shots { display: flex; gap: var(--sp-2); margin-top: var(--sp-3); }
+  .vC .ev .shots a { width: 140px; border: 1px solid var(--line); border-radius: var(--r-2); overflow: hidden; }
+  .vC .ev .shots .thumb { aspect-ratio: 16/10; }
+
+  /* ════════ D · 케이스 스터디 (바이올렛, 이미지-텍스트 교차 큰 카드) ════════ */
+  .vD { background: var(--bg); }
+  .vD .hero { padding: var(--sp-12) var(--sp-10) var(--sp-8); text-align: left; max-width: 820px; }
+  .vD .hero .pill { display: inline-flex; gap: 6px; align-items: center; font-size: var(--fs-12); font-weight: var(--fw-medium); color: var(--acD); background: var(--acD-soft); border-radius: 999px; padding: 4px 12px; }
+  .vD .hero .pill i { width: 6px; height: 6px; border-radius: 999px; background: var(--acD); }
+  .vD h1 { font-size: 44px; font-weight: var(--fw-bold); letter-spacing: -0.03em; line-height: 1.12; margin-top: var(--sp-4); }
+  .vD h1 span { color: var(--acD); }
+  .vD .hero p { font-size: var(--fs-16); color: var(--ink-2); margin-top: var(--sp-4); line-height: 1.7; max-width: 38em; }
+  .vD .kp { display: flex; gap: var(--sp-3); padding: 0 var(--sp-10); flex-wrap: wrap; }
+  .vD .kp div { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: var(--sp-2) var(--sp-4); font-size: var(--fs-13); color: var(--ink-2); }
+  .vD .kp div b { color: var(--acD); font-weight: var(--fw-bold); font-size: var(--fs-16); margin-right: 4px; }
+  .vD .cases { padding: var(--sp-10) var(--sp-10); display: flex; flex-direction: column; gap: var(--sp-6); }
+  .vD .case { display: grid; grid-template-columns: 1.1fr 1fr; gap: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-4); overflow: hidden; box-shadow: var(--shadow-1); }
+  .vD .case.flip .thumb { order: 2; }
+  .vD .case .thumb { aspect-ratio: auto; min-height: 260px; border-right: 1px solid var(--line); }
+  .vD .case.flip .thumb { border-right: 0; border-left: 1px solid var(--line); }
+  .vD .case .b { padding: var(--sp-8); display: flex; flex-direction: column; justify-content: center; }
+  .vD .case .num { font-size: var(--fs-12); color: var(--acD); font-weight: var(--fw-semibold); letter-spacing: .06em; }
+  .vD .case h3 { font-size: var(--fs-22); font-weight: var(--fw-bold); letter-spacing: var(--ls-tight); margin-top: var(--sp-2); }
+  .vD .case p { font-size: var(--fs-14); color: var(--ink-2); margin-top: var(--sp-3); line-height: 1.65; }
+  .vD .case .m { display: flex; gap: var(--sp-5); margin-top: var(--sp-5); }
+  .vD .case .m div { font-size: var(--fs-12); color: var(--ink-3); }
+  .vD .case .m b { display: block; font-size: var(--fs-18); color: var(--ink); font-weight: var(--fw-bold); }
+  .vD .case .go { margin-top: var(--sp-5); align-self: flex-start; font-size: var(--fs-13); font-weight: var(--fw-semibold); color: var(--acD); border-bottom: 2px solid var(--acD); padding-bottom: 2px; }
+  .vD .case.nodemo .thumb { background: var(--acD-soft); display: flex; align-items: center; justify-content: center; }
+  .vD .case.nodemo .thumb span { font-size: var(--fs-13); color: var(--acD); text-align: center; padding: var(--sp-6); line-height: 1.7; }
+
+  /* ════════ E · 미니멀 타이포 (흑백 + 오렌지 1점, 큰 숫자, 표 없음) ════════ */
+  .vE { background: var(--surface); color: var(--acE); }
+  .vE .in { padding: var(--sp-12) var(--sp-12); max-width: 900px; }
+  .vE .top { display: flex; justify-content: space-between; font-size: var(--fs-12); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .vE h1 { font-size: 56px; font-weight: var(--fw-bold); letter-spacing: -0.04em; line-height: 1.05; margin-top: var(--sp-8); }
+  .vE h1 i { font-style: normal; color: var(--acE-pop); }
+  .vE .lede { font-size: var(--fs-18); line-height: 1.6; margin-top: var(--sp-6); max-width: 34em; color: var(--ink-2); }
+  .vE .big { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-6); margin-top: var(--sp-12); }
+  .vE .big b { display: block; font-size: 48px; font-weight: var(--fw-bold); letter-spacing: -0.04em; line-height: 1; }
+  .vE .big b small { font-size: var(--fs-14); font-weight: var(--fw-regular); letter-spacing: 0; color: var(--ink-3); margin-left: 4px; }
+  .vE .big span { display: block; font-size: var(--fs-13); color: var(--ink-3); margin-top: var(--sp-2); }
+  .vE .list { margin-top: var(--sp-12); border-top: 2px solid var(--acE); }
+  .vE .row { display: grid; grid-template-columns: 56px 1fr 180px; gap: var(--sp-5); padding: var(--sp-5) 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .vE .row .i { font-size: var(--fs-13); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .vE .row h3 { font-size: var(--fs-18); font-weight: var(--fw-semibold); letter-spacing: var(--ls-tight); }
+  .vE .row p { font-size: var(--fs-14); color: var(--ink-2); margin-top: var(--sp-1); }
+  .vE .row .r { text-align: right; font-size: var(--fs-13); }
+  .vE .row .r b { display: block; font-size: var(--fs-22); font-weight: var(--fw-bold); letter-spacing: var(--ls-tight); }
+  .vE .row .r a { color: var(--acE-pop); font-weight: var(--fw-semibold); }
+  .vE .strip { display: flex; gap: var(--sp-3); margin-top: var(--sp-10); overflow-x: auto; }
+  .vE .strip a { flex: 0 0 240px; }
+  .vE .strip .thumb { border: 1px solid var(--line); filter: grayscale(1); transition: filter var(--dur-2) var(--ease-std); }
+  .vE .strip a:hover .thumb { filter: none; }
+  .vE .strip h3 { font-size: var(--fs-13); font-weight: var(--fw-semibold); margin-top: var(--sp-2); }
+
+  @media (max-width: 860px) {
+    .vA .wrap { grid-template-columns: 1fr; } .vA aside { position: static; border-right: 0; border-bottom: 1px solid var(--line); }
+    .vA main { padding: var(--sp-6); } .vA .demos { grid-template-columns: 1fr; }
+    .vB .hero .in { grid-template-columns: 1fr; } .vB .hero .meta { text-align: left; }
+    .vB .bento { grid-template-columns: repeat(2, 1fr); } .vB .tile.k, .vB .tile.wide, .vB .tile.tall, .vB .tile.g3 { grid-column: span 2; }
+    .vC .kp { grid-template-columns: repeat(2, 1fr); } .vC .tl::before { display: none; } .vC .ev { grid-template-columns: 1fr; } .vC .ev .when { text-align: left; } .vC .ev .dot { display: none; }
+    .vD .case, .vD .case.flip { grid-template-columns: 1fr; } .vD .case.flip .thumb { order: 0; } .vD h1 { font-size: 32px; }
+    .vE .in { padding: var(--sp-6); } .vE h1 { font-size: 36px; } .vE .big { grid-template-columns: repeat(2, 1fr); } .vE .row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="t">첫 페이지 시안</span>
+  <div class="seg" id="seg">
+    <button data-v="A"><span class="d" style="background:var(--acA)"></span>A 에디토리얼</button>
+    <button data-v="B"><span class="d" style="background:var(--acB)"></span>B 벤토 대시보드</button>
+    <button data-v="C"><span class="d" style="background:var(--acC)"></span>C 타임라인</button>
+    <button data-v="D"><span class="d" style="background:var(--acD)"></span>D 케이스 스터디</button>
+    <button data-v="E"><span class="d" style="background:var(--acE-pop)"></span>E 미니멀 타이포</button>
+  </div>
+  <div class="pick">선택: <b id="picked">없음</b> <button class="btn p" id="pickBtn">이걸로</button> <button class="btn" id="copyBtn">선택 복사</button></div>
+</div></div>
+
+<div class="about"><div class="card" id="about"></div></div>
+
+<div class="stage"><div class="frame">
+
+<!-- ═══════════ A ═══════════ -->
+<div class="v vA" data-v="A"><div class="wrap">
+  <aside>
+    <div class="name">이어진</div>
+    <div class="sub">재무회계 · 결산·대사·자동화</div>
+    <nav>
+      <a class="on" href="#">요약</a><a href="#">대표 프로젝트</a><a href="#">동작하는 데모</a><a href="#">AI를 쓰는 방식</a><a href="#">지금 진행 중</a><a href="#">전체 프로젝트 62</a><a href="#">FAQ</a>
+    </nav>
+    <div class="ct">lee-ding@naver.com<br>2026-09 갱신</div>
+  </aside>
+  <main>
+    <div class="eyebrow">Finance &amp; Accounting · Portfolio</div>
+    <h1>차이를 규명하고,<br>반복은 <em>기계에</em> 넘긴 1년 6개월</h1>
+    <p class="lede">패션 이커머스 재무회계팀에서 월결산과 매출·원가 대사를 담당합니다. 업무의 절반은 차이를 규명하는 일이었고, 차이를 매달 새로 조사하지 않도록 원인별로 분류해 기준을 문서로 확정한 뒤 반복 확인 구간을 자동화했습니다.</p>
+    <div class="stats">
+      <div><b class="n">37</b><span>월 대사 채널</span></div>
+      <div><b class="n">31</b><span>정산 자동수집</span></div>
+      <div><b>원 단위</b><span>대사 재현 정확도</span></div>
+      <div><b class="n">62</b><span>프로젝트 · 데모 9</span></div>
+    </div>
+    <h2>대표 프로젝트<small>결산 근거를 남기는 일과, 반복을 걷어내는 일</small></h2>
+    <article class="case">
+      <h3>위탁매출 34채널 건별 대사 파이프라인 · 정산서 무인 수집</h3>
+      <p class="one">채널이 늘어도 마감이 밀리지 않는 구조로 바꾸고, 수집까지 사람 손을 뺐습니다.</p>
+      <dl>
+        <dt>배경</dt><dd>채널마다 정산서 양식과 공제 항목이 달라 매월 채널별 대사 파일을 새로 만들었고, 정산서는 사람이 파트너 사이트 수십 곳에 로그인해 내려받았습니다.</dd>
+        <dt>결과</dt><dd>34채널 전수를 원 단위까지 재현하는지 확인했고, 남은 차이 3건은 전부 원인을 규명했습니다. 정산 API 28채널, 무인 로그인 수집 11채널.</dd>
+      </dl>
+    </article>
+    <h2>동작하는 데모<small>샘플 데이터로 실제 화면 그대로</small></h2>
+    <div class="demos">
+      <a href="../demo/fund-cycle/"><div class="thumb"><img src="../assets/shots/fund-cycle.jpg" alt=""></div><h3>자금 대시보드</h3><p>합성 15테이블 · 체크섬 7종</p></a>
+      <a href="../demo/nrv-simulator/"><div class="thumb"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div><h3>NRV 시뮬레이터</h3><p>1,420 품번 즉시 재계산</p></a>
+      <a href="../demo/overtime-meal/"><div class="thumb"><img src="../assets/shots/overtime-meal.jpg" alt=""></div><h3>야근식대 대조</h3><p>가상 28명 · 지출 34건</p></a>
+    </div>
+  </main>
+</div></div>
+
+<!-- ═══════════ B ═══════════ -->
+<div class="v vB" data-v="B">
+  <div class="hero"><div class="in">
+    <div>
+      <h1>이어진 — 재무회계<br>결산 · 대사 · 자동화</h1>
+      <p class="role">주식회사 차일디 재무회계팀 매니저 · 패션 브랜드 4개 운영 이커머스 · 1년 6개월</p>
+      <div class="chips"><span>월결산</span><span>매출·정산 대사</span><span>재고평가</span><span>매입 마감</span><span>자금 대시보드</span><span>AI 에이전트 운영</span></div>
+    </div>
+    <div class="meta">lee-ding@naver.com<br>2026년 9월 기준 갱신<br>데모 9개 동작</div>
+  </div></div>
+  <div class="bento">
+    <div class="tile k hi"><span class="l">월 대사 채널</span><b class="n">37<small>개</small></b><div class="s">위탁 34 + 결제대행 3</div></div>
+    <div class="tile k"><span class="l">정산 자동수집</span><b class="n">31<small>채널</small></b><div class="s">API 28 + 결제대행 3 · 무인 11</div></div>
+    <div class="tile k"><span class="l">프로젝트</span><b class="n">62<small>건</small></b><div class="s">대표 8 · 진행 중 8 · 데모 9</div></div>
+    <div class="tile wide">
+      <span class="tag">2026.09 완결</span>
+      <h3>위탁매출 34채널 건별 대사 파이프라인 · 정산서 무인 수집</h3>
+      <p class="one">정산서를 하나의 대사 양식으로 표준화하고 건별 자동 매칭. API가 있으면 API로, 없으면 로그인 자동화로 매월 무인 수집. 34채널 전수 원 단위 재현, 남은 차이 3건 전부 규명.</p>
+      <div class="m"><div>대사 채널<b class="n">34</b></div><div>정산 API<b class="n">28</b></div><div>무인 수집<b class="n">11</b></div><div>확정 기준<b>원 단위</b></div></div>
+    </div>
+    <a class="tile tall" href="../demo/fund-cycle/"><div class="thumb"><img src="../assets/shots/fund-cycle.jpg" alt=""></div><div class="b"><h3>자금 대시보드 데모</h3><p class="one">잔액·수금 예측·생산대금, 진입 시 체크섬 7종</p></div></a>
+    <div class="tile wide">
+      <span class="tag">2026.09 진행 중</span>
+      <h3>전사 라인시트 표준화 — 상품 마스터를 하나의 양식으로</h3>
+      <p class="one">본부별 파일 5종(3계보·최대 173열) 전수 분석 → 공통 필드 13·키 3계층·코드사전 → 수식 연동형 통일안 확정. 발주·입고·매출·자금이 같은 품번 체계 위에서 돌게.</p>
+      <div class="m"><div>분석 양식<b>5종</b></div><div>공통 필드<b class="n">13</b></div><div>확정안<b>수식 연동형</b></div></div>
+    </div>
+    <a class="tile g3" href="../demo/nrv-simulator/"><div class="thumb"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div><div class="b"><h3>NRV 시뮬레이터</h3><p>1,420 품번 즉시 재계산</p></div></a>
+    <a class="tile g3" href="../demo/overtime-meal/"><div class="thumb"><img src="../assets/shots/overtime-meal.jpg" alt=""></div><div class="b"><h3>야근식대 대조</h3><p>가상 28명 · 지출 34건</p></div></a>
+    <a class="tile g3" href="../demo/investor-contracts/"><div class="thumb"><img src="../assets/shots/investor-contracts.jpg" alt=""></div><div class="b"><h3>투자계약 대시보드</h3><p>가상 계약 16건</p></div></a>
+  </div>
+  <div class="foot">아래로 이어짐: AI를 쓰는 방식 · 지금 진행 중 · 전체 프로젝트 62 · FAQ</div>
+</div>
+
+<!-- ═══════════ C ═══════════ -->
+<div class="v vC" data-v="C">
+  <div class="top">
+    <div><h1>이어진 — 재무회계 포트폴리오</h1><p>월결산 · 매출/정산 대사 · 재고평가 · 결산 프로세스 자동화 · 주식회사 차일디 1년 6개월</p></div>
+    <div class="now"><b>Now · 2026.09</b>라인시트 표준화 구축 착수 · 매입 마감 앱 실운영 · 위탁 무인 수집 마무리(1채널 잔여)</div>
+  </div>
+  <div class="kp">
+    <div><b class="n">37</b><span>월 대사 채널</span></div>
+    <div><b class="n">31</b><span>정산 자동수집 채널</span></div>
+    <div><b>원 단위</b><span>대사 재현 정확도</span></div>
+    <div><b class="n">62</b><span>프로젝트 · 데모 9</span></div>
+  </div>
+  <div class="tl">
+    <div class="ev now">
+      <div class="when">2026.09</div><div class="dot"></div>
+      <div><h3>전사 라인시트 표준화<span class="st">진행 중</span></h3><p>본부별 파일 5종 전수 분석 → 공통 필드 13·키 3계층·코드사전 → 수식 연동형 통일안 확정, ERP 양식 73열 좌표 실측. 남은 것: 본부 인터뷰·ERP 코드.</p><div class="metr">분석 양식 <b>5종 · 3계보</b> · 협업 방 <b>그룹 8 · 뷰 4</b></div></div>
+    </div>
+    <div class="ev">
+      <div class="when">2026.09</div><div class="dot"></div>
+      <div><h3>위탁매출 34채널 건별 대사 파이프라인 · 무인 수집<span class="st">완결</span></h3><p>34채널 전수 원 단위 재현, 남은 차이 3건 전부 규명. 정산 API 28채널 + 무인 로그인 11채널로 수집 무인화.</p><div class="metr">대사 채널 <b>34</b> · API <b>28</b> · 무인 <b>11</b></div></div>
+    </div>
+    <div class="ev">
+      <div class="when">2026.08</div><div class="dot"></div>
+      <div><h3>월 매입 마감 앱 · 카드 대장 개편 · 야근식대 자동 판정<span class="st">실운영</span></h3><p>발주↔입고 대사·부대비용 배부·수입 필증 검증·결재를 한 흐름으로. 경비 판정은 예외만 사람이.</p>
+        <div class="shots"><a href="../demo/overtime-meal/"><div class="thumb"><img src="../assets/shots/overtime-meal.jpg" alt=""></div></a><a href="../demo/card-notice/"><div class="thumb"><img src="../assets/shots/card-notice.jpg" alt=""></div></a></div></div>
+    </div>
+    <div class="ev">
+      <div class="when">2026.06~07</div><div class="dot"></div>
+      <div><h3>재고 평가충당금(NRV) 로직 재설계 · 자금 대시보드</h3><p>판단 15항목 분해·7라운드 교차검증 후 원 단위 재현 확정. 자금 원천 단일화 + 일 1회 동기화, 체크섬 7종.</p>
+        <div class="shots"><a href="../demo/nrv-simulator/"><div class="thumb"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div></a><a href="../demo/fund-cycle/"><div class="thumb"><img src="../assets/shots/fund-cycle.jpg" alt=""></div></a></div></div>
+    </div>
+    <div class="ev">
+      <div class="when">2025~26.05</div><div class="dot"></div>
+      <div><h3>결산 원천 단일화 · 투자계약 19건 전수 분석 · 채널 정산구조 규명</h3><p>전표 분개라인을 정본으로 정규화(계정 81), 직접법 현금흐름 차이 0원 검증. 의무 3축 분류·상환 타임라인.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ D ═══════════ -->
+<div class="v vD" data-v="D">
+  <div class="hero">
+    <span class="pill"><i></i>2026년 9월 기준 갱신 · 데모 9개 동작</span>
+    <h1>숫자의 차이를 <span>원 단위</span>까지<br>설명할 수 있게 만드는 사람</h1>
+    <p>패션 이커머스 재무회계팀 매니저 이어진. 차이를 원인별로 분류해 기준을 문서로 확정하고, 반복 확인은 자동화합니다. 아래는 그렇게 만든 것들입니다.</p>
+  </div>
+  <div class="kp"><div><b class="n">37</b>월 대사 채널</div><div><b class="n">31</b>자동수집 채널</div><div><b class="n">62</b>프로젝트</div><div><b class="n">9</b>동작하는 데모</div><div><b class="n">5,811</b>AI에 보낸 지시</div></div>
+  <div class="cases">
+    <article class="case">
+      <div class="thumb"><img src="../assets/shots/fund-cycle.jpg" alt=""></div>
+      <div class="b"><span class="num">CASE 01 · 2026.09 완결</span><h3>위탁매출 34채널 건별 대사 파이프라인</h3>
+        <p>정산서를 하나의 대사 양식으로 표준화하고 ERP 실판매 기준으로 건별 자동 매칭. 정산 API 28채널, 나머지는 로그인 자동화로 무인 수집. 34채널 전수 원 단위 재현, 남은 차이 3건 전부 규명.</p>
+        <div class="m"><div><b class="n">34</b>대사 채널</div><div><b class="n">28</b>정산 API</div><div><b class="n">11</b>무인 수집</div></div></div>
+    </article>
+    <article class="case flip">
+      <div class="thumb"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div>
+      <div class="b"><span class="num">CASE 02</span><h3>재고 평가충당금(NRV) 산정 로직 재설계</h3>
+        <p>판단 15항목으로 분해해 대안·채택 근거를 표로 확정, 다른 AI를 검토자로 7라운드 교차검증. 최종본이 이전 확정본을 원 단위까지 재현하는지 확인한 뒤에만 확정.</p>
+        <div class="m"><div><b class="n">7</b>검증 라운드</div><div><b class="n">15</b>판단 항목</div><div><b>2.2만</b>계산 행</div></div>
+        <a class="go" href="../demo/nrv-simulator/">데모 열기 →</a></div>
+    </article>
+    <article class="case nodemo">
+      <div class="thumb"><span>사내 데이터라 데모 없음<br>구조·건수·비율만 공개</span></div>
+      <div class="b"><span class="num">CASE 03 · 2026.09 진행 중</span><h3>전사 라인시트 표준화</h3>
+        <p>본부별 상품 계획표 5종(3계보·최대 173열)을 전수 분석해 공통 필드 13·키 3계층·코드사전을 정의하고, 수식 연동형 통일안을 확정. 발주·입고·매출·자금이 같은 품번 체계 위에서 돌게 하는 상류 작업.</p>
+        <div class="m"><div><b>5종</b>분석 양식</div><div><b class="n">13</b>공통 필드</div><div><b>그룹 8</b>협업 방</div></div></div>
+    </article>
+  </div>
+</div>
+
+<!-- ═══════════ E ═══════════ -->
+<div class="v vE" data-v="E"><div class="in">
+  <div class="top"><span>Lee Eojin · Finance &amp; Accounting</span><span>2026.09</span></div>
+  <h1>기준은 문서로.<br>반복은 기계로.<br>검증은 <i>원 단위</i>로.</h1>
+  <p class="lede">패션 이커머스 재무회계팀에서 월결산과 매출·원가 대사를 맡고 있습니다. 1년 6개월 동안 한 일을 건수·비율·구조로만 적었습니다.</p>
+  <div class="big">
+    <div><b class="n">37</b><span>월 대사 채널</span></div>
+    <div><b class="n">31</b><span>정산 자동수집 채널</span></div>
+    <div><b class="n">62</b><span>프로젝트</span></div>
+    <div><b class="n">9</b><span>동작하는 데모</span></div>
+  </div>
+  <div class="list">
+    <div class="row"><span class="i">01</span><div><h3>위탁매출 34채널 건별 대사 파이프라인 · 무인 수집</h3><p>34채널 전수 원 단위 재현, 남은 차이 3건 전부 규명. API 28 + 무인 로그인 11.</p></div><div class="r"><b class="n">34</b>채널 · 2026.09 완결</div></div>
+    <div class="row"><span class="i">02</span><div><h3>재고 평가충당금(NRV) 로직 재설계</h3><p>판단 15항목 분해, 7라운드 교차검증, 이전 확정본 원 단위 재현.</p></div><div class="r"><b class="n">7</b>라운드 · <a href="../demo/nrv-simulator/">데모 →</a></div></div>
+    <div class="row"><span class="i">03</span><div><h3>전사 라인시트 표준화</h3><p>5종 3계보 전수 분석 → 공통 필드 13 · 키 3계층 → 수식 연동형 확정.</p></div><div class="r"><b>진행 중</b>2026.09</div></div>
+    <div class="row"><span class="i">04</span><div><h3>월 매입 마감 앱</h3><p>발주↔입고 대사 · 부대비용 배부 · 수입 필증 검증 · 결재를 한 흐름으로.</p></div><div class="r"><b>실운영</b>2026.09</div></div>
+  </div>
+  <div class="strip">
+    <a href="../demo/fund-cycle/"><div class="thumb"><img src="../assets/shots/fund-cycle.jpg" alt=""></div><h3>자금 대시보드</h3></a>
+    <a href="../demo/nrv-simulator/"><div class="thumb"><img src="../assets/shots/nrv-simulator.jpg" alt=""></div><h3>NRV 시뮬레이터</h3></a>
+    <a href="../demo/overtime-meal/"><div class="thumb"><img src="../assets/shots/overtime-meal.jpg" alt=""></div><h3>야근식대 대조</h3></a>
+    <a href="../demo/investor-contracts/"><div class="thumb"><img src="../assets/shots/investor-contracts.jpg" alt=""></div><h3>투자계약</h3></a>
+  </div>
+</div></div>
+
+</div></div>
+
+<script>
+(function () {
+  var ABOUT = {
+    A: { t: 'A · 에디토리얼 — 좌측 고정 목차 + 종이 톤 + 딥 그린', rec: true,
+         why: '긴 문서를 읽게 만드는 구조. 목차가 항상 보여 62건 표·FAQ까지 길어도 길을 잃지 않는다. 종이 톤 배경이 "회계 문서" 인상을 주고, 색은 그린 1점만.',
+         pro: '장점: 정보 밀도 유지하면서도 읽힘. 면접관이 원하는 섹션으로 바로 점프. 인쇄해도 동일.',
+         con: '단점: 첫인상이 화려하진 않다. 모바일에선 목차가 상단으로 접힘.' },
+    B: { t: 'B · 벤토 대시보드 — 진한 헤더 + 격자 카드', rec: false,
+         why: '재무 대시보드를 만드는 사람답게 첫 화면 자체가 대시보드. KPI·대표 프로젝트·데모 썸네일이 한 격자에 섞여 스크롤 전에 다 보인다.',
+         pro: '장점: 5초 노출에 강함. 데모 이미지가 크게 보여 "실물이 있다"가 바로 전달.',
+         con: '단점: 카드가 많아 강조 면적이 올라감(≈25%). 아래 긴 표 섹션과 톤 차이가 생겨 두 문법이 됨.' },
+    C: { t: 'C · 타임라인 — 시간축 + 진행 중 최상단', rec: false,
+         why: '"지금 뭐 하고 있나"가 첫 질문인 경우. 최근이 위, 과거가 아래. 프로젝트 성장 곡선이 보인다.',
+         pro: '장점: 진행 중 항목이 자연스럽게 1순위. 경력 1년 6개월의 밀도가 시간으로 증명됨.',
+         con: '단점: 영역별(재고·정산·결산) 분류가 약해져 "무엇을 할 줄 아나"는 아래 표에 의존.' },
+    D: { t: 'D · 케이스 스터디 — 이미지·텍스트 교차 큰 카드', rec: false,
+         why: '한 프로젝트를 한 화면으로. 스크린샷을 크게 쓰고 제목을 문장형("~하게 만드는 사람")으로.',
+         pro: '장점: 가장 "포트폴리오답다". 데모가 있는 프로젝트는 압도적.',
+         con: '단점: 데모 없는 프로젝트(라인시트·매입 마감)는 빈 판이 생김. 카드당 세로 높이가 커서 62건까지 가면 너무 길다.' },
+    E: { t: 'E · 미니멀 타이포 — 흑백 + 오렌지 1점, 표 최소', rec: false,
+         why: '큰 숫자와 짧은 문장만. 썸네일은 흑백으로 두고 hover에서 색이 돌아온다.',
+         pro: '장점: 가장 세련되고 자신감 있어 보임. 강조 면적 3% 안.',
+         con: '단점: 정보량을 줄여야 성립 — 62건 표·진행 중 표는 별도 페이지로 빼야 한다. 회계 직무 톤과 안 맞을 수 있음.' }
+  };
+  var cur = 'A', picked = null;
+  try { picked = localStorage.getItem('pf_pick'); } catch (e) {}
+  var seg = document.getElementById('seg'), about = document.getElementById('about');
+  function show(v) {
+    cur = v;
+    Array.prototype.forEach.call(document.querySelectorAll('.v'), function (el) { el.classList.toggle('on', el.getAttribute('data-v') === v); });
+    Array.prototype.forEach.call(seg.querySelectorAll('button'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
+    var a = ABOUT[v];
+    about.innerHTML = '<h2>' + a.t + (a.rec ? ' <span class="rec">추천</span>' : '') + '</h2><p><b>왜 이 구조인가</b> — ' + a.why + '</p><p>' + a.pro + '<br>' + a.con + '</p>';
+    document.getElementById('pickBtn').classList.toggle('done', picked === v);
+    document.getElementById('pickBtn').textContent = picked === v ? '선택됨' : '이걸로';
+    window.scrollTo({ top: 0 });
+  }
+  seg.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) show(b.getAttribute('data-v')); });
+  document.getElementById('pickBtn').addEventListener('click', function () {
+    picked = cur; try { localStorage.setItem('pf_pick', picked); } catch (e) {}
+    document.getElementById('picked').textContent = picked; show(cur);
+  });
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    var s = '포트폴리오 첫 페이지 시안 선택: ' + (picked || '(없음)') + ' — ' + (picked ? ABOUT[picked].t : '');
+    try { navigator.clipboard.writeText(s); alert('복사했습니다: ' + s); } catch (e) { prompt('복사', s); }
+  });
+  document.addEventListener('keydown', function (e) { var k = e.key.toUpperCase(); if ('ABCDE'.indexOf(k) >= 0 && !e.metaKey && !e.ctrlKey) show(k); });
+  if (picked) document.getElementById('picked').textContent = picked;
+  show(picked || 'A');
+})();
+</script>
+</body>
+</html>
