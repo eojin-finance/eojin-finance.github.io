@@ -22,6 +22,9 @@ Sheet.prototype.deleteRow=function(i){ this.rows.splice(i-1,1); return this; };
 Sheet.prototype.deleteRows=function(i,n){ this.rows.splice(i-1,n||1); return this; };
 Sheet.prototype.insertRowsAfter=function(){ return this; }; Sheet.prototype.insertRowBefore=function(){ return this; };
 Sheet.prototype.hideColumns=function(){ return this; }; Sheet.prototype.getSheetId=function(){ return 0; };
+['insertColumnsAfter','insertColumnAfter','insertColumnsBefore','insertColumnBefore','deleteColumn','deleteColumns','hideSheet','showSheet','showColumns','hideRows','showRows','sort','setName','setTabColor','protect','clearFormats','setRowHeight','setRowHeights','activate','insertRows','insertRowAfter'].forEach(function(m){ Sheet.prototype[m]=function(){ return this; }; });
+Sheet.prototype.getFrozenRows=function(){ return 1; }; Sheet.prototype.getFrozenColumns=function(){ return 0; }; Sheet.prototype.isSheetHidden=function(){ return false; }; Sheet.prototype.getIndex=function(){ return 1; }; Sheet.prototype.getParent=function(){ return __SS; };
+Sheet.prototype.getFilter=function(){ return null; }; Sheet.prototype.getProtections=function(){ return []; };
 Sheet.prototype.getRange=function(r,c,nr,nc){ var sh=this;
   if(typeof r==='string'){ var m=r.match(/^([A-Z]+)(\d+)(?::([A-Z]+)(\d+))?$/); if(m){ var col=function(s){ var n=0; for(var i=0;i<s.length;i++) n=n*26+(s.charCodeAt(i)-64); return n; };
     var c1=col(m[1]), r1=+m[2], c2=m[3]?col(m[3]):c1, r2=m[4]?+m[4]:r1; return sh.getRange(r1,c1,r2-r1+1,c2-c1+1); } }
@@ -1963,7 +1966,7 @@ table.dt td.l{text-align:left}
     </div>
     <div class="tablewrap" style="max-height:380px"><table class="dt" id="chTable"></table></div>
     <div style="margin-top:12px">
-      <textarea id="chReason" placeholder="선택한 변경 건의 사유 (예: 코스트코 2차 발주 확정으로 수량 증가 / 원단가 인상 반영 / 발매일 연기)"></textarea>
+      <textarea id="chReason" placeholder="선택한 변경 건의 사유 (예: 멤버십몰 2차 발주 확정으로 수량 증가 / 원단가 인상 반영 / 발매일 연기)"></textarea>
       <div class="row" style="margin-top:8px">
         <button class="btn" onclick="submitReasons()">선택 건에 사유 저장</button>
         <span class="muted" id="chSel">0건 선택됨</span>

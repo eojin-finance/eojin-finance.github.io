@@ -22,6 +22,9 @@ Sheet.prototype.deleteRow=function(i){ this.rows.splice(i-1,1); return this; };
 Sheet.prototype.deleteRows=function(i,n){ this.rows.splice(i-1,n||1); return this; };
 Sheet.prototype.insertRowsAfter=function(){ return this; }; Sheet.prototype.insertRowBefore=function(){ return this; };
 Sheet.prototype.hideColumns=function(){ return this; }; Sheet.prototype.getSheetId=function(){ return 0; };
+['insertColumnsAfter','insertColumnAfter','insertColumnsBefore','insertColumnBefore','deleteColumn','deleteColumns','hideSheet','showSheet','showColumns','hideRows','showRows','sort','setName','setTabColor','protect','clearFormats','setRowHeight','setRowHeights','activate','insertRows','insertRowAfter'].forEach(function(m){ Sheet.prototype[m]=function(){ return this; }; });
+Sheet.prototype.getFrozenRows=function(){ return 1; }; Sheet.prototype.getFrozenColumns=function(){ return 0; }; Sheet.prototype.isSheetHidden=function(){ return false; }; Sheet.prototype.getIndex=function(){ return 1; }; Sheet.prototype.getParent=function(){ return __SS; };
+Sheet.prototype.getFilter=function(){ return null; }; Sheet.prototype.getProtections=function(){ return []; };
 Sheet.prototype.getRange=function(r,c,nr,nc){ var sh=this;
   if(typeof r==='string'){ var m=r.match(/^([A-Z]+)(\d+)(?::([A-Z]+)(\d+))?$/); if(m){ var col=function(s){ var n=0; for(var i=0;i<s.length;i++) n=n*26+(s.charCodeAt(i)-64); return n; };
     var c1=col(m[1]), r1=+m[2], c2=m[3]?col(m[3]):c1, r2=m[4]?+m[4]:r1; return sh.getRange(r1,c1,r2-r1+1,c2-c1+1); } }
@@ -103,7 +106,7 @@ var CFG = {
     { b: 'OH',   tab: '4.변환_OH',   row0: 12, col0: 3, n: 300, salesCol: 76 },
     { b: 'ALPHA', tab: '4.변환_ALPHA', row0: 12, col0: 3, n: 500 }
   ],
-  /* 33열 표준 스키마 탭 (OD·UV·COSTCO). 위 4사와 열 배치가 달라 따로 읽는다.
+  /* 33열 표준 스키마 탭 (OD·UV·MEMB). 위 4사와 열 배치가 달라 따로 읽는다.
      A 등급 B 확인항목 C 건수 D 원본행 E 브랜드 F 품번 G 색상 H 품명 I 차수 J 아이템
      K 컬러코드 L 시즌 M 발주처 N 원산지 O 생산방식 P 발주일 Q 납기일 R 납기월
      S 발주량 T 사전원가 U 매입예정액 V 원가구분 W 원가근거 X 발매일 Y 발매월
@@ -125,9 +128,9 @@ var CFG = {
       raw: '5.원본_UV_26FA',  srcRow0: 7, lblRow: 4, szFrom: 39, szTo: 54 },
     { b: 'UV', k: 'UVWI', tab: '4.변환_UV_26WI',  row0: 12, n: 420,
       raw: '5.원본_UV_26WI',  srcRow0: 7, lblRow: 4, szFrom: 39, szTo: 54 },
-    /* COSTCO 원본은 21FW~27SS 12시즌이 한 탭에 있다. 대장과 같은 기준으로 26FW 만.
+    /* MEMB 원본은 21FW~27SS 12시즌이 한 탭에 있다. 대장과 같은 기준으로 26FW 만.
        사이즈는 행별 전개가 아니라 우측 요약 블록(BG~BV)이라 여기서 읽지 않는다. */
-    { b: 'COSTCO', k: 'CS', tab: '4.변환_COSTCO', row0: 12, n: 700, season: '26FW' },
+    { b: 'MEMB', k: 'CS', tab: '4.변환_MEMB', row0: 12, n: 700, season: '26FW' },
     /* UO — 8번째 브랜드. 원본 엑셀은 OH 와 같은 ORDER STATUS 양식이지만 변환탭은 33열 쪽이다
        (9.신규매입 을 타고 대장으로 들어가므로). 사이즈는 원본 H~L 5칸. */
     { b: 'UO', k: 'UO', tab: '4.변환_UO', row0: 12, n: 420,
@@ -343,7 +346,7 @@ function readAll_() {
     }
   });
 
-  /* 33열 표준 탭 — OD·UV·COSTCO. 대장과 같은 기준(집계반영='반영')으로만 넣는다. */
+  /* 33열 표준 탭 — OD·UV·MEMB. 대장과 같은 기준(집계반영='반영')으로만 넣는다. */
   (CFG.BRANDS2 || []).forEach(function (cf) {
     var sh = ss.getSheetByName(cf.tab);
     /* 탭이 아직 없으면 조용히 건너뛴다. 브랜드를 붙일 때 설정이 탭보다 먼저 올라가는데,
@@ -1425,7 +1428,7 @@ function diagText_() {
     });
     var sq = 0, hasSz = {};
     P.sz.forEach(function (x) { sq += x[2]; hasSz[x[0]] = 1; });
-    /* OD·UV·COSTCO 변환탭에는 사이즈 전개 블록이 없다. 그래서 사이즈합은
+    /* OD·UV·MEMB 변환탭에는 사이즈 전개 블록이 없다. 그래서 사이즈합은
        전체 발주량이 아니라 '사이즈 행이 있는 행의 발주량' 과 맞아야 한다. */
     var qSz = 0;
     P.rows.forEach(function (r, i) { if (hasSz[i]) qSz += r[10]; });
@@ -1455,7 +1458,7 @@ function diagText_() {
     chk('사이즈합 = 사이즈 있는 행의 발주량', bad.length === 0,
       Math.round(sq).toLocaleString() + ' / ' + Math.round(qSz).toLocaleString() +
       (bad.length ? '  → ' + bad.length + '행: ' + bad.slice(0, 5).join(' · ') : ''));
-    add('사이즈 없는 소스', true, 'OD·UV·COSTCO 는 원본에 사이즈 전개가 없어 사이즈 행이 생기지 않는다 (' + Math.round(q - qSz).toLocaleString() + '장)');
+    add('사이즈 없는 소스', true, 'OD·UV·MEMB 는 원본에 사이즈 전개가 없어 사이즈 행이 생기지 않는다 (' + Math.round(q - qSz).toLocaleString() + '장)');
     chk('발주량 = 대장 발주량', !led.q || Math.abs(q - led.q) < 1,
       Math.round(q).toLocaleString() + ' vs 대장 ' + Math.round(led.q).toLocaleString());
     chk('약정액 = 대장 매입예정액', !led.amt || Math.abs(amt - led.amt) < 1,
@@ -2044,7 +2047,7 @@ function sizesOf(r){
   return base.map(function(x){ return {s:x.s,q:(e[x.s]!==undefined?Number(e[x.s]):x.q)}; });
 }
 /* 수량은 사이즈 행을 더해서 낸다 — 사이즈를 고치면 수량·금액이 같이 움직여야 하기 때문이다.
-   다만 COSTCO 처럼 원본에 사이즈 전개가 없는 소스는 사이즈 행이 아예 없다.
+   다만 MEMB 처럼 원본에 사이즈 전개가 없는 소스는 사이즈 행이 아예 없다.
    그때 0 으로 두면 대장에는 있는 26억이 화면에서 통째로 사라진다 → 행 자체의 발주량을 쓴다. */
 function qtyOf(r){ var s=sizesOf(r); if(!s.length) return Number(r.q)||0;
   var t=0; s.forEach(function(x){ t+=Number(x.q)||0; }); return t; }
@@ -2071,7 +2074,7 @@ function saleOf(r){
   return Number(r.sa)||0;
 }
 function rdOf(r){ return r.rd||''; }
-/* 발매월 — 없으면 '발매일없음'. OD·UV·COSTCO·UO 는 원본에 발매일 열이 아예 없다. */
+/* 발매월 — 없으면 '발매일없음'. OD·UV·MEMB·UO 는 원본에 발매일 열이 아예 없다. */
 function rmOf(r){ var d=rdOf(r); return d? d.slice(0,7) : '발매일없음'; }
 function hasSale(r){ return (Number(r.sa)||0)>0 || (Number(r.sp)||0)>0; }
 function ctOf(r){ return costOf(r)===0? '원가없음' : (r.ct||'—'); }
@@ -2168,7 +2171,7 @@ function chart(rs){
 }
 /* 발주처 × 납기월 매트릭스 — 어느 업체에 몇 월에 얼마가 나가는지 한 장으로 본다.
    브랜드는 왼쪽 필터로 좁히면 이 표가 그대로 따라온다.
-   납기월을 쓰는 이유: 입고월은 4사 원본에만 있고 OD·UV·COSTCO 에는 없다.
+   납기월을 쓰는 이유: 입고월은 4사 원본에만 있고 OD·UV·MEMB 에는 없다.
    자금 소요 기준도 납기월이라 여기서는 납기월로 통일한다. */
 var MTX = { mode: 'a' };   // a=약정액, q=발주량
 
@@ -2295,7 +2298,7 @@ function matrixPanel(rs){
     '<option value="a"' + (MTX.mode==='a'?' selected':'') + '>약정액('+vlab()+')</option>' +
     '<option value="q"' + (MTX.mode==='q'?' selected':'') + '>발주량</option></select>' +
     '<span class="sub">' + vs.length + '개 발주처 × ' + ms.length + '개월 · 브랜드는 왼쪽 필터로 좁히세요' +
-    ' · 입고월이 아니라 납기월 기준(OD·UV·COSTCO 원본에 입고월이 없음)</span></div>' +
+    ' · 입고월이 아니라 납기월 기준(OD·UV·MEMB 원본에 입고월이 없음)</span></div>' +
     tbl(head, body, foot) + '</div>';
 }
 
@@ -2777,7 +2780,7 @@ function paySave(ex){
    "발주한 게 실제로 나가고 있나" 가 품번 단위로 보인다.
 
    조인은 품번만 쓴다. 색상은 표기가 브랜드마다 달라서(ALPHA·UO·OH 는 BLK 약어,
-   BETA·GAMMA·OD 는 BLACK 풀네임, UV 는 빈칸, COSTCO 는 혼용률까지 붙는다) 맞출 수가 없다.
+   BETA·GAMMA·OD 는 BLACK 풀네임, UV 는 빈칸, MEMB 는 혼용률까지 붙는다) 맞출 수가 없다.
    품번만으로도 소진율·달성률은 다 나온다.
 
    무상량(마케팅·샘플·폐기 출고)은 판매량에서 빼고 따로 센다. 섞으면 소진율이 부풀려진다. */
@@ -2829,7 +2832,7 @@ function ratebar(p){
    예상은 대장의 발매일(rd)로 묶고, 실적은 6.실적_재고 의 발매일로 묶는다. 둘 다 원천이
    우리 2.매출대장 이라 같은 날짜다. ERP 시트의 품번 탭도 결국 우리 걸 베낀 것이라 안 쓴다.
 
-   발매일이 없는 브랜드(OH·OD·UV·UO·COSTCO — 원본에 열 자체가 없다)는 맨 뒤에 한 줄로 모은다.
+   발매일이 없는 브랜드(OH·OD·UV·UO·MEMB — 원본에 열 자체가 없다)는 맨 뒤에 한 줄로 모은다.
    0 이 아니라 '아직 기준이 없는 것' 이라 섞으면 안 된다. */
 function relRows(rs){
   var E={}, ord=[];
@@ -3606,7 +3609,7 @@ function draw(){
   drawAge(); drawErr();
   var ne=Object.keys(EDITS).length;
   document.getElementById('foot').innerHTML=
-    '원천 — 라인시트 중간관리시트 · 변환탭 10개(BETA·GAMMA·OH·ALPHA·OD3·UV2·COSTCO) 직결 · 원본은 매시 정각 자동 동기화 · 읽은 시각 '+esc(BUILT)+'<br>'+
+    '원천 — 라인시트 중간관리시트 · 변환탭 10개(BETA·GAMMA·OH·ALPHA·OD3·UV2·MEMB) 직결 · 원본은 매시 정각 자동 동기화 · 읽은 시각 '+esc(BUILT)+'<br>'+
     BASE.length+'행 / 사이즈 '+SZ.length+'행 · 원가 기준 VAT 별도 · 결제조건 미반영'+
     (ne?' · 수정 '+ne+'행 (_편집 시트에 기록)':'')+
     (ORPH&&ORPH.n?'<br><span style="color:var(--crit)">⚠ 품번이 비어 집계에서 빠진 사이즈 '+ORPH.n+
