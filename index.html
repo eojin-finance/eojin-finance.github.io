@@ -154,7 +154,7 @@
     <li><a href="#s-summary">요약</a></li>
     <li><a href="#s-flag">대표 프로젝트<small>4</small></a></li>
     <li><a href="#s-ops">운영 개선<small>4</small></a></li>
-    <li><a href="#s-demo">데모<small>6+11</small></a></li>
+    <li><a href="#s-demo">데모<small>6+7</small></a></li>
     <li><a href="#s-way">일하는 방식</a></li>
     <li><a href="#s-all">전체 프로젝트</a></li>
     <li><a href="#s-scope">담당 업무</a></li>
@@ -173,7 +173,7 @@
     <div><b class="num">18<small>회</small></b><span>월결산 — 가결산 손익·판관비 분류·비경상 분리</span></div>
     <div><b class="num">34<small>채널</small></b><span>위탁 정산 대사 — 원 단위 일치 확인</span></div>
     <div><b>원 단위</b><span>재고 평가충당금 — 이전 확정본 재현 검증</span></div>
-    <div><b class="num">6<small>+11</small></b><span>동작하는 데모 — 샘플 데이터로 공개</span></div>
+    <div><b class="num">6<small>+7</small></b><span>운영 중인 데모 — 샘플 데이터로 공개</span></div>
   </div>
 
   <section id="s-summary">
@@ -232,7 +232,6 @@
           <div><span class="m">상시 차이 유형</span><span class="v">4</span></div>
           <div><span class="m">확정 기준</span><span class="v">원 단위 일치</span></div>
         </div>
-        <a class="go" href="demo/wita-settlement/">데모 열기 <span aria-hidden="true">→</span></a>
       </article>
 
       <article class="flag">
@@ -258,41 +257,44 @@
     <div class="ops">
       <div><h3>월 매입 마감 앱</h3><p>발주↔입고 대사, 수입 부대비용 배부, 필증 검증, 결재를 한 흐름으로. 예외만 사람이 봅니다.</p><a href="demo/one-close/">데모 →</a></div>
       <div><h3>자금 대시보드</h3><p>잔액·수금 예측·생산대금 지급을 한 화면에. 열 때마다 체크섬 7종으로 원천과 대조합니다.</p><a href="demo/fund-cycle/">데모 →</a></div>
-      <div><h3>상품 계획표(라인시트) 표준화</h3><p>부서마다 다른 양식을 공통 필드 13개·키 3계층으로 통일해 발주·입고·매출·자금이 같은 품번 체계를 쓰게 했습니다.</p><a href="demo/linesheet-hub/">데모 →</a></div>
+      <div><h3>상품 계획표(라인시트) 표준화</h3><p>부서마다 다른 양식을 공통 필드 13개·키 3계층으로 통일해 발주·입고·매출·자금이 같은 품번 체계를 쓰게 했습니다.</p><a href="demo/linesheet-fin/">데모 →</a></div>
       <div><h3>법인카드·경비 통제</h3><p>실물 카드 축소와 가상카드 전환 설계, 관리 대장 정비, 근태 대조로 경비 규정 충족을 자동 판정.</p><a href="demo/overtime-meal/">데모 →</a></div>
     </div>
   </section>
 
   <section id="s-demo">
-    <div class="shead"><h2>동작하는 데모</h2><p>샘플 데이터로 실제 화면 그대로 — 계산·판정 로직은 실제 구현과 동일</p></div>
+    <div class="shead"><h2>동작하는 데모</h2><p>실제 운영 중인 화면 6개 — 샘플 데이터로, 계산·판정 로직은 실제 구현과 동일</p></div>
     <div class="gal">
-      <a class="shot" href="demo/wita-settlement/"><div class="img"><img src="assets/shots/wita-settlement.jpg" alt="위탁 정산 관리" loading="lazy"></div>
-        <div class="b"><h3>위탁 정산 관리</h3><p>채널 룰 편집 · 채널별 계산 · 검증식</p><div class="pf"><b>증명</b> 채널마다 다른 정산서를 한 규칙 체계로 대사한다</div></div></a>
-      <a class="shot" href="demo/nrv-simulator/"><div class="img"><img src="assets/shots/nrv-simulator.jpg" alt="NRV 시뮬레이터" loading="lazy"></div>
-        <div class="b"><h3>NRV 시뮬레이터</h3><p>가정을 움직이면 전 품번 충당금 즉시 재계산</p><div class="pf"><b>증명</b> 충당금 판단 기준이 문서화·재현 가능하다</div></div></a>
       <a class="shot" href="demo/one-close/"><div class="img"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱" loading="lazy"></div>
         <div class="b"><h3>월 매입 마감 앱</h3><p>입고 검수 → B/L 연결 → 부대비용 배부 → 취득원가</p><div class="pf"><b>증명</b> 매입 원가 확정 절차를 화면 순서로 고정했다</div></div></a>
+      <a class="shot" href="demo/nrv-simulator/"><div class="img"><img src="assets/shots/nrv-simulator.jpg" alt="NRV 시뮬레이터" loading="lazy"></div>
+        <div class="b"><h3>NRV 시뮬레이터</h3><p>가정을 움직이면 전 품번 충당금 즉시 재계산</p><div class="pf"><b>증명</b> 충당금 판단 기준이 문서화·재현 가능하다</div></div></a>
+      <a class="shot" href="demo/linesheet-fin/"><div class="img"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계" loading="lazy"></div>
+        <div class="b"><h3>라인시트 재무 집계</h3><p>매입 약정 기준 집계 · 결제조건 · 유효성</p><div class="pf"><b>증명</b> 상품 계획이 매입 약정·자금 소요로 바로 읽힌다</div></div></a>
       <a class="shot" href="demo/fund-cycle/"><div class="img"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드" loading="lazy"></div>
         <div class="b"><h3>자금 대시보드</h3><p>잔액 추이 · 수금 예측 · 진입 시 체크섬 7종</p><div class="pf"><b>증명</b> 보고 숫자가 원천과 자동으로 대조된다</div></div></a>
-      <a class="shot" href="demo/investor-contracts/"><div class="img"><img src="assets/shots/investor-contracts.jpg" alt="투자계약 대시보드" loading="lazy"></div>
-        <div class="b"><h3>투자계약 의무 관리</h3><p>의무를 긴급/정기/이벤트로 분류, 상환 타임라인</p><div class="pf"><b>증명</b> 계약 조항을 월별 실행 의무로 바꿀 수 있다</div></div></a>
+      <a class="shot" href="demo/card-notice/"><div class="img"><img src="assets/shots/card-notice.jpg" alt="법인카드 개편 공지" loading="lazy"></div>
+        <div class="b"><h3>법인카드 개편 공지</h3><p>정책 변경 전후·한도 근거·상황별 가이드</p><div class="pf"><b>증명</b> 정책 변경을 전 구성원이 읽을 수 있게 설명했다</div></div></a>
       <a class="shot" href="demo/overtime-meal/"><div class="img"><img src="assets/shots/overtime-meal.jpg" alt="야근식대 대조" loading="lazy"></div>
         <div class="b"><h3>야근식대 대조</h3><p>근태 vs 카드 내역 사람별 판정, 안내문구 생성</p><div class="pf"><b>증명</b> 규정성 경비를 예외만 사람이 보게 만들었다</div></div></a>
     </div>
     <details class="more">
-      <summary>그 외 데모 11개 — 라인시트·정산 도구·목업</summary>
+      <summary>분석·설계 산출물 7개 — 상시 운영은 아닌 것</summary>
       <div class="gal">
-        <a class="shot" href="demo/linesheet-collector/"><div class="img"><img src="assets/shots/linesheet-collector.jpg" alt="생산 라인시트 수집기" loading="lazy"></div><div class="b"><h3>생산 라인시트 수집기</h3><p>커스텀 양식 업로드 · 건별 조회 · 사이즈 매트릭스</p></div></a>
-        <a class="shot" href="demo/linesheet-hub/"><div class="img"><img src="assets/shots/linesheet-hub.jpg" alt="라인시트 허브" loading="lazy"></div><div class="b"><h3>라인시트 허브</h3><p>통일양식 업로드 → 검증 → 버전 비교</p></div></a>
-        <a class="shot" href="demo/linesheet-fin/"><div class="img"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계" loading="lazy"></div><div class="b"><h3>라인시트 재무 집계</h3><p>매입 약정 기준 집계 · 결제조건</p></div></a>
-        <a class="shot" href="demo/stg-settlement/"><div class="img"><img src="assets/shots/stg-settlement.jpg" alt="자사몰 수탁정산" loading="lazy"></div><div class="b"><h3>자사몰 수탁정산</h3><p>결제대행 + 주문·취소·배송 → 검증 게이트 → 전표</p></div></a>
-        <a class="shot" href="demo/fund-dashboard/"><div class="img"><img src="assets/shots/fund-dashboard.jpg" alt="자금 인텔리전스" loading="lazy"></div><div class="b"><h3>자금 인텔리전스</h3><p>현금 시나리오·손익 시뮬레이션 관점</p></div></a>
-        <a class="shot" href="demo/card-notice/"><div class="img"><img src="assets/shots/card-notice.jpg" alt="법인카드 개편 공지" loading="lazy"></div><div class="b"><h3>법인카드 개편 공지</h3><p>정책 변경 안내 페이지</p></div></a>
-        <a class="shot" href="demo/expense-dashboard/"><div class="img"><img src="assets/shots/expense-dashboard.jpg" alt="지출내역 대시보드" loading="lazy"></div><div class="b"><h3>지출내역 대시보드</h3><p>지출 표 붙여넣기 → 용도·부서 구성</p></div></a>
-        <a class="shot" href="demo/flow-diagram/"><div class="img"><img src="assets/shots/flow-diagram.jpg" alt="전사 업무 흐름도" loading="lazy"></div><div class="b"><h3>전사 업무 흐름도</h3><p>계획→자금→실적 경로 한 장</p></div></a>
-        <a class="shot" href="demo/one-erp/"><div class="img"><img src="assets/shots/one-erp.jpg" alt="ONE ERP 목업" loading="lazy"></div><div class="b"><h3>ONE ERP 목업</h3><p>시스템 통합 시 화면 목업</p></div></a>
-        <a class="shot" href="demo/dashboard-cart/"><div class="img"><img src="assets/shots/dashboard-cart.jpg" alt="Dashboard Cart" loading="lazy"></div><div class="b"><h3>Dashboard Cart</h3><p>보고 화면 설계 도구</p></div></a>
-        <a class="shot" href="demo/meeting-memo/"><div class="img"><img src="assets/shots/meeting-memo.jpg" alt="회의 메모 컨테이너" loading="lazy"></div><div class="b"><h3>회의 메모 컨테이너</h3><p>협의 시트에 붙는 메모 입력</p></div></a>
+      <a class="shot" href="demo/investor-contracts/"><div class="img"><img src="assets/shots/investor-contracts.jpg" alt="투자계약 의무 관리" loading="lazy"></div>
+        <div class="b"><h3>투자계약 의무 관리</h3><p>계약 조항을 긴급/정기/이벤트 의무로 분류 — 분석 1회 산출물</p></div></a>
+      <a class="shot" href="demo/expense-dashboard/"><div class="img"><img src="assets/shots/expense-dashboard.jpg" alt="지출내역 대시보드" loading="lazy"></div>
+        <div class="b"><h3>지출내역 대시보드</h3><p>지출 표 붙여넣기 → 용도·부서 구성 — 법인카드 개편 분석용</p></div></a>
+      <a class="shot" href="demo/fund-dashboard/"><div class="img"><img src="assets/shots/fund-dashboard.jpg" alt="자금 인텔리전스" loading="lazy"></div>
+        <div class="b"><h3>자금 인텔리전스</h3><p>자금 대시보드를 현금 시나리오·손익 관점으로 재구성한 버전</p></div></a>
+      <a class="shot" href="demo/flow-diagram/"><div class="img"><img src="assets/shots/flow-diagram.jpg" alt="전사 업무 흐름도" loading="lazy"></div>
+        <div class="b"><h3>전사 업무 흐름도</h3><p>계획→자금→실적 경로 한 장 — 설명용</p></div></a>
+      <a class="shot" href="demo/one-erp/"><div class="img"><img src="assets/shots/one-erp.jpg" alt="ONE ERP 목업" loading="lazy"></div>
+        <div class="b"><h3>ONE ERP 목업</h3><p>시스템 통합 시 화면 목업 — 설계용</p></div></a>
+      <a class="shot" href="demo/dashboard-cart/"><div class="img"><img src="assets/shots/dashboard-cart.jpg" alt="Dashboard Cart" loading="lazy"></div>
+        <div class="b"><h3>Dashboard Cart</h3><p>보고 화면 설계 도구</p></div></a>
+      <a class="shot" href="demo/meeting-memo/"><div class="img"><img src="assets/shots/meeting-memo.jpg" alt="회의 메모 컨테이너" loading="lazy"></div>
+        <div class="b"><h3>회의 메모 컨테이너</h3><p>협의 시트에 붙는 메모 입력 — 1회 사용</p></div></a>
       </div>
     </details>
   </section>
