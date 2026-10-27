@@ -7062,10 +7062,10 @@
     </header>
 
     <nav class="workspace-tabs" aria-label="업무 가이드 보기">
-      <a class="workspace-tab" href="<?!= appUrl ?>?view=flow" target="_top" data-view="flow">자금 운영 흐름</a>
-      <a class="workspace-tab" href="<?!= appUrl ?>?view=timeline" target="_top" data-view="timeline">통합 일정 시뮬레이터 <em>NEW</em></a>
-      <a class="workspace-tab" href="<?!= appUrl ?>?view=cycle" target="_top" data-view="cycle">데이터 순환 <em>NEW</em></a>
-      <a class="workspace-tab" href="<?!= appUrl ?>?view=sales" target="_top" data-view="sales">매출 정산 상세 <em>NEW</em></a>
+      <a class="workspace-tab" href="?view=flow" target="_top" data-view="flow">자금 운영 흐름</a>
+      <a class="workspace-tab" href="?view=timeline" target="_top" data-view="timeline">통합 일정 시뮬레이터 <em>NEW</em></a>
+      <a class="workspace-tab" href="?view=cycle" target="_top" data-view="cycle">데이터 순환 <em>NEW</em></a>
+      <a class="workspace-tab" href="?view=sales" target="_top" data-view="sales">매출 정산 상세 <em>NEW</em></a>
     </nav>
 
     <section class="board view-panel active" id="flowView" aria-label="전사 계획·자금·실적 통합 흐름도">
@@ -7358,7 +7358,7 @@
               <div class="detail-grid">
                 <div class="detail-item"><span>책임</span><strong id="detailOwner">상품기획 · 생산</strong></div>
                 <div class="detail-item"><span>문서</span><strong id="detailDocument">시즌 발주(생산) 계획</strong></div>
-                <div class="detail-item"><span>시스템</span><strong id="detailSystem">세원 ERP · 자금시트</strong></div>
+                <div class="detail-item"><span>시스템</span><strong id="detailSystem">ERP · 자금시트</strong></div>
                 <div class="detail-item"><span>핵심 산출물</span><strong id="detailOutput">시즌 단위 물량·금액</strong></div>
               </div>
             </article>
@@ -7966,7 +7966,7 @@
   </div>
 
   <script>
-    const INITIAL_VIEW = <?!= JSON.stringify(initialView) ?>;
+    const INITIAL_VIEW = (new URLSearchParams(location.search).get('view') || 'flow');
     const POLICY = {
       approval: {
         managerMax: 500000,
@@ -7985,7 +7985,7 @@
     const STEPS = [
       {
         n: 1, title: "시즌 발주 계획", output: "시즌 단위 물량·금액",
-        owner: "상품기획 · 생산", doc: "시즌 발주(생산) 계획", system: "세원 ERP · 자금시트",
+        owner: "상품기획 · 생산", doc: "시즌 발주(생산) 계획", system: "ERP · 자금시트",
         description: "시즌별로 무엇을 얼마나 발주할지 확정하는 단계입니다. 재무는 이 숫자로 해당 시즌의 현금 유출 계획을 세웁니다.",
         checks: ["시즌별 생산대금 유출 규모를 자금 계획(OCF)에 반영", "입고월 기준으로 시즌 귀속 판단"],
         issue: null
@@ -8006,14 +8006,14 @@
       },
       {
         n: 4, title: "발주 실행", output: "거래처 발주",
-        owner: "상품기획 · 생산", doc: "발주서", system: "세원 ERP",
+        owner: "상품기획 · 생산", doc: "발주서", system: "ERP",
         description: "실제 거래처에 발주가 나가며 계획이 실행 금액으로 전환되는 시점입니다.",
         checks: ["계획 대비 실제 발주액 추적"],
         issue: { title: "재무 인지 시점 공백 (현행 AS-IS)", body: "발주가 확정돼도 재무는 입고·세금계산서 단계에서야 인지하게 됩니다. 자금 계획과 실제 지출 사이에 시차가 생깁니다. 아래 LIVE 데모가 이 공백을 없애는 통합 정본 구조(TO-BE)의 동작입니다." }
       },
       {
         n: 5, title: "입고 · 검수", output: "건별 입고 기록",
-        owner: "생산관리 · 물류", doc: "입고 내역", system: "세원 ERP (건별)",
+        owner: "생산관리 · 물류", doc: "입고 내역", system: "ERP (건별)",
         description: "물건이 실제로 들어오고 시스템에 건별로 기록됩니다. 재고와 원가의 원천이 되는 단계입니다.",
         checks: ["입고 기준으로 재고 수불부 반영", "사전원가 갱신 여부 확인"],
         issue: { title: "원가 기준이 2가지", body: "입고 기록에 사전원가금액과 입고금액이 함께 존재하며 서로 다릅니다(전사 기준 약 1.2억 차이). 어느 쪽을 정본으로 볼지 합의가 필요합니다." }

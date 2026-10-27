@@ -130,12 +130,31 @@ var CFG = {
       raw: '5.원본_UV_26WI',  srcRow0: 7, lblRow: 4, szFrom: 39, szTo: 54 },
     /* MEMB 원본은 21FW~27SS 12시즌이 한 탭에 있다. 대장과 같은 기준으로 26FW 만.
        사이즈는 행별 전개가 아니라 우측 요약 블록(BG~BV)이라 여기서 읽지 않는다. */
-    { b: 'MEMB', k: 'CS', tab: '4.변환_MEMB', row0: 12, n: 700, season: '26FW' },
+    { b: 'MEMB', k: 'CS', tab: '4.변환_MEMB', row0: 12, n: 1391, season: '26FW' },
     /* UO — 8번째 브랜드. 원본 엑셀은 OH 와 같은 ORDER STATUS 양식이지만 변환탭은 33열 쪽이다
        (9.신규매입 을 타고 대장으로 들어가므로). 사이즈는 원본 H~L 5칸. */
     { b: 'UO', k: 'UO', tab: '4.변환_UO', row0: 12, n: 420,
-      raw: '5.원본_UO', srcRow0: 5, lblRow: 4, szFrom: 8, szTo: 12 }
+      raw: '5.원본_UO', srcRow0: 5, lblRow: 4, szFrom: 8, szTo: 12 },
+    /* OD 오픈마켓 — 오픈마켓 직매입 전용 라인(◈ 오픈마켓 LINESHEET, 담당자46). 브랜드는 OD 로 합친다:
+       OD 제품이고, 브랜드를 따로 세우면 집계표·검증식 열을 전부 늘려야 해서(I-008).
+       구분은 차수 '오픈마켓' 과 판매가구분 '오픈마켓공급가' 로 한다. 직매입이라 확정판매가는
+       소비자가가 아니라 오픈마켓 공급가(AM×1.1) — 오픈마켓 입고 단가와 같다.
+       원본 탭에 26SS 가 같이 있어 26FW 만. 사이즈는 원본 우측 블록이라 읽지 않는다. */
+    { b: 'OD', k: 'ODCP', tab: '4.변환_OD_CP', row0: 12, n: 100, season: '26FW' },
+    /* 27SS 변환탭 8개 — E:AG 는 위 33열과 같고 AH 소복종 · AI 매출제외 두 열이 더 있다(w:35).
+       ss 는 대장 시즌 열(블록 기준)과 같게 탭 단위로 박는다. 변환탭 L열은 27SP·27SU 처럼 원본 시즌이라 쓰지 않는다.
+       대장 매출은 AI(사은품·예상매출0)가 빈 행만 싣는다 → 웹앱도 그 행의 매출을 0 으로 둔다. */
+    { b: 'BETA',   k: 'S7GL', tab: '4.변환_27SS_BETA',   row0: 12, n: 600, ss: '27SS', w: 35 },
+    { b: 'GAMMA',   k: 'S7SN', tab: '4.변환_27SS_GAMMA',   row0: 12, n: 600, ss: '27SS', w: 35 },
+    { b: 'ALPHA',   k: 'S7HR', tab: '4.변환_27SS_ALPHA',   row0: 12, n: 600, ss: '27SS', w: 35 },
+    { b: 'OD',     k: 'S7OD', tab: '4.변환_27SS_OD',     row0: 12, n: 600, ss: '27SS', w: 35 },
+    { b: 'OH',     k: 'S7OH', tab: '4.변환_27SS_OH',     row0: 12, n: 600, ss: '27SS', w: 35 },
+    { b: '엘레쎄', k: 'S7EL', tab: '4.변환_27SS_EL',     row0: 12, n: 600, ss: '27SS', w: 35 },
+    { b: 'MEMB', k: 'S7CS', tab: '4.변환_27SS_MEMB', row0: 12, n: 600, ss: '27SS', w: 35 },
+    { b: 'OD',     k: 'S7CP', tab: '4.변환_27SS_OD_CP',  row0: 12, n: 600, ss: '27SS', w: 35 }
   ],
+  /* 27SS 추정 매입 — 원가 없는 행을 원가율로 추정한 시트 탭. 브랜드표(B열 브랜드 · G열 추정 V+)만 읽는다. */
+  EST_TAB: '1.예상매입_27SS추정',
   EDITS: '_편집',
   /* 결제조건 규칙 — 코드가 아니라 시트에 둔다. 누가 언제 고쳤는지가 남아야 하는 값이라서. */
   PAY_TAB: '9.결제조건',
@@ -316,7 +335,7 @@ function readAll_() {
         ct: s_(B[i][9]),
         mj: s_(B[i][11]),
         sb: s_(B[i][12]),
-        ss: s_(B[i][13]) || '26FW',
+        ss: '26FW',            // 대장 시즌 열과 같은 기준(탭 단위). BO 열 값은 쓰지 않는다
         cc: s_(B[i][14]),      // BP 색상코드(정규화)
         wy: s_(B[i][15]),      // BQ 생산방식
         ln: s_(B[i][16]),      // BR 라인
@@ -357,7 +376,8 @@ function readAll_() {
     if (!sh) return;
     var room = sh.getMaxRows() - cf.row0 + 1;
     var n = Math.min(cf.n, room);
-    var G = sh.getRange(cf.row0, 1, n, 33).getValues();
+    var W2 = cf.w || 33;
+    var G = sh.getRange(cf.row0, 1, n, W2).getValues();
 
     var e2 = errCount_(G);
     if (e2) { errs.n += e2; errs.tabs.push(cf.tab + ':' + e2); }
@@ -383,7 +403,9 @@ function readAll_() {
       if (!pn2) continue;
       if (cf.season && s_(G[i][11]) !== cf.season) continue;
       if (s_(G[i][32]) !== '반영') continue;
-      var rid2 = cf.b + '-' + cf.k + s_(G[i][3]);
+      /* 27SS 다중 소스 탭은 D열이 '27SP 7' 처럼 소스+행이다. 공백만 뗀다(탭 안에서 유일 확인 2026-10-26). */
+      var rid2 = cf.b + '-' + cf.k + s_(G[i][3]).replace(/\s+/g, '');
+      var noSale = W2 > 34 && s_(G[i][34]) !== '';
       /* 원본행(D열)으로 사이즈 전개를 붙인다. 라벨이 비었거나 소계('TTL')면 사이즈가 아니다. */
       if (SZG && SZL) {
         var si = n_(G[i][3]) - cf.srcRow0;
@@ -413,8 +435,8 @@ function readAll_() {
         dd: ymd_(G[i][16]),
         ct: s_(G[i][21]),
         mj: s_(G[i][9]),
-        sb: '',
-        ss: s_(G[i][11]) || '26FW',
+        sb: W2 > 33 ? s_(G[i][33]) : '',
+        ss: cf.ss || '26FW',
         cc: s_(G[i][10]),
         wy: s_(G[i][14]),
         ln: '',
@@ -423,14 +445,15 @@ function readAll_() {
         vn: n_(G[i][2]),
         /* 33열 스키마는 X 발매일 · Z 확정판매가 · AB 예상매출 */
         rd: ymd_(G[i][23]),
-        sp: n_(G[i][25]),
-        sa: n_(G[i][27])
+        sp: noSale ? 0 : n_(G[i][25]),
+        sa: noSale ? 0 : n_(G[i][27])
       });
     }
   });
 
   return { base: base, sizes: sizes, sewon: SEWON, orphan: orphan, errs: errs,
            pay: readPay_(),
+           est: readEst_(),
            perf: readPerf_(),
            stk: readStock_(),
            built: Utilities.formatDate(new Date(), CFG.TZ, 'yyyy-MM-dd HH:mm') };
@@ -469,6 +492,27 @@ function readPay_() {
 }
 
 /**
+ * 27SS 추정 매입 — 시트가 계산한 브랜드별 추정분(V+)을 그대로 옮긴다. 화면에서 다시 계산하지 않는다
+ * (매출 대응·중복키 평균 규칙이 시트에 있어 두 군데 두면 갈라진다).
+ * 브랜드표는 7행 머리('브랜드') 아래부터 '합계' 줄 전까지. 행을 끼워도 머리글로 찾는다.
+ */
+function readEst_() {
+  try {
+    var sh = ss_().getSheetByName(CFG.EST_TAB);
+    if (!sh) return { rows: [] };
+    var V = sh.getRange(1, 2, 40, 6).getValues(), out = [], on = false;   // B 브랜드 ~ G 추정
+    for (var i = 0; i < V.length; i++) {
+      var b = s_(V[i][0]);
+      if (b === '브랜드') { on = true; continue; }
+      if (!on) continue;
+      if (!b || b === '합계') break;
+      out.push({ b: b, e: n_(V[i][5]) });
+    }
+    return { rows: out };
+  } catch (e) { return { rows: [], err: String(e) }; }
+}
+
+/**
  * 판매실적 — `6.실적_판매` 한 줄이 품번×판매월 하나다.
  * 원본 ERP 판매현황은 한 달이 68,186행이라 스냅샷에 못 싣는다. 여기 올라오는 건
  * 이미 품번으로 접힌 값(월 1,004행)이고, 개별 행은 apiSalesRows 로 그때그때 가져온다.
@@ -478,7 +522,7 @@ function readPay_() {
  */
 function readPerf_() {
   var sh = ss_().getSheetByName(CFG.PERF_TAB);
-  if (!sh) return { rows: [], err: '탭 없음: ' + CFG.PERF_TAB };
+  if (!sh) return { rows: [] };   /* 2026-10-20 실적 탭 삭제 — 없으면 '연동 꺼짐'이지 오류가 아니다 */
   var last = sh.getLastRow();
   if (last < 3) return { rows: [] };
   var V = sh.getRange(3, 1, last - 2, 16).getValues();
@@ -646,7 +690,7 @@ function syncStock() {
 function readStock_() {
   try {
     var sh = ss_().getSheetByName(CFG.STOCK_TAB);
-    if (!sh) return { rows: [], srcs: [], err: '탭 없음: ' + CFG.STOCK_TAB };
+    if (!sh) return { rows: [], srcs: [] };   /* 2026-10-20 실적 탭 삭제 — 연동 꺼짐 */
     var last = sh.getLastRow();
     if (last < STOCK_ROW0) return { rows: [], srcs: [] };
     var V = sh.getRange(STOCK_ROW0, 1, last - STOCK_ROW0 + 1, STOCK_HEAD.length).getValues();
@@ -660,6 +704,8 @@ function readStock_() {
                   in_: n_(r[2]), out: n_(r[3]), sq: n_(r[4]), sa: n_(r[5]),
                   wh: n_(r[6]), shop: n_(r[9]), stk: n_(r[10]),
                   pre: n_(r[11]), sc: n_(r[12]),
+                  /* 결측('#####') 열 이름. 빈칸을 0 으로 읽은 값과 구분하려고 넘긴다 (검수 F-8) */
+                  ms: s_(r[13]),
                   rel: ymd_(r[17]) || s_(r[17]) });
       if (!by[b]) by[b] = { b: b, n: 0, f: ymd_(r[14]) || s_(r[14]),
                             to: ymd_(r[15]) || s_(r[15]), asof: ymd_(r[16]) || s_(r[16]) };
@@ -843,6 +889,17 @@ function exportFolder_() {
   return it.hasNext() ? it.next() : DriveApp.createFolder(name);
 }
 
+/* '27SS' → 2027. 시즌이 없으면(옛 화면이 보낸 행) 26FW 로 본다. */
+function yrOf_(ss) { return 2000 + (Number(String(ss || '26FW').slice(0, 2)) || 26); }
+/* 파일 이름에 붙일 시즌 — 실제로 줄이 생기는(사이즈 수량 있는) 행만 본다. 섞여 있으면 둘 다 */
+function ssTag_(rows) {
+  var m = {};
+  rows.forEach(function (r) {
+    if ((r.sizes || []).some(function (z) { return Number(z.q); })) m[r.ss || '26FW'] = 1;
+  });
+  return Object.keys(m).sort().join('+') || '26FW';
+}
+
 function batNum_(v) { var m = String(v == null ? '' : v).match(/\d+/); return m ? Number(m[0]) : ''; }
 
 /**
@@ -862,8 +919,8 @@ function buildSewon_(rows) {
       o[idx['차수']] = batNum_(r.bt);
       o[idx['품명']] = r.nm;
       o[idx['브랜드']] = r.b;
-      o[idx['연도']] = 2026;
-      o[idx['시즌']] = 'FW';
+      o[idx['연도']] = yrOf_(r.ss);
+      o[idx['시즌']] = String(r.ss || '26FW').slice(2);
       o[idx['대복종']] = r.mj || '';
       o[idx['소복종']] = r.sb || '';
       o[idx['제품구분']] = (r.mj === 'ACC' ? 'ACC' : 'APP');
@@ -912,7 +969,7 @@ function apiSewonExport(rows, tok) {
   var a = buildSewon_(rows);
   if (a.length < 2) return { ok: false, msg: '사이즈 수량이 있는 행이 없습니다' };
 
-  var name = 'ERP_상품등록_26FW_' + Utilities.formatDate(new Date(), CFG.TZ, 'yyMMdd_HHmm') +
+  var name = 'ERP_상품등록_' + ssTag_(rows) + '_' + Utilities.formatDate(new Date(), CFG.TZ, 'yyMMdd_HHmm') +
              '_' + (a.length - 1) + '행';
   prog_(tok, 8, '임시 시트 준비');
   var tmp = SpreadsheetApp.create('__tmp_' + name);
@@ -1018,7 +1075,7 @@ function buildBi_(rows) {
     o[idx['납기일자']] = ymd8_(r.dd);
     o[idx['예상발매일']] = '';                    // 3사 원본에 없음
     o[idx['스타일넘버']] = r.pn;
-    o[idx['연도']] = 2026;
+    o[idx['연도']] = yrOf_(r.ss);
     o[idx['대복종코드']] = String(r.pn).substr(5, 1);   // 품번 6번째 자리
     o[idx['소복종코드']] = r.sb || '';
     o[idx['품명']] = r.nm || '';
@@ -1046,7 +1103,7 @@ function apiBiExport(rows, tok) {
   var a = r.grid;
   if (a.length < 2) return { ok: false, msg: '수량이 있는 행이 없습니다' };
 
-  var name = 'BI_발주현황_26FW_' + Utilities.formatDate(new Date(), CFG.TZ, 'yyMMdd_HHmm') +
+  var name = 'BI_발주현황_' + ssTag_(rows) + '_' + Utilities.formatDate(new Date(), CFG.TZ, 'yyMMdd_HHmm') +
              '_' + (a.length - 1) + '행';
   prog_(tok, 10, '임시 시트 준비');
   var tmp = SpreadsheetApp.create('__tmp_' + name);
@@ -1132,13 +1189,13 @@ function selftest() {
 var SNAP = {
   SHEET: '_스냅샷',
   CHUNK: 40000,          // 셀 하나에 5만자까지 들어간다. 여유를 둔다.
-  VER: 16,
+  VER: 22,              // 22: 27SS 변환탭 8개 · 행에 시즌(ss) · 27SS 추정 매입(est) 추가(2026-10-26)
   TRIGGER: 'buildSnapshot',
   EVERY_MIN: 15
 };
 
 /* 행 배열의 자리 — 화면(expand)과 반드시 같은 순서여야 한다 */
-var ROWF = ['id','b','pn','nm','cl','v','og','bt','od','dd','q','c','ct','mj','sb','tp','cc','wy','ln','vg','vm','vn','rd','sp','sa'];
+var ROWF = ['id','b','pn','nm','cl','v','og','bt','od','dd','q','c','ct','mj','sb','tp','cc','wy','ln','vg','vm','vn','rd','sp','sa','ss'];
 
 function snapSheet_() {
   var ss = ss_(), sh = ss.getSheetByName(SNAP.SHEET);
@@ -1176,7 +1233,7 @@ function packSnapshot_() {
     return [r.id, db.idx(r.b), r.pn, r.nm, r.cl, dv.idx(r.v), dog.idx(r.og), r.bt,
             r.od, r.dd, r.q, r.c, dct.idx(r.ct), dmj.idx(r.mj), r.sb, r.tp,
             r.cc, dwy.idx(r.wy), dln.idx(r.ln), r.vg || '', r.vm || '', r.vn || 0,
-            r.rd || '', r.sp || 0, r.sa || 0];
+            r.rd || '', r.sp || 0, r.sa || 0, r.ss];
   });
 
   var sz = [];
@@ -1197,6 +1254,7 @@ function packSnapshot_() {
     orphan: raw.orphan,
     errs: raw.errs,
     pay: raw.pay,
+    est: raw.est,
     perf: raw.perf,
     stk: raw.stk,
     sewon: SEWON
@@ -1212,9 +1270,7 @@ function buildSnapshot() {
   if (!lock.tryLock(5000)) return { ok: false, msg: '다른 갱신이 진행 중' };
   try {
     var t0 = Date.now();
-    /* ERP 실적을 6.실적_재고 로 먼저 굽는다. 여기서 실패해도 스냅샷은 계속 만든다 —
-       탭에 남아 있는 지난번 값으로 그리면 되고, 실적 때문에 전체가 멈추면 안 된다. */
-    try { syncStock(); } catch (e) { console.warn('syncStock 실패: ' + e); }
+    /* 2026-10-20 실적 탭(6.실적_*)을 중간관리시트에서 지웠다. syncStock 을 부르면 탭을 다시 만들므로 부르지 않는다. */
     var payload = packSnapshot_();
     var s = JSON.stringify(payload);
     var n = Math.ceil(s.length / SNAP.CHUNK);
@@ -1434,16 +1490,31 @@ function diagText_() {
     P.rows.forEach(function (r, i) { if (hasSz[i]) qSz += r[10]; });
     /* 원본이 매시 갱신되므로 기대값을 숫자로 박으면 매번 빨간불이 된다.
        대신 시트의 매입약정대장과 직접 대조한다 — 그게 진짜 회귀 검사다. */
-    var led = { q: 0, amt: 0, n: 0 };
+    /* 대장은 26FW·27SS 를 한 탭에 담는다(매입 P · 매출 U 시즌). 1행 SUBTOTAL 은 필터를 타므로 쓰지 않고
+       행을 직접 시즌 × 브랜드로 더해 스냅샷과 같은 칸끼리 맞춘다. */
+    var SSN = ['26FW', '27SS'];
+    function cell_(m, s, b) { var k = s + '|' + b; return m[k] || (m[k] = { n: 0, q: 0, amt: 0, sa: 0 }); }
+    var LB = {}, WB = {};
     try {
       var lsh = ss_().getSheetByName('2.매입대장');
       if (lsh) {
-        led.n   = n_(lsh.getRange('D1').getValue());
-        led.q   = n_(lsh.getRange('K1').getValue());
-        led.amt = n_(lsh.getRange('M1').getValue());
+        lsh.getRange(3, 1, Math.max(lsh.getLastRow() - 2, 1), 16).getValues().forEach(function (r) {
+          if (!s_(r[1])) return;                                          // B 품번
+          var c = cell_(LB, s_(r[15]), s_(r[0]));                          // P 시즌 · A 브랜드
+          c.n++; c.q += n_(r[10]); c.amt += n_(r[12]);                     // K 발주량 · M 매입예정액
+        });
       }
-    } catch (e) {}
-    add('행 수', true, String(P.rows.length) + ' (대장 ' + led.n + ')');
+    } catch (e) { L.push('  매입대장 읽기 예외: ' + e); }
+    P.rows.forEach(function (r) {
+      var c = cell_(WB, r[25] || '26FW', P.dict.b[r[1]] || '?');
+      c.n++; c.q += r[10]; c.amt += r[10] * r[11]; c.sa += n_(r[24]);
+    });
+    add('행 수', true, SSN.map(function (s) {
+      var a = 0, b = 0;
+      Object.keys(WB).forEach(function (k) { if (k.indexOf(s + '|') === 0) a += WB[k].n; });
+      Object.keys(LB).forEach(function (k) { if (k.indexOf(s + '|') === 0) b += LB[k].n; });
+      return s + ' ' + a + ' (대장 ' + b + ')';
+    }).join(' · '));
     add('사이즈 행', true, String(P.sz.length));
     /* 안 맞으면 어느 행인지 짚어준다 — ERP 업로드 수량이 대장과 달라지는 자리라 그냥 빨간불만 띄우면 못 고친다. */
     var szByRow = {};
@@ -1458,11 +1529,25 @@ function diagText_() {
     chk('사이즈합 = 사이즈 있는 행의 발주량', bad.length === 0,
       Math.round(sq).toLocaleString() + ' / ' + Math.round(qSz).toLocaleString() +
       (bad.length ? '  → ' + bad.length + '행: ' + bad.slice(0, 5).join(' · ') : ''));
-    add('사이즈 없는 소스', true, 'OD·UV·MEMB 는 원본에 사이즈 전개가 없어 사이즈 행이 생기지 않는다 (' + Math.round(q - qSz).toLocaleString() + '장)');
-    chk('발주량 = 대장 발주량', !led.q || Math.abs(q - led.q) < 1,
-      Math.round(q).toLocaleString() + ' vs 대장 ' + Math.round(led.q).toLocaleString());
-    chk('약정액 = 대장 매입예정액', !led.amt || Math.abs(amt - led.amt) < 1,
-      Math.round(amt).toLocaleString() + ' vs 대장 ' + Math.round(led.amt).toLocaleString());
+    add('사이즈 없는 소스', true, 'MEMB·오픈마켓·27SS 전체는 사이즈 행이 없다 (' + Math.round(q - qSz).toLocaleString() + '장)');
+    /* 시즌마다 합계 한 줄 + 어긋난 브랜드. 대장이 비면(읽기 실패) 비교 자체를 실패로 본다. */
+    function cmpSeason_(label, f, A, B) {
+      SSN.forEach(function (s) {
+        var ta = 0, tb = 0, gap = [];
+        var bs = {};
+        Object.keys(A).concat(Object.keys(B)).forEach(function (k) { if (k.indexOf(s + '|') === 0) bs[k] = 1; });
+        Object.keys(bs).forEach(function (k) {
+          var x = A[k] ? A[k][f] : 0, y = B[k] ? B[k][f] : 0;
+          ta += x; tb += y;
+          if (Math.abs(x - y) >= 1) gap.push(k.split('|')[1] + ' ' + Math.round(x - y).toLocaleString());
+        });
+        chk(s + ' ' + label, tb > 0 && gap.length === 0,
+          Math.round(ta).toLocaleString() + ' vs 대장 ' + Math.round(tb).toLocaleString() +
+          (gap.length ? ' · 차이 ' + gap.join(' / ') : ''));
+      });
+    }
+    cmpSeason_('발주량 = 대장 (브랜드별)', 'q', WB, LB);
+    cmpSeason_('약정액 = 대장 매입예정액 (브랜드별)', 'amt', WB, LB);
     chk('빈 품번 0', blankPn === 0, String(blankPn));
     add('원가 0원 행', true, noCost + '행 (알려진 결함, 과소계상)');
     chk('수식 오류 0', !P.errs || P.errs.n === 0,
@@ -1475,7 +1560,56 @@ function diagText_() {
     add('발주처', true, d.v.length + '곳');
     chk('구표기 없음', d.v.indexOf('지오인터내셔널') < 0 && d.v.indexOf('두코인터내셔날') < 0 &&
       d.v.indexOf('더바름웍스') < 0, d.v.join(','));
+
+    /* 2-2. 2026-10 검수에서 나온 사고 유형 — 합계는 맞는데 일부가 조용히 빠지는 것들.
+       예상매출은 웹앱이 변환탭을 직접 읽어서 대장과 경로가 다르다. 변환탭 수식이 끝까지
+       안 내려오면 대장엔 있고 웹앱엔 없는 매출이 생긴다(ALPHA 1.5억, 검수 F-1). */
+    /* 납기불명은 시즌을 나눠 센다. 27SS 는 OD SU·SS · 엘레쎄 원본에 납기 열이 비어 있어(2026-10 기준) 정보로만 둔다. */
+    var ddB = { '26FW': {}, '27SS': {} };
+    P.rows.forEach(function (r) {
+      var b = d.b[r[1]] || '?', s = r[25] || '26FW', m = ddB[s] || (ddB[s] = {});
+      var x = m[b] || (m[b] = { q: 0, nd: 0 });
+      x.q += n_(r[10]); if (!String(r[9] || '').trim()) x.nd += n_(r[10]);
+    });
+    var LS = {};
+    try {
+      var msh = ss_().getSheetByName('2.매출대장');
+      var mv = msh.getRange(3, 1, Math.max(msh.getLastRow() - 2, 1), 21).getValues();
+      mv.forEach(function (r) { var b = s_(r[0]); if (!b) return;
+        cell_(LS, s_(r[20]), b).sa += n_(r[8]); });                      // U 시즌 · I 예상매출
+    } catch (e) { L.push('  매출대장 읽기 예외: ' + e); }
+    cmpSeason_('예상매출 = 매출대장 (브랜드별)', 'sa', WB, LS);
+    function ndList_(m, cut) {
+      return Object.keys(m).filter(function (b) { return m[b].q && m[b].nd / m[b].q > cut; })
+        .map(function (b) { return b + ' ' + Math.round(m[b].nd / m[b].q * 100) + '%'; });
+    }
+    var ndBad = ndList_(ddB['26FW'], 0.05);
+    chk('26FW 납기불명 브랜드별 5% 이하', ndBad.length === 0, ndBad.join(' / ') || '-');
+    add('27SS 납기불명 (정보)', true, ndList_(ddB['27SS'], 0).join(' / ') || '-');
+    /* 필터 범위가 데이터 끝보다 짧으면 아래쪽 브랜드가 필터에서 사라진다(2026-10-08) */
+    ['2.매입대장', '2.매출대장'].forEach(function (t) {
+      try {
+        var sh = ss_().getSheetByName(t), f = sh.getFilter();
+        var endF = f ? f.getRange().getLastRow() : 0, endD = sh.getLastRow();
+        chk(t + ' 필터 범위 ≥ 데이터 끝', !f || endF >= endD, f ? ('필터 ' + endF + '행 · 데이터 ' + endD + '행') : '필터 없음');
+      } catch (e) { add(t + ' 필터', true, '확인 불가 ' + e); }
+    });
   }
+
+  /* 2-3. 시트 쪽 감시 결과 — 상황판 상태줄이 ⚠ 면 웹앱 진단도 실패로 본다.
+     둘이 따로 놀면 '진단 전부 통과' 인데 시트는 빨간 상태가 된다. */
+  L.push('');
+  L.push('[2-3] 상황판');
+  try {
+    var st = ss_().getSheetByName('0.상황판').getRange('A2:K3').getDisplayValues();
+    var warns = [];
+    for (var c2 = 0; c2 < st[1].length; c2++) {
+      var v2 = String(st[1][c2] || '');
+      if (v2.indexOf('⚠') === 0 || v2.indexOf('●') !== 0 && /오류|실패|멈춤|양식변경|형식변경/.test(v2))
+        warns.push((st[0][c2] || ('열' + (c2 + 1))) + ': ' + v2);
+    }
+    chk('상황판 경고 없음', warns.length === 0, warns.join(' | ') || '-');
+  } catch (e) { add('상황판', true, '읽기 실패 ' + e); }
 
   /* 3. 편집 왕복 */
   L.push('');
@@ -1527,7 +1661,9 @@ function diagText_() {
       if (!a[i][idx['품번']] || !a[i][idx['사이즈']]) blank++;
       for (var k in idx) if (a[i][idx[k]] !== '' && a[i][idx[k]] != null) filled[k] = 1;
     }
-    chk('ERP 발주량 = 스냅샷 발주량', Math.abs(eq - qSz) < 1, Math.round(eq).toLocaleString());
+    /* ERP·BI 는 사이즈 행으로 만든다. 그래서 비교 상대는 '사이즈 합(sq)' 이다. 발주량(qSz)과 비교하면
+       원본 사이즈≠발주량 결함 하나(OD264BPT71 901장)가 [2]·[4]·[4-2] 세 곳에서 따로 실패로 잡혔다. */
+    chk('ERP 발주량 = 스냅샷 사이즈 합', Math.abs(eq - sq) < 1, Math.round(eq).toLocaleString() + ' vs ' + Math.round(sq).toLocaleString());
     chk('품번·사이즈 공란 0', blank === 0, String(blank));
     add('채워지는 열', true, Object.keys(filled).length + '개');
     var must = ['품번','차수','품명','브랜드','연도','시즌','대복종','소복종','제품구분','기획구분',
@@ -1559,14 +1695,16 @@ function diagText_() {
       ttl += Number(bi.grid[i][bidx['TTL']]) || 0;
       for (var c = 14; c <= 24; c++) cols += Number(bi.grid[i][c]) || 0;
     }
-    chk('BI TTL = 스냅샷 발주량', Math.abs(ttl - qSz) < 1, Math.round(ttl).toLocaleString());
+    chk('BI TTL = 스냅샷 사이즈 합', Math.abs(ttl - sq) < 1, Math.round(ttl).toLocaleString() + ' vs ' + Math.round(sq).toLocaleString());
     var uq = 0;
     for (var k = 1; k < bi.unplaced.length; k++) uq += Number(bi.unplaced[k][3]) || 0;
     add('사이즈 열 배치', true, Math.round(cols).toLocaleString() + '장 (' +
       Math.round(cols / ttl * 1000) / 10 + '%)');
     chk('배치 + 미배치 = TTL', Math.round(cols + uq) === Math.round(ttl),
       Math.round(cols).toLocaleString() + ' + ' + Math.round(uq).toLocaleString());
-    chk('미배치 13,019장 이하', Math.round(uq) <= 13019,
+    /* 템플릿에 열이 없는 사이즈(00S·110·100·60)는 구조상 못 넣는다. 예전엔 13,019 를 박아 두고 실패로 봤는데
+       발주가 늘면 정상인데도 실패가 된다(검수 D P2-3). 표시만 하고, 진짜 검사는 위 '배치+미배치=TTL' 이다. */
+    add('미배치 (템플릿에 열 없는 사이즈)', true,
       (bi.unplaced.length - 1) + '건 · ' + Math.round(uq).toLocaleString() +
       '장 (00S·110·100·60 — 템플릿에 열 없음)');
     var cc = 0, wy = 0;
@@ -1590,7 +1728,8 @@ function diagText_() {
   add('트리거', true, trg);
   if (P && P.built) {
     var age = Math.round((Date.now() - new Date(P.built.replace(/-/g, '/')).getTime()) / 60000);
-    add('스냅샷 나이', true, age + '분');
+    /* 트리거는 15분마다다. 1시간이 넘었으면 갱신이 멈춘 것 — 예전엔 표시만 하고 통과시켰다 */
+    chk('스냅샷 나이 60분 이하', age <= 60, age + '분');
   }
 
   L.push('');
@@ -1841,6 +1980,8 @@ table.paydelta .up{color:var(--crit)} table.paydelta .dn{color:var(--ok)}
 .mrow{display:flex;gap:8px;margin-top:16px}
 .ph .sub{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-left:auto}
 .pb{padding:15px}
+.estl{padding:8px 15px;font-size:12px;color:var(--mut);border-bottom:1px solid var(--rule)}
+.ogrp{font-size:11px;font-weight:600;color:var(--faint);padding:6px 6px 2px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media (max-width:1000px){.grid2{grid-template-columns:1fr}}
 
@@ -1956,11 +2097,12 @@ input.inline.txt{text-align:left;font-family:var(--sans)}
 <div class="boot" id="boot">
   <div class="spin"></div>
   <div class="t">라인시트를 읽는 중</div>
-  <div class="s" id="bootmsg">중간관리시트 변환 탭 10개 · 시트에서 직접</div>
+  <div class="s" id="bootmsg">중간관리시트 변환 탭 20개 · 시트에서 직접</div>
 </div>
 
 <div class="top">
-  <div class="brandmark">라인시트 재무 집계<span>26FW</span></div>
+  <div class="brandmark">라인시트 재무 집계</div>
+  <div class="seg" id="fs" role="group" aria-label="시즌"><button type="button" data-s="" aria-pressed="true">전체</button><button type="button" data-s="26FW" aria-pressed="false">26FW</button><button type="button" data-s="27SS" aria-pressed="false">27SS</button></div>
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" aria-selected="true" data-v="buy">매입</button>
     <button class="tab" role="tab" aria-selected="false" data-v="sell">매출</button>
@@ -2020,7 +2162,7 @@ input.inline.txt{text-align:left;font-family:var(--sans)}
 (function(){
 "use strict";
 var BASE=[],SZ=[],SEWON=[],EDITS={},byId={},szBy={},ME='',BUILT='',ORPH=null,PERF=null,ERRS=null;
-var PAYRULES=[],PAYERR='';
+var PAYRULES=[],PAYERR='',EST=[];
 /* 실적 - 6.실적_판매(품번x판매월)를 스냅샷으로 받는다. 원본 행은 누를 때만 서버에서 온다. */
 var ACT=[],ACTMOS=[],ACTERR='';
 /* 재고·입고 - 판매현황_ERPERP 시트를 그대로 읽은 것. 브랜드 일부만 들어온다. */
@@ -2081,11 +2223,18 @@ function ctOf(r){ return costOf(r)===0? '원가없음' : (r.ct||'—'); }
 function isEd(r){ return !!EDITS[r.id]; }
 
 /* ---------- filters ---------- */
-var F={q:'',b:{},m:{},c:{},o:{},v:''};
+var F={q:'',s:'',b:{},m:{},c:{},o:{},v:''};
+/* 브랜드 순서 = 본부순(시트 1.* 탭과 같다). 목록에 없는 브랜드는 맨 뒤. */
+var HQ=[['패션',['MEMB','OD','OH','UV','UO','엘레쎄']],['A본부',['ALPHA']],['B본부',['BETA','GAMMA']]];
+var BRK={},BHQ={};
+HQ.forEach(function(g,gi){ g[1].forEach(function(b,i){ BRK[b]=gi*100+i; BHQ[b]=g[0]; }); });
+function brk(b){ return BRK[b]!==undefined? BRK[b] : 999; }
+function byBrk(a,b){ return brk(a)-brk(b) || (a<b?-1:a>b?1:0); }
 function uniq(fn){ var m={}; BASE.forEach(function(r){ var k=fn(r); m[k]=(m[k]||0)+1; });
   return Object.keys(m).sort().map(function(k){ return {k:k,n:m[k]}; }); }
 function anyOn(o){ return Object.keys(o).some(function(k){ return o[k]; }); }
 function pass(r){
+  if(F.s&&r.ss!==F.s) return false;
   if(F.q&&(r.pn+' '+r.nm+' '+r.cl).toLowerCase().indexOf(F.q.toLowerCase())<0) return false;
   if(anyOn(F.b)&&!F.b[r.b]) return false;
   if(anyOn(F.m)&&!F.m[monOf(r)]) return false;
@@ -2095,13 +2244,17 @@ function pass(r){
   return true;
 }
 function rows(){ return BASE.filter(pass); }
-function chkGroup(el,items,store){
-  el.innerHTML=items.map(function(i){ return '<label class="opt"><input type="checkbox" value="'+esc(i.k)+'"'+
+function chkGroup(el,items,store,hdr){
+  var last=null;
+  el.innerHTML=items.map(function(i){ var h=hdr? (hdr(i.k)||'') : null, g='';
+    if(hdr && h!==last){ last=h; if(h) g='<div class="ogrp">'+esc(h)+'</div>'; }
+    return g+'<label class="opt"><input type="checkbox" value="'+esc(i.k)+'"'+
     (store[i.k]?' checked':'')+'><span>'+esc(i.k)+'</span><span class="cnt">'+i.n+'</span></label>'; }).join('');
   el.onchange=function(e){ store[e.target.value]=e.target.checked; draw(); };
 }
 function buildFilters(){
-  chkGroup(document.getElementById('fb'),uniq(function(r){return r.b;}),F.b);
+  chkGroup(document.getElementById('fb'),uniq(function(r){return r.b;}).sort(function(x,y){ return byBrk(x.k,y.k); }),F.b,
+    function(b){ return BHQ[b]||'기타'; });
   chkGroup(document.getElementById('fm'),uniq(monOf),F.m);
   chkGroup(document.getElementById('fc'),uniq(ctOf),F.c);
   chkGroup(document.getElementById('fo'),uniq(function(r){return r.og;}),F.o);
@@ -2261,7 +2414,7 @@ function paySpread(v,mo,amt){
 }
 
 /* 지금 보고 있는 범위를 제목 옆에 박아 둔다. 필터가 걸린 줄 모르고 읽는 일이 없게. */
-function brandSel(){ return Object.keys(F.b).filter(function(k){ return F.b[k]; }).sort(); }
+function brandSel(){ return Object.keys(F.b).filter(function(k){ return F.b[k]; }).sort(byBrk); }
 function bl(){
   var b=brandSel();
   return '<span class="bl">'+esc(b.length? b.join(' · ') : '전체 브랜드')+'</span>';
@@ -2564,6 +2717,20 @@ function payDrill(v, mo){
   });
 }
 
+/* 27SS 추정 매입 — 원가 없는 행의 추정분. 시트 1.예상매입_27SS추정 값 그대로이고 위 표에는 더하지 않는다.
+   브랜드 필터만 탄다(추정분엔 발주처·납기 구분이 없다). 26FW 만 볼 때나 0 이면 숨긴다. */
+function estLine(){
+  if(F.s==='26FW'||!EST.length) return '';
+  var t=0, parts=[];
+  EST.slice().sort(function(x,y){ return byBrk(x.b,y.b); }).forEach(function(x){
+    if(anyOn(F.b)&&!F.b[x.b]) return;
+    if(!x.e) return;
+    t+=x.e; parts.push(esc(x.b)+' '+wv(x.e/1.1));
+  });
+  if(!t) return '';
+  return '<div class="estl" title="시트 1.예상매입_27SS추정 · 원가 없는 행 = 예상매출 ÷ 1.1 × 브랜드 원가율 · 표 합계에 미포함">'+
+    '27SS 추정 매입 <b>'+wv(t/1.1)+'</b> · '+parts.join(' · ')+'</div>';
+}
 function payPanel(rs){
   var P=paySplitRows(rs);
   if(!P.vs.length) return '';
@@ -2599,6 +2766,7 @@ function payPanel(rs){
     '<span class="sub">'+n0(P.cells.length)+'건 · 납기월 다음 달부터 · '+vlab()+'</span></div>'+
     (PAYERR? '<div class="paywarn">결제조건을 못 읽었습니다 ('+esc(PAYERR)+') — 기본 규칙으로 계산했습니다</div>':'')+
     (bad.length? '<div class="paywarn">'+esc(bad.join(' · '))+' 열이 있습니다 — <b>9.결제조건</b> 탭을 확인하세요</div>':'')+
+    estLine()+
     (P.dead.length? '<div class="paywarn">한 건도 못 잡은 예외 '+P.dead.length+'줄 — '+
       esc(P.dead.map(function(r){ return (r.v||'')+(r.mo?' '+r.mo:''); }).join(', '))+
       ' · 발주처 이름이 대장과 다르면 그 줄은 조용히 안 먹습니다</div>':'')+
@@ -2794,11 +2962,15 @@ function actBy(mo){
   });
   return m;
 }
-/** 화면 필터가 걸린 대장 행을 품번으로 접는다 — 예상 쪽. */
+/** 재발주 품번(GL263IMM02_1 등)의 '_n' 접미사를 뗀다. ERP 판매·ERP 재고에는 접미사가 없어서
+    붙은 채로 조인하면 재발주분은 늘 실적 0, 기본 품번은 소진율이 부풀었다(I-038 계열, 검수 F-6). */
+function pnBase(pn){ return String(pn||'').replace(/_\d+$/,''); }
+/** 화면 필터가 걸린 대장 행을 품번으로 접는다 — 예상 쪽. 재발주분은 기본 품번에 합친다. */
 function expBy(rs){
   var m={};
   rs.forEach(function(r){
-    var x=m[r.pn]||(m[r.pn]={b:r.b,nm:r.nm,q:0,sal:0,cost:0,tag:0});
+    var pk=pnBase(r.pn);
+    var x=m[pk]||(m[pk]={b:r.b,nm:r.nm,q:0,sal:0,cost:0,tag:0});
     x.q+=qtyOf(r); x.sal+=saleOf(r); x.cost+=amtOf(r);
     if(r.sp) x.tag=Math.max(x.tag,Number(r.sp)||0);
   });
@@ -2808,8 +2980,9 @@ function expBy(rs){
 function stkBy(){
   var m={};
   STK.forEach(function(r){
-    var x=m[r.pn]||(m[r.pn]={in_:0,out:0,wh:0,shop:0,stk:0});
+    var x=m[r.pn]||(m[r.pn]={in_:0,out:0,wh:0,shop:0,stk:0,ms:''});
     x.in_+=r.in_; x.out+=r.out; x.wh+=r.wh; x.shop+=r.shop; x.stk+=r.stk;
+    if(r.ms) x.ms=x.ms? x.ms+','+r.ms : r.ms;
   });
   return m;
 }
@@ -2839,18 +3012,25 @@ function relRows(rs){
   function key(d,b){ return (d||'￿발매일 없음')+'|'+b; }
   rs.forEach(function(r){
     var d=r.rd||'', b=r.b, k=key(d,b);
-    if(!E[k]){ E[k]={d:d,b:b,q:0,sal:0,sq:0,sa:0,stk:0,has:false}; ord.push(k); }
+    if(!E[k]){ E[k]={d:d,b:b,q:0,sal:0,cost:0,sq:0,sa:0,stk:0,has:false}; ord.push(k); }
     var e=E[k]; e.q+=qtyOf(r); e.sal+=saleOf(r);
+    /* 원가는 판매가가 있는 행만 센다 — 시트 1.예상매출 F 가 2.매출대장 을 보는데,
+       매출대장은 판매가 없는 행(사은품 OD265AZZ01 등)을 안 싣는다. 이 조건이라야 원 단위까지 같다. */
+    if(saleOf(r)||Number(r.sp)) e.cost+=amtOf(r);
   });
   var SB=stkBrands();
   /* 실적의 발매일(r.rel)은 2.매출대장 E 에서, 예상의 발매일(r.rd)은 변환탭 CB 에서 온다.
      두 경로가 늘 같지는 않아서(I-019·I-033) 섞으면 같은 품번이 다른 줄로 갈라진다 —
      발매일 없음 줄이 소진율 158% 로 나오던 원인이다. 여기서는 대장 쪽 rd 하나로 통일한다. */
   var rdOf={};
-  rs.forEach(function(r){ if(!rdOf[r.pn] && r.rd) rdOf[r.pn]=r.rd; });
+  rs.forEach(function(r){ var pk=pnBase(r.pn); if(!rdOf[pk] && r.rd) rdOf[pk]=r.rd; });
   STK.forEach(function(r){
-    var k=key(rdOf[r.pn]||'',r.b);
-    if(!E[k]) return;                 /* 대장에 없는 품번(전 시즌)은 이 표의 관심 밖 */
+    /* 대장 발매일이 없는 품번은 버린다. 예전엔 '발매일 없음|브랜드' 키가 우연히 있으면 전시즌
+       589품번 판매(6.6억)가 그 줄에 붙어 ALPHA 판매율 2,332% 가 나왔다(검수 F-2).
+       시트 1.예상매출 판매누적(SUMIFS 발매일=A열)과 같은 정의다. */
+    if(!rdOf[r.pn]) return;
+    var k=key(rdOf[r.pn],r.b);
+    if(!E[k]) return;
     var e=E[k]; e.sq+=r.sq; e.sa+=r.sa; e.stk+=r.stk; e.has=true;
   });
   Object.keys(E).forEach(function(k){ if(SB[E[k].b]) E[k].live=true; });
@@ -2858,42 +3038,45 @@ function relRows(rs){
     .filter(function(e){ return e.q||e.sal; })
     .sort(function(a,b){
       var x=a.d||'￿', y=b.d||'￿';
-      return x<y?-1:x>y?1:(a.b<b.b?-1:1);
+      return x<y?-1:x>y?1:byBrk(a.b,b.b);
     });
 }
 function relPanel(rs){
   var L=relRows(rs);
   if(!L.length) return '';
-  var T={q:0,sal:0,sq:0,sa:0};
-  L.forEach(function(e){ T.q+=e.q; T.sal+=e.sal; T.sq+=e.sq; T.sa+=e.sa; });
+  var T={q:0,sal:0,cost:0,sq:0,sa:0};
+  L.forEach(function(e){ T.q+=e.q; T.sal+=e.sal; T.cost+=e.cost; T.sq+=e.sq; T.sa+=e.sa; });
   var dash='<span style="color:var(--faint)">-</span>';
   var nolive='<span style="color:var(--faint)" title="이 브랜드는 ERP 재고가 아직 연동되지 않았습니다">·</span>';
+  var on=STKSRC.length>0;   /* 실적 연동이 꺼져 있으면(2026-10-20 실적 탭 삭제) 판매 4열을 아예 뺀다 */
   var head='<th class="nos">발매일</th><th class="nos">브랜드</th>'+
-    '<th class="nos r">발주수량</th><th class="nos r">정가 합계</th>'+
-    '<th class="nos r">판매수량</th><th class="nos r">실판가 합계</th>'+
-    '<th class="nos r">미판매재고</th><th class="nos" style="width:112px">판매율</th>';
+    '<th class="nos r">발주수량</th><th class="nos r">정가 합계</th><th class="nos r">원가(VAT-)</th>'+
+    (on? '<th class="nos r">판매수량</th><th class="nos r">실판가 합계</th>'+
+    '<th class="nos r">미판매재고</th><th class="nos" style="width:112px">판매율</th>' : '');
   var body=L.map(function(e){
     var live=e.live;
     return '<tr'+(e.d?'':' class="paysub"')+'><td>'+esc(e.d||'발매일 없음')+'</td><td>'+esc(e.b)+'</td>'+
       '<td class="r">'+(e.q?n0(e.q):dash)+'</td>'+
       '<td class="r">'+(e.sal?n0(e.sal):dash)+'</td>'+
-      '<td class="r">'+(live?(e.sq?n0(e.sq):dash):nolive)+'</td>'+
+      '<td class="r">'+(e.cost?n0(e.cost):dash)+'</td>'+
+      (on? '<td class="r">'+(live?(e.sq?n0(e.sq):dash):nolive)+'</td>'+
       '<td class="r">'+(live?(e.sa?n0(e.sa):dash):nolive)+'</td>'+
       '<td class="r">'+(live&&e.q?n0(e.q-e.sq):nolive)+'</td>'+
-      '<td>'+(live?ratebar(e.q?e.sq/e.q*100:0):nolive)+'</td></tr>';
+      '<td>'+(live?ratebar(e.q?e.sq/e.q*100:0):nolive)+'</td>' : '')+'</tr>';
   }).join('');
   var foot='<td colspan="2">합계</td><td class="r">'+n0(T.q)+'</td><td class="r">'+n0(T.sal)+'</td>'+
-    '<td class="r">'+n0(T.sq)+'</td><td class="r">'+n0(T.sa)+'</td>'+
-    '<td class="r">'+n0(T.q-T.sq)+'</td><td>'+ratebar(T.q?T.sq/T.q*100:0)+'</td>';
+    '<td class="r">'+n0(T.cost)+'</td>'+
+    (on? '<td class="r">'+n0(T.sq)+'</td><td class="r">'+n0(T.sa)+'</td>'+
+    '<td class="r">'+n0(T.q-T.sq)+'</td><td>'+ratebar(T.q?T.sq/T.q*100:0)+'</td>' : '');
   var nostk=L.filter(function(e){ return !e.live; }).length;
   return '<div class="panel"><div class="ph"><h2>발매일 × 브랜드</h2>'+bl()+
-    '<span class="sub">'+n0(L.length)+'줄 · 예상·실적 둘 다 VAT 포함</span></div>'+
-    tbl(head,body,foot,['116px','84px','104px','132px','104px','132px','112px','112px'])+
+    '<span class="sub">'+n0(L.length)+'줄 · 정가·실판가 VAT 포함 · 원가 VAT 별도</span></div>'+
+    tbl(head,body,foot,['108px','78px','96px','128px','124px'].concat(on?['96px','128px','104px','108px']:[]))+
     '<div class="pb" style="padding-top:10px;font-size:11px;color:var(--mut)">'+
       '시트 <b>1.예상매출</b> 의 발매일자별 표와 같은 숫자입니다. '+
       '발매일이 없는 브랜드는 원본에 발매일 열 자체가 없어 맨 뒤에 모았습니다 — 0 이 아니라 기준이 없는 겁니다. '+
-      '그 줄의 판매율은 100%를 넘을 수 있습니다 — 분모는 26FW 발주량인데 실제로는 이월분까지 같이 팔리기 때문입니다.'+
-      (nostk? ' 재고가 아직 연동되지 않은 브랜드는 <b>·</b> 로 둡니다.':'')+
+      (on? '그 줄의 판매율은 100%를 넘을 수 있습니다 — 분모는 26FW 발주량인데 실제로는 이월분까지 같이 팔리기 때문입니다.'+
+      (nostk? ' 재고가 아직 연동되지 않은 브랜드는 <b>·</b> 로 둡니다.':'') : '')+
       '</div></div>';
 }
 
@@ -2906,13 +3089,13 @@ function actPanel(rs){
   /* 재고 없음(0)과 아예 안 들어온 브랜드를 구분한다 - 둘을 섞으면 0 으로 읽힌다 */
   var nostk='<span style="color:var(--faint)" title="이 브랜드는 ERP 재고가 아직 연동되지 않았습니다">·</span>';
   var keys=Object.keys(E).filter(function(pn){ return AP.only!=='sold' || (A[pn]&&A[pn].q); });
-  var T={q:0,sq:0,fq:0,sal:0,sa:0,sc:0,n:0,hit:0,in_:0,stk:0};
+  var T={q:0,sq:0,fq:0,sal:0,sa:0,sc:0,n:0,hit:0,in_:0,stk:0,ms:0};
   keys.forEach(function(pn){
     var e=E[pn], a=A[pn];
     T.q+=e.q; T.sal+=e.sal; T.n++;
     if(a){ T.hit++; T.sq+=a.q; T.fq+=a.fq; T.sa+=a.a; T.sc+=a.c; }
     var k=SB[e.b]?SK[pn]:null;
-    if(k){ T.in_+=k.in_; T.stk+=k.stk; }
+    if(k){ T.in_+=k.in_; T.stk+=k.stk; if(k.ms) T.ms+=k.ms.split(',').length; }
   });
   var SORT={
     rate:  function(x,y){ return x.r-y.r; },
@@ -2942,7 +3125,9 @@ function actPanel(rs){
       '<td>'+esc(x.pn)+'</td><td>'+esc(x.b)+'</td>'+
       '<td style="max-width:220px;overflow:hidden;text-overflow:ellipsis">'+esc(x.nm||'')+'</td>'+
       '<td class="r">'+n0(x.q)+'</td>'+
-      '<td class="r">'+(x.sk? (x.sk.in_?n0(x.sk.in_):dash) : nostk)+'</td>'+
+      '<td class="r">'+(x.sk? ((x.sk.ms&&x.sk.ms.indexOf('입고')>=0)
+          ? '<span title="ERP 원본이 #### 로 잘려 입고를 못 읽었습니다 — 0 이 아니라 모르는 값" style="color:var(--warn)">?</span>'
+          : (x.sk.in_?n0(x.sk.in_):dash)) : nostk)+'</td>'+
       '<td class="r">'+(x.sq?n0(x.sq):dash)+
         (x.fq?'<span class="freeq" title="무상출고 - 매출 0">+'+n0(x.fq)+'</span>':'')+'</td>'+
       '<td>'+ratebar(x.r)+'</td>'+
@@ -2955,8 +3140,8 @@ function actPanel(rs){
       '<td class="r">'+(x.tag&&x.up? (x.up/x.tag*100).toFixed(0)+'%' :dash)+'</td></tr>';
   }).join('');
   var foot='<td colspan="3">합계 · '+n0(T.n)+'품번 (실적 있는 품번 '+n0(T.hit)+')</td>'+
-    '<td class="r">'+n0(T.in_)+'</td>'+
-    '<td class="r">'+n0(T.q)+'</td><td class="r">'+n0(T.sq)+'</td>'+
+    '<td class="r">'+n0(T.q)+'</td><td class="r">'+n0(T.in_)+(T.ms?'<span class="freeq" title="ERP 원본이 #### 로 잘려 못 읽은 칸이 있어 이 합계는 하한값입니다">결측 '+n0(T.ms)+'</span>':'')+'</td>'+
+    '<td class="r">'+n0(T.sq)+'</td>'+
     '<td>'+ratebar(T.q?T.sq/T.q*100:0)+'</td><td class="r">'+n0(T.stk)+'</td>'+
     '<td class="r">'+n0(T.sal)+'</td><td class="r">'+n0(T.sa)+'</td>'+
     '<td>'+ratebar(T.sal?T.sa/T.sal*100:0)+'</td><td></td><td></td><td></td>';
@@ -3268,6 +3453,7 @@ function drawLed(all){
   var col=COLS.filter(function(c){return c.k===SORT.k;})[0]||COLS[10];
   var s=rs.slice().sort(function(a,b){ var x=col.g(a),y=col.g(b);
     if(typeof x==='number'&&typeof y==='number') return (x-y)*SORT.d;
+    if(col.k==='b') return byBrk(x,y)*SORT.d;
     return String(x).localeCompare(String(y),'ko')*SORT.d; });
   var shown=(LED_LIMIT>0?s.slice(0,LED_LIMIT):s);
   var head=COLS.map(function(c){ return '<th class="'+(c.r?'r':'')+'" data-k="'+c.k+'">'+c.t+
@@ -3451,7 +3637,7 @@ function runExport(opt){
   var rs=rows(); if(!rs.length){ toast('내보낼 행이 없습니다'); return; }
   var payload=rs.map(function(r){ return { pn:r.pn, bt:batOf(r), nm:r.nm, b:r.b, mj:r.mj, sb:r.sb,
     og:r.og, v:vendOf(r), od:r.od, dd:dueOf(r), tp:r.tp, c:costOf(r), cn:r.cl,
-    cl:r.cl, cc:r.cc, wy:r.wy, ln:r.ln,
+    cl:r.cl, cc:r.cc, wy:r.wy, ln:r.ln, ss:r.ss,
     sizes:sizesOf(r).filter(function(x){ return x.q; }) }; });
   var n=opt.perSize? payload.reduce(function(a,r){ return a+r.sizes.length; },0) : payload.length;
   var btn=document.getElementById(opt.btn); btn.disabled=true;
@@ -3512,7 +3698,7 @@ document.getElementById('reset').onclick=function(){
 };
 document.getElementById('refresh').onclick=function(){
   var b=this; b.disabled=true;
-  busyOn('시트에서 다시 읽는 중','중간관리시트 변환 탭 10개 · 스냅샷 재생성');
+  busyOn('시트에서 다시 읽는 중','중간관리시트 변환 탭 20개 · 스냅샷 재생성');
   google.script.run
     .withSuccessHandler(function(r){
       busyOff(); b.disabled=false;
@@ -3588,6 +3774,12 @@ function drawVal(rs){
 }
 
 /* ---------- views ---------- */
+Array.prototype.forEach.call(document.querySelectorAll('#fs button'),function(b){
+  b.onclick=function(){ F.s=b.getAttribute('data-s')||'';
+    Array.prototype.forEach.call(document.querySelectorAll('#fs button'),function(x){
+      x.setAttribute('aria-pressed',String(x===b)); });
+    draw(); };
+});
 var VIEW='buy';
 Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(t){
   t.onclick=function(){ VIEW=t.getAttribute('data-v');
@@ -3609,7 +3801,7 @@ function draw(){
   drawAge(); drawErr();
   var ne=Object.keys(EDITS).length;
   document.getElementById('foot').innerHTML=
-    '원천 — 라인시트 중간관리시트 · 변환탭 10개(BETA·GAMMA·OH·ALPHA·OD3·UV2·MEMB) 직결 · 원본은 매시 정각 자동 동기화 · 읽은 시각 '+esc(BUILT)+'<br>'+
+    '원천 — 라인시트 중간관리시트 · 변환탭 20개(26FW 12 · 27SS 8) 직결 · 원본은 매시 정각 자동 동기화 · 읽은 시각 '+esc(BUILT)+'<br>'+
     BASE.length+'행 / 사이즈 '+SZ.length+'행 · 원가 기준 VAT 별도 · 결제조건 미반영'+
     (ne?' · 수정 '+ne+'행 (_편집 시트에 기록)':'')+
     (ORPH&&ORPH.n?'<br><span style="color:var(--crit)">⚠ 품번이 비어 집계에서 빠진 사이즈 '+ORPH.n+
@@ -3652,15 +3844,16 @@ function expand(p){
              sb:r[14], tp:r[15], cc:r[16]||'', wy:(d.wy&&d.wy[r[17]])||'',
              ln:(d.ln&&d.ln[r[18]])||'',
              vg:r[19]||'', vm:r[20]||'', vn:r[21]||0,
-             rd:r[22]||'', sp:r[23]||0, sa:r[24]||0 }; });
+             rd:r[22]||'', sp:r[23]||0, sa:r[24]||0, ss:r[25]||'26FW' }; });
   var sizes=[];
   p.sz.forEach(function(s){ var b=base[s[0]]; if(b) sizes.push({id:b.id,s:d.sz[s[1]],q:s[2]}); });
   return { base:base, sizes:sizes, orphan:p.orphan, errs:p.errs, sewon:p.sewon,
-           pay:p.pay, perf:p.perf, stk:p.stk, built:p.built };
+           pay:p.pay, est:p.est, perf:p.perf, stk:p.stk, built:p.built };
 }
 function applyPayload(d,edits){
   BASE=d.base; SZ=d.sizes; SEWON=d.sewon; ORPH=d.orphan; BUILT=d.built; ERRS=d.errs;
   PAYRULES=(d.pay&&d.pay.rows)||[]; PAYERR=(d.pay&&d.pay.err)||'';
+  EST=(d.est&&d.est.rows)||[];
   ACT=(d.perf&&d.perf.rows)||[]; ACTMOS=(d.perf&&d.perf.months)||[];
   ACTERR=(d.perf&&d.perf.err)||'';
   STK=(d.stk&&d.stk.rows)||[]; STKSRC=(d.stk&&d.stk.srcs)||[]; STKERR=(d.stk&&d.stk.err)||'';
