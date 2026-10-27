@@ -6760,7 +6760,7 @@ window.google.script.run = (function(){
     function businessKey(value, brand) {
       const text = (String(value || '') + ' ' + String(brand || '')).replace(/\s+/g, '').toUpperCase();
       if (text.indexOf('대형유통') >= 0 || text.indexOf('BULKRETAIL') >= 0 || text.indexOf('패션') >= 0) return 'fashion';
-      if (text.indexOf('A본부') >= 0 || text.indexOf('HIRO') >= 0) return 'hiro';
+      if (text.indexOf('A본부') >= 0 || text.indexOf('ALPHA') >= 0) return 'hiro';
       if (text.indexOf('B본부') >= 0 || text.indexOf('KIDS') >= 0 || text.indexOf('CIEL') >= 0 || text.indexOf('DUNE') >= 0) return 'kids';
       return 'other';
     }

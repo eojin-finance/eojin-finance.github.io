@@ -996,16 +996,16 @@ function repairYm() {
 
 /** 브랜드(품번 앞 2자리) → 본부. 시트가 비어 있으면 기본값을 깔아준다 */
 var DEPT_SEED = [
-  { '브랜드': 'HR', '본부': 'A본부', '담당자': '' },
-  { '브랜드': 'OD', '본부': 'C본부', '담당자': '' },
-  { '브랜드': 'UV', '본부': 'C본부', '담당자': '' },
-  { '브랜드': 'OH', '본부': 'C본부', '담당자': '' },
-  { '브랜드': 'EL', '본부': 'C본부', '담당자': '' },
-  { '브랜드': 'OA', '본부': 'C본부', '담당자': '' },
-  { '브랜드': 'EK', '본부': 'C본부', '담당자': '' },
-  { '브랜드': 'GL', '본부': 'B본부', '담당자': '' },
-  { '브랜드': 'SN', '본부': 'B본부', '담당자': '' },
-  { '브랜드': 'UO', '본부': '운영', '담당자': '' }
+  { '브랜드': 'BA', '본부': 'A본부', '담당자': '' },
+  { '브랜드': 'BG', '본부': 'C본부', '담당자': '' },
+  { '브랜드': 'BJ', '본부': 'C본부', '담당자': '' },
+  { '브랜드': 'BH', '본부': 'C본부', '담당자': '' },
+  { '브랜드': 'BE', '본부': 'C본부', '담당자': '' },
+  { '브랜드': 'BF', '본부': 'C본부', '담당자': '' },
+  { '브랜드': 'BD', '본부': 'C본부', '담당자': '' },
+  { '브랜드': 'BB', '본부': 'B본부', '담당자': '' },
+  { '브랜드': 'BC', '본부': 'B본부', '담당자': '' },
+  { '브랜드': 'BK', '본부': '운영', '담당자': '' }
 ];
 
 function deptMap_() {
@@ -1400,8 +1400,8 @@ function ai_(v) { return bround_(num_(v)); }
 /** 브랜드 = 품번 앞 2자리. 본부 분담의 단위다 */
 function brandOf_(item) { return String(item || '').trim().slice(0, 2).toUpperCase(); }
 /** 품번의 «제작/사입» — 브랜드마다 사입을 가르는 규칙. 규칙이 없는 브랜드는 전부 제작.
- *  (어진 2026-10-07: UO 는 품명에 [JAPAN LINE] 이 들어간 것이 사입 — 가상수입처 수입) */
-var BUY_RULES = { UO: /JAPAN\s*LINE/i };
+ *  (어진 2026-10-07: BK 는 품명에 [JAPAN LINE] 이 들어간 것이 사입 — 가상수입처 수입) */
+var BUY_RULES = { BK: /JAPAN\s*LINE/i };
 function kindOf_(item, name) {
   var re = BUY_RULES[brandOf_(item)];
   return (re && re.test(String(name || ''))) ? '사입' : '제작';
@@ -2777,7 +2777,7 @@ function apiAutoRun0_(ym) {
  * 배포: 웹앱 · 실행 = 나(배포자) · 액세스 = 링크가 있는 모든 사용자 → 권한 시트의 이메일만 쓰기 가능.
  */
 var LS_SHEET_ID = '';   // 라인시트 통합
-var WH_BY_BRAND = { HR: 'ALPHA 물류 (물류센터A)', GL: 'BETA / GAMMA 물류센터A물류', SN: 'BETA / GAMMA 물류센터A물류' };
+var WH_BY_BRAND = { BA: 'ALPHA 물류 (물류센터A)', BB: 'BETA / GAMMA 물류센터A물류', BC: 'BETA / GAMMA 물류센터A물류' };
 var REASONS = { a: ['바코드택 오부착', '사이즈택 오부착', '케어라벨 오부착', 'RFID 오부착', '라벨≠내용'], b: ['실수량부족', '기타'] };
 
 /** 진단·복구 진입점은 관리자만. 링크 한 줄로 달이 지워지는 일이 없게. */
@@ -3738,8 +3738,8 @@ function defaultYm_() {
 function k_(item, cc, size) { return item + '|' + cc + '|' + size; }
 /** 품번 앞 2자리 = 브랜드. 담당은 본부가 아니라 브랜드로 갈린다 */
 function br_(item) { return String(item || '').trim().slice(0, 2).toUpperCase(); }
-var BR_DEPT = { HR: 'A본부', OD: 'C본부', UV: 'C본부', OH: 'C본부', EL: 'C본부', OA: 'C본부',
-                GL: 'B본부', SN: 'B본부', UO: '운영', PR: 'A본부' };
+var BR_DEPT = { BA: 'A본부', BG: 'C본부', BJ: 'C본부', BH: 'C본부', BE: 'C본부', BF: 'C본부',
+                BB: 'B본부', BC: 'B본부', BK: '운영', PR: 'A본부' };
 function deptOfBr_(b) { return BR_DEPT[b] || ''; }
 /** 브랜드별 빈 칸 */
 function brCell_() { return { sku: 0, plan: 0, act: 0, diff: 0, amt: 0, need: 0 }; }
@@ -3967,7 +3967,7 @@ function dbUrl_() {
 function chk_(s) { try { return JSON.parse(s || '[]'); } catch (e) { return []; } }
 
 /** 내가 볼 수 있는 브랜드 — 권한 시트 「브랜드」 칸이 비었으면 전부.
- *  'OD,UV' 처럼 쉼표로 여럿 적을 수 있다. */
+ *  'BG,BJ' 처럼 쉼표로 여럿 적을 수 있다. */
 function myBrands_() {
   try { return who_().brands || null; } catch (e) { return null; }   // null = 전부
 }
@@ -4472,7 +4472,7 @@ function apiTexts(ym, id) {
 // ───── Linesheet.gs
 /**
  * 라인시트 통합 시트 직접 읽기 (같은 계정이라 웹앱 호출 없이 openById).
- * 로컬 server.py 의 레이아웃 4종 판독을 옮긴 것 — A 오더리스트 / B 품번형 / C OH / D MEMB.
+ * 로컬 server.py 의 레이아웃 4종 판독을 옮긴 것 — A 오더리스트 / B 품번형 / C BH / D MEMB.
  * 캐시: 스크립트 캐시 6시간 + 스크립트 속성(요약). 차수 그룹은 «출고처 × 브랜드 × 차수».
  */
 var LS_META = 'LS_META';
@@ -5715,7 +5715,7 @@ function deptProgress_(ym, lines) {
     var e = loaded[b] || { n: 0, qty: 0, amt: 0, imp: 0 };
     var on = !!meta[b];
     // 그 달에 입고가 한 줄도 없는 브랜드는 «대기» 가 아니다 — 올릴 줄이 없는데 기다리면
-    // ③ 이 영영 안 끝난다. (7월엔 UV 입고가 없는데 UV 가 C본부에 등록돼 있어 그랬다)
+    // ③ 이 영영 안 끝난다. (7월엔 BJ 입고가 없는데 BJ 가 C본부에 등록돼 있어 그랬다)
     var none = !on && !e.n;
     d.brands.push({ brand: b, on: on, none: none, n: e.n, qty: e.qty, amt: e.amt, imp: e.imp,
                     who: on ? meta[b].who : '', at: on ? meta[b].at : '',
@@ -6506,11 +6506,11 @@ var AMR_HOST = 'https://gw.example.com', AMR_CO = '1000', AMR_DIV = '1000', AMR_
 var AMR_FROM = '2026-09';   // 이 달부터 보낸다 — 8월까지는 이미 월말(8/31) 전표로 장부에 있다
 var AMR_GOODS = '1460000', AMR_AP = '2510000';
 // 브랜드(품번 앞 2자리) → 사용부서 — 2026-08 계산서 전표에서 읽은 그대로
-var AMR_DEPT = { HR: '3100', OD: '5100', OH: '5100', UV: '5100', EL: '5100', OA: '5100', EK: '5100',
-                 UO: '6100', JY: '6100', GL: '7100', SN: '7100' };
+var AMR_DEPT = { BA: '3100', BG: '5100', BH: '5100', BJ: '5100', BE: '5100', BF: '5100', BD: '5100',
+                 BK: '6100', JY: '6100', BB: '7100', BC: '7100' };
 var AMR_DEPT_NM = { '3100': 'A본부사업본부', '5100': 'C본부사업본부', '6100': '브랜드사업본부', '7100': 'B본부사업본부' };
-// 프로젝트 — 2026-08 실제 전표 관행(A본부·OD·UV 만 26_상품_FW). 시즌이 바뀌면 여기를 고친다
-var AMR_PJT = { HR: 'P9993', OD: 'P9993', UV: 'P9993' };
+// 프로젝트 — 2026-08 실제 전표 관행(A본부·BG·BJ 만 26_상품_FW). 시즌이 바뀌면 여기를 고친다
+var AMR_PJT = { BA: 'P9993', BG: 'P9993', BJ: 'P9993' };
 // 이름으로 하나로 안 좁혀지는 입고처 — 2026-08 실제 전표에 쓰인 거래처코드
 var AMR_ALIAS = { '제이케이': '03153', '두코인터내셔널': '02121' };
 
@@ -7443,13 +7443,13 @@ function payMigrate_(tab, go) {
  *
  * 서버는 줄만 가볍게 준다. 분류·접기는 화면이 한다(linesheet-fin 과 같은 방식).
  * 예정 = 라인시트 통합(LS_SHEET_ID) 4.변환_* 탭 — linesheet-fin readAll_ 과 같은 열·같은 거름
- *        (4사 캔슬 제외 · 33열 탭은 집계반영='반영' · MEMB·OD_CP 는 26FW 만 · 품번 «_1» 차수 접미 제거).
+ *        (4사 캔슬 제외 · 33열 탭은 집계반영='반영' · MEMB·BG_CP 는 26FW 만 · 품번 «_1» 차수 접미 제거).
  * 실적 = 입고현황(SH.RCPT) — rowsYm_ 달 캐시를 그대로 쓴다. 반품은 수량·금액을 음수로.
  * 9월 정답 대조: scratchpad period/C_build.py (290줄·123품번·141,270개·2,811,618,454원).
  */
-var PA_B4 = { '4.변환_BETA': 'BETA', '4.변환_GAMMA': 'GAMMA', '4.변환_OH': 'OH', '4.변환_ALPHA': 'ALPHA' };
-var PA_B33 = { '4.변환_OD_26FA': '', '4.변환_OD_26WI': '', '4.변환_OD_26ACC': '', '4.변환_UV_26FA': '',
-  '4.변환_UV_26WI': '', '4.변환_MEMB': '26FW', '4.변환_UO': '', '4.변환_OD_CP': '26FW' };
+var PA_B4 = { '4.변환_BETA': 'BETA', '4.변환_GAMMA': 'GAMMA', '4.변환_BH': 'BH', '4.변환_ALPHA': 'ALPHA' };
+var PA_B33 = { '4.변환_BG_26FA': '', '4.변환_BG_26WI': '', '4.변환_BG_26ACC': '', '4.변환_BJ_26FA': '',
+  '4.변환_BJ_26WI': '', '4.변환_MEMB': '26FW', '4.변환_BK': '', '4.변환_BG_CP': '26FW' };
 
 /** 품번 — 리오더 «GL263BDP01_1» 은 본 품번으로, 공백·하이픈 제거, 대문자 */
 function paItem_(t) { return s_(t).replace(/_\d+$/, '').replace(/[\s\-_]/g, '').toUpperCase(); }
@@ -8631,7 +8631,7 @@ button{font:inherit;cursor:pointer;border-radius:4px}
 .btn.sm{padding:2px 8px;font-size:12px}
 .btn.go{background:var(--acc);border-color:var(--acc);color:var(--on-brand);font-weight:700}
 .btn.go:hover{color:var(--on-brand);opacity:.92}
-.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed}
 /* 하는 중인 단추 — 초를 세지 않고 밑줄이 흐른다 */
 .btn:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 
@@ -8640,7 +8640,7 @@ button{font:inherit;cursor:pointer;border-radius:4px}
 .pill.ok{color:var(--ok)} .pill.bad{color:var(--bad)} .pill.warn{color:var(--warn)}
 .pill.acc{color:var(--acc)} .pill.mut{color:var(--ink-3)}
 .dp{font-size:11px;font-weight:700;padding:0 5px;border:1px solid currentColor;border-radius:4px;white-space:nowrap}
-/* 제작/사입 — 제작 실선 · 사입 점선+연파랑 (UO 품명 [JAPAN LINE]) */
+/* 제작/사입 — 제작 실선 · 사입 점선+연파랑 (BK 품명 [JAPAN LINE]) */
 .kd{display:inline-flex;align-items:center;height:20px;padding:0 var(--sp-2);border-radius:var(--r-1);font-size:var(--fs-12);font-weight:var(--fw-medium);white-space:nowrap;margin-right:var(--sp-2)}
 .kd.mk{border:1px solid var(--ink-2);color:var(--ink-2)}
 .kd.bu{border:1px dashed var(--brand-ink);color:var(--brand-ink);background:var(--brand-soft)}
@@ -9182,8 +9182,8 @@ button.busy::after,.pill.busy::after{content:"";position:absolute;left:50%;top:5
     </div>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" aria-selected="true" data-t="close">입고 확정 <span class="c" id="tcClose"></span></button>
-      <button class="tab" role="tab" aria-selected="false" data-t="stock">입고 실적 <span class="c" id="tcStock"></span></button>
       <button class="tab" role="tab" aria-selected="false" data-t="pay">대금 지급 <span class="c" id="tcPay"></span></button>
+      <button class="tab" role="tab" aria-selected="false" data-t="stock">입고 실적 <span class="c" id="tcStock"></span></button>
       <button class="tab" role="tab" aria-selected="false" data-t="case">입고 검수 <span class="c" id="tcCase"></span></button>
     </div>
 
@@ -9516,8 +9516,8 @@ function sgn(n){ return n>0?('+'+fmt(n)):fmt(n); }
 function fmtu(n){ n=Number(n||0); var t=NF2.format(Math.abs(n)); return n<0?('('+t+')'):t; }
 function curYm(){ var e=$('ym'); return (e&&e.value)||S.ym||null; }
 
-var BR_DEPT = {HR:'A본부',OD:'C본부',UV:'C본부',OH:'C본부',EL:'C본부',OA:'C본부',EK:'C본부',
-               GL:'B본부',SN:'B본부',UO:'운영', PR:'A본부'};
+var BR_DEPT = {BA:'A본부',BG:'C본부',BJ:'C본부',BH:'C본부',BE:'C본부',BF:'C본부',BD:'C본부',
+               BB:'B본부',BC:'B본부',BK:'운영', PR:'A본부'};
 
 /** 관리자 전용 «담당자로 보기» — 본부 묶음, 그다음 브랜드 하나씩 */
 function actAsOpts(cur){
@@ -9827,9 +9827,9 @@ $('ym').onchange=function(){
 /* ── 브랜드 ───────────────────────────────────── */
 /* 브랜드 보기 규칙 하나 — 세 탭이 다 이것만 쓴다.
    S.br 이 '' 이면 담당자는 «내 담당», 담당 브랜드가 없는 사람(재무·관리)은 전체.
-   'ALL' 은 담당자가 고르는 «전체 브랜드», 'HR' 처럼 두 글자면 그 브랜드 하나. */
+   'ALL' 은 담당자가 고르는 «전체 브랜드», 'BA' 처럼 두 글자면 그 브랜드 하나. */
 function brMine(){ return (S.boot&&S.boot.myBrands)||null; }
-/* 고른 브랜드 묶음 — 'OD,UO' 처럼 여러 개. 안 골랐으면 null */
+/* 고른 브랜드 묶음 — 'BG,BK' 처럼 여러 개. 안 골랐으면 null */
 function brSet(){ if(!S.br || S.br==='ALL') return null; var s=S.br.split(',').filter(String); return s.length?s:null; }
 function brOne(){ var s=brSet(); return (s && s.length===1) ? s[0] : ''; }
 function brShow(b){
@@ -11124,7 +11124,7 @@ function closeRender(reuse){   // reuse = 탭을 다시 열 때만 — 같은 �
   // 담당자: 내 담당 브랜드를 이 달에 아직 안 올렸으면 — 남이 먼저 올려 «ERP 끝남» 으로 보여도 내 할 일은 올리기다
   var upB={}; (d.parts||[]).forEach(function(p){ String(p.brand||'').split('+').forEach(function(b){ if(b) upB[b.toUpperCase()]=1; }); });
   var myB=(S.boot&&S.boot.myBrands)||null;
-  // 내 담당 브랜드가 «하나도» 안 올라왔을 때만 — C본부처럼 브랜드가 여럿이면 그달 입고 없는 브랜드(EL·OA·EK)는
+  // 내 담당 브랜드가 «하나도» 안 올라왔을 때만 — C본부처럼 브랜드가 여럿이면 그달 입고 없는 브랜드(BE·BF·BD)는
   // 파일에 아예 없어서, 브랜드별로 보면 영영 «대기» 로 남는다
   var myLeft=(myB && !myB.some(function(b){ return upB[b]; })) ? myB.slice() : [];
   var openNo=S.openStg;
@@ -11216,7 +11216,7 @@ function closeRender(reuse){   // reuse = 탭을 다시 열 때만 — 같은 �
         +'<span class="circ">'+ico(st==='done'?'check':(st==='skip'?'minus':x.ic))
         +(x.pip?('<span class="pip">'+(x.pip>999?'999+':fmt(x.pip))+'</span>'):'')+'</span>'
         +'<span class="nl">'+esc(x.t)+'</span><span class="nm">'+esc(x.m)+'</span></button></li>';
-    }).join('')+'</ol></div>'+(PRE?brStrip(d):'');
+    }).join('')+'</ol></div>'+(PRE&&!TIDY?brStrip(d):'');   // 10/27 정리: 숨김 — ERP 칸 본부 격자와 중복
 
   // 기계가 방금 한 것 · 사람에게 남긴 것 — 문장 대신 칩
   var A=(S.auto && S.auto.ym===S.ym)?S.auto:null;
@@ -11260,6 +11260,7 @@ function closeRender(reuse){   // reuse = 탭을 다시 열 때만 — 같은 �
   if(fb) fb.onclick=function(){ S.flowOpen=!S.flowOpen; closeRender(); };
   $('pClose').querySelectorAll('[data-lg]').forEach(function(tr){
     tr.onclick=function(){
+      if(TIDY) return;
       var k=tr.getAttribute('data-lg');
       S.lgOpen=(S.lgOpen===k)?'':k; closeRender();
     };
@@ -11748,7 +11749,7 @@ function ledger(d,s){
 
   var h='<div class="secth" style="border-top:1px solid var(--line-2)"><b>입고대장</b>'
     +(brLabel()?('<span class="pill acc">'+esc(brLabel())+'</span>'):'')
-    +(TIDY?('<span class="hint" title="행을 누르면 값의 근거가 펼쳐집니다">'+fmt(rows.length)+'품번</span>')   // 10/27 정리: 숨김 — 설명 문장은 title 로
+    +(TIDY?('<span class="hint">'+fmt(rows.length)+'품번</span>')   // 10/27 정리: 숨김 — 설명 문장은 title 로
       :('<span class="hint">'+fmt(rows.length)+'품번 · 줄을 누르면 이 값이 어디서 왔는지 펼쳐집니다</span>'))
     +'<span style="margin-left:auto;display:flex;gap:6px;align-items:center">'
     +'<input type="text" id="lgQ" value="'+esc(S.lgQ||'')+'" placeholder="품번·품명 검색" '
@@ -11764,7 +11765,7 @@ function ledger(d,s){
     +(noOh?'<th class="n">취득원가</th><th>단가 기준</th><th>입고묶음</th>'
       :('<th class="n">기준금액</th><th>단가 기준</th><th class="n">부대비용</th><th>입고묶음</th>'
     +'<th class="n">취득원가</th>'))+'</tr></thead><tbody>';
-  /* 사입이 섞인 브랜드(UO)는 «제작» «사입» 두 묶음으로 쌓는다 — 머리 줄이 곧 소계. 머리를 누르면 접힌다 (E안 · 2026-10-07) */
+  /* 사입이 섞인 브랜드(BK)는 «제작» «사입» 두 묶음으로 쌓는다 — 머리 줄이 곧 소계. 머리를 누르면 접힌다 (E안 · 2026-10-07) */
   var hasBuy = L.some(function(r){ return r.kd==='사입'; });
   var LL = L.slice(0,cap);
   (hasBuy ? ['제작','사입'] : ['']).forEach(function(kd){
@@ -11790,7 +11791,7 @@ function ledger(d,s){
     var fx = gl.length ? byFx[gl[0]] : null;
     var src = '<span class="pill'+(bs.k==='환율적용'?' a':'')+'">'+esc(bs.lbl)+'</span>';
     var open=S.lgOpen===r.k;
-    h+='<tr data-lg="'+esc(r.k)+'"'+(open?' class="on"':'')+' style="cursor:pointer">'
+    h+='<tr data-lg="'+esc(r.k)+'"'+(open&&!TIDY?' class="on"':'')+(TIDY?'':' style="cursor:pointer"')+'>'
       +'<td class="bc">'+memoBub('품번', r.k)+'</td>'
       +'<td class="k"><b>'+esc(r.k)+'</b></td><td class="hint">'+esc(r.nm)+'</td>'
       +'<td class="n">'+fmt(r.q)+'</td><td class="n">'+(noOh?('<b>'+fmt(r.base)+'</b>'):fmt(r.base))+'</td>'
@@ -11798,7 +11799,7 @@ function ledger(d,s){
       +(noOh?'':('<td class="n">'+(r.oh?fmt(r.oh):'–')+'</td>'))
       +'<td class="k hint">'+esc(gl.join(', ')||'–')+'</td>'
       +(noOh?'':('<td class="n"><b>'+fmt(r.base+r.oh)+'</b></td>'))+'</tr>';
-    if(open) h+='<tr><td colspan="'+NC+'" class="lgev">'+lgWhy(r,cl,fx,gl)+'</td></tr>';
+    if(open && !TIDY) h+='<tr><td colspan="'+NC+'" class="lgev">'+lgWhy(r,cl,fx,gl)+'</td></tr>';   // 10/27 정리: 숨김 — 근거 펼침
   });
   });
   h+='</tbody></table></div>';
@@ -11921,7 +11922,7 @@ function lgWhy(r, cl, fx, gl){
 
 /** 이 달을 통째로 비우기 — 재무만. 주소가 아니라 단추로 한다(탭에 남은 주소가 사고를 냈다). */
 function stgReset(d){
-  if(!d.canFin) return '';
+  if(!d.canFin || TIDY) return '';   // 10/27 정리: 숨김 — 당월 초기화(어진)
   var R=S.rst;
   if(d.closed) return '<div class="rst"><span class="hint">확정된 달은 비울 수 없습니다 — 「확정 해제」 를 먼저 하세요.</span></div>';
   var RSTT='입고현황 · 메타 · 비용 · 비용품번 · 환율 · 유니패스를 이 달만 지웁니다. 지우기 전에 백업을 뜹니다.';
@@ -12185,23 +12186,23 @@ function pvTbl(d){
   });
   // 구분 열은 사입이 하나라도 보일 때만 — 제작뿐인 달·브랜드에선 열이 늘지 않는다
   var PKD = PVR.some(function(p){ return p.kd && p.kd['사입']; });
-  var OH = COST_ON || !!PT.oh;   // 부대비용을 끈 동안 얹힌 게 없으면 기준금액=취득원가 — 한 열
+  var BH = COST_ON || !!PT.oh;   // 부대비용을 끈 동안 얹힌 게 없으면 기준금액=취득원가 — 한 열
   if(PVR.length){
     h+='<div class="secth" style="border-top:1px solid var(--line)"><b>입고처별</b> '
       +(brLabel()?('<span class="pill acc">'+esc(brLabel())+'</span>'):'')
       +(TIDY?'':'<span class="hint">품번별 근거는 아래 입고대장 줄을 누르세요</span>')   // 10/27 정리: 숨김 — 설명 문장
       +'<span class="grow"></span>'+ibtn('copy','지결 대조 리포트 복사 — 거래처별 금액과 메모를 글로','id="pvReport"')+'</div>'
       +'<div class="tw" style="max-height:280px;overflow:auto"><table><thead><tr><th>입고처</th>'+(PKD?'<th>구분</th>':'')+'<th class="n">행</th>'
-      +'<th class="n">수량</th>'+(OH?'<th class="n">기준금액</th><th class="n">부대비용</th>':'')+'<th class="n">취득원가</th></tr></thead><tbody>';
+      +'<th class="n">수량</th>'+(BH?'<th class="n">기준금액</th><th class="n">부대비용</th>':'')+'<th class="n">취득원가</th></tr></thead><tbody>';
     PVR.forEach(function(p){
       h+='<tr><td>'+esc(p.vendor)+(p.unres?' <span class="pill bad">미확정 '+p.unres+'</span>':'')+'</td>'
         +(PKD?('<td>'+['제작','사입'].filter(function(k){ return p.kd&&p.kd[k]; }).map(kdChip).join(' ')+'</td>'):'')
         +'<td class="n">'+fmt(p.lines)+'</td><td class="n">'+fmt(p.qty)+'</td>'
-        +(OH?('<td class="n">'+fmt(p.base)+'</td><td class="n">'+(p.oh?fmt(p.oh):'–')+'</td>'):'')
+        +(BH?('<td class="n">'+fmt(p.base)+'</td><td class="n">'+(p.oh?fmt(p.oh):'–')+'</td>'):'')
         +'<td class="n"><b>'+fmt(p.landed)+'</b></td></tr>';
     });
     h+='<tr class="tot"><td>합계</td>'+(PKD?'<td></td>':'')+'<td class="n">'+fmt(PT.lines)+'</td><td class="n">'+fmt(PT.qty)+'</td>'
-      +(OH?('<td class="n">'+fmt(PT.base)+'</td><td class="n">'+fmt(PT.oh)+'</td>'):'')+'<td class="n">'+fmt(PT.landed)+'</td></tr>';
+      +(BH?('<td class="n">'+fmt(PT.base)+'</td><td class="n">'+fmt(PT.oh)+'</td>'):'')+'<td class="n">'+fmt(PT.landed)+'</td></tr>';
     h+='</tbody></table></div>';
   }
   return h;
@@ -12277,8 +12278,8 @@ function stg7(d, okBy, noRecon, nImp){
           +ibtn('refresh','재고수불부 재전송','id="bRepush"'))
       +(d.canFin?'<button class="btn sm" id="bUnfix" style="margin-left:auto">확정 해제</button>':'');
   }else{
-    h+='<button class="btn go" id="bFix"'+(allOk&&d.canFin?'':' disabled')+'>당월 마감 확정</button>'
-      +(!d.canFin ? '<span class="hint">확정은 재무가 합니다</span>' : allOk
+    h+='<button class="btn go" id="bFix"'+(!d.canFin?' aria-disabled="true"':(allOk?'':' disabled'))+'>당월 마감 확정</button>'   // 담당자: 눌리면 안내 대화상자
+      +(!d.canFin ? '' : allOk
         ? qm((noRecon?'이 달은 건별 검수 없이 입고내역으로 마감합니다. ':'')
            +'확정하면 이 달 숫자가 잠깁니다. 품번별 입고가 재고수불부(Baserow)로 넘어갑니다. '
            +'확정을 해제해도 이미 보낸 줄은 안 돌아옵니다 — 고친 뒤 다시 확정해서 다시 보내야 바뀝니다.')
@@ -12469,6 +12470,7 @@ function bindStg(){
   });
   on('bFix', function(){
     var m=$('fixMsg'), d0=S.close, s0=d0.summary||{};
+    if(!d0.canFin){ ui.tell({title:'당월 마감 확정', body:'확정은 재무팀이 합니다. 업로드를 마쳤으면 대금 지급 탭에서 금액을 확인하세요.'}); return; }
     if(!$('bFix')._ok){
       ui.ask({title:d0.ym+' 마감 확정', ok:'확정 후 전송',
         body:'취득원가 '+fmt(s0.landed)+((COST_ON||s0.oh_inv)?(' · 부대비용 '+fmt(s0.oh_inv)):'')+' · '+fmt(s0.lines)+'행이 재고수불부로 넘어갑니다. 확정을 풀어도 이미 보낸 줄은 그대로 남습니다.'})
@@ -14193,7 +14195,7 @@ function kDl(L, name){
    실적 줄 = [입고일,거래처,품번,컬러,수입,수량,원화금액,사전원가,USD] (반품 음수)
    분류 규칙·9월 정답은 scratchpad period/C_build.py — 바꾸면 test_planactual.js 로 대조한다. */
 /* PA-PURE-START */
-var PA_PFX={HR:'ALPHA',GL:'BETA',SN:'GAMMA',OH:'OH',UO:'UO',OD:'OD',UV:'UV',EL:'EL',OA:'OA'};
+var PA_PFX={BA:'ALPHA',BB:'BETA',BC:'GAMMA',BH:'BH',BK:'BK',BG:'BG',BJ:'BJ',BE:'BE',BF:'BF'};
 var PA_CLS=[['ok','일치','기간 안 예정 수량과 실제 수량 차이 ±5% 이내'],['less','부족','예정보다 5% 넘게 적게 입고'],
   ['more','초과','예정보다 5% 넘게 많이 입고'],['none','미입고','기간 안 납기인데 입고 0'],['b4','기입고','기간 안 납기인데 기간 전에 이미 다 입고'],
   ['late','지연','납기가 기간 전인데 이 기간에 입고'],['early','조기','납기가 기간 뒤인데 이 기간에 입고'],['mix','혼재','한 품번에 기간 안·밖 납기가 섞임'],

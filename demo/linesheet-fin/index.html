@@ -103,10 +103,10 @@ var CFG = {
   BRANDS: [
     { b: 'BETA', tab: '4.변환_BETA', row0: 12, col0: 3, n: 400 },
     { b: 'GAMMA', tab: '4.변환_GAMMA', row0: 12, col0: 3, n: 300 },
-    { b: 'OH',   tab: '4.변환_OH',   row0: 12, col0: 3, n: 300, salesCol: 76 },
+    { b: 'BH',   tab: '4.변환_BH',   row0: 12, col0: 3, n: 300, salesCol: 76 },
     { b: 'ALPHA', tab: '4.변환_ALPHA', row0: 12, col0: 3, n: 500 }
   ],
-  /* 33열 표준 스키마 탭 (OD·UV·MEMB). 위 4사와 열 배치가 달라 따로 읽는다.
+  /* 33열 표준 스키마 탭 (BG·BJ·MEMB). 위 4사와 열 배치가 달라 따로 읽는다.
      A 등급 B 확인항목 C 건수 D 원본행 E 브랜드 F 품번 G 색상 H 품명 I 차수 J 아이템
      K 컬러코드 L 시즌 M 발주처 N 원산지 O 생산방식 P 발주일 Q 납기일 R 납기월
      S 발주량 T 사전원가 U 매입예정액 V 원가구분 W 원가근거 X 발매일 Y 발매월
@@ -118,40 +118,40 @@ var CFG = {
      탭마다 사이즈 블록 시작 열이 한 칸씩 다르므로 열을 고정하지 않고 라벨을 보고 잡는다.
      'S.TTL' 같은 소계 열은 라벨로 걸러진다. */
   BRANDS2: [
-    { b: 'OD', k: 'ODFA', tab: '4.변환_OD_26FA',  row0: 12, n: 420,
-      raw: '5.원본_OD_26FA',  srcRow0: 7, lblRow: 4, szFrom: 39, szTo: 54 },
-    { b: 'OD', k: 'ODWI', tab: '4.변환_OD_26WI',  row0: 12, n: 420,
-      raw: '5.원본_OD_26WI',  srcRow0: 7, lblRow: 4, szFrom: 39, szTo: 54 },
-    { b: 'OD', k: 'ODAC', tab: '4.변환_OD_26ACC', row0: 12, n: 420,
-      raw: '5.원본_OD_26ACC', srcRow0: 7, lblRow: 4, szFrom: 39, szTo: 54 },
-    { b: 'UV', k: 'UVFA', tab: '4.변환_UV_26FA',  row0: 12, n: 420,
-      raw: '5.원본_UV_26FA',  srcRow0: 7, lblRow: 4, szFrom: 39, szTo: 54 },
-    { b: 'UV', k: 'UVWI', tab: '4.변환_UV_26WI',  row0: 12, n: 420,
-      raw: '5.원본_UV_26WI',  srcRow0: 7, lblRow: 4, szFrom: 39, szTo: 54 },
+    { b: 'BG', k: 'ODFA', tab: '4.변환_BG_26FA',  row0: 12, n: 420,
+      raw: '5.원본_BG_26FA',  srcRow0: 7, lblRow: 4, szFrom: 39, szTo: 54 },
+    { b: 'BG', k: 'ODWI', tab: '4.변환_BG_26WI',  row0: 12, n: 420,
+      raw: '5.원본_BG_26WI',  srcRow0: 7, lblRow: 4, szFrom: 39, szTo: 54 },
+    { b: 'BG', k: 'ODAC', tab: '4.변환_BG_26ACC', row0: 12, n: 420,
+      raw: '5.원본_BG_26ACC', srcRow0: 7, lblRow: 4, szFrom: 39, szTo: 54 },
+    { b: 'BJ', k: 'UVFA', tab: '4.변환_BJ_26FA',  row0: 12, n: 420,
+      raw: '5.원본_BJ_26FA',  srcRow0: 7, lblRow: 4, szFrom: 39, szTo: 54 },
+    { b: 'BJ', k: 'UVWI', tab: '4.변환_BJ_26WI',  row0: 12, n: 420,
+      raw: '5.원본_BJ_26WI',  srcRow0: 7, lblRow: 4, szFrom: 39, szTo: 54 },
     /* MEMB 원본은 21FW~27SS 12시즌이 한 탭에 있다. 대장과 같은 기준으로 26FW 만.
        사이즈는 행별 전개가 아니라 우측 요약 블록(BG~BV)이라 여기서 읽지 않는다. */
     { b: 'MEMB', k: 'CS', tab: '4.변환_MEMB', row0: 12, n: 1391, season: '26FW' },
-    /* UO — 8번째 브랜드. 원본 엑셀은 OH 와 같은 ORDER STATUS 양식이지만 변환탭은 33열 쪽이다
+    /* BK — 8번째 브랜드. 원본 엑셀은 BH 와 같은 ORDER STATUS 양식이지만 변환탭은 33열 쪽이다
        (9.신규매입 을 타고 대장으로 들어가므로). 사이즈는 원본 H~L 5칸. */
-    { b: 'UO', k: 'UO', tab: '4.변환_UO', row0: 12, n: 420,
-      raw: '5.원본_UO', srcRow0: 5, lblRow: 4, szFrom: 8, szTo: 12 },
-    /* OD 오픈마켓 — 오픈마켓 직매입 전용 라인(◈ 오픈마켓 LINESHEET, 담당자46). 브랜드는 OD 로 합친다:
-       OD 제품이고, 브랜드를 따로 세우면 집계표·검증식 열을 전부 늘려야 해서(I-008).
+    { b: 'BK', k: 'BK', tab: '4.변환_BK', row0: 12, n: 420,
+      raw: '5.원본_BK', srcRow0: 5, lblRow: 4, szFrom: 8, szTo: 12 },
+    /* BG 오픈마켓 — 오픈마켓 직매입 전용 라인(◈ 오픈마켓 LINESHEET, 담당자46). 브랜드는 BG 로 합친다:
+       BG 제품이고, 브랜드를 따로 세우면 집계표·검증식 열을 전부 늘려야 해서(I-008).
        구분은 차수 '오픈마켓' 과 판매가구분 '오픈마켓공급가' 로 한다. 직매입이라 확정판매가는
        소비자가가 아니라 오픈마켓 공급가(AM×1.1) — 오픈마켓 입고 단가와 같다.
        원본 탭에 26SS 가 같이 있어 26FW 만. 사이즈는 원본 우측 블록이라 읽지 않는다. */
-    { b: 'OD', k: 'ODCP', tab: '4.변환_OD_CP', row0: 12, n: 100, season: '26FW' },
+    { b: 'BG', k: 'ODCP', tab: '4.변환_BG_CP', row0: 12, n: 100, season: '26FW' },
     /* 27SS 변환탭 8개 — E:AG 는 위 33열과 같고 AH 소복종 · AI 매출제외 두 열이 더 있다(w:35).
        ss 는 대장 시즌 열(블록 기준)과 같게 탭 단위로 박는다. 변환탭 L열은 27SP·27SU 처럼 원본 시즌이라 쓰지 않는다.
        대장 매출은 AI(사은품·예상매출0)가 빈 행만 싣는다 → 웹앱도 그 행의 매출을 0 으로 둔다. */
     { b: 'BETA',   k: 'S7GL', tab: '4.변환_27SS_BETA',   row0: 12, n: 600, ss: '27SS', w: 35 },
     { b: 'GAMMA',   k: 'S7SN', tab: '4.변환_27SS_GAMMA',   row0: 12, n: 600, ss: '27SS', w: 35 },
     { b: 'ALPHA',   k: 'S7HR', tab: '4.변환_27SS_ALPHA',   row0: 12, n: 600, ss: '27SS', w: 35 },
-    { b: 'OD',     k: 'S7OD', tab: '4.변환_27SS_OD',     row0: 12, n: 600, ss: '27SS', w: 35 },
-    { b: 'OH',     k: 'S7OH', tab: '4.변환_27SS_OH',     row0: 12, n: 600, ss: '27SS', w: 35 },
-    { b: '엘레쎄', k: 'S7EL', tab: '4.변환_27SS_EL',     row0: 12, n: 600, ss: '27SS', w: 35 },
+    { b: 'BG',     k: 'S7OD', tab: '4.변환_27SS_BG',     row0: 12, n: 600, ss: '27SS', w: 35 },
+    { b: 'BH',     k: 'S7OH', tab: '4.변환_27SS_BH',     row0: 12, n: 600, ss: '27SS', w: 35 },
+    { b: '브랜드E', k: 'S7EL', tab: '4.변환_27SS_BE',     row0: 12, n: 600, ss: '27SS', w: 35 },
     { b: 'MEMB', k: 'S7CS', tab: '4.변환_27SS_MEMB', row0: 12, n: 600, ss: '27SS', w: 35 },
-    { b: 'OD',     k: 'S7CP', tab: '4.변환_27SS_OD_CP',  row0: 12, n: 600, ss: '27SS', w: 35 }
+    { b: 'BG',     k: 'S7CP', tab: '4.변환_27SS_BG_CP',  row0: 12, n: 600, ss: '27SS', w: 35 }
   ],
   /* 27SS 추정 매입 — 원가 없는 행을 원가율로 추정한 시트 탭. 브랜드표(B열 브랜드 · G열 추정 V+)만 읽는다. */
   EST_TAB: '1.예상매입_27SS추정',
@@ -261,14 +261,14 @@ function dt8_(v) {
 /* ───────── 데이터 읽기 ───────── */
 
 /**
- * 변환 탭 4개(BETA·GAMMA·OH·ALPHA)에서 베이스 로우와 사이즈 행을 읽는다.
+ * 변환 탭 4개(BETA·GAMMA·BH·ALPHA)에서 베이스 로우와 사이즈 행을 읽는다.
  * 컬럼 위치는 변환 탭 설계에 묶여 있다 — 탭 구조를 바꾸면 여기도 바꾼다.
  * 아래 열 기호는 유효성 3열을 끼우기 전 기준이다. 실제로는 전부 +3 (col0) 이다.
  *   A 행키 · B 품번 · C 차수 · D 품명 · N 발주일 · P TAG가
  *   BB 브랜드 · BC 색상 · BD 발주처(정규화) · BE 원산지 · BF 발주량 · BG 사전원가
  *   BH 매입예정액 · BI 납기일 · BJ 납기월 · BK 원가구분 · BM 대복종 · BN 소복종 · BO 시즌
  *   W 행키 · X 사이즈 · Y 수량   (전개 블록)
- * 매출 블록(발매일·확정판매가·예상매출)은 변환 탭 오른쪽 끝에 따로 있다 — CB~CF(OH 만 BX~CB).
+ * 매출 블록(발매일·확정판매가·예상매출)은 변환 탭 오른쪽 끝에 따로 있다 — CB~CF(BH 만 BX~CB).
  * ERP·BI 양식에는 안 들어가지만 화면에서 매출을 보려면 필요해서 rd·sp·sa 세 칸만 읽는다.
  */
 /* #REF! · #VALUE! 같은 수식 오류. 변환 탭이 깨지면 조용히 쓰레기가 집계되므로 센다. */
@@ -304,7 +304,7 @@ function readAll_() {
     var V = sh.getRange(r0,  1,      n,    3).getValues();   // 등급·확인 필요 항목·건수
     /* 매출 블록 5칸 — 발매일 · 발매월 · 확정판매가(VAT+) · 판매가구분 · 예상매출(VAT+).
        변환탭 오른쪽 끝에 따로 붙어 있어 col0 과 무관한 절대 위치다. 기본 CB(80).
-       OH 만 원본에 발매일 열이 없어 블록이 네 칸 앞이다(BX=76) — 칸 순서는 같다. */
+       BH 만 원본에 발매일 열이 없어 블록이 네 칸 앞이다(BX=76) — 칸 순서는 같다. */
     var SC = cf.salesCol || 80, maxC = sh.getMaxColumns();
     var S5 = (SC + 4 <= maxC) ? sh.getRange(r0, SC, n, 5).getValues() : null;
 
@@ -365,7 +365,7 @@ function readAll_() {
     }
   });
 
-  /* 33열 표준 탭 — OD·UV·MEMB. 대장과 같은 기준(집계반영='반영')으로만 넣는다. */
+  /* 33열 표준 탭 — BG·BJ·MEMB. 대장과 같은 기준(집계반영='반영')으로만 넣는다. */
   (CFG.BRANDS2 || []).forEach(function (cf) {
     var sh = ss.getSheetByName(cf.tab);
     /* 탭이 아직 없으면 조용히 건너뛴다. 브랜드를 붙일 때 설정이 탭보다 먼저 올라가는데,
@@ -1030,7 +1030,7 @@ var BI_HEAD = ['발주일자','매입처명','납기일자','예상발매일','�
 'XXL','00F','TTL','컬러 Ratio','사전원가','사후원가','예상판매가','M/UP'];
 
 /* 우리 사이즈 → 템플릿 열. 여기 없는 사이즈는 열이 아예 없어서 못 넣는다(TTL 에는 들어간다). */
-/* 브랜드마다 같은 사이즈를 다르게 적는다 — BETA·ALPHA 는 M/L/XL, OH 는 00M/00L.
+/* 브랜드마다 같은 사이즈를 다르게 적는다 — BETA·ALPHA 는 M/L/XL, BH 는 00M/00L.
    양쪽 표기를 모두 받는다. 00S·0XS·110·100·60 은 템플릿에 열이 아예 없다. */
 var BI_SIZE = { '120':'120','130':'130','140':'140','150':'150','160':'160','170':'170',
                 'M':'00M','00M':'00M','L':'00L','00L':'00L','XL':'0XL','0XL':'0XL',
@@ -1484,7 +1484,7 @@ function diagText_() {
     });
     var sq = 0, hasSz = {};
     P.sz.forEach(function (x) { sq += x[2]; hasSz[x[0]] = 1; });
-    /* OD·UV·MEMB 변환탭에는 사이즈 전개 블록이 없다. 그래서 사이즈합은
+    /* BG·BJ·MEMB 변환탭에는 사이즈 전개 블록이 없다. 그래서 사이즈합은
        전체 발주량이 아니라 '사이즈 행이 있는 행의 발주량' 과 맞아야 한다. */
     var qSz = 0;
     P.rows.forEach(function (r, i) { if (hasSz[i]) qSz += r[10]; });
@@ -1564,7 +1564,7 @@ function diagText_() {
     /* 2-2. 2026-10 검수에서 나온 사고 유형 — 합계는 맞는데 일부가 조용히 빠지는 것들.
        예상매출은 웹앱이 변환탭을 직접 읽어서 대장과 경로가 다르다. 변환탭 수식이 끝까지
        안 내려오면 대장엔 있고 웹앱엔 없는 매출이 생긴다(ALPHA 1.5억, 검수 F-1). */
-    /* 납기불명은 시즌을 나눠 센다. 27SS 는 OD SU·SS · 엘레쎄 원본에 납기 열이 비어 있어(2026-10 기준) 정보로만 둔다. */
+    /* 납기불명은 시즌을 나눠 센다. 27SS 는 BG SU·SS · 브랜드E 원본에 납기 열이 비어 있어(2026-10 기준) 정보로만 둔다. */
     var ddB = { '26FW': {}, '27SS': {} };
     P.rows.forEach(function (r) {
       var b = d.b[r[1]] || '?', s = r[25] || '26FW', m = ddB[s] || (ddB[s] = {});
@@ -2210,13 +2210,13 @@ function wv(x){ return won((x||0)*vmul()); }
 /* 매출 — 기본은 변환탭이 계산해 둔 값(sa)을 그대로 쓴다. 그게 대장에 들어간 값이라서다.
    화면에서 고친 행만 수량×확정판매가로 다시 낸다.
    항상 다시 곱하면 안 된다 — qtyOf 는 사이즈 행 합이라 원본 수량열과 미세하게 다를 수 있고
-   (OD 26WI 901장 같은 원본 결함), 그러면 웹앱 매출이 대장과 조용히 갈라진다. */
+   (BG 26WI 901장 같은 원본 결함), 그러면 웹앱 매출이 대장과 조용히 갈라진다. */
 function saleOf(r){
   if(isEd(r) && r.sp) return qtyOf(r)*Number(r.sp);
   return Number(r.sa)||0;
 }
 function rdOf(r){ return r.rd||''; }
-/* 발매월 — 없으면 '발매일없음'. OD·UV·MEMB·UO 는 원본에 발매일 열이 아예 없다. */
+/* 발매월 — 없으면 '발매일없음'. BG·BJ·MEMB·BK 는 원본에 발매일 열이 아예 없다. */
 function rmOf(r){ var d=rdOf(r); return d? d.slice(0,7) : '발매일없음'; }
 function hasSale(r){ return (Number(r.sa)||0)>0 || (Number(r.sp)||0)>0; }
 function ctOf(r){ return costOf(r)===0? '원가없음' : (r.ct||'—'); }
@@ -2225,7 +2225,7 @@ function isEd(r){ return !!EDITS[r.id]; }
 /* ---------- filters ---------- */
 var F={q:'',s:'',b:{},m:{},c:{},o:{},v:''};
 /* 브랜드 순서 = 본부순(시트 1.* 탭과 같다). 목록에 없는 브랜드는 맨 뒤. */
-var HQ=[['패션',['MEMB','OD','OH','UV','UO','엘레쎄']],['A본부',['ALPHA']],['B본부',['BETA','GAMMA']]];
+var HQ=[['패션',['MEMB','BG','BH','BJ','BK','브랜드E']],['A본부',['ALPHA']],['B본부',['BETA','GAMMA']]];
 var BRK={},BHQ={};
 HQ.forEach(function(g,gi){ g[1].forEach(function(b,i){ BRK[b]=gi*100+i; BHQ[b]=g[0]; }); });
 function brk(b){ return BRK[b]!==undefined? BRK[b] : 999; }
@@ -2324,7 +2324,7 @@ function chart(rs){
 }
 /* 발주처 × 납기월 매트릭스 — 어느 업체에 몇 월에 얼마가 나가는지 한 장으로 본다.
    브랜드는 왼쪽 필터로 좁히면 이 표가 그대로 따라온다.
-   납기월을 쓰는 이유: 입고월은 4사 원본에만 있고 OD·UV·MEMB 에는 없다.
+   납기월을 쓰는 이유: 입고월은 4사 원본에만 있고 BG·BJ·MEMB 에는 없다.
    자금 소요 기준도 납기월이라 여기서는 납기월로 통일한다. */
 var MTX = { mode: 'a' };   // a=약정액, q=발주량
 
@@ -2451,7 +2451,7 @@ function matrixPanel(rs){
     '<option value="a"' + (MTX.mode==='a'?' selected':'') + '>약정액('+vlab()+')</option>' +
     '<option value="q"' + (MTX.mode==='q'?' selected':'') + '>발주량</option></select>' +
     '<span class="sub">' + vs.length + '개 발주처 × ' + ms.length + '개월 · 브랜드는 왼쪽 필터로 좁히세요' +
-    ' · 입고월이 아니라 납기월 기준(OD·UV·MEMB 원본에 입고월이 없음)</span></div>' +
+    ' · 입고월이 아니라 납기월 기준(BG·BJ·MEMB 원본에 입고월이 없음)</span></div>' +
     tbl(head, body, foot) + '</div>';
 }
 
@@ -2947,8 +2947,8 @@ function paySave(ex){
    대장(예상)은 시즌 전체 발주고, 실적은 그 달까지 팔린 것이다. 둘을 한 줄에 놓으면
    "발주한 게 실제로 나가고 있나" 가 품번 단위로 보인다.
 
-   조인은 품번만 쓴다. 색상은 표기가 브랜드마다 달라서(ALPHA·UO·OH 는 BLK 약어,
-   BETA·GAMMA·OD 는 BLACK 풀네임, UV 는 빈칸, MEMB 는 혼용률까지 붙는다) 맞출 수가 없다.
+   조인은 품번만 쓴다. 색상은 표기가 브랜드마다 달라서(ALPHA·BK·BH 는 BLK 약어,
+   BETA·GAMMA·BG 는 BLACK 풀네임, BJ 는 빈칸, MEMB 는 혼용률까지 붙는다) 맞출 수가 없다.
    품번만으로도 소진율·달성률은 다 나온다.
 
    무상량(마케팅·샘플·폐기 출고)은 판매량에서 빼고 따로 센다. 섞으면 소진율이 부풀려진다. */
@@ -3005,7 +3005,7 @@ function ratebar(p){
    예상은 대장의 발매일(rd)로 묶고, 실적은 6.실적_재고 의 발매일로 묶는다. 둘 다 원천이
    우리 2.매출대장 이라 같은 날짜다. ERP 시트의 품번 탭도 결국 우리 걸 베낀 것이라 안 쓴다.
 
-   발매일이 없는 브랜드(OH·OD·UV·UO·MEMB — 원본에 열 자체가 없다)는 맨 뒤에 한 줄로 모은다.
+   발매일이 없는 브랜드(BH·BG·BJ·BK·MEMB — 원본에 열 자체가 없다)는 맨 뒤에 한 줄로 모은다.
    0 이 아니라 '아직 기준이 없는 것' 이라 섞으면 안 된다. */
 function relRows(rs){
   var E={}, ord=[];

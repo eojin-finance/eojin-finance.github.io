@@ -256,7 +256,7 @@ function DEMO_DATA(){
 </script>
 <script>
 var D=null, P=null, BRANDS=[], AGE_LB=['0년차','1년차','2년차','3년차+'], SPAN_LB=['26H2 (반기)','2027년','2028년','2029년'];
-var HIROGYE={'AURORA':1,'BLANC':1,'GRAIN':1};
+var ALPHAGRP={'AURORA':1,'BLANC':1,'GRAIN':1};
 var sim={sMult:[1,1,1,1], dAdd:[0,0,0,0], fee:null};
 var FEE0=0; // 로드 후 P.수수료['계'] 원값 (기본값 판정 기준)
 var vsim={s:[0,0,0,0], d:[0,0,0,0], fee:0};
@@ -264,7 +264,7 @@ var selReal=null;
 
 /* ── 핵심 계산 (확정 엑셀 수식 이식본) ── */
 function calcSku(grp,season,ageE,qty,amt,tag,roy,ov){
-  var wg=HIROGYE[grp]?'A군':'그외', win=(season===4);
+  var wg=ALPHAGRP[grp]?'A군':'그외', win=(season===4);
   var fee=(ov&&ov.fee!=null)?ov.fee:P.수수료['계'];
   var Q=fee+roy, rem=Math.max(qty,0), rec=0, steps=[];
   for(var j=0;j<4;j++){
@@ -525,7 +525,7 @@ function virtSliders(){
 function virtDefaults(){
   if(!el('v-s0'))virtSliders();
   var g=el('v-grp').value||BRANDS[0], win=Number(el('v-season').value)===4;
-  var wg=HIROGYE[g]?'A군':'그외';
+  var wg=ALPHAGRP[g]?'A군':'그외';
   for(var k=0;k<4;k++){
     var s=Math.min(1,P.소진율[g][k]*(win?P.겨울배수[wg][k]:1));
     var d=Math.min(1,Math.max(0,P.할인율[g][k]+(win?P.겨울가산[wg][k]:0)));

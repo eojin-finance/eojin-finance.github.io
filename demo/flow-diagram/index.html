@@ -8984,22 +8984,22 @@
     /* ── v42 · 실시간 정산 보드: 카페24 품목 스트림 + PG 주문번호 매칭 + 선수금 추적 ── */
     const RT_CARRY = 40850000;
     const RT_EVENTS = [
-      { type: "order", orderNo: "#10231", items: [{ code: "#10231-01", name: "HR 다운패딩 M", amt: 129000 }] },
-      { type: "ship", code: "#10224-01", name: "HR 후리스 L", amt: 89000 },
-      { type: "order", orderNo: "#10233", items: [{ code: "#10233-01", name: "HR 패딩", amt: 139000 }, { code: "#10233-02", name: "HR 비니", amt: 29000 }] },
-      { type: "ship", code: "#10231-01", name: "HR 다운패딩 M", amt: 129000 },
-      { type: "cancel", orderNo: "#10228", code: "#10228-01", name: "HR 볼캡", amt: 32000, label: "미배송 취소" },
-      { type: "partial", orderNo: "#10233", code: "#10233-02", name: "HR 비니", amt: 29000, label: "부분취소 1/2품목" },
-      { type: "order", orderNo: "#10234", items: [{ code: "#10234-01", name: "HR 머플러", amt: 45000 }] },
-      { type: "ship", code: "#10233-01", name: "HR 패딩", amt: 139000 },
-      { type: "return", orderNo: "#10224", code: "#10224-01", name: "HR 후리스 L", amt: 89000 },
-      { type: "ship", code: "#10234-01", name: "HR 머플러", amt: 45000 }
+      { type: "order", orderNo: "#10231", items: [{ code: "#10231-01", name: "BA 다운패딩 M", amt: 129000 }] },
+      { type: "ship", code: "#10224-01", name: "BA 후리스 L", amt: 89000 },
+      { type: "order", orderNo: "#10233", items: [{ code: "#10233-01", name: "BA 패딩", amt: 139000 }, { code: "#10233-02", name: "BA 비니", amt: 29000 }] },
+      { type: "ship", code: "#10231-01", name: "BA 다운패딩 M", amt: 129000 },
+      { type: "cancel", orderNo: "#10228", code: "#10228-01", name: "BA 볼캡", amt: 32000, label: "미배송 취소" },
+      { type: "partial", orderNo: "#10233", code: "#10233-02", name: "BA 비니", amt: 29000, label: "부분취소 1/2품목" },
+      { type: "order", orderNo: "#10234", items: [{ code: "#10234-01", name: "BA 머플러", amt: 45000 }] },
+      { type: "ship", code: "#10233-01", name: "BA 패딩", amt: 139000 },
+      { type: "return", orderNo: "#10224", code: "#10224-01", name: "BA 후리스 L", amt: 89000 },
+      { type: "ship", code: "#10234-01", name: "BA 머플러", amt: 45000 }
     ];
     const RT_POOL_SEED = [
-      { code: "#10224-01", name: "HR 후리스 L", amt: 89000 },
-      { code: "#10228-01", name: "HR 볼캡", amt: 32000 },
-      { code: "#10219-01", name: "HR 슬랙스", amt: 79000 },
-      { code: "#10221-01", name: "HR 니트", amt: 65000 }
+      { code: "#10224-01", name: "BA 후리스 L", amt: 89000 },
+      { code: "#10228-01", name: "BA 볼캡", amt: 32000 },
+      { code: "#10219-01", name: "BA 슬랙스", amt: 79000 },
+      { code: "#10221-01", name: "BA 니트", amt: 65000 }
     ];
     const rtState = { netPay: 0, sales: 0, poolHidden: 484, pgTotal: 0, pgMatched: 0, idx: 0, timer: 0, running: false };
 
