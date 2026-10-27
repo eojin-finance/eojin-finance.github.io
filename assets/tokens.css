@@ -1,5 +1,5 @@
 /* ============================================================
-   childy-ui tokens.css  —  차일디 재무 웹앱 공용 디자인 토큰 v1 (2026-09-23)
+   childy-ui tokens.css  —  차일디 재무 웹앱 공용 디자인 토큰 v1.2 (2026-09-23 · 09-28 .dd 드롭다운 · .dlg 대화상자 · 10-02 .drp 기간 선택)
    사용법: <style> 맨 위에 이 파일 내용을 붙이고, 앱 고유 CSS는 이 변수만 참조한다.
    규칙: 색·크기·간격·반경·그림자·모션 값을 앱 CSS에 리터럴로 쓰지 않는다. 전부 var().
    ============================================================ */
@@ -157,6 +157,10 @@ button{cursor:pointer}
 .btn.ghost{background:transparent;color:var(--ink-2)} .btn.ghost:hover{background:var(--surface-2);color:var(--ink)}
 .btn.danger{background:var(--neg-soft);color:var(--neg-ink)} .btn.danger:hover{background:var(--neg);color:#fff}
 .btn.sm{height:32px;padding:0 var(--sp-3);font-size:var(--fs-13)}
+.btn.sq{width:var(--hit);padding:0} .btn.sm.sq{width:32px}   /* 기호 하나짜리(?·×·⋯) 버튼은 정사각형 */
+/* 한 줄 = 높이 하나 — 툴바·동작칸·필터 줄에 놓인 버튼·드롭다운·입력·세그먼트는 같은 높이. .sm 은 표 칸·줄글 안에서만 */
+.toolbar .btn.sm,.actions .btn.sm{height:var(--hit);padding:0 var(--sp-4);font-size:var(--fs-14)}
+.toolbar .seg,.actions .seg{height:var(--hit);align-items:stretch} .toolbar .seg>button,.actions .seg>button{height:auto}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .btn.busy{position:relative;color:transparent!important;pointer-events:none}
 .btn.busy::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;border:2px solid currentColor;
@@ -260,6 +264,93 @@ table.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:var(--f
 @keyframes fade-out{to{opacity:0}}
 @keyframes pop-in{from{opacity:0;transform:translate(-50%,-50%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 .popover{animation-name:pop-in-tl} @keyframes pop-in-tl{from{opacity:0;transform:scale(.96) translateY(-4px)}to{opacity:1;transform:none}}
+
+/* 드롭다운 — 내재화 (components.js ddEnhanceAll). 네이티브 <select> 목록은 OS 가 그려서 서체·색·다크모드·보조 문구를 못 바꾼다.
+   <select> 는 .dd 안에 숨겨 두고 .dd-btn(닫힌 모양) + .dd-list(펼친 목록, body 에 fixed) 를 앱이 그린다 */
+.dd{position:relative;display:inline-flex;max-width:100%}
+.dd[hidden],.dd>select{display:none}
+.dd-btn{display:inline-flex;align-items:center;gap:var(--sp-2);width:100%;min-width:120px;height:var(--hit);padding:0 var(--sp-2) 0 var(--sp-3);
+  border:1px solid var(--line-strong);border-radius:var(--r-2);background:var(--surface);color:var(--ink);text-align:left;white-space:nowrap;
+  transition:border-color var(--dur-1) var(--ease-std),background-color var(--dur-1) var(--ease-std)}
+.dd-btn:hover{background:var(--surface-2)}
+.dd-btn[aria-expanded="true"]{border-color:var(--brand)}
+.dd-btn:disabled{opacity:.45;cursor:not-allowed}
+.dd-btn.sm{height:32px;font-size:var(--fs-13)}
+.dd-v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.dd-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.dd-note{font-size:var(--fs-12);color:var(--ink-3);font-weight:var(--fw-regular)}
+.dd-chev{flex:none;color:var(--ink-3);transition:transform var(--dur-1) var(--ease-std)}
+.dd-btn[aria-expanded="true"] .dd-chev{transform:rotate(180deg)}
+.dd-list{position:fixed;z-index:70;overflow:auto;scrollbar-width:thin;scrollbar-gutter:stable;/* 폭을 잴 때도 스크롤바 자리를 넣는다 — 달이 많으면 «202…» 로 잘렸다 */max-width:min(480px,calc(100vw - 16px));padding:var(--sp-1);background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r-3);box-shadow:var(--shadow-3);font-size:var(--fs-14);
+  animation:dd-in var(--dur-2) var(--ease-out) both;transform-origin:top left}
+.dd-list.up{transform-origin:bottom left;animation-name:dd-in-up}
+.dd-list.out{animation:fade-out var(--dur-exit) var(--ease-in) both}
+.dd-q{position:sticky;top:0;z-index:1;width:100%;height:32px;margin-bottom:var(--sp-1);padding:0 var(--sp-3);border:1px solid var(--line-strong);border-radius:var(--r-2);background:var(--surface)}
+.dd-grp{padding:var(--sp-2) var(--sp-3) var(--sp-1);font-size:var(--fs-12);font-weight:var(--fw-semibold);color:var(--ink-3)}
+.dd-opt{display:flex;align-items:center;gap:var(--sp-2);min-height:36px;padding:0 var(--sp-3) 0 var(--sp-2);border-radius:var(--r-2);cursor:pointer;white-space:nowrap;color:var(--ink)}
+.dd-opt[data-act]{background:var(--surface-2)}
+.dd-check{flex:none;visibility:hidden;color:var(--brand)}
+.dd-opt[aria-selected="true"] .dd-check{visibility:visible}   /* 선택 = 체크 기호 + 브랜드색. 굵게는 안 쓴다 */
+.dd-opt[aria-disabled="true"]{color:var(--ink-4);cursor:default}
+.dd-opt .dd-note{margin-left:auto;padding-left:var(--sp-4)}
+.dd-none{padding:var(--sp-3);font-size:var(--fs-13);color:var(--ink-3)}
+/* 목록은 scale 하지 않는다 — 줄었다 커지는 동안 버튼과 끝선이 어긋나 보인다 */
+@keyframes dd-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes dd-in-up{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* 대화상자 — 내재화 (components.js ask·tell). alert/confirm/prompt 대신 <dialog class="dlg"> + showModal()
+   버튼은 왼쪽 "닫기"(ghost) · 오른쪽 행동 동사. 위험 동작은 기본 포커스가 "닫기" */
+dialog.dlg{width:min(440px,calc(100vw - 32px));padding:0;border:0;border-radius:var(--r-4);background:var(--surface);color:var(--ink);
+  box-shadow:var(--shadow-3);animation:dlg-in var(--dur-3) var(--ease-out) both}
+dialog.dlg::backdrop{background:rgba(15,20,28,.45);animation:fade-in var(--dur-2) var(--ease-out) both}
+dialog.dlg.out,dialog.dlg.out::backdrop{animation:fade-out var(--dur-exit) var(--ease-in) both}
+.dlg-h{padding:var(--sp-5) var(--sp-6) 0}
+.dlg-b{padding:var(--sp-3) var(--sp-6) var(--sp-5);color:var(--ink-2)}
+.dlg-b .input{width:100%;margin-top:var(--sp-3)}
+.dlg-f{display:flex;justify-content:flex-end;gap:var(--sp-2);padding:0 var(--sp-6) var(--sp-5)}
+@keyframes dlg-in{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+
+/* 기간 선택 — 내재화 (components.js drp). 기간 조회는 전부 이 래퍼 하나. date 입력 두 개를 나란히 두지 않는다.
+   버튼 = "시작 ~ 끝" + 달력 아이콘 / 펼침 = 빠른 선택 3줄 + 달력 2장 + 선택 기간 N일 · 닫기 · 적용 (아마란스 기간 선택기 모양) */
+.drp{display:inline-flex;max-width:100%}
+.drp-btn{display:inline-flex;align-items:center;gap:var(--sp-2);height:var(--hit);padding:0 var(--sp-3);border:1px solid var(--line-strong);border-radius:var(--r-2);
+  background:var(--surface);color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;transition:border-color var(--dur-1) var(--ease-std),background-color var(--dur-1) var(--ease-std)}
+.drp-btn:hover{background:var(--surface-2)}
+.drp-btn[aria-expanded="true"]{border-color:var(--brand)}
+.drp-ic{flex:none;color:var(--ink-3)}
+.drp-pop{position:fixed;z-index:70;width:min(560px,calc(100vw - 16px));max-height:calc(100vh - 16px);overflow:auto;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-3);box-shadow:var(--shadow-3);animation:dd-in var(--dur-2) var(--ease-out) both}
+.drp-pop.out{animation:fade-out var(--dur-exit) var(--ease-in) both}
+.drp-pre{display:flex;flex-direction:column;gap:var(--sp-1);padding:var(--sp-3);border-bottom:1px solid var(--line)}
+.drp-row{display:grid;grid-template-columns:repeat(8,1fr);gap:var(--sp-1)}
+.drp-row:last-child{grid-template-columns:repeat(12,1fr)}
+.drp-p{height:32px;padding:0 var(--sp-1);border:1px solid var(--line);border-radius:var(--r-1);background:var(--surface);font-size:var(--fs-13);color:var(--ink-2);white-space:nowrap;
+  transition:background-color var(--dur-1) var(--ease-std),border-color var(--dur-1) var(--ease-std)}
+.drp-p:hover{background:var(--surface-2)}
+.drp-p[aria-pressed="true"]{border-color:var(--brand);color:var(--brand-ink);box-shadow:inset 0 -2px 0 var(--brand)}   /* 고른 빠른 선택 = 브랜드 테두리 + 밑줄 (굵게 안 씀) */
+.drp-cal{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);padding:var(--sp-3) var(--sp-4)}
+.drp-m{display:flex;flex-direction:column;gap:var(--sp-2);min-width:0}
+.drp-mh{display:grid;grid-template-columns:28px 28px 1fr 28px 28px;align-items:center;text-align:center}
+.drp-mh b{font-size:var(--fs-16);font-weight:var(--fw-semibold);font-variant-numeric:tabular-nums}
+.drp-nav{height:28px;border:0;border-radius:var(--r-1);background:transparent;color:var(--ink-3);font-size:var(--fs-16)}
+.drp-nav:hover{background:var(--surface-2);color:var(--ink)}
+.drp-g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px 0}
+.drp-w{font-size:var(--fs-12);font-weight:var(--fw-medium);color:var(--ink-3);text-align:center;padding-block:var(--sp-1)}
+.drp-w.sun{color:var(--neg-ink)}
+.drp-d{height:32px;border:0;background:transparent;font-size:var(--fs-13);font-variant-numeric:tabular-nums;color:var(--ink);border-radius:0}
+.drp-d:hover{background:var(--surface-2)}
+.drp-d.sun{color:var(--neg-ink)}
+.drp-d.out{color:var(--ink-4)}
+.drp-d.today{box-shadow:inset 0 0 0 1px var(--line-strong)}
+.drp-d.in{background:var(--brand-soft)}
+.drp-d.end{background:var(--brand);color:var(--on-brand);border-radius:var(--r-1)}
+.drp-d:disabled{color:var(--ink-4);cursor:not-allowed;background:transparent}
+.drp-f{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-3) var(--sp-4);border-top:1px solid var(--line)}
+.drp-n{margin-right:auto;font-size:var(--fs-13);color:var(--ink-3);font-variant-numeric:tabular-nums}
+.drp-nav.nx{visibility:hidden}
+@media (max-width:560px){ .drp-cal{grid-template-columns:1fr} .drp-cal .drp-m:last-child{display:none} .drp-nav.nx{visibility:visible}
+  .drp-row{grid-template-columns:repeat(4,1fr)} .drp-row:last-child{grid-template-columns:repeat(6,1fr)} }
 
 /* 탭 내용 전환 — 짧은 페이드+살짝 위로 */
 .tab-panel{animation:panel-in var(--dur-2) var(--ease-out) both}

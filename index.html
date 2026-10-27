@@ -9,248 +9,381 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="assets/tokens.css">
 <style>
-  /* 챕터 스토리(3안): 글라스 앱바 · 중앙 히어로 · 01~04 챕터(헤드라인 + 증거 카드 트랙) · 데모 트랙 */
-  :root { --ios: #0A84FF; --gray6: #F2F2F7; --gray5: #E5E5EA; --gray4: #D1D1D6; --label2: #6E6E73; --sep: rgba(60,60,67,.18); --dk2: #1D1D1F; --dksub: #A1A1A6; --paper: #FFFFFF; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --gray6: #1C1C1E; --gray5: #2C2C2E; --gray4: #3A3A3C; --label2: #98989D; --sep: rgba(84,84,88,.6); --dk2: #0B0B0C; --paper: #000000; } }
-  :root[data-theme="dark"] { --gray6: #1C1C1E; --gray5: #2C2C2E; --gray4: #3A3A3C; --label2: #98989D; --sep: rgba(84,84,88,.6); --dk2: #0B0B0C; --paper: #000000; }
-  body { font-family: "Pretendard Variable", var(--font-sans); background: var(--paper); color: var(--ink); letter-spacing: -0.01em; line-height: 1.5; }
+  /* 글래시 v4: 떠 있는 앱바·도크·히어로 칩만 유리, 카드는 단색. 모션은 등장(순차)·막대 성장·클릭 링·카운트업 */
+  :root {
+    --fs-d1: 64px; --fs-d2: 44px; --fs-d3: 34px;   /* 디스플레이 — 애플 스케일, 히어로·챕터 제목에만 */
+    --r-card: 24px;
+    --wmax: 1120px; --pad: var(--sp-6);
+    --ez: var(--ease-out);
+    --tint-1: color-mix(in srgb, var(--brand) 26%, transparent);
+    --tint-2: color-mix(in srgb, var(--brand) 12%, transparent);
+    --tint-3: color-mix(in srgb, var(--warn) 14%, transparent);
+  }
+  /* 다크: 색은 tokens.css 가 바꾼다. 배경 번짐만 조금 더 진하게 (어두운 바탕에선 같은 알파가 안 보인다) */
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --tint-1: color-mix(in srgb, var(--brand) 34%, transparent); --tint-2: color-mix(in srgb, var(--brand) 20%, transparent); --tint-3: color-mix(in srgb, var(--warn) 12%, transparent); } }
+  :root[data-theme="dark"] { --tint-1: color-mix(in srgb, var(--brand) 34%, transparent); --tint-2: color-mix(in srgb, var(--brand) 20%, transparent); --tint-3: color-mix(in srgb, var(--warn) 12%, transparent); }
+  body { font-family: "Pretendard Variable", var(--font-sans); background: var(--bg); color: var(--ink); line-height: var(--lh-body); }
   h1, h2, h3, p { margin: 0; } a { color: inherit; text-decoration: none; }
   img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-  .thumb { aspect-ratio: 16/10; overflow: hidden; background: var(--gray6); }
   .num { font-variant-numeric: tabular-nums; }
+  .wrap { max-width: var(--wmax); margin: 0 auto; padding: 0 var(--pad); }
 
-  /* 앱바 (글라스 — 떠 있는 층) */
-  .appbar { position: sticky; top: 0; z-index: 20; background: var(--glass-bg); backdrop-filter: blur(20px) saturate(1.8); border-bottom: 1px solid var(--sep); }
-  .appbar .in { max-width: 980px; margin: 0 auto; height: 48px; display: flex; align-items: center; gap: var(--sp-5); padding: 0 var(--sp-5); font-size: var(--fs-12); overflow-x: auto; scrollbar-width: none; white-space: nowrap; }
-  .appbar .n { font-weight: var(--fw-semibold); font-size: var(--fs-14); margin-right: auto; }
-  .appbar a { opacity: .8; transition: opacity var(--dur-1) var(--ease-std); } .appbar a:hover, .appbar a.on { opacity: 1; }
-  .appbar a.cta { background: var(--ios); color: #fff; border-radius: 999px; padding: 4px 12px; opacity: 1; }
+  /* 배경 — 유리가 비칠 것. 고정 레이어, 스크롤에 따라 아주 조금만 움직인다 */
+  .aura { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+  .aura i { position: absolute; border-radius: var(--r-pill); filter: blur(80px); will-change: transform; }
+  .aura i:nth-child(1) { width: 560px; height: 560px; left: -120px; top: -160px; background: var(--tint-1); }
+  .aura i:nth-child(2) { width: 640px; height: 640px; right: -200px; top: 18vh; background: var(--tint-2); }
+  .aura i:nth-child(3) { width: 480px; height: 480px; left: 30vw; top: 70vh; background: var(--tint-3); }
+
+  /* 앱바 — 떠 있는 유리 알약 */
+  .topbar { position: fixed; top: var(--sp-3); left: 50%; z-index: 30; transform: translateX(-50%); width: min(var(--wmax), calc(100% - 24px));
+    border-radius: var(--r-pill); transition: transform var(--dur-3) var(--ez), opacity var(--dur-2) var(--ez); }
+  .topbar.hide { transform: translate(-50%, -140%); }
+  .topbar .in { height: 52px; display: flex; align-items: center; gap: var(--sp-1); padding: 0 var(--sp-2) 0 var(--sp-5); font-size: var(--fs-13); font-weight: var(--fw-medium); white-space: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .topbar .n { font-size: var(--fs-16); font-weight: var(--fw-bold); margin-right: auto; padding-right: var(--sp-4); }
+  .topbar a.l { padding: var(--sp-2) var(--sp-3); border-radius: var(--r-pill); color: var(--ink-2); transition: background var(--dur-1) var(--ease-std), color var(--dur-1) var(--ease-std); }
+  .topbar a.l:hover { background: var(--surface-2); color: var(--ink); }
+  .topbar a.l.on { color: var(--brand-ink); background: var(--brand-soft); }
+  .pill { display: inline-flex; align-items: center; gap: var(--sp-2); height: var(--hit); padding: 0 var(--sp-5); border-radius: var(--r-pill); font-size: var(--fs-14); font-weight: var(--fw-semibold);
+    transition: transform var(--dur-1) var(--ease-std), background var(--dur-1) var(--ease-std), box-shadow var(--dur-2) var(--ease-std); }
+  .pill:active { transform: scale(.96); }
+  .pill.pri { background: var(--brand); color: var(--on-brand); } .pill.pri:hover { background: var(--brand-hover); box-shadow: 0 8px 24px -8px var(--tint-1); }
+  .pill.sec { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); border: 1px solid var(--line); } .pill.sec:hover { background: var(--surface-2); }
+  .topbar .pill { height: 36px; padding: 0 var(--sp-4); font-size: var(--fs-13); margin-left: var(--sp-2); }
 
   /* 히어로 */
-  .hero { text-align: center; padding: 96px var(--sp-6) 48px; max-width: 760px; margin: 0 auto; }
-  .hero .eb { font-size: var(--fs-14); color: var(--label2); font-weight: var(--fw-medium); }
-  .hero h1 { font-size: 56px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.07; margin-top: var(--sp-3); }
-  .hero p { font-size: var(--fs-22); color: var(--label2); line-height: 1.4; margin-top: var(--sp-5); }
-  .hero .links { margin-top: var(--sp-6); display: flex; gap: var(--sp-6); justify-content: center; font-size: var(--fs-16); flex-wrap: wrap; }
-  .hero .links a { color: var(--ios); } .hero .links a::after { content: ' ›'; }
-  .stats { display: flex; justify-content: center; gap: 56px; padding: var(--sp-8) var(--sp-4); border-top: 1px solid var(--sep); border-bottom: 1px solid var(--sep); margin: 0 auto; max-width: 980px; flex-wrap: wrap; }
-  .stats b { display: block; font-size: 40px; font-weight: 600; letter-spacing: -0.03em; white-space: nowrap; } .stats b small { font-size: var(--fs-16); font-weight: 500; color: var(--label2); letter-spacing: 0; margin-left: 2px; }
-  .stats span { font-size: var(--fs-13); color: var(--label2); }
+  .hero { min-height: 92vh; display: grid; grid-template-columns: 1.05fr 1fr; gap: var(--sp-10); align-items: center; padding-top: 120px; padding-bottom: var(--sp-10); }
+  .chip { display: inline-flex; align-items: center; gap: var(--sp-2); height: 32px; padding: 0 var(--sp-3); border-radius: var(--r-pill); background: var(--surface); border: 1px solid var(--line); font-size: var(--fs-13); font-weight: var(--fw-medium); color: var(--ink-2); box-shadow: var(--shadow-1); }
+  .chip .dot { width: 8px; height: 8px; border-radius: var(--r-pill); background: var(--pos); }
+  .hero h1 { font-size: var(--fs-d1); font-weight: var(--fw-bold); letter-spacing: -0.035em; line-height: 1.08; margin-top: var(--sp-5); }
+  .hero h1 .ln { display: block; overflow: hidden; padding-bottom: 4px; }
+  .hero h1 .ln > span { display: block; transform: translateY(105%); transition: transform var(--dur-3) var(--ez); }
+  .hero h1 .ln:nth-child(2) > span { transition-delay: 90ms; }
+  .hero h1 em { font-style: normal; color: var(--brand); }
+  .ready .hero h1 .ln > span { transform: none; }
+  .hero .lead { font-size: var(--fs-18); color: var(--ink-2); line-height: 1.6; margin-top: var(--sp-5); max-width: 30em; }
+  .hero .cta { display: flex; gap: var(--sp-3); margin-top: var(--sp-8); flex-wrap: wrap; }
 
-  /* 챕터 */
-  .chap { position: relative; padding-top: 64px; scroll-margin-top: 56px; }
-  .chap + .chap { border-top: 1px solid var(--sep); }
-  .chap .no { max-width: 980px; margin: 0 auto; padding: 0 var(--sp-6); font-size: 64px; font-weight: 700; letter-spacing: -0.05em; color: var(--gray5); line-height: 1; }
-  .sh { max-width: 980px; margin: 0 auto; padding: var(--sp-2) var(--sp-6) 0; }
-  .sh h2 { font-size: 40px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; }
-  .sh .sub { font-size: var(--fs-18); color: var(--label2); margin-top: var(--sp-3); max-width: 36em; }
-  .sh.c { text-align: center; padding-top: 72px; } .sh.c .sub { margin-left: auto; margin-right: auto; }
-  .prog { position: fixed; right: var(--sp-5); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 10; }
-  .prog a { width: 8px; height: 8px; border-radius: 999px; background: var(--gray4); transition: transform var(--dur-1) var(--ease-std), background var(--dur-1) var(--ease-std); }
-  .prog a.on { background: var(--ink); transform: scale(1.25); }
+  /* 히어로 화면 더미 — 포인터를 따라 살짝 기운다 */
+  .stack { position: relative; aspect-ratio: 1 / .92; perspective: 1400px; }
+  .stack .s { position: absolute; border-radius: var(--r-4); overflow: hidden; background: var(--surface); box-shadow: var(--shadow-3); border: 1px solid var(--line);
+    transform: translate3d(var(--tx, 0), var(--ty, 0), 0) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform var(--dur-3) var(--ez), opacity var(--dur-3) var(--ez); }
+  .stack .s1 { width: 78%; aspect-ratio: 16/10; left: 0; top: 4%; }
+  .stack .s2 { width: 62%; aspect-ratio: 16/10; right: 0; top: 38%; }
+  .stack .s3 { width: 46%; aspect-ratio: 16/10; left: 8%; bottom: 0; }
+  .stack .fl { position: absolute; z-index: 2; display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2) var(--sp-4) var(--sp-2) var(--sp-2); border-radius: var(--r-pill); font-size: var(--fs-13); font-weight: var(--fw-semibold);
+    transform: translate3d(var(--tx, 0), var(--ty, 0), 0); transition: transform var(--dur-3) var(--ez), opacity var(--dur-3) var(--ez); }
+  .stack .fl b { display: grid; place-items: center; width: 28px; height: 28px; border-radius: var(--r-pill); background: var(--pos); color: var(--on-brand); }
+  .stack .fl b svg { width: 16px; height: 16px; }
+  .stack .f1 { right: 6%; top: 8%; } .stack .f2 { left: 52%; bottom: 10%; }
+  .stack .s, .stack .fl { opacity: 0; }
+  .ready .stack .s, .ready .stack .fl { opacity: 1; }
+  .stack .s2 { transition-delay: 60ms; } .stack .s3 { transition-delay: 120ms; } .stack .f1 { transition-delay: 220ms; } .stack .f2 { transition-delay: 280ms; }
 
-  /* 트랙 + 카드 */
-  .track { --pad: max(var(--sp-6), calc((100% - 980px) / 2 + var(--sp-6))); --cw: 380px; display: flex; gap: var(--sp-4); overflow-x: auto; scroll-snap-type: x mandatory; padding: var(--sp-5) var(--pad); scrollbar-width: none; }
-  .track::-webkit-scrollbar { display: none; }
-  /* 마지막 카드도 스냅 시작점에 설 수 있게 꼬리 여백 — 없으면 끝 카드는 끝까지 못 밀린다 */
-  /* 카드는 JS가 .lane 으로 감싼다 — 러버밴드(끝에서 튕김)는 lane 의 transform 으로, 스크롤은 track 이 */
-  .track { cursor: grab; user-select: none; overscroll-behavior-x: contain; }
-  .track.drag { cursor: grabbing; scroll-snap-type: none; }
-  @media (pointer: fine) { .track { scroll-snap-type: none; } }   /* 마우스·트랙패드는 JS 가 카드 단위로 움직인다 — 네이티브 스냅과 싸우지 않게 */
-  .track > .lane { display: flex; gap: var(--sp-4); }
-  .track > .lane > .sp, .track > .lane > .sp0 { flex: 0 0 0px; }
-  .track.drag .cardx { pointer-events: none; }
-  .cardx { transition: box-shadow var(--dur-2) var(--ease-std); }
-  .cardx:hover { box-shadow: 0 14px 34px -18px rgba(0,0,0,.35); }
-  .dots i { transition: background var(--dur-1) var(--ease-std); }
-  .track .rv { opacity: 1; transform: none; transition: none; }   /* 트랙 안 카드는 즉시 — 넘김 모션과 겹치지 않게 */
-  .track > .lane { will-change: transform; }
-  .hero .links a, .appbar a.cta { transition: transform var(--dur-1) var(--ease-std); display: inline-block; } .hero .links a:hover, .appbar a.cta:hover { transform: translateY(-1px); } .appbar a.cta:active { transform: scale(.94); }
-  .cardx { flex: 0 0 380px; scroll-snap-align: center; border-radius: 22px; overflow: hidden; background: var(--gray6); box-shadow: 0 10px 30px -18px rgba(0,0,0,.35); display: flex; flex-direction: column; }
-  .cardx .b { padding: var(--sp-4) var(--sp-5) var(--sp-5); }
-  .cardx .eb { font-size: var(--fs-11); text-transform: uppercase; letter-spacing: .06em; color: var(--ios); font-weight: 700; }
-  .cardx h3 { font-size: var(--fs-18); font-weight: 600; margin-top: 4px; } .cardx p { font-size: var(--fs-13); color: var(--label2); margin-top: var(--sp-1); line-height: 1.55; }
-  .cardx .pf { font-size: var(--fs-12); color: var(--ink); margin-top: var(--sp-2); display: block; } .cardx .pf b { color: var(--ios); } .cardx.light a.pf { color: var(--ios); }
-  .cardx.text { background: var(--dk2); color: #fff; padding: var(--sp-6); justify-content: flex-end; min-height: 300px; }
-  .cardx.text .eb { color: #5AC8FA; } .cardx.text h3 { font-size: var(--fs-22); } .cardx.text p { color: var(--dksub); font-size: var(--fs-14); }
-  .cardx.text .k { display: flex; gap: var(--sp-5); margin-top: var(--sp-4); flex-wrap: wrap; } .cardx.text .k b { display: block; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; } .cardx.text .k span { font-size: var(--fs-11); color: var(--dksub); }
-  .cardx.light { background: var(--gray6); color: var(--ink); padding: var(--sp-6); justify-content: flex-end; min-height: 300px; }
-  .cardx.light .eb { color: var(--ios); } .cardx.light h3 { font-size: var(--fs-22); } .cardx.light p { color: var(--label2); font-size: var(--fs-14); }
-  .cardx.light .k { display: flex; gap: var(--sp-5); margin-top: var(--sp-4); } .cardx.light .k b { display: block; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; } .cardx.light .k span { font-size: var(--fs-11); color: var(--label2); }
-  .cardx.big { flex-basis: 640px; } .cardx.big .thumb { aspect-ratio: 16/9; }
-  .dots { display: flex; gap: 6px; justify-content: center; } .dots i { width: 6px; height: 6px; border-radius: 999px; background: var(--gray4); } .dots i.on { background: var(--ink); }
+  /* 숫자 */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: var(--sp-6); box-shadow: var(--shadow-1); }
+  .stat b { display: block; font-size: var(--fs-d2); font-weight: var(--fw-bold); letter-spacing: -0.03em; line-height: 1.05; white-space: nowrap; }
+  .stat b small { font-size: var(--fs-16); font-weight: var(--fw-medium); color: var(--ink-3); letter-spacing: 0; margin-left: 4px; }
+  .stat span { display: block; font-size: var(--fs-13); color: var(--ink-3); margin-top: var(--sp-2); }
+  .stat .bar { height: 4px; border-radius: var(--r-pill); background: var(--surface-2); margin-top: var(--sp-4); overflow: hidden; }
+  .stat .bar i { display: block; height: 100%; background: var(--brand); border-radius: inherit; transform-origin: left; transform: scaleX(0); transition: transform var(--dur-3) var(--ez); transition-delay: inherit; }
+  .stat.in .bar i { transform: scaleX(var(--s, 1)); }
 
-  /* 챕터 상세(접기) */
-  details.dt { max-width: 980px; margin: var(--sp-4) auto 0; padding: 0 var(--sp-6); }
-  details.dt > summary { cursor: pointer; list-style: none; font-size: var(--fs-14); color: var(--ios); font-weight: 500; padding: var(--sp-2) 0; }
-  details.dt > summary::-webkit-details-marker { display: none; } details.dt > summary::after { content: ' ›'; }
-  details.dt[open] > summary::after { content: ' ˅'; }
-  details.dt dl { margin: var(--sp-3) 0 0; font-size: var(--fs-14); line-height: 1.65; max-width: 44em; }
-  details.dt dt { font-size: var(--fs-12); color: var(--ios); font-weight: 600; margin-top: var(--sp-3); } details.dt dd { margin: 2px 0 0; color: var(--ink-2); } details.dt dd strong { color: var(--ink); font-weight: 600; }
+  /* 챕터 — 왼쪽 제목 고정, 오른쪽 벤토 */
+  .chap { padding-top: 120px; scroll-margin-top: 40px; }
+  .chap .grid { display: grid; grid-template-columns: 360px 1fr; gap: var(--sp-10); align-items: start; }
+  .chap .side { position: sticky; top: 104px; }
+  .chap .no { font-size: var(--fs-d1); font-weight: var(--fw-bold); letter-spacing: -0.05em; line-height: 1; color: transparent; -webkit-text-stroke: 1.5px var(--line-strong); }
+  .chap .lb { display: inline-flex; margin-top: var(--sp-5); font-size: var(--fs-13); font-weight: var(--fw-semibold); color: var(--brand-ink); background: var(--brand-soft); padding: var(--sp-1) var(--sp-3); border-radius: var(--r-pill); }
+  .chap h2 { font-size: var(--fs-d3); font-weight: var(--fw-bold); letter-spacing: -0.03em; line-height: 1.18; margin-top: var(--sp-3); text-wrap: balance; }
+  .chap .sub { font-size: var(--fs-16); color: var(--ink-2); line-height: 1.65; margin-top: var(--sp-4); text-wrap: pretty; }
+  .bento { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .bento > .w { grid-column: 1 / -1; }
 
-  /* 3열·2열·표 */
-  .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); max-width: 980px; margin: var(--sp-6) auto 0; padding: 0 var(--sp-6); }
-  .three div { background: var(--gray6); border-radius: 20px; padding: var(--sp-6); }
-  .three b { display: block; font-size: var(--fs-18); font-weight: 600; margin-bottom: var(--sp-2); } .three p { font-size: var(--fs-14); color: var(--label2); }
-  .two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); max-width: 980px; margin: var(--sp-6) auto 0; padding: 0 var(--sp-6); }
-  .two > div { background: var(--gray6); border-radius: 20px; padding: var(--sp-5) var(--sp-6); }
-  .two h3 { font-size: var(--fs-16); font-weight: 600; margin-bottom: var(--sp-2); color: var(--ios); }
-  .two ul { margin: 0; padding-left: 18px; font-size: var(--fs-14); color: var(--ink-2); } .two li { margin: 4px 0; }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 0 var(--sp-6); }
-  .note { font-size: var(--fs-12); color: var(--label2); margin-top: var(--sp-4); }
-  .tw { overflow-x: auto; }
+  .cd { position: relative; display: flex; flex-direction: column; border-radius: var(--r-card); overflow: hidden; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-1);
+    transition: transform var(--dur-2) var(--ease-std), box-shadow var(--dur-2) var(--ease-std); }
+  a.cd:hover { transform: translateY(-3px); box-shadow: var(--shadow-3); }
+  a.cd:active { transform: scale(.985); }
+  .cd .thumb { aspect-ratio: 16/9; overflow: hidden; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+  .cd .thumb img { transition: transform var(--dur-3) var(--ez); } a.cd:hover .thumb img { transform: scale(1.03); }
+  .cd .b { padding: var(--sp-5) var(--sp-6) var(--sp-6); display: flex; flex-direction: column; gap: var(--sp-2); flex: 1; }
+  .cd .eb { font-size: var(--fs-12); font-weight: var(--fw-semibold); color: var(--brand-ink); }
+  .cd h3 { font-size: var(--fs-18); font-weight: var(--fw-bold); letter-spacing: -0.01em; line-height: 1.35; }
+  .cd p { font-size: var(--fs-14); color: var(--ink-2); line-height: 1.6; }
+  .cd .pf { margin-top: auto; padding-top: var(--sp-3); font-size: var(--fs-13); color: var(--ink-3); display: flex; gap: var(--sp-2); align-items: baseline; }
+  .cd .pf b { flex: none; color: var(--brand-ink); font-weight: var(--fw-semibold); }
+  .cd .go { position: absolute; top: var(--sp-4); right: var(--sp-4); z-index: 1; width: 36px; height: 36px; border-radius: var(--r-pill); display: grid; place-items: center; color: var(--ink);
+    transition: transform var(--dur-2) var(--ease-std); }
+  .cd .go svg { width: 18px; height: 18px; } a.cd:hover .go { transform: translate(2px, -2px); }
+  .k { display: flex; gap: var(--sp-6); margin-top: var(--sp-3); flex-wrap: wrap; }
+  .k b { display: block; font-size: var(--fs-28); font-weight: var(--fw-bold); letter-spacing: -0.02em; line-height: 1.1; white-space: nowrap; }
+  .k span { font-size: var(--fs-12); color: var(--ink-3); }
+  /* 반전 카드 — 라이트에선 검정, 다크에선 흰 바탕 */
+  .cd.inv { background: var(--ink); border-color: transparent; color: var(--bg); }
+  .cd.inv p, .cd.inv .k span { color: color-mix(in srgb, var(--bg) 72%, transparent); }
+  .cd.inv .eb { color: color-mix(in srgb, var(--brand) 55%, var(--bg)); }
+  .cd.txt .b { padding: var(--sp-6); justify-content: flex-end; min-height: 280px; }
+  .cd.txt h3 { font-size: var(--fs-22); }
+
+  /* 검증식 막대 — 템플릿의 막대 성장 */
+  .eq { display: grid; gap: var(--sp-2); margin-top: var(--sp-4); }
+  .eq .r { display: grid; grid-template-columns: 76px 1fr; gap: var(--sp-3); align-items: center; font-size: var(--fs-12); color: color-mix(in srgb, var(--bg) 72%, transparent); }
+  .eq .t { position: relative; height: 14px; }
+  .eq .t i { position: absolute; top: 0; bottom: 0; left: var(--l, 0%); width: var(--w, 100%); border-radius: var(--r-1); background: var(--c, var(--brand)); transform-origin: left; transform: scaleX(0); transition: transform var(--dur-3) var(--ez); }
+  .in .eq .t i { transform: scaleX(1); }
+  .eq .r:nth-child(2) i { transition-delay: 120ms; } .eq .r:nth-child(3) i { transition-delay: 220ms; } .eq .r:nth-child(4) i { transition-delay: 320ms; } .eq .r:nth-child(5) i { transition-delay: 440ms; }
+
+  /* 데모 그리드 */
+  .sect { padding-top: 140px; scroll-margin-top: 40px; }
+  .sh { text-align: center; max-width: 720px; margin: 0 auto var(--sp-8); }
+  .sh .lb { display: inline-flex; font-size: var(--fs-13); font-weight: var(--fw-semibold); color: var(--brand-ink); background: var(--brand-soft); padding: var(--sp-1) var(--sp-3); border-radius: var(--r-pill); }
+  .sh h2 { font-size: var(--fs-d2); font-weight: var(--fw-bold); letter-spacing: -0.035em; line-height: 1.12; margin-top: var(--sp-3); text-wrap: balance; }
+  .sh .sub { font-size: var(--fs-16); color: var(--ink-2); margin-top: var(--sp-3); }
+  .demos { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); }
+  .demos .cd .thumb { aspect-ratio: 16/10; }
+  details.more { margin-top: var(--sp-6); }
+  details.more > summary { list-style: none; cursor: pointer; display: flex; justify-content: center; }
+  details.more > summary::-webkit-details-marker { display: none; }
+  details.more > summary .pill svg { width: 16px; height: 16px; transition: transform var(--dur-2) var(--ease-std); }
+  details.more[open] > summary .pill svg { transform: rotate(180deg); }
+  details.more .demos { margin-top: var(--sp-5); grid-template-columns: repeat(4, 1fr); }
+  details.more .cd h3 { font-size: var(--fs-16); }
+  details[open] > .fade { animation: fade-up var(--dur-3) var(--ez) both; }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* 일하는 방식 — 스크롤 위치의 항목만 또렷하게 (템플릿 단계 강조) */
+  .way { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); }
+  .way .cd .b { padding: var(--sp-6); }
+  .way .ix { width: 40px; height: 40px; border-radius: var(--r-pill); display: grid; place-items: center; background: var(--brand-soft); color: var(--brand-ink); margin-bottom: var(--sp-2); }
+  .way .ix svg { width: 20px; height: 20px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); margin-top: var(--sp-4); }
+  .two .b { padding: var(--sp-6); }
+  .two ul { margin: var(--sp-2) 0 0; padding: 0; list-style: none; display: grid; gap: var(--sp-3); }
+  .two li { display: flex; gap: var(--sp-3); font-size: var(--fs-14); color: var(--ink-2); line-height: 1.55; }
+  .two li::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: var(--r-pill); background: var(--brand); margin-top: 8px; }
+  .two .me li::before { background: var(--ink); }
+  .note { font-size: var(--fs-13); color: var(--ink-3); margin-top: var(--sp-5); text-align: center; }
+
+  /* 전체 프로젝트 — 세그먼트 + 표 */
+  .segw { display: flex; justify-content: center; margin-bottom: var(--sp-5); overflow-x: auto; scrollbar-width: none; }
+  .seg2 { display: inline-flex; padding: var(--sp-1); gap: 2px; border-radius: var(--r-pill); background: var(--surface-2); border: 1px solid var(--line); }
+  .seg2 button { height: 36px; padding: 0 var(--sp-4); border: 0; border-radius: var(--r-pill); background: transparent; color: var(--ink-2); font: inherit; font-size: var(--fs-13); font-weight: var(--fw-semibold); cursor: pointer; white-space: nowrap;
+    transition: background var(--dur-1) var(--ease-std), color var(--dur-1) var(--ease-std), box-shadow var(--dur-1) var(--ease-std); }
+  .seg2 button small { font-size: var(--fs-12); color: var(--ink-3); margin-left: 4px; font-weight: var(--fw-medium); }
+  .seg2 button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-2); }
+  .panel { border-radius: var(--r-card); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-1); padding: var(--sp-2) var(--sp-6); }
+  .panel[hidden] { display: none; }
+  .panel.show { animation: fade-up var(--dur-2) var(--ez) both; }
   table { width: 100%; border-collapse: collapse; font-size: var(--fs-14); }
-  th, td { text-align: left; padding: var(--sp-3) var(--sp-3); border-bottom: 1px solid var(--sep); vertical-align: top; }
-  thead th { font-size: var(--fs-12); font-weight: 500; color: var(--label2); white-space: nowrap; }
-  details.grp { border-bottom: 1px solid var(--sep); }
-  details.grp > summary { cursor: pointer; padding: var(--sp-4) 0; font-size: var(--fs-16); font-weight: 600; list-style: none; display: flex; gap: var(--sp-2); align-items: baseline; }
-  details.grp > summary::-webkit-details-marker { display: none; } details.grp > summary::before { content: '+'; color: var(--ios); } details.grp[open] > summary::before { content: '−'; }
-  details.grp > summary small { font-size: var(--fs-12); color: var(--label2); font-weight: 400; }
-  details.grp table { margin-bottom: var(--sp-4); }
-  details.faq { border-bottom: 1px solid var(--sep); }
-  details.faq > summary { cursor: pointer; padding: var(--sp-4) 0; font-size: var(--fs-16); font-weight: 500; list-style: none; }
-  details.faq > summary::-webkit-details-marker { display: none; } details.faq > summary::before { content: '+'; color: var(--ios); margin-right: var(--sp-2); font-weight: 600; } details.faq[open] > summary::before { content: '−'; }
-  details.faq p { margin: 0 0 var(--sp-4) var(--sp-5); font-size: var(--fs-14); color: var(--ink-2); max-width: 44em; line-height: 1.65; }
-  footer { max-width: 980px; margin: 72px auto 0; padding: var(--sp-6) var(--sp-6) 56px; border-top: 1px solid var(--sep); font-size: var(--fs-13); color: var(--label2); display: flex; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap; }
-  footer a { color: var(--ios); }
+  th, td { text-align: left; padding: var(--sp-4) var(--sp-3); border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  thead th { font-size: var(--fs-12); font-weight: var(--fw-semibold); color: var(--ink-3); white-space: nowrap; padding-top: var(--sp-3); padding-bottom: var(--sp-3); }
+  td:first-child { font-weight: var(--fw-semibold); }
+  td { color: var(--ink-2); } td:first-child { color: var(--ink); }
+  .tw { overflow-x: auto; }
 
-  /* 모션 */
-  .rv { opacity: 0; transform: translateY(10px); transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out); transition-delay: calc(var(--i, 0) * 30ms); }
+  /* FAQ */
+  .faqs { max-width: 820px; margin: 0 auto; display: grid; gap: var(--sp-3); }
+  details.faq { border-radius: var(--r-4); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-1); }
+  details.faq > summary { cursor: pointer; padding: var(--sp-5) var(--sp-6); font-size: var(--fs-16); font-weight: var(--fw-semibold); list-style: none; display: flex; gap: var(--sp-4); align-items: center; }
+  details.faq > summary::-webkit-details-marker { display: none; }
+  details.faq > summary svg { flex: none; margin-left: auto; width: 20px; height: 20px; color: var(--ink-3); transition: transform var(--dur-2) var(--ease-std); }
+  details.faq[open] > summary svg { transform: rotate(45deg); color: var(--brand); }
+  details.faq p { padding: 0 var(--sp-6) var(--sp-6); font-size: var(--fs-14); color: var(--ink-2); line-height: 1.7; }
+
+  footer { margin-top: 140px; padding: var(--sp-8) 0 120px; border-top: 1px solid var(--line); font-size: var(--fs-13); color: var(--ink-3); }
+  footer .wrap { display: flex; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap; }
+  footer a { color: var(--brand-ink); } footer strong { color: var(--ink); }
+
+  /* 챕터 도크 — 아래에 떠 있는 유리 */
+  .dock { position: fixed; left: 50%; bottom: var(--sp-4); z-index: 30; transform: translate(-50%, 160%); border-radius: var(--r-pill); padding: var(--sp-1);
+    display: flex; gap: 2px; max-width: calc(100% - 24px); overflow-x: auto; scrollbar-width: none; transition: transform var(--dur-3) var(--ez); }
+  .dock.show { transform: translate(-50%, 0); }
+  .dock.glass { background: color-mix(in srgb, var(--surface) 84%, transparent); }   /* 어두운 카드 위를 지나갈 때도 글자 대비 4.5:1 — 가이드 §5 알파 상향 */
+  .dock a { position: relative; display: flex; align-items: center; gap: var(--sp-2); height: 40px; padding: 0 var(--sp-4); border-radius: var(--r-pill); font-size: var(--fs-13); font-weight: var(--fw-semibold); color: var(--ink-2); white-space: nowrap; transition: color var(--dur-1) var(--ease-std); }
+  .dock a::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--surface); box-shadow: var(--shadow-2); opacity: 0; transform: scale(.9); transition: opacity var(--dur-2) var(--ez), transform var(--dur-2) var(--ez); z-index: -1; }
+  .dock a.on { color: var(--ink); } .dock a.on::before { opacity: 1; transform: none; }
+  .dock a i { font-style: normal; font-size: var(--fs-12); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .dock a.on i { color: var(--brand); }
+  .dock a:hover { color: var(--ink); }
+
+  /* 등장 모션 */
+  .rv { opacity: 0; transform: translateY(16px); transition: opacity var(--dur-3) var(--ez), transform var(--dur-3) var(--ez); transition-delay: calc(var(--i, 0) * 60ms); }
   .rv.in { opacity: 1; transform: none; }
-  .top { position: fixed; right: var(--sp-4); bottom: var(--sp-4); width: 40px; height: 40px; border-radius: 999px; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; font-weight: 700; box-shadow: var(--shadow-2); opacity: 0; transform: translateY(8px); transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out); z-index: 10; }
-  .top.show { opacity: 1; transform: none; }
-  @media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; transition: none; } .cardx, .top, .prog a { transition: none; } }
-  @media (max-width: 860px) {
-    .hero { padding: 56px var(--sp-5) 36px; } .hero h1 { font-size: 36px; } .hero p { font-size: var(--fs-18); }
-    .stats { gap: var(--sp-6) var(--sp-8); } .stats b { font-size: 30px; }
-    .chap { padding-top: 44px; } .chap .no { font-size: 44px; } .sh h2 { font-size: 28px; } .sh .sub { font-size: var(--fs-16); }
-    .track { --pad: var(--sp-5); --cw: 300px; } .cardx, .cardx.big { flex-basis: 300px; } .cardx.text, .cardx.light { min-height: 240px; }
-    .three, .two { grid-template-columns: 1fr; } .prog { display: none; }
+  /* 등장이 끝나면 지연을 지운다 — 남아 있으면 hover 가 늦게 반응한다 */
+  .rv.done { transition: opacity var(--dur-2) var(--ease-std), transform var(--dur-2) var(--ease-std), box-shadow var(--dur-2) var(--ease-std); transition-delay: 0s; }
+  /* 클릭할 수 있는 카드는 처음 보일 때 한 번 링이 퍼진다 */
+  .ring { animation: ring var(--dur-3) var(--ease-out) 1; }
+  @keyframes ring { from { box-shadow: 0 0 0 0 var(--tint-1); } to { box-shadow: 0 0 0 16px transparent; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rv, .hero h1 .ln > span, .stack .s, .stack .fl, .stat .bar i, .eq .t i { opacity: 1; transform: none; transition: none; }
+    .ring { animation: none; } .topbar, .dock { transition: none; }
+  }
+  @media (max-width: 980px) {
+    :root { --fs-d1: 40px; --fs-d2: 32px; --fs-d3: 28px; --pad: var(--sp-4); --r-card: 20px; }
+    .hero { grid-template-columns: 1fr; min-height: 0; padding-top: 104px; gap: var(--sp-8); }
+    .stack { max-width: 520px; width: 100%; margin: 0 auto; }
+    .stats { grid-template-columns: 1fr 1fr; } .stat { padding: var(--sp-5); }
+    .chap { padding-top: 88px; } .chap .grid { grid-template-columns: 1fr; gap: var(--sp-6); } .chap .side { position: static; }
+    .chap .no { font-size: var(--fs-d2); }
+    .bento, .way, .two { grid-template-columns: 1fr; }
+    .demos, details.more .demos { grid-template-columns: 1fr 1fr; }
+    .sect { padding-top: 100px; }
+    .topbar a.l { display: none; }
+    .panel { padding: var(--sp-1) var(--sp-4); }
+    .segw { justify-content: flex-start; }
+  }
+  @media (max-width: 600px) {
+    .demos, details.more .demos { grid-template-columns: 1fr; }
+    .cd.txt .b { min-height: 0; }
+    .dock a { padding: 0 var(--sp-3); } .dock a span { display: none; }
   }
 </style>
 </head>
 <body>
-<div class="appbar"><div class="in">
-  <span class="n">이어진</span>
-  <a href="#c1">재무기획</a><a href="#c2">시스템 설계</a><a href="#c3">결산·대사</a><a href="#c6">데모</a><a href="#s-way">일하는 방식</a><a href="#s-all">전체</a><a href="#s-faq">FAQ</a>
-  <a class="cta" href="mailto:lee-ding@naver.com">연락하기</a>
-</div></div>
-<nav class="prog" aria-label="챕터"><a href="#c1" title="01"></a><a href="#c2" title="02"></a><a href="#c3" title="03"></a><a href="#c4" title="04"></a><a href="#c5" title="05"></a><a href="#c6" title="06"></a></nav>
+<div class="aura" aria-hidden="true"><i></i><i></i><i></i></div>
 
-<div class="hero">
-  <div class="eb">재무기획 · 시스템 설계 · 재무회계 — 패션 이커머스</div>
-  <h1>계획을 숫자로,<br>숫자를 시스템으로.</h1>
-  <p>결산과 대사를 맡으면서 현금흐름 예측과 시즌 계획을 세웠고, 그 계획이 매달 돌아가는 재무 시스템을 스타트업 안에서 직접 만들었습니다.</p>
-  <div class="links"><a href="#c1">재무기획 보기</a><a href="#c2">시스템 설계 보기</a><a href="#c6">데모 6개 열기</a></div>
-</div>
-<div class="stats rv">
-  <div><b class="num">15<small>테이블</small></b><span>현금흐름 예측 — 원천 단일화·체크섬 7종</span></div>
-  <div><b class="num">6<small>개</small></b><span>실운영 재무 시스템 — 직접 설계·구축</span></div>
-  <div><b class="num">34<small>채널</small></b><span>정산 대사 — 원 단위 일치</span></div>
-  <div><b class="num">18<small>회</small></b><span>월결산 — 가결산·비경상 분리</span></div>
-</div>
+<header class="topbar glass"><div class="in">
+  <a class="n" href="#">이어진</a>
+  <a class="l" href="#c1">재무기획</a><a class="l" href="#c2">시스템 설계</a><a class="l" href="#c3">결산·대사</a><a class="l" href="#s-demo">데모</a><a class="l" href="#s-way">일하는 방식</a><a class="l" href="#s-all">전체</a><a class="l" href="#s-faq">FAQ</a>
+  <a class="pill pri" href="mailto:lee-ding@naver.com">연락하기</a>
+</div></header>
+
+<main>
+<section class="wrap hero">
+  <div>
+    <span class="chip"><span class="dot"></span>재무기획 · 시스템 설계 · 재무회계 · 패션 이커머스</span>
+    <h1><span class="ln"><span>계획을 숫자로,</span></span><span class="ln"><span>숫자를 <em>시스템</em>으로.</span></span></h1>
+    <p class="lead">결산과 대사를 맡으면서 현금흐름 예측과 시즌 계획을 세웠고, 그 계획이 매달 돌아가는 재무 시스템을 스타트업 안에서 직접 만들었습니다.</p>
+    <div class="cta"><a class="pill pri" href="#c1">재무기획 보기</a><a class="pill sec" href="#s-demo">데모 6개 열기</a></div>
+  </div>
+  <div class="stack" aria-hidden="true">
+    <div class="s s1" data-depth="1"><img src="assets/shots/fund-cycle.jpg" alt=""></div>
+    <div class="s s2" data-depth="1.8"><img src="assets/shots/one-close.jpg" alt=""></div>
+    <div class="s s3" data-depth="2.6"><img src="assets/shots/nrv-simulator.jpg" alt=""></div>
+    <div class="fl f1 glass" data-depth="3.4"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></b>체크섬 7종 통과</div>
+    <div class="fl f2 glass" data-depth="4"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></b>34채널 원 단위 일치</div>
+  </div>
+</section>
+
+<section class="wrap stats">
+  <div class="stat rv"><b class="num" data-count>15<small>테이블</small></b><span>현금흐름 예측 원천 · 체크섬 7종</span><div class="bar"><i style="--s:.62"></i></div></div>
+  <div class="stat rv"><b class="num" data-count>6<small>개</small></b><span>직접 설계·구축한 실운영 재무 시스템</span><div class="bar"><i style="--s:.4"></i></div></div>
+  <div class="stat rv"><b class="num" data-count>34<small>채널</small></b><span>정산 대사 원 단위 일치</span><div class="bar"><i style="--s:1"></i></div></div>
+  <div class="stat rv"><b class="num" data-count>18<small>회</small></b><span>월결산 · 가결산 · 비경상 분리</span><div class="bar"><i style="--s:.75"></i></div></div>
+</section>
 
 <!-- 01 -->
-<section class="chap" id="c1">
-  <div class="no">01</div>
-  <div class="sh rv"><h2>재무기획 — 이번 달 자금이 버티는지를 파일을 열지 않고 답하기.</h2><p class="sub">자금 현황·가결산·정산이 각각 다른 파일에 있어 예측은 사람이 매번 다시 계산했습니다. 원천을 하나로 모으고 예측을 매일 자동으로 돌렸습니다.</p></div>
-  <div class="track" data-dots>
-    <a class="cardx big rv" href="demo/fund-cycle/"><div class="thumb"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드"></div><div class="b"><div class="eb">데모</div><h3>자금 대시보드 — 잔액·수금 예측·생산대금</h3><p>원천 15테이블을 매일 동기화, 열 때마다 체크섬 7종으로 원천과 대조. 예측이 바뀌면 사유가 기록으로 남습니다.</p><div class="pf"><b>증명</b> 보고 숫자가 원천과 자동으로 대조된다</div></div></a>
-    <div class="cardx text rv"><div class="eb">시즌 계획</div><h3>시즌·부서별 영업·잉여현금흐름</h3><p>자금 원천을 별도 DB로 옮겨 시즌과 부서 축으로 현금흐름을 산출. 26SS 파일럿, 컨펌 시트로 부서장 승인 흐름.</p><div class="k"><div><b>2</b><span>축 (시즌 · 부서)</span></div><div><b>1</b><span>시즌 파일럿</span></div></div></div>
-    <div class="cardx light rv"><div class="eb">수익성</div><h3>채널 원가율 · 공헌이익</h3><p>매출을 총액 기준으로 환산해 채널을 같은 축에 올려 비교. 고정·변동비는 예측용·분석용 2체계로 판정 규칙을 고정.</p><div class="k"><div><b>2</b><span>비용 체계</span></div><div><b>채널×부문</b><span>비교 축</span></div></div></div>
-    <div class="cardx light rv"><div class="eb">계약 → 자금</div><h3>투자계약 의무를 자금계획에 연결</h3><p>계약 조항을 긴급/정기/이벤트 의무로 분류하고 상환권이 열리는 시점을 타임라인으로 자금계획과 연결.</p><a class="pf" href="demo/investor-contracts/"><b>데모</b> 의무 캘린더 · 상환 타임라인</a></div>
-  </div><div class="dots"></div>
-</section>
+<section class="chap" id="c1"><div class="wrap grid">
+  <div class="side rv"><div class="no">01</div><span class="lb">재무기획</span><h2>이번 달 자금이 버티는지, 파일을 열지 않고 답하기.</h2><p class="sub">자금 현황·가결산·정산이 각각 다른 파일에 있어 예측은 사람이 매번 다시 계산했습니다. 원천을 하나로 모으고 예측을 매일 자동으로 돌렸습니다.</p></div>
+  <div class="bento">
+    <a class="cd w rv hot" href="demo/fund-cycle/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드" loading="lazy"></div><div class="b"><div class="eb">데모</div><h3>자금 대시보드 · 잔액·수금 예측·생산대금</h3><p>원천 15테이블을 매일 동기화, 열 때마다 체크섬 7종으로 원천과 대조. 예측이 바뀌면 사유가 기록으로 남습니다.</p><div class="pf"><b>증명</b>보고 숫자가 원천과 자동으로 대조된다</div></div></a>
+    <div class="cd txt inv rv"><div class="b"><div class="eb">시즌 계획</div><h3>시즌·부서별 영업·잉여현금흐름</h3><p>자금 원천을 별도 DB로 옮겨 시즌과 부서 축으로 현금흐름을 산출. 26SS 파일럿, 컨펌 시트로 부서장 승인 흐름.</p><div class="k"><div><b>2</b><span>축 (시즌 · 부서)</span></div><div><b>1</b><span>시즌 파일럿</span></div></div></div></div>
+    <div class="cd txt rv"><div class="b"><div class="eb">수익성</div><h3>채널 원가율 · 공헌이익</h3><p>매출을 총액 기준으로 환산해 채널을 같은 축에 올려 비교. 고정·변동비는 예측용·분석용 2체계로 판정 규칙을 고정.</p><div class="k"><div><b>2</b><span>비용 체계</span></div><div><b>채널×부문</b><span>비교 축</span></div></div></div></div>
+    <a class="cd txt w rv hot" href="demo/investor-contracts/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="b" style="min-height:0"><div class="eb">계약 → 자금</div><h3>투자계약 의무를 자금계획에 연결</h3><p>계약 조항을 긴급/정기/이벤트 의무로 분류하고 상환권이 열리는 시점을 타임라인으로 자금계획과 연결.</p><div class="pf"><b>데모</b>의무 캘린더 · 상환 타임라인</div></div></a>
+  </div>
+</div></section>
 
 <!-- 02 -->
-<section class="chap" id="c2">
-  <div class="no">02</div>
-  <div class="sh rv"><h2>시스템 설계 — 흩어진 파일을 하나의 흐름으로.</h2><p class="sub">스타트업엔 재무 시스템이 없었습니다. 구글시트·엑셀·ERP 추출본을 정본 하나로 모으고, 상품 계획 → 발주 → 입고 → 매입 원가 → 자금이 같은 품번 체계 위에서 돌게 만들었습니다.</p></div>
-  <div class="track" data-dots>
-    <div class="cardx text rv"><div class="eb">정본</div><h3>결산 원천 단일화</h3><p>회계 전표의 모든 분개라인을 정본으로 정규화하고 계정 81개를 유형·현금흐름으로 매핑. 새 계정이 나타나면 적재가 멈춰 임의 분류를 막습니다. 직접법 현금흐름 = 통장 순증감.</p><div class="k"><div><b>81</b><span>계정 매핑</span></div><div><b>0</b><span>현금흐름 차이</span></div></div></div>
-    <a class="cardx rv" href="demo/one-close/"><div class="thumb"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱"></div><div class="b"><div class="eb">실운영</div><h3>월 매입 마감 앱</h3><p>발주↔입고 대사, 수입 부대비용 배부, 필증 검증, 결재를 한 흐름으로 — 예외만 사람이 봅니다</p><div class="pf"><b>증명</b> 매입 원가 확정 절차를 화면 순서로 고정했다</div></div></a>
-    <a class="cardx rv" href="demo/linesheet-fin/"><div class="thumb"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계"></div><div class="b"><div class="eb">상류 표준화</div><h3>상품 계획표(라인시트) 표준화</h3><p>부서마다 다른 양식 5종을 공통 필드 13개·키 3계층으로 통일, 매입 약정·자금 소요로 바로 읽히는 집계 앱</p><div class="pf"><b>증명</b> 상품 계획이 자금 계획과 같은 원천을 쓴다</div></div></a>
-    <div class="cardx light rv"><div class="eb">설계</div><h3>전사 정보 흐름 설계</h3><p>계획이 자금·실적으로 이어지는 경로를 한 장으로 그리고, 생산·재무가 같이 쓰는 협업 방(그룹 8·상태 5·공유 뷰 4)과 "하나의 시스템" 목업으로 방향을 합의.</p><a class="pf" href="demo/flow-diagram/"><b>데모</b> 흐름도 · ONE ERP 목업</a></div>
-  </div><div class="dots"></div>
-</section>
+<section class="chap" id="c2"><div class="wrap grid">
+  <div class="side rv"><div class="no">02</div><span class="lb">시스템 설계</span><h2>흩어진 파일을 하나의 흐름으로.</h2><p class="sub">스타트업엔 재무 시스템이 없었습니다. 구글시트·엑셀·ERP 추출본을 정본 하나로 모으고, 상품 계획 → 발주 → 입고 → 매입 원가 → 자금이 같은 품번 체계 위에서 돌게 만들었습니다.</p></div>
+  <div class="bento">
+    <div class="cd txt inv w rv"><div class="b" style="min-height:0"><div class="eb">정본</div><h3>결산 원천 단일화</h3><p>회계 전표의 모든 분개라인을 정본으로 정규화하고 계정 81개를 유형·현금흐름으로 매핑. 새 계정이 나타나면 적재가 멈춰 임의 분류를 막습니다. 직접법 현금흐름 = 통장 순증감.</p><div class="k"><div><b>81</b><span>계정 매핑</span></div><div><b>0</b><span>현금흐름 차이</span></div></div></div></div>
+    <a class="cd rv hot" href="demo/one-close/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱" loading="lazy"></div><div class="b"><div class="eb">실운영</div><h3>월 매입 마감 앱</h3><p>발주↔입고 대사, 수입 부대비용 배부, 필증 검증, 결재를 한 흐름으로. 예외만 사람이 봅니다.</p><div class="pf"><b>증명</b>매입 원가 확정 절차를 화면 순서로 고정했다</div></div></a>
+    <a class="cd rv hot" href="demo/linesheet-fin/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계" loading="lazy"></div><div class="b"><div class="eb">상류 표준화</div><h3>상품 계획표(라인시트) 표준화</h3><p>부서마다 다른 양식 5종을 공통 필드 13개·키 3계층으로 통일, 매입 약정·자금 소요로 바로 읽히는 집계 앱.</p><div class="pf"><b>증명</b>상품 계획이 자금 계획과 같은 원천을 쓴다</div></div></a>
+    <a class="cd txt w rv hot" href="demo/flow-diagram/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="b" style="min-height:0"><div class="eb">설계</div><h3>전사 정보 흐름 설계</h3><p>계획이 자금·실적으로 이어지는 경로를 한 장으로 그리고, 생산·재무가 같이 쓰는 협업 방(그룹 8·상태 5·공유 뷰 4)과 "하나의 시스템" 목업으로 방향을 합의.</p><div class="pf"><b>데모</b>흐름도 · ONE ERP 목업</div></div></a>
+  </div>
+</div></section>
 
 <!-- 03 -->
-<section class="chap" id="c3">
-  <div class="no">03</div>
-  <div class="sh rv"><h2>월결산 — 매달 같은 기준으로.</h2><p class="sub">판관비 분류가 담당자마다 달라 월별 비교가 어려웠고, 일회성 손익이 정상 손익에 섞였습니다. 한 체계로 고정했습니다.</p></div>
-  <div class="track" data-dots>
-    <div class="cardx text rv"><div class="eb">한 일</div><h3>판관비 7대 분류, 비경상 분리</h3><p>지급수수료를 판매성·관리성으로 분해. 비경상 항목을 걷어낸 정상 손익을 수식 연동 한 장 보고서로. 보고서 상단에 결론과 검증식이 먼저 오고 표는 뒤로.</p><div class="k"><div><b>7</b><span>대 분류</span></div><div><b>18</b><span>회 결산</span></div></div></div>
-    <div class="cardx light rv"><div class="eb">결과</div><h3>같은 정의로 매달</h3><p>EBITDA·마진·매출 대비 비율이 같은 정의로 나옵니다. 상반기 실적 분석은 원천→배부→지표→피벗 수식 체인으로 재현 가능하게.</p></div>
-  </div><div class="dots"></div>
-</section>
+<section class="chap" id="c3"><div class="wrap grid">
+  <div class="side rv"><div class="no">03</div><span class="lb">월결산</span><h2>매달 같은 기준으로.</h2><p class="sub">판관비 분류가 담당자마다 달라 월별 비교가 어려웠고, 일회성 손익이 정상 손익에 섞였습니다. 한 체계로 고정했습니다.</p></div>
+  <div class="bento">
+    <div class="cd txt inv rv"><div class="b"><div class="eb">한 일</div><h3>판관비 7대 분류, 비경상 분리</h3><p>지급수수료를 판매성·관리성으로 분해. 비경상 항목을 걷어낸 정상 손익을 수식 연동 한 장 보고서로. 보고서 상단에 결론과 검증식이 먼저 오고 표는 뒤로.</p><div class="k"><div><b>7</b><span>대 분류</span></div><div><b>18</b><span>회 결산</span></div></div></div></div>
+    <div class="cd txt rv"><div class="b"><div class="eb">결과</div><h3>같은 정의로 매달</h3><p>EBITDA·마진·매출 대비 비율이 같은 정의로 나옵니다. 상반기 실적 분석은 원천→배부→지표→피벗 수식 체인으로 재현 가능하게.</p></div></div>
+  </div>
+</div></section>
 
 <!-- 04 -->
-<section class="chap" id="c4">
-  <div class="no">04</div>
-  <div class="sh rv"><h2>재고 평가충당금 — 판단 기준부터 재현 가능하게.</h2><p class="sub">근거가 문서로 남아 있지 않아 금액이 바뀔 때 이유를 설명하기 어려웠습니다. 감사인이 반드시 근거를 확인하는 항목입니다.</p></div>
-  <div class="track" data-dots>
-    <a class="cardx big rv" href="demo/nrv-simulator/"><div class="thumb"><img src="assets/shots/nrv-simulator.jpg" alt="NRV 시뮬레이터"></div><div class="b"><div class="eb">데모</div><h3>NRV 시뮬레이터</h3><p>가정을 움직이면 전 품번 충당금이 즉시 재계산됩니다</p><div class="pf"><b>증명</b> 충당금 판단 기준이 문서화·재현 가능하다</div></div></a>
-    <div class="cardx text rv"><div class="eb">한 일</div><h3>판단 15항목, 7라운드</h3><p>에이징 구간·시즌 판별·계절지수·순실현가치 추정·예외 처리를 항목별 대안과 채택 근거로 확정. 다른 AI 모델을 검토자로 세워 교차검증.</p><div class="k"><div><b>15</b><span>판단 항목</span></div><div><b>7</b><span>라운드</span></div></div></div>
-    <div class="cardx light rv"><div class="eb">결과</div><h3>이전 확정본 원 단위 재현</h3><p>최종본이 이전 확정본을 원 단위까지 재현하는지 확인한 뒤에만 확정. 시나리오 비교가 회의 중에 끝납니다.</p></div>
-  </div><div class="dots"></div>
-</section>
+<section class="chap" id="c4"><div class="wrap grid">
+  <div class="side rv"><div class="no">04</div><span class="lb">재고 평가충당금</span><h2>판단 기준부터 재현 가능하게.</h2><p class="sub">근거가 문서로 남아 있지 않아 금액이 바뀔 때 이유를 설명하기 어려웠습니다. 감사인이 반드시 근거를 확인하는 항목입니다.</p></div>
+  <div class="bento">
+    <a class="cd w rv hot" href="demo/nrv-simulator/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/nrv-simulator.jpg" alt="NRV 시뮬레이터" loading="lazy"></div><div class="b"><div class="eb">데모</div><h3>NRV 시뮬레이터</h3><p>가정을 움직이면 전 품번 충당금이 즉시 재계산됩니다.</p><div class="pf"><b>증명</b>충당금 판단 기준이 문서화·재현 가능하다</div></div></a>
+    <div class="cd txt inv rv"><div class="b"><div class="eb">한 일</div><h3>판단 15항목, 7라운드</h3><p>에이징 구간·시즌 판별·계절지수·순실현가치 추정·예외 처리를 항목별 대안과 채택 근거로 확정. 다른 AI 모델을 검토자로 세워 교차검증.</p><div class="k"><div><b>15</b><span>판단 항목</span></div><div><b>7</b><span>라운드</span></div></div></div></div>
+    <div class="cd txt rv"><div class="b"><div class="eb">결과</div><h3>이전 확정본 원 단위 재현</h3><p>최종본이 이전 확정본을 원 단위까지 재현하는지 확인한 뒤에만 확정. 시나리오 비교가 회의 중에 끝납니다.</p></div></div>
+  </div>
+</div></section>
 
 <!-- 05 -->
-<section class="chap" id="c5">
-  <div class="no">05</div>
-  <div class="sh rv"><h2>정산과 경비 — 검증식 하나로, 예외만 사람이.</h2><p class="sub">채널마다 다른 정산서, 규정과 대조해야 하는 경비. 반복 확인을 기계에 넘기고 사람은 예외만 봅니다.</p></div>
-  <div class="track" data-dots>
-    <div class="cardx text rv"><div class="eb">검증식</div><h3>정산서 입금액 = ERP 실판매 − 수수료 − 반품 ± 상시차이</h3><p>위탁 34채널 전부 원 단위로 맞는지 확인. 남은 차이 3건은 원인을 규명해 회계처리 방침을 정했습니다.</p><div class="k"><div><b>34</b><span>채널</span></div><div><b>4</b><span>상시차이 유형</span></div></div></div>
-    <div class="cardx light rv"><div class="eb">수집</div><h3>파트너사 제공 방식 안에서 자동화</h3><p>결제대행 3사 정산은 매일 수집·정규화해 단일 저장소에 적재, 대사 원천탭을 자동 생성합니다.</p><div class="k"><div><b>3</b><span>결제대행사</span></div><div><b>일 1회</b><span>수집</span></div></div></div>
-    <a class="cardx rv" href="demo/overtime-meal/"><div class="thumb"><img src="assets/shots/overtime-meal.jpg" alt="야근식대 대조"></div><div class="b"><div class="eb">실운영</div><h3>경비 자동 판정</h3><p>근태와 카드 내역을 사람별로 대조해 규정 충족을 판정, 안내문구까지 생성</p><div class="pf"><b>증명</b> 규정성 경비를 예외만 사람이 보게 만들었다</div></div></a>
-    <a class="cardx rv" href="demo/card-notice/"><div class="thumb"><img src="assets/shots/card-notice.jpg" alt="법인카드 개편 공지"></div><div class="b"><div class="eb">전사 공지</div><h3>법인카드 통제 개편</h3><p>실물 카드 축소와 가상카드 전환 설계, 관리 대장 정비</p><div class="pf"><b>증명</b> 정책 변경을 전 구성원이 읽을 수 있게 설명했다</div></div></a>
-  </div><div class="dots"></div>
-</section>
+<section class="chap" id="c5"><div class="wrap grid">
+  <div class="side rv"><div class="no">05</div><span class="lb">정산과 경비</span><h2>검증식 하나로, 예외만 사람이.</h2><p class="sub">채널마다 다른 정산서, 규정과 대조해야 하는 경비. 반복 확인을 기계에 넘기고 사람은 예외만 봅니다.</p></div>
+  <div class="bento">
+    <div class="cd txt inv w rv"><div class="b" style="min-height:0"><div class="eb">검증식</div><h3>정산서 입금액 = ERP 실판매 − 수수료 − 반품 ± 상시차이</h3>
+      <div class="eq" aria-label="검증식 구조 (비율은 예시)">
+        <div class="r"><span>실판매</span><div class="t"><i style="--w:100%"></i></div></div>
+        <div class="r"><span>− 수수료</span><div class="t"><i style="--l:72%;--w:28%;--c:var(--warn)"></i></div></div>
+        <div class="r"><span>− 반품</span><div class="t"><i style="--l:62%;--w:10%;--c:var(--warn)"></i></div></div>
+        <div class="r"><span>± 상시차이</span><div class="t"><i style="--l:60%;--w:2%;--c:var(--g400)"></i></div></div>
+        <div class="r"><span>= 입금액</span><div class="t"><i style="--w:60%;--c:var(--pos)"></i></div></div>
+      </div>
+      <p style="margin-top:var(--sp-3)">위탁 34채널 전부 원 단위로 맞는지 확인. 남은 차이 3건은 원인을 규명해 회계처리 방침을 정했습니다.</p><div class="k"><div><b>34</b><span>채널</span></div><div><b>4</b><span>상시차이 유형</span></div></div></div></div>
+    <div class="cd txt rv"><div class="b"><div class="eb">수집</div><h3>파트너사 제공 방식 안에서 자동화</h3><p>결제대행 3사 정산은 매일 수집·정규화해 단일 저장소에 적재, 대사 원천탭을 자동 생성합니다.</p><div class="k"><div><b>3</b><span>결제대행사</span></div><div><b>일 1회</b><span>수집</span></div></div></div></div>
+    <a class="cd rv hot" href="demo/overtime-meal/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/overtime-meal.jpg" alt="야근식대 대조" loading="lazy"></div><div class="b"><div class="eb">실운영</div><h3>경비 자동 판정</h3><p>근태와 카드 내역을 사람별로 대조해 규정 충족을 판정, 안내문구까지 생성.</p><div class="pf"><b>증명</b>규정성 경비를 예외만 사람이 보게 만들었다</div></div></a>
+    <a class="cd w rv hot" href="demo/card-notice/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/card-notice.jpg" alt="법인카드 개편 공지" loading="lazy"></div><div class="b"><div class="eb">전사 공지</div><h3>법인카드 통제 개편</h3><p>실물 카드 축소와 가상카드 전환 설계, 관리 대장 정비.</p><div class="pf"><b>증명</b>정책 변경을 전 구성원이 읽을 수 있게 설명했다</div></div></a>
+  </div>
+</div></section>
 
-<!-- 06 -->
-<section class="chap" id="c6">
-  <div class="no">06</div>
-  <div class="sh rv"><h2>실제로 돌아가는 화면 6.</h2><p class="sub">샘플 데이터로, 계산·판정 로직은 실제 구현과 동일합니다. 실운영 앱은 서버 코드까지 브라우저에서 그대로 실행됩니다.</p></div>
-  <div class="track" data-dots>
-    <a class="cardx rv" href="demo/one-close/"><div class="thumb"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱"></div><div class="b"><div class="eb">실운영 · 직접 설계</div><h3>월 매입 마감 앱</h3><p>입고 검수 → B/L 연결 → 부대비용 배부 → 취득원가</p></div></a>
-    <a class="cardx rv" href="demo/nrv-simulator/"><div class="thumb"><img src="assets/shots/nrv-simulator.jpg" alt="NRV 시뮬레이터"></div><div class="b"><div class="eb">실운영</div><h3>NRV 시뮬레이터</h3><p>가정을 움직이면 전 품번 즉시 재계산</p></div></a>
-    <a class="cardx rv" href="demo/linesheet-fin/"><div class="thumb"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계"></div><div class="b"><div class="eb">실운영</div><h3>라인시트 재무 집계</h3><p>매입 약정 기준 집계 · 결제조건 · 유효성</p></div></a>
-    <a class="cardx rv" href="demo/fund-cycle/"><div class="thumb"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드"></div><div class="b"><div class="eb">실운영</div><h3>자금 대시보드</h3><p>잔액 추이 · 수금 예측 · 체크섬 7종</p></div></a>
-    <a class="cardx rv" href="demo/card-notice/"><div class="thumb"><img src="assets/shots/card-notice.jpg" alt="법인카드 개편 공지"></div><div class="b"><div class="eb">전사 공지</div><h3>법인카드 개편</h3><p>정책 변경 전후 · 한도 근거 · 상황별 가이드</p></div></a>
-    <a class="cardx rv" href="demo/overtime-meal/"><div class="thumb"><img src="assets/shots/overtime-meal.jpg" alt="야근식대 대조"></div><div class="b"><div class="eb">실운영</div><h3>야근식대 대조</h3><p>근태 vs 카드 사람별 판정, 안내문구</p></div></a>
-  </div><div class="dots"></div>
-  <details class="dt"><summary>분석·설계 산출물 7개 — 상시 운영은 아닌 것</summary>
-    <div class="track" data-dots style="padding-left:0;padding-right:0">
-      <a class="cardx" href="demo/investor-contracts/"><div class="thumb"><img src="assets/shots/investor-contracts.jpg" alt="투자계약 의무 관리"></div><div class="b"><h3>투자계약 의무 관리</h3><p>계약 조항을 긴급/정기/이벤트 의무로 — 분석 1회 산출물</p></div></a>
-      <a class="cardx" href="demo/expense-dashboard/"><div class="thumb"><img src="assets/shots/expense-dashboard.jpg" alt="지출내역 대시보드"></div><div class="b"><h3>지출내역 대시보드</h3><p>지출 표 붙여넣기 → 용도·부서 구성</p></div></a>
-      <a class="cardx" href="demo/fund-dashboard/"><div class="thumb"><img src="assets/shots/fund-dashboard.jpg" alt="자금 인텔리전스"></div><div class="b"><h3>자금 인텔리전스</h3><p>현금 시나리오·손익 관점 버전</p></div></a>
-      <a class="cardx" href="demo/flow-diagram/"><div class="thumb"><img src="assets/shots/flow-diagram.jpg" alt="전사 업무 흐름도"></div><div class="b"><h3>전사 업무 흐름도</h3><p>계획→자금→실적 경로 한 장</p></div></a>
-      <a class="cardx" href="demo/one-erp/"><div class="thumb"><img src="assets/shots/one-erp.jpg" alt="ONE ERP 목업"></div><div class="b"><h3>ONE ERP 목업</h3><p>시스템 통합 시 화면 목업</p></div></a>
-      <a class="cardx" href="demo/dashboard-cart/"><div class="thumb"><img src="assets/shots/dashboard-cart.jpg" alt="Dashboard Cart"></div><div class="b"><h3>Dashboard Cart</h3><p>보고 화면 설계 도구</p></div></a>
-      <a class="cardx" href="demo/meeting-memo/"><div class="thumb"><img src="assets/shots/meeting-memo.jpg" alt="회의 메모 컨테이너"></div><div class="b"><h3>회의 메모 컨테이너</h3><p>협의 시트에 붙는 메모 입력 — 1회 사용</p></div></a>
-    </div><div class="dots"></div>
+<!-- 06 데모 -->
+<section class="sect" id="s-demo"><div class="wrap">
+  <div class="sh rv"><span class="lb">06 · 데모</span><h2>실제로 돌아가는 화면 6.</h2><p class="sub">샘플 데이터로, 계산·판정 로직은 실제 구현과 동일합니다. 실운영 앱은 서버 코드까지 브라우저에서 그대로 실행됩니다.</p></div>
+  <div class="demos">
+    <a class="cd rv hot" href="demo/one-close/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱" loading="lazy"></div><div class="b"><div class="eb">실운영 · 직접 설계</div><h3>월 매입 마감 앱</h3><p>입고 검수 → B/L 연결 → 부대비용 배부 → 취득원가</p></div></a>
+    <a class="cd rv hot" href="demo/nrv-simulator/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/nrv-simulator.jpg" alt="NRV 시뮬레이터" loading="lazy"></div><div class="b"><div class="eb">실운영</div><h3>NRV 시뮬레이터</h3><p>가정을 움직이면 전 품번 즉시 재계산</p></div></a>
+    <a class="cd rv hot" href="demo/linesheet-fin/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계" loading="lazy"></div><div class="b"><div class="eb">실운영</div><h3>라인시트 재무 집계</h3><p>매입 약정 기준 집계 · 결제조건 · 유효성</p></div></a>
+    <a class="cd rv hot" href="demo/fund-cycle/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드" loading="lazy"></div><div class="b"><div class="eb">실운영</div><h3>자금 대시보드</h3><p>잔액 추이 · 수금 예측 · 체크섬 7종</p></div></a>
+    <a class="cd rv hot" href="demo/card-notice/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/card-notice.jpg" alt="법인카드 개편 공지" loading="lazy"></div><div class="b"><div class="eb">전사 공지</div><h3>법인카드 개편</h3><p>정책 변경 전후 · 한도 근거 · 상황별 가이드</p></div></a>
+    <a class="cd rv hot" href="demo/overtime-meal/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/overtime-meal.jpg" alt="야근식대 대조" loading="lazy"></div><div class="b"><div class="eb">실운영</div><h3>야근식대 대조</h3><p>근태 vs 카드 사람별 판정, 안내문구</p></div></a>
+  </div>
+  <details class="more"><summary><span class="pill sec">분석·설계 산출물 7개<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+    <div class="demos fade">
+      <a class="cd" href="demo/investor-contracts/"><div class="thumb"><img src="assets/shots/investor-contracts.jpg" alt="투자계약 의무 관리" loading="lazy"></div><div class="b"><h3>투자계약 의무 관리</h3><p>계약 조항을 긴급/정기/이벤트 의무로. 분석 1회 산출물</p></div></a>
+      <a class="cd" href="demo/expense-dashboard/"><div class="thumb"><img src="assets/shots/expense-dashboard.jpg" alt="지출내역 대시보드" loading="lazy"></div><div class="b"><h3>지출내역 대시보드</h3><p>지출 표 붙여넣기 → 용도·부서 구성</p></div></a>
+      <a class="cd" href="demo/fund-dashboard/"><div class="thumb"><img src="assets/shots/fund-dashboard.jpg" alt="자금 인텔리전스" loading="lazy"></div><div class="b"><h3>자금 인텔리전스</h3><p>현금 시나리오·손익 관점 버전</p></div></a>
+      <a class="cd" href="demo/flow-diagram/"><div class="thumb"><img src="assets/shots/flow-diagram.jpg" alt="전사 업무 흐름도" loading="lazy"></div><div class="b"><h3>전사 업무 흐름도</h3><p>계획→자금→실적 경로 한 장</p></div></a>
+      <a class="cd" href="demo/one-erp/"><div class="thumb"><img src="assets/shots/one-erp.jpg" alt="ONE ERP 목업" loading="lazy"></div><div class="b"><h3>ONE ERP 목업</h3><p>시스템 통합 시 화면 목업</p></div></a>
+      <a class="cd" href="demo/dashboard-cart/"><div class="thumb"><img src="assets/shots/dashboard-cart.jpg" alt="Dashboard Cart" loading="lazy"></div><div class="b"><h3>Dashboard Cart</h3><p>보고 화면 설계 도구</p></div></a>
+      <a class="cd" href="demo/meeting-memo/"><div class="thumb"><img src="assets/shots/meeting-memo.jpg" alt="회의 메모 컨테이너" loading="lazy"></div><div class="b"><h3>회의 메모 컨테이너</h3><p>협의 시트에 붙는 메모 입력. 1회 사용</p></div></a>
+    </div>
   </details>
-</section>
+</div></section>
 
-<section id="s-way">
-  <div class="sh c rv"><h2>일하는 방식.</h2><p class="sub">위 프로젝트에 공통으로 적용한 기준</p></div>
-  <div class="three">
-    <div class="rv"><b>차이는 덮지 않고 분류</b><p>원인이 지정된 차이는 다음 달에 다시 조사하지 않습니다. 마감이 매달 새로 하는 조사에서, 기준에 맞춰 확인하는 작업으로 바뀝니다.</p></div>
-    <div class="rv"><b>검증 없이 편해지지 않는다</b><p>자동으로 나온 숫자는 원천 합계와 대사하고, 재계산해도 같은 값인지 확인한 뒤 씁니다. 원 단위까지 재현되지 않으면 확정하지 않습니다.</p></div>
-    <div class="rv"><b>판단은 문서로, 반복은 기계로</b><p>기준이 필요한 항목은 대안과 채택 근거를 남겨 사람이 판단하고, 반복 확인만 자동화합니다. 그래야 감사·상급자에게 설명이 됩니다.</p></div>
+<section class="sect" id="s-way"><div class="wrap">
+  <div class="sh rv"><span class="lb">기준</span><h2>일하는 방식.</h2><p class="sub">위 프로젝트에 공통으로 적용한 기준</p></div>
+  <div class="way">
+    <div class="cd rv"><div class="b"><span class="ix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h6"/></svg></span><h3>차이는 덮지 않고 분류</h3><p>원인이 지정된 차이는 다음 달에 다시 조사하지 않습니다. 마감이 매달 새로 하는 조사에서, 기준에 맞춰 확인하는 작업으로 바뀝니다.</p></div></div>
+    <div class="cd rv"><div class="b"><span class="ix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span><h3>검증 없이 편해지지 않는다</h3><p>자동으로 나온 숫자는 원천 합계와 대사하고, 재계산해도 같은 값인지 확인한 뒤 씁니다. 원 단위까지 재현되지 않으면 확정하지 않습니다.</p></div></div>
+    <div class="cd rv"><div class="b"><span class="ix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><h3>판단은 문서로, 반복은 기계로</h3><p>기준이 필요한 항목은 대안과 채택 근거를 남겨 사람이 판단하고, 반복 확인만 자동화합니다. 그래야 감사·상급자에게 설명이 됩니다.</p></div></div>
   </div>
-  <div class="sh c rv" style="padding-top:56px"><h2 style="font-size:28px">AI는 어디까지 쓰나.</h2><p class="sub">회계 판단은 사람, 반복 확인은 기계</p></div>
   <div class="two">
-    <div class="rv"><h3>AI에게 맡기는 것</h3><ul><li>대사 파일 정규화·건별 매칭 같은 반복 확인</li><li>초안 작성(보고서 골격, 검증 스크립트)</li><li>판단 항목표에 대한 반박·교차검증(다른 모델을 검토자로)</li><li>화면·시스템 조작의 반복 구간</li></ul></div>
-    <div class="rv"><h3>내가 결정하는 것</h3><ul><li>회계정책·충당금률·분류 기준의 채택과 승인 요청</li><li>차이의 원인 판정과 회계처리 방침</li><li>원천 합계·재계산·이전 확정본 재현이 맞는지 최종 확인</li><li>회사 정보의 사용 범위 — 정책 범위 밖 접근은 하지 않음</li></ul></div>
+    <div class="cd rv"><div class="b"><div class="eb">AI에게 맡기는 것</div><ul><li>대사 파일 정규화·건별 매칭 같은 반복 확인</li><li>초안 작성(보고서 골격, 검증 스크립트)</li><li>판단 항목표에 대한 반박·교차검증(다른 모델을 검토자로)</li><li>화면·시스템 조작의 반복 구간</li></ul></div></div>
+    <div class="cd rv me"><div class="b"><div class="eb">내가 결정하는 것</div><ul><li>회계정책·충당금률·분류 기준의 채택과 승인 요청</li><li>차이의 원인 판정과 회계처리 방침</li><li>원천 합계·재계산·이전 확정본 재현이 맞는지 최종 확인</li><li>회사 정보의 사용 범위. 정책 범위 밖 접근은 하지 않음</li></ul></div></div>
   </div>
-  <div class="wrap"><p class="note">작업 기준(파일 버전 규칙, 엑셀 품질 바, 금지 목록)을 문서로 고정해 모든 작업이 같은 기준을 따르게 하고, 사용량은 주간 운영일지로 남깁니다.</p></div>
-</section>
+  <p class="note">작업 기준(파일 버전 규칙, 엑셀 품질 바, 금지 목록)을 문서로 고정해 모든 작업이 같은 기준을 따르게 하고, 사용량은 주간 운영일지로 남깁니다.</p>
+</div></section>
 
-<section id="s-all">
-  <div class="sh c rv"><h2>전체 프로젝트.</h2><p class="sub">영역별 36건 — 펼쳐서 봅니다</p></div>
-  <div class="wrap" style="margin-top:var(--sp-6)">
-    <details class="grp" open><summary>결산 · 경영 보고 <small>8건</small></summary><div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
+<section class="sect" id="s-all"><div class="wrap">
+  <div class="sh rv"><span class="lb">36건</span><h2>전체 프로젝트.</h2></div>
+  <div class="segw rv"><div class="seg2" role="tablist" aria-label="영역">
+    <button role="tab" aria-selected="true" aria-controls="g1">결산·경영 보고<small>8</small></button>
+    <button role="tab" aria-selected="false" aria-controls="g2">매출·정산 대사<small>9</small></button>
+    <button role="tab" aria-selected="false" aria-controls="g3">재고·매입·원가<small>7</small></button>
+    <button role="tab" aria-selected="false" aria-controls="g4">세무·경비·자산<small>7</small></button>
+    <button role="tab" aria-selected="false" aria-controls="g5">문서·인프라<small>5</small></button>
+  </div></div>
+  <div class="rv">
+    <div class="panel" id="g1" role="tabpanel"><div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
       <tr><td>월 가결산 손익 자동화</td><td>판관비 7대 분류 재편, EBITDA·마진·매출 대비 비율 동시 산출</td></tr>
       <tr><td>비경상손익 분리 요약</td><td>일회성 항목을 걷어낸 정상 손익을 수식 연동 한 장 보고서로</td></tr>
       <tr><td>고정·변동비 분류 기준표</td><td>예측용·분석용 2체계 병존, 판정 순서 규칙화 + 미판정 리포트</td></tr>
@@ -258,8 +391,8 @@
       <tr><td>직접법 현금흐름 검증</td><td>산출값과 통장 순증감 일치, 혼합 전표 순액 판정 규칙 반영</td></tr>
       <tr><td>시즌·부서별 현금흐름</td><td>영업·잉여현금흐름을 시즌·부서 축으로 산출, 컨펌 시트 흐름</td></tr>
       <tr><td>상반기 실적 분석 워크북</td><td>원천→배부→지표→피벗 수식 체인, 브랜드·안분 기준 통일</td></tr>
-      <tr><td>채널 원가율·공헌이익 분석</td><td>매출을 총액 기준으로 환산해 채널을 같은 축에서 비교</td></tr></tbody></table></div></details>
-    <details class="grp"><summary>매출 · 정산 대사 <small>9건</small></summary><div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
+      <tr><td>채널 원가율·공헌이익 분석</td><td>매출을 총액 기준으로 환산해 채널을 같은 축에서 비교</td></tr></tbody></table></div></div>
+    <div class="panel" id="g2" role="tabpanel" hidden><div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
       <tr><td>위탁매출 34채널 건별 대사</td><td>표준 대사 양식·건별 매칭, 상시 차이 4유형 분리, 원 단위 일치 확인</td></tr>
       <tr><td>대형 유통 정산구조 규명</td><td>차수별 분할지급·기준 미달 미지급·프로모션 공제가 차액의 정체임을 확인</td></tr>
       <tr><td>정산서 수집 자동화</td><td>파트너사 제공 방식(API·다운로드) 안에서 월 수집을 자동화</td></tr>
@@ -268,36 +401,36 @@
       <tr><td>취소·합수거 자동 상계</td><td>주문자 단위 합이 0이 되는 조합을 허용오차 내에서 자동 상계</td></tr>
       <tr><td>실판매 vs 인식매출 차이 규명</td><td>주문 원본 건별 대조, 반품 시점차·협업 배분·할인율로 유형화</td></tr>
       <tr><td>스마트스토어·품의·플랫폼 대사 양식</td><td>월 대사 양식 3종 설계, 검증식·전월 취소 보정, 이월 검증</td></tr>
-      <tr><td>자사몰 수탁정산 웹앱</td><td>결제대행 건별과 주문·취소·배송을 엔진으로 정산·전표 생성 (설계 확정)</td></tr></tbody></table></div></details>
-    <details class="grp"><summary>재고 · 매입 · 매출원가 <small>7건</small></summary><div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
+      <tr><td>자사몰 수탁정산 웹앱</td><td>결제대행 건별과 주문·취소·배송을 엔진으로 정산·전표 생성 (설계 확정)</td></tr></tbody></table></div></div>
+    <div class="panel" id="g3" role="tabpanel" hidden><div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
       <tr><td>NRV 산정 로직 재설계</td><td>판단 15항목 분해·근거 문서화, 7라운드 교차검증, 이전 확정본 원 단위 재현</td></tr>
       <tr><td>NRV 시뮬레이터</td><td>가정 변경 시 즉시 재계산, 확정 로직과 동일 소스</td></tr>
       <tr><td>재고 에이징 기준 정립</td><td>수불부 DB화·전년 로직 이식, 쓰면 안 되는 원천을 함정으로 기록</td></tr>
       <tr><td>매출원가 건별 재구축</td><td>건별 대조 후 재무상태표 재고와 일치 확인, 브릿지 문서화</td></tr>
       <tr><td>월 매입 마감 앱</td><td>발주↔입고 대사·부대비용 배부·필증 검증·결재를 한 흐름으로</td></tr>
       <tr><td>입고·부대비용 대사 DB</td><td>원천만 적재하고 배부는 뷰로 계산, 세트 품번 이중계산 차단</td></tr>
-      <tr><td>상품 계획표(라인시트) 표준화</td><td>양식 5종 분석 → 공통 필드 13·키 3계층 → 통일안 확정, 재무 집계 앱</td></tr></tbody></table></div></details>
-    <details class="grp"><summary>세무 · 경비 · 자산 <small>7건</small></summary><div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
+      <tr><td>상품 계획표(라인시트) 표준화</td><td>양식 5종 분석 → 공통 필드 13·키 3계층 → 통일안 확정, 재무 집계 앱</td></tr></tbody></table></div></div>
+    <div class="panel" id="g4" role="tabpanel" hidden><div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
       <tr><td>세금계산서 대사</td><td>매칭 키 설계로 계산서·원장·발주를 묶어 대조, 오판 방지 기준 명시</td></tr>
       <tr><td>부가세 신고자료·전자신고</td><td>산출 절차와 기간 지정 규칙을 문서로 고정, 재제출 순서 정리</td></tr>
       <tr><td>이벤트 경품 원천징수 기준</td><td>기타소득 과세 기준과 대납 환산을 품의 예산 기준으로 정리</td></tr>
       <tr><td>금융기관 제출자료 체계</td><td>기관별 서류 목록화, 수집 현황·갱신 시점 관리</td></tr>
       <tr><td>법인카드 운영 개편</td><td>실물 축소 + 가상카드 전환 설계, 한도 정책, 관리 대장 20열 체계</td></tr>
       <tr><td>야근식대 자동 판정</td><td>근태 세그먼트 합산 규칙으로 기준 충족 판정, 예외 사유 자동 기재</td></tr>
-      <tr><td>투자계약 의무 관리</td><td>계약 조항을 긴급/정기/이벤트 의무로 분류, 상환 시점을 자금계획과 연결</td></tr></tbody></table></div></details>
-    <details class="grp"><summary>문서 · 인프라 <small>5건</small></summary><div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
+      <tr><td>투자계약 의무 관리</td><td>계약 조항을 긴급/정기/이벤트 의무로 분류, 상환 시점을 자금계획과 연결</td></tr></tbody></table></div></div>
+    <div class="panel" id="g5" role="tabpanel" hidden><div class="tw"><table><thead><tr><th style="width:32%">프로젝트</th><th>한 일과 결과</th></tr></thead><tbody>
       <tr><td>전사 회계·전자결재 가이드</td><td>28페이지 작성·웹앱 배포, 반복 문의를 문서로 흡수</td></tr>
       <tr><td>자금 대시보드·업무 흐름도</td><td>자금·현금흐름·업무 흐름을 상시 조회 가능한 웹앱으로</td></tr>
       <tr><td>회계 원천 DB</td><td>매출·원가·입고·마케팅출고 적재/조회 체계</td></tr>
       <tr><td>작업 기준 문서와 검증 절차</td><td>파일 버전·엑셀 품질 바·금지 목록을 기준 문서로, 교차검증 절차를 템플릿화</td></tr>
-      <tr><td>팀 온보딩 문서</td><td>도구 사용 방식·보안 점검·용어 정리를 팀 공유용으로 작성</td></tr></tbody></table></div></details>
-    <p class="note">지표는 건수·구조만 적었습니다. 금액·거래처·내부 시스템 정보는 포함하지 않습니다.</p>
+      <tr><td>팀 온보딩 문서</td><td>도구 사용 방식·보안 점검·용어 정리를 팀 공유용으로 작성</td></tr></tbody></table></div></div>
   </div>
-</section>
+  <p class="note">지표는 건수·구조만 적었습니다. 금액·거래처·내부 시스템 정보는 포함하지 않습니다.</p>
+</div></section>
 
-<section id="s-scope">
-  <div class="sh c rv"><h2>담당 업무와 도구.</h2></div>
-  <div class="wrap" style="margin-top:var(--sp-6)"><div class="tw"><table>
+<section class="sect" id="s-scope"><div class="wrap">
+  <div class="sh rv"><span class="lb">범위</span><h2>담당 업무와 도구.</h2></div>
+  <div class="panel rv"><div class="tw"><table>
     <thead><tr><th style="width:22%">영역</th><th>담당 내용</th><th style="width:16%">주기</th></tr></thead>
     <tbody>
       <tr><td>재무기획</td><td>현금흐름 예측·자금 대시보드, 시즌·부서별 계획, 채널 수익성·고정변동비, 투자계약 의무 관리</td><td>월 / 시즌</td></tr>
@@ -309,102 +442,89 @@
       <tr><td>경비·자산</td><td>법인카드 운영·한도 정책·관리 대장, 경비 지급 판정, 영수증 관리</td><td>월</td></tr>
       <tr><td>도구</td><td>회계·물류 ERP, 엑셀 수식 체인·동적 배열, Python(pandas·openpyxl)·SQL·로컬 DB, Google Apps Script 웹앱·브라우저 자동화·HTML 리포트, AI 에이전트 반자동 작업·모델 간 교차검증</td><td>상시</td></tr>
     </tbody></table></div></div>
-</section>
+</div></section>
 
-<section id="s-faq">
-  <div class="sh c rv"><h2>자주 받는 질문.</h2></div>
-  <div class="wrap" style="margin-top:var(--sp-4)">
-    <details class="faq"><summary>회계 담당자가 왜 기획과 시스템까지 하나요?</summary><p>스타트업엔 재무기획 담당도, 재무 시스템도 따로 없었습니다. 결산을 하다 보면 "다음 달 자금은 버티는가", "이 시즌 발주가 자금에 어떻게 닿는가"를 누군가 답해야 했고, 그 답은 흩어진 파일로는 나오지 않았습니다. 그래서 원천을 하나로 모으는 시스템을 먼저 만들고 그 위에서 예측과 계획을 세웠습니다. 기준을 정하는 일과 그 기준을 코드로 옮기는 일을 같이 한 이유도 같습니다.</p></details>
-    <details class="faq"><summary>자동화한 숫자를 어떻게 믿습니까?</summary><p>세 가지를 확인한 뒤에만 씁니다. ① 원천 데이터 합계와 결과물 합계가 원 단위까지 일치하는지 ② 다시 계산해도 같은 값이 나오는지 ③ 이전 확정본을 재현하는지. 하나라도 안 맞으면 원인을 규명할 때까지 확정하지 않습니다.</p></details>
-    <details class="faq"><summary>AI가 만든 결과를 그대로 쓰나요?</summary><p>아니요. 판단이 필요한 항목은 표로 분해해 근거를 적고, 다른 모델을 검토자로 세워 교차검증한 뒤 사람이 확정합니다. AI는 반복 확인과 초안에 쓰고, 회계정책·분류 기준·차이의 회계처리는 제가 결정하고 승인을 받습니다.</p></details>
-    <details class="faq"><summary>본인이 없으면 자동화는 누가 유지하나요?</summary><p>모든 도구는 규칙을 시트나 문서로 꺼내 두어 코드를 몰라도 기준을 고칠 수 있게 했고, 절차·함정·검증 방법을 팀 문서로 남겼습니다. 도구가 멈춰도 같은 대사 양식으로 수작업이 가능합니다.</p></details>
-    <details class="faq"><summary>이 페이지에 실제 숫자가 없는 이유</summary><p>재직 중인 회사의 금액·거래처·내부 시스템 정보는 공개하지 않습니다. 성과는 건수와 구조로만 적었고, 데모는 전부 생성된 샘플 데이터로 동작합니다. 상세 내용은 면접에서 회사 정보를 침해하지 않는 범위로 설명드리겠습니다.</p></details>
+<section class="sect" id="s-faq"><div class="wrap">
+  <div class="sh rv"><span class="lb">FAQ</span><h2>자주 받는 질문.</h2></div>
+  <div class="faqs">
+    <details class="faq rv"><summary>회계 담당자가 왜 기획과 시스템까지 하나요?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary><p class="fade">스타트업엔 재무기획 담당도, 재무 시스템도 따로 없었습니다. 결산을 하다 보면 "다음 달 자금은 버티는가", "이 시즌 발주가 자금에 어떻게 닿는가"를 누군가 답해야 했고, 그 답은 흩어진 파일로는 나오지 않았습니다. 그래서 원천을 하나로 모으는 시스템을 먼저 만들고 그 위에서 예측과 계획을 세웠습니다. 기준을 정하는 일과 그 기준을 코드로 옮기는 일을 같이 한 이유도 같습니다.</p></details>
+    <details class="faq rv"><summary>자동화한 숫자를 어떻게 믿습니까?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary><p class="fade">세 가지를 확인한 뒤에만 씁니다. ① 원천 데이터 합계와 결과물 합계가 원 단위까지 일치하는지 ② 다시 계산해도 같은 값이 나오는지 ③ 이전 확정본을 재현하는지. 하나라도 안 맞으면 원인을 규명할 때까지 확정하지 않습니다.</p></details>
+    <details class="faq rv"><summary>AI가 만든 결과를 그대로 쓰나요?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary><p class="fade">아니요. 판단이 필요한 항목은 표로 분해해 근거를 적고, 다른 모델을 검토자로 세워 교차검증한 뒤 사람이 확정합니다. AI는 반복 확인과 초안에 쓰고, 회계정책·분류 기준·차이의 회계처리는 제가 결정하고 승인을 받습니다.</p></details>
+    <details class="faq rv"><summary>본인이 없으면 자동화는 누가 유지하나요?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary><p class="fade">모든 도구는 규칙을 시트나 문서로 꺼내 두어 코드를 몰라도 기준을 고칠 수 있게 했고, 절차·함정·검증 방법을 팀 문서로 남겼습니다. 도구가 멈춰도 같은 대사 양식으로 수작업이 가능합니다.</p></details>
+    <details class="faq rv"><summary>이 페이지에 실제 숫자가 없는 이유<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary><p class="fade">재직 중인 회사의 금액·거래처·내부 시스템 정보는 공개하지 않습니다. 성과는 건수와 구조로만 적었고, 데모는 전부 생성된 샘플 데이터로 동작합니다. 상세 내용은 면접에서 회사 정보를 침해하지 않는 범위로 설명드리겠습니다.</p></details>
   </div>
-</section>
+</div></section>
+</main>
 
-<footer>
-  <div><strong style="color:var(--ink)">이어진</strong> · 패션 이커머스(브랜드 복수 운영) 재무회계팀 매니저 · 재직 중 1년 6개월 · <a href="mailto:lee-ding@naver.com">lee-ding@naver.com</a></div>
-  <div>개인 포트폴리오이며 소속 회사와 무관하게 작성했습니다. 회사 내부 데이터는 포함하지 않습니다. 2026-09 갱신 · <span id="build">build 73515c6</span></div>
-</footer>
-<a class="top" href="#" aria-label="맨 위로">↑</a>
+<footer><div class="wrap">
+  <div><strong>이어진</strong> · 패션 이커머스(브랜드 복수 운영) 재무회계팀 매니저 · 재직 중 1년 6개월 · <a href="mailto:lee-ding@naver.com">lee-ding@naver.com</a></div>
+  <div>개인 포트폴리오이며 소속 회사와 무관하게 작성했습니다. 회사 내부 데이터는 포함하지 않습니다. 2026-10 갱신 · <span id="build">build glass-v4</span></div>
+</div></footer>
+
+<nav class="dock glass" aria-label="챕터">
+  <a href="#c1"><i>01</i><span>재무기획</span></a><a href="#c2"><i>02</i><span>시스템</span></a><a href="#c3"><i>03</i><span>결산</span></a><a href="#c4"><i>04</i><span>재고</span></a><a href="#c5"><i>05</i><span>정산</span></a><a href="#s-demo"><i>06</i><span>데모</span></a>
+</nav>
 
 <script>
 (function () {
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // 트랙: 카드를 .lane 으로 감싸고 꼬리 여백을 넣는다 (러버밴드는 lane 을 밀고, 스크롤은 track 이)
-  document.querySelectorAll('.track').forEach(function (t) {
-    var lane = document.createElement('div'); lane.className = 'lane';
-    while (t.firstChild) lane.appendChild(t.firstChild);
-    var sp0 = document.createElement('div'); sp0.className = 'sp0'; lane.insertBefore(sp0, lane.firstChild);
-    var sp = document.createElement('div'); sp.className = 'sp'; lane.appendChild(sp); t.appendChild(lane);
-  });
-  // 트랙 제어 — 운동 모델 하나: pos 가 target 을 지수 감쇠로 따라간다. 휠·드래그·되돌림 전부 이 애니메이터가 움직인다.
-  document.querySelectorAll('.track').forEach(function (t) {
-    var lane = t.firstElementChild, sp = lane.querySelector('.sp'), sp0 = lane.querySelector('.sp0');
-    var cur = 0, pos = 0, target = 0, raf = null, lastTs = 0, dragging = false, moved = false, startX = 0, startPos = 0, lastX = 0, lastT = 0, vx = 0, acc = 0, lastWheel = 0, armed = true, settleTimer = null;
-    var TAU = 80;   // ms — 작을수록 빠르게 붙는다
-    function cards() { return Array.prototype.filter.call(lane.children, function (c) { return !c.classList.contains('sp') && !c.classList.contains('sp0'); }); }
-    function padL() { return parseFloat(getComputedStyle(t).paddingLeft) || 0; }
-    function fitTail() { var cs = cards(), first = cs[0], last = cs[cs.length - 1], pad = padL(), cw = t.clientWidth;
-      var a = Math.max(0, cw / 2 - first.offsetWidth / 2 - pad - 16), b = Math.max(0, cw / 2 - last.offsetWidth / 2 - pad - 16);
-      sp0.style.flexBasis = a + 'px'; sp0.style.width = a + 'px'; sp.style.flexBasis = b + 'px'; sp.style.width = b + 'px'; }
-    function centerOf(c) { return c.offsetLeft + padL() + c.offsetWidth / 2 - t.clientWidth / 2; }
-    function maxL() { return Math.max(0, Math.min(t.scrollWidth - t.clientWidth, centerOf(cards()[cards().length - 1]))); }
-    function posOf(i) { var cs = cards(); i = Math.max(0, Math.min(cs.length - 1, i)); return Math.max(0, Math.min(maxL(), centerOf(cs[i]))); }
-    function nearest(x) { var cs = cards(), best = 0, bd = 1e9; cs.forEach(function (c, i) { var d = Math.abs(centerOf(c) - x); if (d < bd) { bd = d; best = i; } }); return best; }
-    // pos 를 화면에 반영: 범위 안은 scrollLeft, 범위 밖은 lane transform(러버밴드)
-    function apply() { var m = maxL(), over = 0; if (pos < 0) { t.scrollLeft = 0; over = pos; } else if (pos > m) { t.scrollLeft = m; over = pos - m; } else { t.scrollLeft = pos; }
-      lane.style.transform = over ? 'translateX(' + (-over) + 'px)' : ''; }
-    function tick(ts) { var dt = Math.min(48, ts - (lastTs || ts)); lastTs = ts; var k = 1 - Math.exp(-dt / TAU); pos += (target - pos) * k;
-      if (Math.abs(target - pos) < 0.4) { pos = target; apply(); raf = null; lastTs = 0; return; } apply(); raf = requestAnimationFrame(tick); }
-    function go(x) { target = x; if (!raf) { lastTs = 0; raf = requestAnimationFrame(tick); } }
-    function goTo(i) { var cs = cards(); cur = Math.max(0, Math.min(cs.length - 1, i)); go(posOf(cur)); }
-    function stop() { if (raf) cancelAnimationFrame(raf); raf = null; lastTs = 0; }
-    function rubber(d) { var c = 90; return Math.sign(d) * c * (1 - Math.exp(-Math.abs(d) / c)); }
-    fitTail(); pos = target = t.scrollLeft; window.addEventListener('load', fitTail);
-    window.addEventListener('resize', function () { fitTail(); pos = target = posOf(cur); apply(); });
-    // 스크롤바·터치 등 외부 스크롤이 멈추면 현재 카드 갱신
-    t.addEventListener('scroll', function () { if (dragging || raf) return; clearTimeout(settleTimer); settleTimer = setTimeout(function () { pos = target = t.scrollLeft; cur = nearest(pos); }, 120); }, { passive: true });
-    // 휠(가로 델타 또는 Shift+세로): 제스처당 한 장. 끝에서는 살짝 밀렸다 돌아온다.
-    t.addEventListener('wheel', function (e) { var dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : (e.shiftKey ? e.deltaY : 0); if (!dx) return;
-      e.preventDefault(); t.style.scrollSnapType = 'none'; var now = e.timeStamp, n = cards().length;
-      if (now - lastWheel > 80 || Math.abs(dx) >= 100) armed = true; lastWheel = now;
-      var atEdge = (cur === 0 && dx < 0) || (cur === n - 1 && dx > 0);
-      if (atEdge) { var m = maxL(), base = dx < 0 ? 0 : m; if (!raf) pos = base; pos = base + rubber((pos - base) + dx * 0.6); apply(); clearTimeout(settleTimer); settleTimer = setTimeout(function () { go(base); }, 70); return; }
-      if (!armed) return; acc += dx; if (Math.abs(acc) < 30) return; goTo(cur + (acc > 0 ? 1 : -1)); acc = 0; armed = false; }, { passive: false });
-    // 마우스 드래그: 손을 그대로 따라가고, 놓으면 속도만큼 앞 카드로
-    t.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse' || e.button !== 0) return; t.style.scrollSnapType = 'none'; stop(); dragging = true; moved = false; startX = lastX = e.clientX; startPos = pos = t.scrollLeft + (lane.style.transform ? pos - t.scrollLeft : 0); lastT = e.timeStamp; vx = 0; });   // 포인터 캡처는 실제로 움직인 뒤에만 — 누르자마자 잡으면 click 이 카드 링크 대신 트랙으로 가서 데모가 안 열린다
-    t.addEventListener('pointermove', function (e) { if (!dragging) return; var dx = e.clientX - startX; if (!moved && Math.abs(dx) > 4) { moved = true; t.classList.add('drag'); try { t.setPointerCapture(e.pointerId); } catch (x) {} } if (!moved) return;
-      var raw = startPos - dx, m = maxL(); pos = raw < 0 ? rubber(raw) : raw > m ? m + rubber(raw - m) : raw; apply();
-      var dt = e.timeStamp - lastT; if (dt > 0) vx = (lastX - e.clientX) / dt; lastX = e.clientX; lastT = e.timeStamp; });
-    function endDrag() { if (!dragging) return; dragging = false; t.classList.remove('drag'); if (!moved) return;
-      var i = nearest(pos + vx * 120); if (Math.abs(vx) > 0.3 && i === cur) i = cur + (vx > 0 ? 1 : -1); goTo(i); }
-    t.addEventListener('pointerup', endDrag); t.addEventListener('pointercancel', endDrag);
-    t.addEventListener('click', function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
-    t.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') { goTo(cur + 1); e.preventDefault(); } else if (e.key === 'ArrowLeft') { goTo(cur - 1); e.preventDefault(); } });
-  });
-  // 트랙 점
-  document.querySelectorAll('.track[data-dots]').forEach(function (t) { var dots = t.nextElementSibling; if (!dots || !dots.classList.contains('dots')) return; var cards = Array.prototype.filter.call(t.firstElementChild.children, function (c) { return !c.classList.contains('sp') && !c.classList.contains('sp0'); }); var n = cards.length;
-    dots.innerHTML = Array.apply(null, Array(n)).map(function (_, i) { return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('');
-    t.addEventListener('scroll', function () { var pad = parseFloat(getComputedStyle(t).paddingLeft) || 0, x = t.scrollLeft + t.clientWidth / 2 - pad, best = 0, bd = 1e9; cards.forEach(function (c, j) { var d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - x); if (d < bd) { bd = d; best = j; } }); Array.prototype.forEach.call(dots.children, function (d, j) { d.classList.toggle('on', j === best); }); }, { passive: true }); });
-  // 등장
-  var els = Array.prototype.slice.call(document.querySelectorAll('.rv'));
-  els.forEach(function (el) { var sib = Array.prototype.filter.call(el.parentNode.children, function (c) { return c.classList.contains('rv'); }); el.style.setProperty('--i', Math.min(sib.indexOf(el), 7)); });
-  if (reduce || !('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); }
-  else { var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }); }, { rootMargin: '0px 0px -6% 0px', threshold: 0.05 }); els.forEach(function (e) { io.observe(e); });
-    // 가로 트랙은 트랙이 보이면 카드 전부 등장 — 옆으로 밀 때 카드가 늦게 뜨지 않게
-    var tio = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { Array.prototype.forEach.call(x.target.querySelectorAll('.rv'), function (c) { c.classList.add('in'); }); tio.unobserve(x.target); } }); }, { threshold: 0.05 }); document.querySelectorAll('.track').forEach(function (t) { tio.observe(t); }); }
-  // 숫자 카운트업
-  document.querySelectorAll('.stats b.num').forEach(function (b) { var t = b.firstChild; if (!t || t.nodeType !== 3) return; var target = parseInt(t.nodeValue, 10); if (!target || reduce) return;
-    var t0 = null; function step(ts) { if (!t0) t0 = ts; var p = Math.min(1, (ts - t0) / 320); var e = 1 - Math.pow(1 - p, 3); t.nodeValue = String(Math.round(target * e)); if (p < 1) requestAnimationFrame(step); } t.nodeValue = '0'; requestAnimationFrame(step); });
-  // 챕터 진행 점 + 앱바 활성 + 맨 위
-  var chaps = Array.prototype.slice.call(document.querySelectorAll('.chap')), prog = document.querySelectorAll('.prog a'), top = document.querySelector('.top');
-  var navs = Array.prototype.slice.call(document.querySelectorAll('.appbar a[href^="#"]'));
-  function mark() { var y = window.scrollY + 220, cur = -1; chaps.forEach(function (c, i) { if (c.offsetTop <= y) cur = i; });
-    prog.forEach(function (p, i) { p.classList.toggle('on', i === cur); });
-    var secs = navs.map(function (a) { return document.querySelector(a.getAttribute('href')); }); var k = -1; secs.forEach(function (s, i) { if (s && s.offsetTop <= y) k = i; }); navs.forEach(function (a, i) { a.classList.toggle('on', i === k); });
-    if (top) top.classList.toggle('show', window.scrollY > 600); }
-  window.addEventListener('scroll', mark, { passive: true }); mark();
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  // 첫 화면: 헤드라인 줄 단위로 올라오고 화면 더미가 뒤따른다
+  requestAnimationFrame(function () { requestAnimationFrame(function () { document.body.classList.add('ready'); }); });
+
+  // 등장 — 같은 부모 안 순서대로 60ms 씩 (최대 8개)
+  var els = $$('.rv');
+  els.forEach(function (el) { var sib = $$(':scope > .rv', el.parentNode); el.style.setProperty('--i', Math.min(sib.indexOf(el), 7)); });
+  function reveal(el) {
+    el.classList.add('in');
+    setTimeout(function () { el.classList.add('done'); }, 400 + (+el.style.getPropertyValue('--i') || 0) * 60);
+    if (el.matches('.stat')) count(el.querySelector('[data-count]'));
+    if (el.matches('.hot') && !reduce) setTimeout(function () { el.classList.add('ring'); }, 380);
+  }
+  if (reduce || !('IntersectionObserver' in window)) els.forEach(reveal);
+  else { var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { reveal(x.target); io.unobserve(x.target); } }); }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }); els.forEach(function (e) { io.observe(e); }); }
+  document.addEventListener('animationend', function (e) { if (e.animationName === 'ring') e.target.classList.remove('ring'); });
+
+  // 숫자 카운트업 (320ms)
+  function count(b) { var t = b && b.firstChild; if (!t || t.nodeType !== 3 || reduce) return; var to = parseInt(t.nodeValue, 10); if (!to) return;
+    var t0 = null; t.nodeValue = '0'; requestAnimationFrame(function step(ts) { if (!t0) t0 = ts; var p = Math.min(1, (ts - t0) / 320), e = 1 - Math.pow(1 - p, 3); t.nodeValue = String(Math.round(to * e)); if (p < 1) requestAnimationFrame(step); }); }
+
+  // 히어로 화면 더미: 포인터를 따라 깊이만큼 움직인다 (마우스에서만)
+  var stack = document.querySelector('.stack');
+  if (stack && !reduce && matchMedia('(pointer: fine)').matches) {
+    var layers = $$('[data-depth]', stack);
+    document.querySelector('.hero').addEventListener('pointermove', function (e) {
+      var r = stack.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+      layers.forEach(function (l) { var d = +l.dataset.depth; l.style.setProperty('--tx', (x * d * 6) + 'px'); l.style.setProperty('--ty', (y * d * 6) + 'px');
+        if (l.classList.contains('s')) { l.style.setProperty('--ry', (x * 6) + 'deg'); l.style.setProperty('--rx', (-y * 6) + 'deg'); } });
+    });
+    document.querySelector('.hero').addEventListener('pointerleave', function () { layers.forEach(function (l) { ['--tx', '--ty', '--rx', '--ry'].forEach(function (k) { l.style.removeProperty(k); }); }); });
+  }
+
+  // 전체 프로젝트 세그먼트 (←/→ 로도)
+  var tabs = $$('.seg2 [role=tab]');
+  function sel(btn) { tabs.forEach(function (b) { var on = b === btn; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; var p = document.getElementById(b.getAttribute('aria-controls')); p.hidden = !on; p.classList.toggle('show', on); }); }
+  tabs.forEach(function (b, i) { b.tabIndex = i ? -1 : 0; b.addEventListener('click', function () { sel(b); });
+    b.addEventListener('keydown', function (e) { var k = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!k) return; var n = tabs[(i + k + tabs.length) % tabs.length]; sel(n); n.focus(); e.preventDefault(); }); });
+
+  // 스크롤: 앱바 숨김/표시 · 도크 표시 · 현재 챕터 · 배경 살짝
+  var bar = document.querySelector('.topbar'), dock = document.querySelector('.dock'), aura = $$('.aura i');
+  var dl = $$('.dock a'), nl = $$('.topbar a.l');
+  var dsec = dl.map(function (a) { return document.querySelector(a.getAttribute('href')); }), nsec = nl.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+  var lastY = scrollY, tick = false;
+  function idx(secs, y) { var k = -1; secs.forEach(function (s, i) { if (s && s.getBoundingClientRect().top + scrollY <= y) k = i; }); return k; }
+  function onScroll() {
+    tick = false; var y = scrollY, mid = y + innerHeight * .4;
+    bar.classList.toggle('hide', y > 400 && y > lastY + 4); if (y < lastY - 4 || y < 400) bar.classList.remove('hide'); lastY = y;
+    var end = document.querySelector('#s-way').getBoundingClientRect().top + y;
+    var di = idx(dsec, mid); dock.classList.toggle('show', di >= 0 && mid < end);
+    dl.forEach(function (a, i) { a.classList.toggle('on', i === di); });
+    var ni = idx(nsec, mid); nl.forEach(function (a, i) { a.classList.toggle('on', i === ni); });
+    if (!reduce) aura.forEach(function (a, i) { a.style.transform = 'translate3d(0,' + (-y * (0.04 + i * 0.03)) + 'px,0)'; });
+  }
+  addEventListener('scroll', function () { if (!tick) { tick = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  onScroll();
 })();
 </script>
 </body>
