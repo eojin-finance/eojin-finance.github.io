@@ -1,16 +1,58 @@
 
-<div id="demobar">
-  <b>샘플 데이터 데모</b>
-  <span>실제 사내 데이터가 아닌 생성된 값으로 동작합니다. 화면·계산·시나리오 로직은 실제 구현과 동일합니다.</span>
-  <a href="../../">← 포트폴리오</a>
-</div>
+<!--demobar:start-->
 <style>
-#demobar{position:sticky;top:0;z-index:99;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
-  background:#fff8e1;border-bottom:1px solid #f0dfa8;padding:9px 16px;font-size:12.5px;color:#6b5b21;
-  font-family:system-ui,-apple-system,'Malgun Gothic',sans-serif}
-#demobar b{background:#6b5b21;color:#fff8e1;padding:2px 8px;border-radius:10px;font-size:11.5px}
-#demobar a{margin-left:auto;color:#6b5b21;font-weight:700;text-decoration:none}
+.dbr{--dbr-sf:#FFFFFF;--dbr-ln:#D1D6DB;--dbr-ink:#191F28;--dbr-ink2:#4E5968;--dbr-hv:#F2F4F6;--dbr-ws:#FFF3DC;--dbr-wi:#9A5F00;--dbr-gl:rgba(255,255,255,.86);--dbr-fc:rgba(49,130,246,.55);
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;font-size:14px;line-height:1.5;color:var(--dbr-ink);letter-spacing:0;text-align:left;box-sizing:border-box}
+@media (prefers-color-scheme:dark){.dbr{--dbr-sf:#1B2027;--dbr-ln:#323A45;--dbr-ink:#F2F4F6;--dbr-ink2:#B0B8C1;--dbr-hv:#252C35;--dbr-ws:#3A2B12;--dbr-wi:#FFC46B;--dbr-gl:rgba(27,32,39,.86);--dbr-fc:rgba(78,150,250,.6)}}
+.dbr *{box-sizing:border-box}
+#demobar{position:relative;z-index:5;display:block;padding:6px 12px;background:var(--dbr-sf);border-bottom:1px solid var(--dbr-ln)}
+.dbr-row{display:flex;align-items:center;gap:8px;min-height:40px}
+.dbr-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;min-width:40px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:var(--dbr-ink);font:inherit;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap}
+.dbr-btn:hover{background:var(--dbr-hv)}
+.dbr-btn svg,.dbr-tag svg{width:18px;height:18px;flex:none}
+.dbr-sq{padding:0;width:40px;font-size:16px}
+.dbr-nm{font-size:16px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dbr-tag{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;background:var(--dbr-ws);color:var(--dbr-ink);font-weight:600;white-space:nowrap}
+.dbr-tag svg{color:var(--dbr-wi)}
+.dbr-grow{flex:1}
+.dbr-info{margin:0;padding:4px 8px 6px 52px;color:var(--dbr-ink2);max-width:80ch}
+.dbr :focus-visible,.dbr-skip:focus{outline:3px solid var(--dbr-fc);outline-offset:2px}
+.dbr-skip{position:absolute;left:8px;top:8px;z-index:60;transform:translateY(-300%);padding:8px 12px;border-radius:8px;background:var(--dbr-ink);color:var(--dbr-sf);font-weight:600;text-decoration:none}
+.dbr-skip:focus{transform:none}
+#dbr-pill{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;display:flex;align-items:center;gap:4px;padding:4px;max-width:calc(100vw - 32px);border:1px solid var(--dbr-ln);border-radius:999px;background:var(--dbr-gl);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);box-shadow:0 8px 24px rgba(0,0,0,.16);transform:translate(-50%,0);opacity:1;transition:opacity .2s cubic-bezier(0,0,0,1),transform .2s cubic-bezier(0,0,0,1)}
+#dbr-pill[data-off]{opacity:0;transform:translate(-50%,12px);pointer-events:none}
+#dbr-pill .dbr-btn{height:44px;border-radius:999px}
+#dbr-pill .dbr-sq{width:44px}
+#dbr-pill .dbr-lb{display:inline-flex;align-items:center;gap:6px;padding:0 8px;font-weight:600;white-space:nowrap}
+#dbr-pill .dbr-lb svg{width:18px;height:18px;color:var(--dbr-wi)}
+#dbr-pop{position:absolute;left:0;right:0;bottom:calc(100% + 8px);margin:0;padding:12px 16px;border:1px solid var(--dbr-ln);border-radius:12px;background:var(--dbr-sf);color:var(--dbr-ink);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#dbr-pill{background:var(--dbr-sf)}}
+@media (max-width:600px){.dbr-info{padding-left:8px}}
+@media (max-width:420px){.dbr-tag span{display:none}.dbr-tag{padding:0 6px}}
+@media (max-width:400px){#dbr-pill .dbr-lb{display:none}}
+@media (prefers-reduced-motion:reduce){#dbr-pill{transition:none}}
 </style>
+<a class="dbr dbr-skip" href="#dbr-main">본문으로 건너뛰기</a>
+<nav id="demobar" class="dbr" aria-label="데모 안내"><div class="dbr-row"><a class="dbr-btn" href="../../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>포트폴리오</a><span class="dbr-nm">자금 인텔리전스</span><span class="dbr-tag" title="실제 사내 데이터가 아닌 생성된 값으로 동작합니다. 화면·계산·시나리오 로직은 실제 구현과 동일합니다."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z"/></svg><span>가상 데이터</span></span><span class="dbr-grow"></span><button type="button" class="dbr-btn dbr-sq" id="dbr-q" aria-label="데모 설명" aria-expanded="false" aria-controls="dbr-info" title="데모 설명">?</button></div><p class="dbr-info" id="dbr-info" hidden>실제 사내 데이터가 아닌 생성된 값으로 동작합니다. 화면·계산·시나리오 로직은 실제 구현과 동일합니다.</p></nav>
+<nav id="dbr-pill" class="dbr" aria-label="데모 안내 (떠 있는 단추)"><a class="dbr-btn" href="../../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>포트폴리오</a><span class="dbr-lb" title="실제 사내 데이터가 아닌 생성된 값으로 동작합니다. 화면·계산·시나리오 로직은 실제 구현과 동일합니다."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z"/></svg>데모</span><button type="button" class="dbr-btn dbr-sq" id="dbr-q2" aria-label="데모 설명" aria-expanded="false" aria-controls="dbr-pop" title="데모 설명">?</button><p id="dbr-pop" hidden>실제 사내 데이터가 아닌 생성된 값으로 동작합니다. 화면·계산·시나리오 로직은 실제 구현과 동일합니다.</p></nav>
+<span id="dbr-main" tabindex="-1"></span>
+<script>(function(){
+  var bar=document.getElementById('demobar'), pill=document.getElementById('dbr-pill'), b=document.body;
+  // 띠를 본문 여백 밖까지 펼친다 (데모마다 body 여백이 달라서 실제 값을 읽는다)
+  // 앱 CSS 가 띠보다 늦게 오는 데모가 있어(body margin 8 → 0) 로드 때 다시 잰다
+  function fit(){ var cs=getComputedStyle(b), pt=parseFloat(cs.paddingTop)+parseFloat(cs.marginTop), pl=parseFloat(cs.paddingLeft)+parseFloat(cs.marginLeft), pr=parseFloat(cs.paddingRight)+parseFloat(cs.marginRight);
+    bar.style.margin=(-pt)+'px '+(-pr)+'px '+pt+'px '+(-pl)+'px'; }
+  fit(); document.addEventListener('DOMContentLoaded',fit); window.addEventListener('load',fit);
+  function tg(btn,box){ btn.addEventListener('click',function(){ box.hidden=!box.hidden; btn.setAttribute('aria-expanded',String(!box.hidden)); }); }
+  tg(document.getElementById('dbr-q'),document.getElementById('dbr-info'));
+  tg(document.getElementById('dbr-q2'),document.getElementById('dbr-pop'));
+  document.addEventListener('keydown',function(e){ if(e.key!=='Escape')return; ['dbr-info','dbr-pop'].forEach(function(id,i){ var x=document.getElementById(id); if(!x.hidden){ x.hidden=true; document.getElementById(i?'dbr-q2':'dbr-q').setAttribute('aria-expanded','false'); } }); });
+  // 앱바가 화면에 있으면 알약은 숨긴다 (숨은 알약은 Tab 으로도 안 잡히게 inert)
+  function show(on){ if(on){ pill.removeAttribute('data-off'); pill.inert=false; } else { pill.setAttribute('data-off',''); pill.inert=true; document.getElementById('dbr-pop').hidden=true; document.getElementById('dbr-q2').setAttribute('aria-expanded','false'); } }
+  show(false);
+  if('IntersectionObserver' in window) new IntersectionObserver(function(en){ show(!en[0].isIntersecting); }).observe(bar);
+})();</script>
+<!--demobar:end-->
 <!-- 자금 인텔리전스 (데모) — 통합 앱 (탭: #brief #cashsim #plsim #exec). 중간시트만 읽음 -->
 <meta charset="utf-8">
 <div id="app" class="viz-root">
