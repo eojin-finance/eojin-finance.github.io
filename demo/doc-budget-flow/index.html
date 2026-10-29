@@ -1,0 +1,1486 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>예산 지출 업무 흐름 (데모) — 이어진 포트폴리오</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* ============================================================
+   example-ui tokens.css  —  샘플기업 재무 웹앱 공용 디자인 토큰 v1.2 (2026-09-23 · 09-28 .dd 드롭다운 · .dlg 대화상자 · 10-02 .drp 기간 선택)
+   사용법: <style> 맨 위에 이 파일 내용을 붙이고, 앱 고유 CSS는 이 변수만 참조한다.
+   규칙: 색·크기·간격·반경·그림자·모션 값을 앱 CSS에 리터럴로 쓰지 않는다. 전부 var().
+   ============================================================ */
+
+/* ---------- 0. 폰트 ----------
+   Pretendard Variable (CDN). 오프라인·차단 환경이면 system-ui → Apple SD Gothic Neo → 맑은 고딕으로 내려간다.
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+*/
+
+:root{
+  /* 서체 */
+  --font-sans:"Pretendard Variable",Pretendard,system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,Consolas,"Malgun Gothic",monospace;   /* ID·코드·해시 전용. 금액엔 쓰지 않는다 */
+
+  /* 타입 스케일 — 8단계만 쓴다. 이 외 크기는 금지 */
+  --fs-11:11px;  /* caption  — eyebrow·단위·메타. 본문 금지 */
+  --fs-12:12px;  /* small    — 표 보조열·배지 */
+  --fs-13:13px;  /* body-s   — 밀도 높은 표 본문(최소 본문) */
+  --fs-14:14px;  /* body     — 기본 본문·입력·버튼 */
+  --fs-16:16px;  /* title-s  — 카드 제목 */
+  --fs-18:18px;  /* title    — 섹션 제목 */
+  --fs-22:22px;  /* headline — 화면 제목 */
+  --fs-28:28px;  /* display  — KPI 핵심 숫자 */
+  --lh-tight:1.2; --lh-body:1.5; --lh-display:1.1;
+  --fw-regular:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --ls-tight:-0.01em; --ls-display:-0.02em;
+
+  /* 간격 — 4px 기반 */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-10:40px; --sp-12:48px;
+
+  /* 반경 — 바깥 반경 = 안 반경 + 패딩 (동심원 규칙) */
+  --r-1:4px;   /* 칩·작은 입력 */
+  --r-2:8px;   /* 버튼·입력·탭 */
+  --r-3:12px;  /* 카드·패널 */
+  --r-4:16px;  /* 시트·모달·팝오버 */
+  --r-pill:999px;
+
+  /* 터치·클릭 목표 */
+  --hit:40px;        /* 데스크톱 최소 클릭 높이 (WCAG 24 이상, 권장 40) */
+  --hit-touch:44px;  /* 모바일 최소 (Apple 44pt) */
+  --row-dense:36px; --row-comfy:44px;   /* 표 행 높이 */
+
+  /* ---------- 색 (라이트) ----------
+     중립 회색 11단계 + 브랜드 1색 + 의미색 4종. 그 외 색은 만들지 않는다. */
+  --g0:#FFFFFF; --g50:#F9FAFB; --g100:#F2F4F6; --g200:#E5E8EB; --g300:#D1D6DB; --g400:#B0B8C1;
+  --g500:#8B95A1; --g600:#6B7684; --g700:#4E5968; --g800:#333D4B; --g900:#191F28;
+
+  --bg:var(--g50);            /* 페이지 바탕 */
+  --surface:var(--g0);        /* 카드·패널 */
+  --surface-2:var(--g100);    /* 표 머리·구분 영역 */
+  --line:var(--g200);         /* 기본 구분선 */
+  --line-strong:var(--g300);  /* 입력 테두리 */
+  --ink:var(--g900);          /* 본문 */
+  --ink-2:var(--g700);        /* 보조 */
+  --ink-3:var(--g600);        /* 라벨·캡션 (4.5:1 유지되는 가장 밝은 회색) */
+  --ink-4:var(--g400);        /* 비활성·플레이스홀더 */
+
+  --brand:#3182F6; --brand-hover:#1B64DA; --brand-soft:#E8F3FF; --brand-ink:#1B64DA; --on-brand:#FFFFFF;
+  --neg:#E5484D;  --neg-soft:#FDECEC;  --neg-ink:#C0353A;     /* 마이너스·오류·삭제 */
+  --pos:#1E9E5B;  --pos-soft:#E6F6EC;  --pos-ink:#177A46;     /* 완료·일치 (금액 +에는 쓰지 않는다) */
+  --warn:#DB8600; --warn-soft:#FFF3DC; --warn-ink:#9A5F00;    /* 대기·주의 */
+  --info:var(--brand); --info-soft:var(--brand-soft);
+
+  --focus:0 0 0 3px rgba(49,130,246,.35);
+  --shadow-1:0 1px 2px rgba(25,31,40,.06);
+  --shadow-2:0 2px 8px -2px rgba(25,31,40,.10),0 1px 2px rgba(25,31,40,.06);
+  --shadow-3:0 12px 32px -12px rgba(25,31,40,.22),0 2px 6px rgba(25,31,40,.08);
+
+  /* 글라스 — 떠 있는 층(앱바·툴바·시트)에만 */
+  --glass-bg:rgba(255,255,255,.66); --glass-line:rgba(255,255,255,.55); --glass-blur:18px; --glass-sat:1.4;
+
+  /* ---------- 모션 ----------
+     들어올 땐 ease-out·짧게, 나갈 땐 더 짧게. 레이아웃 속성은 애니메이션하지 않는다 (transform·opacity만). */
+  --dur-1:120ms;  /* hover·press·토글 */
+  --dur-2:200ms;  /* 열림·페이드·탭 전환 (기본) */
+  --dur-3:320ms;  /* 시트·모달·큰 이동 */
+  --dur-exit:150ms;
+  --ease-out:cubic-bezier(0,0,0,1);           /* 등장 */
+  --ease-in:cubic-bezier(0.3,0,1,1);          /* 퇴장 */
+  --ease-std:cubic-bezier(0.2,0,0,1);         /* 상태 전환 */
+  --ease-spring:cubic-bezier(0.34,1.56,0.64,1); /* 강조 튐 — 작은 요소에만 */
+}
+
+/* ---------- 색 (다크) ---------- */
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --g0:#101318; --g50:#14181E; --g100:#1B2027; --g200:#252C35; --g300:#323A45; --g400:#4A5462;
+  --g500:#6B7684; --g600:#8B95A1; --g700:#B0B8C1; --g800:#D1D6DB; --g900:#F2F4F6;
+  --bg:var(--g50); --surface:var(--g100); --surface-2:var(--g200); --line:var(--g200); --line-strong:var(--g300);
+  --brand:#4E96FA; --brand-hover:#74AEFF; --brand-soft:#17304F; --brand-ink:#8CBEFF; --on-brand:#0B1220;
+  --neg:#F0656A; --neg-soft:#3A1F21; --neg-ink:#FF8A8E;
+  --pos:#3FBF7A; --pos-soft:#17301F; --pos-ink:#6FDB9E;
+  --warn:#F0A63A; --warn-soft:#3A2B12; --warn-ink:#FFC46B;
+  --focus:0 0 0 3px rgba(78,150,250,.45);
+  --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 2px 8px -2px rgba(0,0,0,.5),0 1px 2px rgba(0,0,0,.4);
+  --shadow-3:0 12px 32px -12px rgba(0,0,0,.7),0 2px 6px rgba(0,0,0,.5);
+  --glass-bg:rgba(20,24,30,.58); --glass-line:rgba(255,255,255,.10);
+}}
+:root[data-theme="dark"]{
+  --g0:#101318; --g50:#14181E; --g100:#1B2027; --g200:#252C35; --g300:#323A45; --g400:#4A5462;
+  --g500:#6B7684; --g600:#8B95A1; --g700:#B0B8C1; --g800:#D1D6DB; --g900:#F2F4F6;
+  --bg:var(--g50); --surface:var(--g100); --surface-2:var(--g200); --line:var(--g200); --line-strong:var(--g300);
+  --brand:#4E96FA; --brand-hover:#74AEFF; --brand-soft:#17304F; --brand-ink:#8CBEFF; --on-brand:#0B1220;
+  --neg:#F0656A; --neg-soft:#3A1F21; --neg-ink:#FF8A8E;
+  --pos:#3FBF7A; --pos-soft:#17301F; --pos-ink:#6FDB9E;
+  --warn:#F0A63A; --warn-soft:#3A2B12; --warn-ink:#FFC46B;
+  --focus:0 0 0 3px rgba(78,150,250,.45);
+  --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 2px 8px -2px rgba(0,0,0,.5),0 1px 2px rgba(0,0,0,.4);
+  --shadow-3:0 12px 32px -12px rgba(0,0,0,.7),0 2px 6px rgba(0,0,0,.5);
+  --glass-bg:rgba(20,24,30,.58); --glass-line:rgba(255,255,255,.10);
+}
+
+/* ============================================================
+   1. 베이스 — 모든 앱 공통. 여기 있는 건 앱에서 다시 쓰지 않는다.
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:var(--fw-regular) var(--fs-14)/var(--lh-body) var(--font-sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:"tnum" 1;/* 숫자 폭 고정 = 표에서 자릿수 맞음 */
+  word-break:keep-all;overflow-wrap:break-word;/* 한글은 단어 단위로 끊고, 긴 URL·코드만 비상 분리 */}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{text-wrap:balance}   /* 제목 줄 길이 고르게 — keep-all 과 함께여야 한글에서 동작 */
+p{text-wrap:pretty}            /* 마지막 줄 외톨이 단어 방지 */
+em,i{font-style:normal;font-weight:var(--fw-semibold)} /* 한글엔 이탤릭이 없다 — 기울이지 말고 굵게 */
+h1{font-size:var(--fs-22);font-weight:var(--fw-bold);line-height:var(--lh-tight);letter-spacing:var(--ls-tight)}
+h2{font-size:var(--fs-18);font-weight:var(--fw-semibold);line-height:var(--lh-tight)}
+h3{font-size:var(--fs-16);font-weight:var(--fw-semibold);line-height:var(--lh-tight)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:none;box-shadow:var(--focus)}
+::selection{background:var(--brand-soft)}
+
+/* 숫자 */
+.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.num.neg{color:var(--neg-ink)}     /* 마이너스만 색 — 플러스는 잉크색 그대로 */
+.unit{font-size:var(--fs-12);color:var(--ink-3);margin-left:2px;font-weight:var(--fw-regular)}
+.mono{font-family:var(--font-mono);font-size:.93em}
+
+/* 텍스트 */
+.eyebrow{font-size:var(--fs-11);font-weight:var(--fw-semibold);letter-spacing:.04em;color:var(--ink-3);text-transform:uppercase}
+.caption{font-size:var(--fs-12);color:var(--ink-3)}
+.muted{color:var(--ink-3)}
+
+/* 표면 */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-3);box-shadow:var(--shadow-1)}
+.card>.card-h{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--line)}
+.card>.card-b{padding:var(--sp-4)}
+
+/* 버튼 — 4종만: primary / secondary / ghost / danger. 크기 2종 */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-2);height:var(--hit);padding:0 var(--sp-4);
+  border-radius:var(--r-2);border:1px solid transparent;font-weight:var(--fw-medium);font-size:var(--fs-14);white-space:nowrap;
+  transition:background-color var(--dur-1) var(--ease-std),border-color var(--dur-1) var(--ease-std),color var(--dur-1) var(--ease-std),transform var(--dur-1) var(--ease-std)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--brand);color:var(--on-brand)} .btn.primary:hover{background:var(--brand-hover)}
+.btn.secondary{background:var(--surface);border-color:var(--line-strong);color:var(--ink)} .btn.secondary:hover{background:var(--surface-2)}
+.btn.ghost{background:transparent;color:var(--ink-2)} .btn.ghost:hover{background:var(--surface-2);color:var(--ink)}
+.btn.danger{background:var(--neg-soft);color:var(--neg-ink)} .btn.danger:hover{background:var(--neg);color:#fff}
+.btn.sm{height:32px;padding:0 var(--sp-3);font-size:var(--fs-13)}
+.btn.sq{width:var(--hit);padding:0} .btn.sm.sq{width:32px}   /* 기호 하나짜리(?·×·⋯) 버튼은 정사각형 */
+/* 한 줄 = 높이 하나 — 툴바·동작칸·필터 줄에 놓인 버튼·드롭다운·입력·세그먼트는 같은 높이. .sm 은 표 칸·줄글 안에서만 */
+.toolbar .btn.sm,.actions .btn.sm{height:var(--hit);padding:0 var(--sp-4);font-size:var(--fs-14)}
+.toolbar .seg,.actions .seg{height:var(--hit);align-items:stretch} .toolbar .seg>button,.actions .seg>button{height:auto}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.busy{position:relative;color:transparent!important;pointer-events:none}
+.btn.busy::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;border:2px solid currentColor;
+  border-color:var(--ink-4) var(--ink-4) var(--ink-4) transparent;animation:spin .7s linear infinite}
+.btn.primary.busy::after{border-color:rgba(255,255,255,.75) rgba(255,255,255,.75) rgba(255,255,255,.75) transparent}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 입력 */
+.input,input[type=text],input[type=number],input[type=date],select,textarea{
+  height:var(--hit);padding:0 var(--sp-3);border:1px solid var(--line-strong);border-radius:var(--r-2);background:var(--surface);
+  transition:border-color var(--dur-1) var(--ease-std),box-shadow var(--dur-1) var(--ease-std)}
+textarea{height:auto;padding:var(--sp-2) var(--sp-3)}
+input:focus-visible,select:focus-visible,textarea:focus-visible{border-color:var(--brand);box-shadow:var(--focus)}
+input::placeholder{color:var(--ink-4)}
+input[aria-invalid="true"]{border-color:var(--neg)}
+.field{display:flex;flex-direction:column;gap:var(--sp-1)}
+.field>label{font-size:var(--fs-13);font-weight:var(--fw-medium);color:var(--ink-2)}
+.field>.help{font-size:var(--fs-12);color:var(--ink-3)} .field>.error{font-size:var(--fs-12);color:var(--neg-ink)}
+
+/* 세그먼트·탭 */
+.seg{display:inline-flex;padding:2px;background:var(--surface-2);border-radius:var(--r-2);gap:2px}
+.seg>button{height:32px;padding:0 var(--sp-3);border:0;border-radius:6px;background:transparent;color:var(--ink-2);font-weight:var(--fw-medium);font-size:var(--fs-13);
+  transition:background-color var(--dur-1) var(--ease-std),color var(--dur-1) var(--ease-std),box-shadow var(--dur-1) var(--ease-std)}
+.seg>button[aria-pressed="true"],.seg>button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-1)}
+.tabs{display:flex;gap:var(--sp-1);border-bottom:1px solid var(--line)}
+.tabs>button{position:relative;height:var(--hit);padding:0 var(--sp-3);border:0;background:transparent;color:var(--ink-3);font-weight:var(--fw-medium);
+  transition:color var(--dur-1) var(--ease-std)}
+.tabs>button:hover{color:var(--ink)}
+.tabs>button[aria-selected="true"]{color:var(--ink)}
+.tabs>button[aria-selected="true"]::after{content:"";position:absolute;left:var(--sp-3);right:var(--sp-3);bottom:-1px;height:2px;border-radius:1px;background:var(--brand)}
+
+/* 배지·칩 — 색은 의미색 4종만 */
+.badge{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 var(--sp-2);border-radius:var(--r-pill);font-size:var(--fs-12);font-weight:var(--fw-medium);white-space:nowrap;
+  background:var(--surface-2);color:var(--ink-2)}
+.badge.neg{background:var(--neg-soft);color:var(--neg-ink)} .badge.pos{background:var(--pos-soft);color:var(--pos-ink)}
+.badge.warn{background:var(--warn-soft);color:var(--warn-ink)} .badge.info{background:var(--brand-soft);color:var(--brand-ink)}
+.badge.dot::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* 표 — 세로선 없음, 가로선 1px, 머리 sticky, 숫자 우측 tabular */
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:var(--r-3);background:var(--surface)}
+table.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:var(--fs-13)}
+.tbl th{position:sticky;top:0;z-index:1;height:var(--row-dense);padding:0 var(--sp-3);background:var(--surface-2);color:var(--ink-3);
+  font-size:var(--fs-12);font-weight:var(--fw-semibold);text-align:left;white-space:nowrap;border-bottom:1px solid var(--line)}
+.tbl td{height:var(--row-dense);padding:0 var(--sp-3);border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr{transition:background-color var(--dur-1) var(--ease-std)}
+.tbl tbody tr:hover td{background:var(--surface-2)}
+.tbl tbody tr[aria-selected="true"] td{background:var(--brand-soft)}
+.tbl th.num,.tbl td.num{text-align:right}
+.tbl tr.total td{font-weight:var(--fw-semibold);background:var(--surface-2);border-top:1px solid var(--line-strong)}
+.tbl.comfy th,.tbl.comfy td{height:var(--row-comfy)}
+.tbl td.first{position:sticky;left:0;background:var(--surface);z-index:1}
+
+/* KPI 타일 — 숫자가 가장 크고, 라벨은 위에 작게 */
+.kpi{display:flex;flex-direction:column;gap:var(--sp-1);padding:var(--sp-4);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-3)}
+.kpi>.k{font-size:var(--fs-13);color:var(--ink-3);font-weight:var(--fw-medium)}
+.kpi>.v{font-size:var(--fs-28);font-weight:var(--fw-bold);letter-spacing:var(--ls-display);line-height:var(--lh-display);font-variant-numeric:tabular-nums}
+.kpi>.d{font-size:var(--fs-12);color:var(--ink-3)}
+.kpi>.d.neg{color:var(--neg-ink)} .kpi>.d.pos{color:var(--pos-ink)}
+
+/* 알림 — 결과는 남고, 정보는 사라진다 */
+.toasts{position:fixed;right:var(--sp-4);bottom:var(--sp-4);z-index:80;display:flex;flex-direction:column;gap:var(--sp-2);width:min(400px,calc(100vw - 32px));pointer-events:none}
+.toast{pointer-events:auto;display:flex;gap:var(--sp-3);align-items:flex-start;padding:var(--sp-3) var(--sp-4);border-radius:var(--r-3);
+  background:var(--g900);color:var(--g0);box-shadow:var(--shadow-3);font-size:var(--fs-13);
+  animation:toast-in var(--dur-2) var(--ease-out) both}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .toast{background:var(--g200);color:var(--g900)} }
+:root[data-theme="dark"] .toast{background:var(--g200);color:var(--g900)}
+.toast.out{animation:toast-out var(--dur-exit) var(--ease-in) both}
+@keyframes toast-in{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes toast-out{to{opacity:0;transform:translateY(6px)}}
+.toast .x{margin-left:auto;background:none;border:0;color:inherit;opacity:.6;padding:0 2px} .toast .x:hover{opacity:1}
+.inline-msg{display:flex;gap:var(--sp-2);padding:var(--sp-3) var(--sp-4);border-radius:var(--r-2);font-size:var(--fs-13);background:var(--surface-2);color:var(--ink-2)}
+.inline-msg.neg{background:var(--neg-soft);color:var(--neg-ink)} .inline-msg.warn{background:var(--warn-soft);color:var(--warn-ink)}
+.inline-msg.pos{background:var(--pos-soft);color:var(--pos-ink)} .inline-msg.info{background:var(--brand-soft);color:var(--brand-ink)}
+
+/* 스켈레톤 — 300ms 넘게 기다리면 스피너 대신 이걸 */
+.skel{position:relative;overflow:hidden;background:var(--surface-2);border-radius:var(--r-1);color:transparent!important;min-height:1em}
+.skel::after{content:"";position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);animation:shimmer 1.4s var(--ease-std) infinite}
+@keyframes shimmer{to{transform:translateX(100%)}}
+
+/* 빈 상태 */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-2);padding:var(--sp-12) var(--sp-4);text-align:center;color:var(--ink-3)}
+.empty>b{font-size:var(--fs-16);color:var(--ink);font-weight:var(--fw-semibold)}
+
+/* 떠 있는 층 — 글라스 */
+.glass{background:var(--glass-bg);-webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border:1px solid var(--glass-line);box-shadow:var(--shadow-2)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){ .glass{background:var(--surface)} }
+@media (prefers-reduced-transparency:reduce){ .glass{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none} }
+.appbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:var(--sp-3);height:56px;padding:0 var(--sp-5);border-bottom:1px solid var(--line)}
+
+/* 시트·모달·팝오버 — 등장 200 ease-out, 퇴장 150 ease-in */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(15,20,28,.45);animation:fade-in var(--dur-2) var(--ease-out) both}
+.sheet{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:61;width:min(560px,calc(100vw - 32px));max-height:min(80vh,720px);overflow:auto;
+  background:var(--surface);border-radius:var(--r-4);box-shadow:var(--shadow-3);animation:pop-in var(--dur-3) var(--ease-out) both}
+.sheet.out,.scrim.out{animation:fade-out var(--dur-exit) var(--ease-in) both}
+.popover{position:absolute;z-index:50;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-3);box-shadow:var(--shadow-3);padding:var(--sp-2);
+  animation:pop-in var(--dur-2) var(--ease-out) both;transform-origin:top left}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+@keyframes fade-out{to{opacity:0}}
+@keyframes pop-in{from{opacity:0;transform:translate(-50%,-50%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.popover{animation-name:pop-in-tl} @keyframes pop-in-tl{from{opacity:0;transform:scale(.96) translateY(-4px)}to{opacity:1;transform:none}}
+
+/* 드롭다운 — 내재화 (components.js ddEnhanceAll). 네이티브 <select> 목록은 OS 가 그려서 서체·색·다크모드·보조 문구를 못 바꾼다.
+   <select> 는 .dd 안에 숨겨 두고 .dd-btn(닫힌 모양) + .dd-list(펼친 목록, body 에 fixed) 를 앱이 그린다 */
+.dd{position:relative;display:inline-flex;max-width:100%}
+.dd[hidden],.dd>select{display:none}
+.dd-btn{display:inline-flex;align-items:center;gap:var(--sp-2);width:100%;min-width:120px;height:var(--hit);padding:0 var(--sp-2) 0 var(--sp-3);
+  border:1px solid var(--line-strong);border-radius:var(--r-2);background:var(--surface);color:var(--ink);text-align:left;white-space:nowrap;
+  transition:border-color var(--dur-1) var(--ease-std),background-color var(--dur-1) var(--ease-std)}
+.dd-btn:hover{background:var(--surface-2)}
+.dd-btn[aria-expanded="true"]{border-color:var(--brand)}
+.dd-btn:disabled{opacity:.45;cursor:not-allowed}
+.dd-btn.sm{height:32px;font-size:var(--fs-13)}
+.dd-v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.dd-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.dd-note{font-size:var(--fs-12);color:var(--ink-3);font-weight:var(--fw-regular)}
+.dd-chev{flex:none;color:var(--ink-3);transition:transform var(--dur-1) var(--ease-std)}
+.dd-btn[aria-expanded="true"] .dd-chev{transform:rotate(180deg)}
+.dd-list{position:fixed;z-index:70;overflow:auto;scrollbar-width:thin;scrollbar-gutter:stable;/* 폭을 잴 때도 스크롤바 자리를 넣는다 — 달이 많으면 «202…» 로 잘렸다 */max-width:min(480px,calc(100vw - 16px));padding:var(--sp-1);background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r-3);box-shadow:var(--shadow-3);font-size:var(--fs-14);
+  animation:dd-in var(--dur-2) var(--ease-out) both;transform-origin:top left}
+.dd-list.up{transform-origin:bottom left;animation-name:dd-in-up}
+.dd-list.out{animation:fade-out var(--dur-exit) var(--ease-in) both}
+.dd-q{position:sticky;top:0;z-index:1;width:100%;height:32px;margin-bottom:var(--sp-1);padding:0 var(--sp-3);border:1px solid var(--line-strong);border-radius:var(--r-2);background:var(--surface)}
+.dd-grp{padding:var(--sp-2) var(--sp-3) var(--sp-1);font-size:var(--fs-12);font-weight:var(--fw-semibold);color:var(--ink-3)}
+.dd-opt{display:flex;align-items:center;gap:var(--sp-2);min-height:36px;padding:0 var(--sp-3) 0 var(--sp-2);border-radius:var(--r-2);cursor:pointer;white-space:nowrap;color:var(--ink)}
+.dd-opt[data-act]{background:var(--surface-2)}
+.dd-check{flex:none;visibility:hidden;color:var(--brand)}
+.dd-opt[aria-selected="true"] .dd-check{visibility:visible}   /* 선택 = 체크 기호 + 브랜드색. 굵게는 안 쓴다 */
+.dd-opt[aria-disabled="true"]{color:var(--ink-4);cursor:default}
+.dd-opt .dd-note{margin-left:auto;padding-left:var(--sp-4)}
+.dd-none{padding:var(--sp-3);font-size:var(--fs-13);color:var(--ink-3)}
+/* 목록은 scale 하지 않는다 — 줄었다 커지는 동안 버튼과 끝선이 어긋나 보인다 */
+@keyframes dd-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes dd-in-up{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* 대화상자 — 내재화 (components.js ask·tell). alert/confirm/prompt 대신 <dialog class="dlg"> + showModal()
+   버튼은 왼쪽 "닫기"(ghost) · 오른쪽 행동 동사. 위험 동작은 기본 포커스가 "닫기" */
+dialog.dlg{width:min(440px,calc(100vw - 32px));padding:0;border:0;border-radius:var(--r-4);background:var(--surface);color:var(--ink);
+  box-shadow:var(--shadow-3);animation:dlg-in var(--dur-3) var(--ease-out) both}
+dialog.dlg::backdrop{background:rgba(15,20,28,.45);animation:fade-in var(--dur-2) var(--ease-out) both}
+dialog.dlg.out,dialog.dlg.out::backdrop{animation:fade-out var(--dur-exit) var(--ease-in) both}
+.dlg-h{padding:var(--sp-5) var(--sp-6) 0}
+.dlg-b{padding:var(--sp-3) var(--sp-6) var(--sp-5);color:var(--ink-2)}
+.dlg-b .input{width:100%;margin-top:var(--sp-3)}
+.dlg-f{display:flex;justify-content:flex-end;gap:var(--sp-2);padding:0 var(--sp-6) var(--sp-5)}
+@keyframes dlg-in{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+
+/* 기간 선택 — 내재화 (components.js drp). 기간 조회는 전부 이 래퍼 하나. date 입력 두 개를 나란히 두지 않는다.
+   버튼 = "시작 ~ 끝" + 달력 아이콘 / 펼침 = 빠른 선택 3줄 + 달력 2장 + 선택 기간 N일 · 닫기 · 적용 (회계시스템 기간 선택기 모양) */
+.drp{display:inline-flex;max-width:100%}
+.drp-btn{display:inline-flex;align-items:center;gap:var(--sp-2);height:var(--hit);padding:0 var(--sp-3);border:1px solid var(--line-strong);border-radius:var(--r-2);
+  background:var(--surface);color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;transition:border-color var(--dur-1) var(--ease-std),background-color var(--dur-1) var(--ease-std)}
+.drp-btn:hover{background:var(--surface-2)}
+.drp-btn[aria-expanded="true"]{border-color:var(--brand)}
+.drp-ic{flex:none;color:var(--ink-3)}
+.drp-pop{position:fixed;z-index:70;width:min(560px,calc(100vw - 16px));max-height:calc(100vh - 16px);overflow:auto;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-3);box-shadow:var(--shadow-3);animation:dd-in var(--dur-2) var(--ease-out) both}
+.drp-pop.out{animation:fade-out var(--dur-exit) var(--ease-in) both}
+.drp-pre{display:flex;flex-direction:column;gap:var(--sp-1);padding:var(--sp-3);border-bottom:1px solid var(--line)}
+.drp-row{display:grid;grid-template-columns:repeat(8,1fr);gap:var(--sp-1)}
+.drp-row:last-child{grid-template-columns:repeat(12,1fr)}
+.drp-p{height:32px;padding:0 var(--sp-1);border:1px solid var(--line);border-radius:var(--r-1);background:var(--surface);font-size:var(--fs-13);color:var(--ink-2);white-space:nowrap;
+  transition:background-color var(--dur-1) var(--ease-std),border-color var(--dur-1) var(--ease-std)}
+.drp-p:hover{background:var(--surface-2)}
+.drp-p[aria-pressed="true"]{border-color:var(--brand);color:var(--brand-ink);box-shadow:inset 0 -2px 0 var(--brand)}   /* 고른 빠른 선택 = 브랜드 테두리 + 밑줄 (굵게 안 씀) */
+.drp-cal{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);padding:var(--sp-3) var(--sp-4)}
+.drp-m{display:flex;flex-direction:column;gap:var(--sp-2);min-width:0}
+.drp-mh{display:grid;grid-template-columns:28px 28px 1fr 28px 28px;align-items:center;text-align:center}
+.drp-mh b{font-size:var(--fs-16);font-weight:var(--fw-semibold);font-variant-numeric:tabular-nums}
+.drp-nav{height:28px;border:0;border-radius:var(--r-1);background:transparent;color:var(--ink-3);font-size:var(--fs-16)}
+.drp-nav:hover{background:var(--surface-2);color:var(--ink)}
+.drp-g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px 0}
+.drp-w{font-size:var(--fs-12);font-weight:var(--fw-medium);color:var(--ink-3);text-align:center;padding-block:var(--sp-1)}
+.drp-w.sun{color:var(--neg-ink)}
+.drp-d{height:32px;border:0;background:transparent;font-size:var(--fs-13);font-variant-numeric:tabular-nums;color:var(--ink);border-radius:0}
+.drp-d:hover{background:var(--surface-2)}
+.drp-d.sun{color:var(--neg-ink)}
+.drp-d.out{color:var(--ink-4)}
+.drp-d.today{box-shadow:inset 0 0 0 1px var(--line-strong)}
+.drp-d.in{background:var(--brand-soft)}
+.drp-d.end{background:var(--brand);color:var(--on-brand);border-radius:var(--r-1)}
+.drp-d:disabled{color:var(--ink-4);cursor:not-allowed;background:transparent}
+.drp-f{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-3) var(--sp-4);border-top:1px solid var(--line)}
+.drp-n{margin-right:auto;font-size:var(--fs-13);color:var(--ink-3);font-variant-numeric:tabular-nums}
+.drp-nav.nx{visibility:hidden}
+@media (max-width:560px){ .drp-cal{grid-template-columns:1fr} .drp-cal .drp-m:last-child{display:none} .drp-nav.nx{visibility:visible}
+  .drp-row{grid-template-columns:repeat(4,1fr)} .drp-row:last-child{grid-template-columns:repeat(6,1fr)} }
+
+/* 탭 내용 전환 — 짧은 페이드+살짝 위로 */
+.tab-panel{animation:panel-in var(--dur-2) var(--ease-out) both}
+@keyframes panel-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* 숫자가 바뀔 때 — 배경 한 번 번쩍 (값 변화 알림) */
+.flash{animation:flash var(--dur-3) var(--ease-out)}
+@keyframes flash{0%{background:var(--brand-soft)}100%{background:transparent}}
+
+/* 접근성 — 모션 줄이기 요청 시 전부 끈다 */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-sans)}
+.wf-page{max-width:1040px;margin:0 auto;padding:var(--sp-12) var(--sp-4)}
+.wf-hero h1{font-size:var(--fs-28);font-weight:var(--fw-bold);line-height:var(--lh-tight);letter-spacing:-.02em;margin:var(--sp-2) 0 var(--sp-3)}
+.wf-lead{font-size:var(--fs-16);line-height:var(--lh-body);color:var(--ink-2);margin:0;max-width:44em}
+.wf-sec{margin:var(--sp-12) 0 0}
+.wf-sec h2{font-size:var(--fs-22);font-weight:var(--fw-bold);line-height:var(--lh-tight);margin:var(--sp-1) 0 var(--sp-2)}
+.wf-sub{font-size:var(--fs-14);color:var(--ink-2);line-height:var(--lh-body);margin:0 0 var(--sp-4)}
+.wf-bar{display:flex;flex-wrap:wrap;gap:var(--sp-3);align-items:center;justify-content:space-between;margin:0 0 var(--sp-4)}
+
+/* 스윔레인 */
+.wf-lanes{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-3);padding:var(--sp-4);overflow-x:auto}
+.wf-grid{display:grid;grid-template-columns:96px repeat(6,minmax(120px,1fr));grid-template-rows:repeat(3,minmax(104px,auto));gap:var(--sp-2) var(--sp-3);min-width:880px;position:relative}
+.wf-lane{grid-column:1;display:flex;align-items:center;font-size:var(--fs-13);font-weight:var(--fw-semibold);color:var(--ink-2);border-right:1px solid var(--line);padding-right:var(--sp-2)}
+.wf-laneband{grid-column:2 / -1;border-radius:var(--r-2);background:var(--g50)}
+.wf-step{position:relative;z-index:1;align-self:center;padding:var(--sp-3);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-2);box-shadow:var(--shadow-1);cursor:pointer;
+  opacity:0;transform:translateY(6px);transition:opacity var(--dur-2) var(--ease-out),transform var(--dur-2) var(--ease-out),border-color var(--dur-1) var(--ease-std),box-shadow var(--dur-1) var(--ease-std)}
+.wf-step.in{opacity:1;transform:none}
+.wf-step.cur{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.wf-step .n{display:inline-flex;width:22px;height:22px;border-radius:50%;align-items:center;justify-content:center;font-size:var(--fs-12);font-weight:var(--fw-bold);background:var(--g100);color:var(--ink-2);margin:0 0 var(--sp-2);transition:all var(--dur-2) var(--ease-out)}
+.wf-step.cur .n,.wf-step.done .n{background:var(--brand);color:var(--g0)}
+.wf-step b{display:block;font-size:var(--fs-13);font-weight:var(--fw-semibold);line-height:1.35}
+.wf-step .doc{display:inline-flex;margin:var(--sp-2) 0 0;min-height:22px;padding:2px var(--sp-2);line-height:1.35;border-radius:var(--r-1);font-size:var(--fs-12);font-weight:var(--fw-medium);align-items:center;background:var(--brand-soft);color:var(--brand-ink)}
+.wf-step .doc.ext{background:var(--g100);color:var(--ink-2)}
+.wf-svg{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:visible}
+.wf-svg path{fill:none;stroke:var(--g300);stroke-width:2;stroke-dasharray:var(--len);stroke-dashoffset:var(--len);transition:stroke-dashoffset var(--dur-3) var(--ease-out)}
+.wf-svg path.on{stroke-dashoffset:0}
+.wf-svg path.hot{stroke:var(--brand)}
+.wf-detail{margin:var(--sp-4) 0 0;padding:var(--sp-4) var(--sp-5);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-3);display:grid;grid-template-columns:auto 1fr;gap:var(--sp-1) var(--sp-4);align-items:start;min-height:96px}
+.wf-detail .k{font-size:var(--fs-12);color:var(--ink-3);font-weight:var(--fw-medium);padding-top:2px}
+.wf-detail .v{font-size:var(--fs-14);line-height:var(--lh-body)}
+.wf-detail .t{grid-column:1 / -1;font-size:var(--fs-16);font-weight:var(--fw-bold);margin:0 0 var(--sp-1)}
+.wf-fade{transition:opacity var(--dur-2) var(--ease-out)}
+.wf-fade.out{opacity:0}
+
+/* 양식 */
+.wf-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-2);margin:0 0 var(--sp-4)}
+.wf-meta div{padding:var(--sp-3);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-2)}
+.wf-meta span{display:block;font-size:var(--fs-12);color:var(--ink-3);font-weight:var(--fw-medium)}
+.wf-meta b{display:block;font-size:var(--fs-14);font-weight:var(--fw-semibold);margin:var(--sp-1) 0 0;line-height:1.4}
+.wf-paper{border:1px solid var(--line);border-radius:var(--r-3);box-shadow:var(--shadow-2);overflow:auto}
+.wf-fill{transition:background-color var(--dur-3) var(--ease-out)}
+.wf-flash{animation:wfflash var(--dur-3) var(--ease-out)}
+@keyframes wfflash{from{background-color:var(--brand-soft)}to{background-color:transparent}}
+
+/* 역할 */
+.wf-roles{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3)}
+.wf-role{padding:var(--sp-4);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-3)}
+.wf-role h3{font-size:var(--fs-16);font-weight:var(--fw-bold);margin:0 0 var(--sp-3)}
+.wf-role ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--sp-2)}
+.wf-role li{font-size:var(--fs-14);line-height:var(--lh-body);padding-left:var(--sp-4);position:relative}
+.wf-role li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--brand)}
+.wf-foot{margin:var(--sp-12) 0 0;font-size:var(--fs-12);color:var(--ink-3);line-height:var(--lh-body)}
+
+.rv{opacity:0;transform:translateY(8px);transition:opacity var(--dur-2) var(--ease-out),transform var(--dur-2) var(--ease-out)}
+.rv.in{opacity:1;transform:none}
+@media (max-width:720px){
+  .wf-meta{grid-template-columns:1fr 1fr}
+  .wf-roles{grid-template-columns:1fr}
+  .wf-detail{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.rv,.wf-step{opacity:1;transform:none}.wf-svg path{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<!--demobar:start-->
+<style>
+.dbr{--dbr-sf:#FFFFFF;--dbr-ln:#D1D6DB;--dbr-ink:#191F28;--dbr-ink2:#4E5968;--dbr-hv:#F2F4F6;--dbr-ws:#FFF3DC;--dbr-wi:#9A5F00;--dbr-gl:rgba(255,255,255,.86);--dbr-fc:rgba(49,130,246,.55);
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;font-size:14px;line-height:1.5;color:var(--dbr-ink);letter-spacing:0;text-align:left;box-sizing:border-box}
+@media (prefers-color-scheme:dark){.dbr{--dbr-sf:#1B2027;--dbr-ln:#323A45;--dbr-ink:#F2F4F6;--dbr-ink2:#B0B8C1;--dbr-hv:#252C35;--dbr-ws:#3A2B12;--dbr-wi:#FFC46B;--dbr-gl:rgba(27,32,39,.86);--dbr-fc:rgba(78,150,250,.6)}}
+.dbr *{box-sizing:border-box}
+#demobar{position:relative;z-index:5;display:block;padding:6px 12px;background:var(--dbr-sf);border-bottom:1px solid var(--dbr-ln)}
+.dbr-row{display:flex;align-items:center;gap:8px;min-height:40px}
+.dbr-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;min-width:40px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:var(--dbr-ink);font:inherit;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap}
+.dbr-btn:hover{background:var(--dbr-hv)}
+.dbr-btn svg,.dbr-tag svg{width:18px;height:18px;flex:none}
+.dbr-sq{padding:0;width:40px;font-size:16px}
+.dbr-nm{font-size:16px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dbr-tag{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;background:var(--dbr-ws);color:var(--dbr-ink);font-weight:600;white-space:nowrap}
+.dbr-tag svg{color:var(--dbr-wi)}
+.dbr-grow{flex:1}
+.dbr-info{margin:0;padding:4px 8px 6px 52px;color:var(--dbr-ink2);max-width:80ch}
+.dbr :focus-visible,.dbr-skip:focus{outline:3px solid var(--dbr-fc);outline-offset:2px}
+.dbr-skip{position:absolute;left:8px;top:8px;z-index:60;transform:translateY(-300%);padding:8px 12px;border-radius:8px;background:var(--dbr-ink);color:var(--dbr-sf);font-weight:600;text-decoration:none}
+.dbr-skip:focus{transform:none}
+#dbr-pill{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;display:flex;align-items:center;gap:4px;padding:4px;max-width:calc(100vw - 32px);border:1px solid var(--dbr-ln);border-radius:999px;background:var(--dbr-gl);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);box-shadow:0 8px 24px rgba(0,0,0,.16);transform:translate(-50%,0);opacity:1;transition:opacity .2s cubic-bezier(0,0,0,1),transform .2s cubic-bezier(0,0,0,1)}
+#dbr-pill[data-off]{opacity:0;transform:translate(-50%,12px);pointer-events:none}
+#dbr-pill .dbr-btn{height:44px;border-radius:999px}
+#dbr-pill .dbr-sq{width:44px}
+#dbr-pill .dbr-lb{display:inline-flex;align-items:center;gap:6px;padding:0 8px;font-weight:600;white-space:nowrap}
+#dbr-pill .dbr-lb svg{width:18px;height:18px;color:var(--dbr-wi)}
+#dbr-pop{position:absolute;left:0;right:0;bottom:calc(100% + 8px);margin:0;padding:12px 16px;border:1px solid var(--dbr-ln);border-radius:12px;background:var(--dbr-sf);color:var(--dbr-ink);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#dbr-pill{background:var(--dbr-sf)}}
+@media (max-width:600px){.dbr-info{padding-left:8px}}
+@media (max-width:420px){.dbr-tag span{display:none}.dbr-tag{padding:0 6px}}
+@media (max-width:400px){#dbr-pill .dbr-lb{display:none}}
+@media (prefers-reduced-motion:reduce){#dbr-pill{transition:none}}
+</style>
+<a class="dbr dbr-skip" href="#dbr-main">본문으로 건너뛰기</a>
+<nav id="demobar" class="dbr" aria-label="데모 안내"><div class="dbr-row"><a class="dbr-btn" href="../../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>포트폴리오</a><span class="dbr-nm">예산 지출 업무 흐름</span><span class="dbr-tag" title="사내 전자결재 안내 문서 그대로. 업무 흐름 단계와 양식 유형을 눌러 보세요 — 양식 값은 모두 예시입니다."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z"/></svg><span>가상 데이터</span></span><span class="dbr-grow"></span><button type="button" class="dbr-btn dbr-sq" id="dbr-q" aria-label="데모 설명" aria-expanded="false" aria-controls="dbr-info" title="데모 설명">?</button></div><p class="dbr-info" id="dbr-info" hidden>사내 전자결재 안내 문서 그대로. 업무 흐름 단계와 양식 유형을 눌러 보세요 — 양식 값은 모두 예시입니다.</p></nav>
+<nav id="dbr-pill" class="dbr" aria-label="데모 안내 (떠 있는 단추)"><a class="dbr-btn" href="../../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>포트폴리오</a><span class="dbr-lb" title="사내 전자결재 안내 문서 그대로. 업무 흐름 단계와 양식 유형을 눌러 보세요 — 양식 값은 모두 예시입니다."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z"/></svg>데모</span><button type="button" class="dbr-btn dbr-sq" id="dbr-q2" aria-label="데모 설명" aria-expanded="false" aria-controls="dbr-pop" title="데모 설명">?</button><p id="dbr-pop" hidden>사내 전자결재 안내 문서 그대로. 업무 흐름 단계와 양식 유형을 눌러 보세요 — 양식 값은 모두 예시입니다.</p></nav>
+<span id="dbr-main" tabindex="-1"></span>
+<script>(function(){
+  var bar=document.getElementById('demobar'), pill=document.getElementById('dbr-pill'), b=document.body;
+  // 띠를 본문 여백 밖까지 펼친다 (데모마다 body 여백이 달라서 실제 값을 읽는다)
+  // 앱 CSS 가 띠보다 늦게 오는 데모가 있어(body margin 8 → 0) 로드 때 다시 잰다
+  function fit(){ var cs=getComputedStyle(b), pt=parseFloat(cs.paddingTop)+parseFloat(cs.marginTop), pl=parseFloat(cs.paddingLeft)+parseFloat(cs.marginLeft), pr=parseFloat(cs.paddingRight)+parseFloat(cs.marginRight);
+    bar.style.margin=(-pt)+'px '+(-pr)+'px '+pt+'px '+(-pl)+'px'; }
+  fit(); document.addEventListener('DOMContentLoaded',fit); window.addEventListener('load',fit);
+  function tg(btn,box){ btn.addEventListener('click',function(){ box.hidden=!box.hidden; btn.setAttribute('aria-expanded',String(!box.hidden)); }); }
+  tg(document.getElementById('dbr-q'),document.getElementById('dbr-info'));
+  tg(document.getElementById('dbr-q2'),document.getElementById('dbr-pop'));
+  document.addEventListener('keydown',function(e){ if(e.key!=='Escape')return; ['dbr-info','dbr-pop'].forEach(function(id,i){ var x=document.getElementById(id); if(!x.hidden){ x.hidden=true; document.getElementById(i?'dbr-q2':'dbr-q').setAttribute('aria-expanded','false'); } }); });
+  // 앱바가 화면에 있으면 알약은 숨긴다 (숨은 알약은 Tab 으로도 안 잡히게 inert)
+  function show(on){ if(on){ pill.removeAttribute('data-off'); pill.inert=false; } else { pill.setAttribute('data-off',''); pill.inert=true; document.getElementById('dbr-pop').hidden=true; document.getElementById('dbr-q2').setAttribute('aria-expanded','false'); } }
+  show(false);
+  if('IntersectionObserver' in window) new IntersectionObserver(function(en){ show(!en[0].isIntersecting); }).observe(bar);
+})();</script>
+<!--demobar:end-->
+<main class="wf-page">
+
+<header class="wf-hero rv">
+  <div class="eyebrow">재무회계팀 · 전자결재 · 2026.10</div>
+  <h1>예산 지출 업무 흐름</h1>
+  <p class="wf-lead">예산이 필요한 지출은 「예산 품의서」로 시작합니다. 광고비는 매달 「광고비 집행 보고서」를 거쳐 재무회계팀이 지출결의서로 마감합니다.</p>
+</header>
+
+<section class="wf-sec rv" id="flow">
+  <div class="eyebrow">01</div>
+  <h2>업무 흐름</h2>
+  <div class="wf-bar">
+    <div class="seg" id="flowSeg" role="tablist" aria-label="흐름 선택">
+      <button aria-pressed="true" data-f="ad">광고비</button><button aria-pressed="false" data-f="gen">촬영 · 행사 · 기타</button>
+    </div>
+    <span class="wf-sub" style="margin:0">단계를 누르면 설명이 바뀝니다</span>
+  </div>
+  <div class="wf-lanes">
+    <div class="wf-grid" id="grid">
+      <svg class="wf-svg" id="svg"></svg>
+      <div class="wf-lane" style="grid-row:1">실무부서</div><div class="wf-laneband" style="grid-row:1"></div>
+      <div class="wf-lane" style="grid-row:2">결재자</div><div class="wf-laneband" style="grid-row:2"></div>
+      <div class="wf-lane" style="grid-row:3">재무회계팀</div><div class="wf-laneband" style="grid-row:3"></div>
+    </div>
+  </div>
+  <div class="wf-detail wf-fade" id="detail"></div>
+</section>
+
+<section class="wf-sec rv" id="form221">
+  <div class="eyebrow">02</div>
+  <h2>예산 품의서</h2>
+  <div class="wf-meta">
+    <div><span>작성</span><b>실무부서</b></div>
+    <div><span>시점</span><b>집행 전</b></div>
+    <div><span>결재</span><b>팀장 → 본부장 → 경영지원본부장 → 대표이사</b></div>
+    <div><span>필수</span><b>품의 유형 · 브랜드 · 대상 분기 · 대상 카드</b></div>
+  </div>
+  <div class="wf-bar">
+    <div class="seg" id="typeSeg" role="tablist" aria-label="품의 유형">
+      <button aria-pressed="false" data-t="촬영">촬영</button><button aria-pressed="false" data-t="행사">행사</button><button aria-pressed="true" data-t="광고">광고</button><button aria-pressed="false" data-t="기타">기타</button>
+    </div>
+    <span class="wf-sub" style="margin:0">유형을 바꾸면 칸 이름 · 예시가 바뀝니다 (예시값)</span>
+  </div>
+  <div class="wf-paper"><!-- lint-ignore-start --><div id="p221" style="background:#FFFFFF;padding:32px;min-width:830px;"><p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><b style="font-family:돋움;font-size:11pt;"></b></p>
+<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><span style="font-size:11pt;font-family:돋움;"><b><span style="font-family:'맑은 고딕';">&nbsp;</span></b></span></p>
+<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><span style="font-size:11pt;font-family:돋움;"><b><span style="font-family:'맑은 고딕';">&nbsp;</span></b></span></p>
+<table cellspacing="0" cellpadding="3" style="border-collapse:collapse;width:785px;table-layout:fixed;overflow-wrap:break-word;word-break:normal;">
+	<colgroup>
+	<col style="width:784px;">
+	</colgroup>
+	<tbody>
+		<tr>
+			<td style="width:777px;height:20px;border:1px solid rgb(0, 0, 0);">
+				<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><b style="font-family:돋움;font-size:11pt;"></b></p>
+				<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><span style="font-size:11pt;font-family:돋움;"><b><span style="font-size:9pt;font-family:'맑은 고딕';">​</span></b></span></p>
+				<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><span style="font-size:11pt;font-family:돋움;"><b><span style="font-family:'맑은 고딕';">&nbsp; 결재 라인</span></b></span></p>
+				<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><span style="font-family:'맑은 고딕';font-size:11pt;">&nbsp;</span></p>
+				<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><span style="font-family:'맑은 고딕';font-size:11pt;">&nbsp;&nbsp;</span><b><span style="font-size:10pt;font-family:'맑은 고딕';">기안자</span><span id="docs-internal-guid-df5a8926-7fff-bb06-7c39-cba1ddf95641" style="font-family:돋움;font-size:10pt;"><span style="font-variant-numeric:normal;font-variant-east-asian:normal;font-variant-alternates:normal;font-variant-position:normal;font-variant-emoji:normal;vertical-align:baseline;white-space-collapse:preserve;"> </span><b><span style="font-size:10pt;font-family:'맑은 고딕';">→</span></b><span style="font-variant-numeric:normal;font-variant-east-asian:normal;font-variant-alternates:normal;font-variant-position:normal;font-variant-emoji:normal;vertical-align:baseline;white-space-collapse:preserve;font-family:'맑은 고딕';"> 팀장 </span><b><span id="docs-internal-guid-df5a8926-7fff-bb06-7c39-cba1ddf95641" style="font-family:돋움;font-size:10pt;"><b><span style="font-size:10pt;font-family:'맑은 고딕';">→</span></b></span></b><span style="font-variant-numeric:normal;font-variant-east-asian:normal;font-variant-alternates:normal;font-variant-position:normal;font-variant-emoji:normal;vertical-align:baseline;white-space-collapse:preserve;font-family:'맑은 고딕';"> 본부장 </span><b><span style="font-size:10pt;font-family:'맑은 고딕';">→ 경영지원본부 본부장</span></b><b><span id="docs-internal-guid-df5a8926-7fff-bb06-7c39-cba1ddf95641" style="font-family:돋움;font-size:10pt;"><b><b><span id="docs-internal-guid-df5a8926-7fff-bb06-7c39-cba1ddf95641" style="font-size:10pt;"><b><span id="docs-internal-guid-df5a8926-7fff-bb06-7c39-cba1ddf95641" style="font-size:10pt;"><b><b><span id="docs-internal-guid-df5a8926-7fff-bb06-7c39-cba1ddf95641" style="font-size:10pt;font-family:'맑은 고딕';">&nbsp;→&nbsp;</span></b></b></span></b></span></b></b></span></b><span style="font-family:'맑은 고딕';font-variant-numeric:normal;font-variant-east-asian:normal;font-variant-alternates:normal;font-variant-position:normal;font-variant-emoji:normal;vertical-align:baseline;white-space-collapse:preserve;"> 대표이사</span></span></b></p>
+				<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><b style="font-size:10pt;"><span style="color:rgb(255, 0, 0);font-family:'맑은 고딕';font-variant-numeric:normal;font-variant-east-asian:normal;font-variant-alternates:normal;font-variant-position:normal;font-variant-emoji:normal;vertical-align:baseline;white-space-collapse:preserve;font-size:10pt;">   ※ 전결 금지</span></b></p>
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><span style="font-family:'맑은 고딕';">​</span></p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<table style="width:770px;border-collapse:collapse;table-layout:fixed;margin:6px 0px 0px;overflow-wrap:break-word;word-break:normal;">
+	<colgroup>
+	<col style="width:170px;" width="170">
+	<col style="width:214px;" width="214">
+	<col style="width:112px;" width="112">
+	<col style="width:273px;" width="273">
+	</colgroup>
+	<tbody>
+		<tr style="height:25px;">
+			<td colspan="4" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(227, 234, 243);font-weight:bold;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">■ 기본 정보</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">품의 유형 <span style="color:#cc0000;">*</span></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>촬영</option>
+				<option>행사</option>
+				<option>광고</option>
+				<option>기타</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">브랜드 <span style="color:#cc0000;">*</span></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">대상 분기 <span style="color:#cc0000;">*</span></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>1분기 (1·2·3월)</option>
+				<option>2분기 (4·5·6월)</option>
+				<option>3분기 (7·8·9월)</option>
+				<option>4분기 (10·11·12월)</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">대상 카드 <span style="color:#cc0000;">*</span></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">지출예정 기간</p>
+				<p style="font-family:돋움체;font-size:11px;color:rgb(153, 153, 153);font-weight:normal;margin-top:0px;margin-bottom:0px;line-height:1.2;">(예: 2026.04.01~06.30)</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">온라인 결제</p>
+				<p style="font-family:돋움체;font-size:11px;color:rgb(153, 153, 153);font-weight:normal;margin-top:0px;margin-bottom:0px;line-height:1.2;">온라인 결제 예정 시 선택</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>사용 (온라인 결제 오픈)</option>
+				<option>미사용</option>
+				</select></p>
+			</td>
+		</tr>
+		<tr style="height:25px;">
+			<td colspan="4" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(227, 234, 243);font-weight:bold;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">■ 유형별 정보 <span style="font-weight:normal;color:#666;">(품의 유형을 고르면 항목 이름이 바뀝니다)</span></p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td data-dze-formula="=IF(B2=&quot;촬영&quot;,&quot;촬영일 · 장소&quot;,IF(B2=&quot;행사&quot;,&quot;행사일 · 장소&quot;,IF(B2=&quot;광고&quot;,&quot;게재 매체&quot;,IF(B2=&quot;기타&quot;,&quot;일정 · 장소&quot;,&quot;(품의 유형 선택)&quot;))))" title="=IF(B2=&quot;촬영&quot;,&quot;촬영일 · 장소&quot;,IF(B2=&quot;행사&quot;,&quot;행사일 · 장소&quot;,IF(B2=&quot;광고&quot;,&quot;게재 매체&quot;,IF(B2=&quot;기타&quot;,&quot;일정 · 장소&quot;,&quot;(품의 유형 선택)&quot;))))" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">(품의 유형 선택)</p>
+			</td>
+			<td colspan="3" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td data-dze-formula="=IF(B2=&quot;촬영&quot;,&quot;모델 · 스태프&quot;,IF(B2=&quot;행사&quot;,&quot;참석 인원 · 대상&quot;,IF(B2=&quot;광고&quot;,&quot;게재 기간&quot;,IF(B2=&quot;기타&quot;,&quot;참여 인원 · 대상&quot;,&quot;(품의 유형 선택)&quot;))))" title="=IF(B2=&quot;촬영&quot;,&quot;모델 · 스태프&quot;,IF(B2=&quot;행사&quot;,&quot;참석 인원 · 대상&quot;,IF(B2=&quot;광고&quot;,&quot;게재 기간&quot;,IF(B2=&quot;기타&quot;,&quot;참여 인원 · 대상&quot;,&quot;(품의 유형 선택)&quot;))))" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">(품의 유형 선택)</p>
+			</td>
+			<td colspan="3" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:20px;">
+			<td data-dze-formula="=IF(B2=&quot;촬영&quot;,&quot;촬영 컷 수 · 용도&quot;,IF(B2=&quot;행사&quot;,&quot;행사 형식&quot;,IF(B2=&quot;광고&quot;,&quot;목표 지표&quot;,IF(B2=&quot;기타&quot;,&quot;세부 내용&quot;,&quot;(품의 유형 선택)&quot;))))" title="=IF(B2=&quot;촬영&quot;,&quot;촬영 컷 수 · 용도&quot;,IF(B2=&quot;행사&quot;,&quot;행사 형식&quot;,IF(B2=&quot;광고&quot;,&quot;목표 지표&quot;,IF(B2=&quot;기타&quot;,&quot;세부 내용&quot;,&quot;(품의 유형 선택)&quot;))))" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;border-bottom:0px none;padding-bottom:1px;vertical-align:bottom;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">(품의 유형 선택)</p>
+			</td>
+			<td colspan="3" rowspan="2" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:16px;">
+			<td data-dze-formula="=IF(B2=&quot;촬영&quot;,&quot;&quot;,IF(B2=&quot;행사&quot;,&quot;팝업, 세미나, 쇼케이스 등&quot;,IF(B2=&quot;광고&quot;,&quot;노출, 클릭, 전환 목표치&quot;,IF(B2=&quot;기타&quot;,&quot;진행 방식, 수량 등&quot;,&quot;&quot;))))" title="=IF(B2=&quot;촬영&quot;,&quot;&quot;,IF(B2=&quot;행사&quot;,&quot;팝업, 세미나, 쇼케이스 등&quot;,IF(B2=&quot;광고&quot;,&quot;노출, 클릭, 전환 목표치&quot;,IF(B2=&quot;기타&quot;,&quot;진행 방식, 수량 등&quot;,&quot;&quot;))))" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:normal;color:rgb(153, 153, 153);font-size:11px;word-break:keep-all;border-top:0px none;padding-top:0px;vertical-align:top;">
+				<p style="font-family:돋움체;font-size:11px;color:rgb(153, 153, 153);font-weight:normal;margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:25px;">
+			<td colspan="4" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(227, 234, 243);font-weight:bold;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">■ 품의 배경 · 사유</p>
+			</td>
+		</tr>
+		<tr style="height:22px;">
+			<td data-dze-formula="=IF(B2=&quot;촬영&quot;,&quot;촬영 개요&quot;,IF(B2=&quot;행사&quot;,&quot;행사 개요&quot;,IF(B2=&quot;광고&quot;,&quot;광고 개요&quot;,IF(B2=&quot;기타&quot;,&quot;품의 개요&quot;,&quot;(품의 유형 선택)&quot;))))" title="=IF(B2=&quot;촬영&quot;,&quot;촬영 개요&quot;,IF(B2=&quot;행사&quot;,&quot;행사 개요&quot;,IF(B2=&quot;광고&quot;,&quot;광고 개요&quot;,IF(B2=&quot;기타&quot;,&quot;품의 개요&quot;,&quot;(품의 유형 선택)&quot;))))" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;border-bottom:0px none;padding-bottom:1px;vertical-align:bottom;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">(품의 유형 선택)</p>
+			</td>
+			<td colspan="3" rowspan="2" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:16px;">
+			<td data-dze-formula="=IF(B2=&quot;촬영&quot;,&quot;목적, 일정, 장소, 활용처&quot;,IF(B2=&quot;행사&quot;,&quot;목적, 일정, 장소, 규모&quot;,IF(B2=&quot;광고&quot;,&quot;목적, 매체, 기간, 목표&quot;,IF(B2=&quot;기타&quot;,&quot;목적, 일정, 장소, 대상&quot;,&quot;&quot;))))" title="=IF(B2=&quot;촬영&quot;,&quot;목적, 일정, 장소, 활용처&quot;,IF(B2=&quot;행사&quot;,&quot;목적, 일정, 장소, 규모&quot;,IF(B2=&quot;광고&quot;,&quot;목적, 매체, 기간, 목표&quot;,IF(B2=&quot;기타&quot;,&quot;목적, 일정, 장소, 대상&quot;,&quot;&quot;))))" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:normal;color:rgb(153, 153, 153);font-size:11px;word-break:keep-all;border-top:0px none;padding-top:0px;vertical-align:top;">
+				<p style="font-family:돋움체;font-size:11px;color:rgb(153, 153, 153);font-weight:normal;margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:30px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">필요성 · 목적</p>
+			</td>
+			<td colspan="3" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:22px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;border-bottom:0px none;padding-bottom:1px;vertical-align:bottom;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">예산 산출 근거</p>
+			</td>
+			<td colspan="3" rowspan="2" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:16px;">
+			<td data-dze-formula="=IF(B2=&quot;촬영&quot;,&quot;단가 × 수량, 촬영 회차&quot;,IF(B2=&quot;행사&quot;,&quot;단가 × 인원, 대관 시간&quot;,IF(B2=&quot;광고&quot;,&quot;매체 단가 × 집행 기간&quot;,IF(B2=&quot;기타&quot;,&quot;항목별 단가 × 수량&quot;,&quot;&quot;))))" title="=IF(B2=&quot;촬영&quot;,&quot;단가 × 수량, 촬영 회차&quot;,IF(B2=&quot;행사&quot;,&quot;단가 × 인원, 대관 시간&quot;,IF(B2=&quot;광고&quot;,&quot;매체 단가 × 집행 기간&quot;,IF(B2=&quot;기타&quot;,&quot;항목별 단가 × 수량&quot;,&quot;&quot;))))" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:normal;color:rgb(153, 153, 153);font-size:11px;word-break:keep-all;border-top:0px none;padding-top:0px;vertical-align:top;">
+				<p style="font-family:돋움체;font-size:11px;color:rgb(153, 153, 153);font-weight:normal;margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<table style="width:770px;border-collapse:collapse;table-layout:fixed;margin:10px 0px 0px;overflow-wrap:break-word;word-break:normal;">
+	<colgroup>
+	<col style="width:36px;">
+	<col style="width:190px;">
+	<col style="width:108px;">
+	<col style="width:96px;">
+	<col style="width:96px;">
+	<col style="width:108px;">
+	<col style="width:135px;">
+	<col style="width:0px;">
+	</colgroup>
+	<tbody>
+		<tr style="height:25px;">
+			<td colspan="8" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(227, 234, 243);font-weight:bold;width:754px;height:14px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">■ 지출 내역 <span style="color:#999;font-weight:normal;font-size:11px;">(예정 지출일 = 실제 결제·이체 예정일 / 촬영 · 행사일 아님)</span></p>
+			</td>
+		</tr>
+		<tr style="height:40px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(235, 235, 235);font-weight:bold;text-align:center;width:21px;height:29px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">순번</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(235, 235, 235);font-weight:bold;text-align:center;width:175px;height:29px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">지출항목</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(235, 235, 235);font-weight:bold;text-align:center;width:93px;height:29px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">거래처</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(235, 235, 235);font-weight:bold;text-align:center;width:81px;height:29px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">결제방법</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(235, 235, 235);font-weight:bold;text-align:center;width:81px;height:29px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">예정 지출일</p>
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><span style="color:#999;font-weight:normal;font-size:11px;">(YYYY.MM.DD)</span></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(235, 235, 235);font-weight:bold;text-align:center;width:93px;height:29px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">예상금액(원)</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(235, 235, 235);font-weight:bold;text-align:center;width:120px;height:29px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">비고</p>
+			</td>
+			<td style="display:none;width:0px;height:40px;">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">key</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;color:rgb(136, 136, 136);width:21px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(136, 136, 136);margin-top:0px;margin-bottom:0px;line-height:1.2;">1</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;height:15px;width:175px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;vertical-align:middle;padding:2px 3px;width:89px;height:21px;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>법인카드</option>
+				<option>법인카드(온라인)</option>
+				<option>계좌이체</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;width:81px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:120px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:26px;" data-dze-formula="=D3" title="=D3">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">―</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;color:rgb(136, 136, 136);width:21px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(136, 136, 136);margin-top:0px;margin-bottom:0px;line-height:1.2;">2</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;height:15px;width:175px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;vertical-align:middle;padding:2px 3px;width:89px;height:21px;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>법인카드</option>
+				<option>법인카드(온라인)</option>
+				<option>계좌이체</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;width:81px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:120px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:26px;" data-dze-formula="=D4" title="=D4">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">―</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;color:rgb(136, 136, 136);width:21px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(136, 136, 136);margin-top:0px;margin-bottom:0px;line-height:1.2;">3</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;height:15px;width:175px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;vertical-align:middle;padding:2px 3px;width:89px;height:21px;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>법인카드</option>
+				<option>법인카드(온라인)</option>
+				<option>계좌이체</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;width:81px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:120px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:26px;" data-dze-formula="=D5" title="=D5">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">―</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;color:rgb(136, 136, 136);width:21px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(136, 136, 136);margin-top:0px;margin-bottom:0px;line-height:1.2;">4</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;height:15px;width:175px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;vertical-align:middle;padding:2px 3px;width:89px;height:21px;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>법인카드</option>
+				<option>법인카드(온라인)</option>
+				<option>계좌이체</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;width:81px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:120px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:26px;" data-dze-formula="=D6" title="=D6">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">―</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;color:rgb(136, 136, 136);width:21px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(136, 136, 136);margin-top:0px;margin-bottom:0px;line-height:1.2;">5</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;height:15px;width:175px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;vertical-align:middle;padding:2px 3px;width:89px;height:21px;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>법인카드</option>
+				<option>법인카드(온라인)</option>
+				<option>계좌이체</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;width:81px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:120px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:26px;" data-dze-formula="=D7" title="=D7">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">―</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;color:rgb(136, 136, 136);width:21px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(136, 136, 136);margin-top:0px;margin-bottom:0px;line-height:1.2;">6</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;height:15px;width:175px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;vertical-align:middle;padding:2px 3px;width:89px;height:21px;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>법인카드</option>
+				<option>법인카드(온라인)</option>
+				<option>계좌이체</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;width:81px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:120px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:26px;" data-dze-formula="=D8" title="=D8">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">―</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;color:rgb(136, 136, 136);width:21px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(136, 136, 136);margin-top:0px;margin-bottom:0px;line-height:1.2;">7</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;height:15px;width:175px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;vertical-align:middle;padding:2px 3px;width:89px;height:21px;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>법인카드</option>
+				<option>법인카드(온라인)</option>
+				<option>계좌이체</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;width:81px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:120px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:26px;" data-dze-formula="=D9" title="=D9">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">―</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;color:rgb(136, 136, 136);width:21px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(136, 136, 136);margin-top:0px;margin-bottom:0px;line-height:1.2;">8</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;height:15px;width:175px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;vertical-align:middle;padding:2px 3px;width:89px;height:21px;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>법인카드</option>
+				<option>법인카드(온라인)</option>
+				<option>계좌이체</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;width:81px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:120px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:26px;" data-dze-formula="=D10" title="=D10">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">―</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;color:rgb(136, 136, 136);width:21px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(136, 136, 136);margin-top:0px;margin-bottom:0px;line-height:1.2;">9</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;height:15px;width:175px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;vertical-align:middle;padding:2px 3px;width:89px;height:21px;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>법인카드</option>
+				<option>법인카드(온라인)</option>
+				<option>계좌이체</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;width:81px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:120px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:26px;" data-dze-formula="=D11" title="=D11">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">―</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;color:rgb(136, 136, 136);width:21px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(136, 136, 136);margin-top:0px;margin-bottom:0px;line-height:1.2;">10</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;height:15px;width:175px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;vertical-align:middle;padding:2px 3px;width:89px;height:21px;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>법인카드</option>
+				<option>법인카드(온라인)</option>
+				<option>계좌이체</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;width:81px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:120px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:26px;" data-dze-formula="=D12" title="=D12">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">―</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;color:rgb(136, 136, 136);width:21px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(136, 136, 136);margin-top:0px;margin-bottom:0px;line-height:1.2;">11</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;height:15px;width:175px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;vertical-align:middle;padding:2px 3px;width:89px;height:21px;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>법인카드</option>
+				<option>법인카드(온라인)</option>
+				<option>계좌이체</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;width:81px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:120px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:26px;" data-dze-formula="=D13" title="=D13">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">―</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;color:rgb(136, 136, 136);width:21px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(136, 136, 136);margin-top:0px;margin-bottom:0px;line-height:1.2;">12</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;height:15px;width:175px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;vertical-align:middle;padding:2px 3px;width:89px;height:21px;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>법인카드</option>
+				<option>법인카드(온라인)</option>
+				<option>계좌이체</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:center;width:81px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;width:93px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:120px;height:15px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:26px;" data-dze-formula="=D14" title="=D14">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">―</p>
+			</td>
+		</tr>
+		<tr style="height:25px;">
+			<td colspan="5" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;text-align:right;width:511px;height:14px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">합 계</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;font-weight:bold;background:rgb(251, 251, 240);width:93px;height:14px;" data-dze-formula="=FIXED(SUM(F3:F14),0)" title="=FIXED(SUM(F3:F14),0)">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">0</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;width:120px;height:14px;color:rgb(204, 102, 0);font-weight:bold;word-break:keep-all;" data-dze-formula="=IF(SUM(F3:F14)-SUMIF(H3:H14,&quot;법인카드&quot;,F3:F14)-SUMIF(H3:H14,&quot;법인카드(온라인)&quot;,F3:F14)-SUMIF(H3:H14,&quot;계좌이체&quot;,F3:F14)=0,&quot;&quot;,CONCATENATE(&quot;⚠ 결제방법 미선택 &quot;,FIXED(SUM(F3:F14)-SUMIF(H3:H14,&quot;법인카드&quot;,F3:F14)-SUMIF(H3:H14,&quot;법인카드(온라인)&quot;,F3:F14)-SUMIF(H3:H14,&quot;계좌이체&quot;,F3:F14),0),&quot;원&quot;))" title="=IF(SUM(F3:F14)-SUMIF(H3:H14,&quot;법인카드&quot;,F3:F14)-SUMIF(H3:H14,&quot;법인카드(온라인)&quot;,F3:F14)-SUMIF(H3:H14,&quot;계좌이체&quot;,F3:F14)=0,&quot;&quot;,CONCATENATE(&quot;⚠ 결제방법 미선택 &quot;,FIXED(SUM(F3:F14)-SUMIF(H3:H14,&quot;법인카드&quot;,F3:F14)-SUMIF(H3:H14,&quot;법인카드(온라인)&quot;,F3:F14)-SUMIF(H3:H14,&quot;계좌이체&quot;,F3:F14),0),&quot;원&quot;))">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(204, 102, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:25px;">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:25px;">
+			<td colspan="5" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(240, 244, 251);font-weight:bold;text-align:right;color:rgb(26, 74, 138);width:511px;height:14px;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(26, 74, 138);margin-top:0px;margin-bottom:0px;line-height:1.2;">★ 법인카드 결제분 (한도 세팅액)</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;padding:5px 7px;vertical-align:middle;text-align:right;font-weight:bold;background:rgb(232, 240, 251);color:rgb(26, 74, 138);font-size:13px;width:93px;height:14px;" data-dze-formula="=FIXED(SUMIF(H3:H14,&quot;법인카드&quot;,F3:F14)+SUMIF(H3:H14,&quot;법인카드(온라인)&quot;,F3:F14),0)" title="=FIXED(SUMIF(H3:H14,&quot;법인카드&quot;,F3:F14)+SUMIF(H3:H14,&quot;법인카드(온라인)&quot;,F3:F14),0)">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(26, 74, 138);margin-top:0px;margin-bottom:0px;line-height:1.2;"><span style="font-size:9pt;">0</span></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;padding:5px 7px;vertical-align:middle;color:rgb(204, 102, 0);font-size:11px;width:120px;height:14px;font-weight:bold;word-break:keep-all;" data-dze-formula="=IF(SUMIF(H3:H14,&quot;법인카드(온라인)&quot;,F3:F14)=0,&quot;&quot;,CONCATENATE(&quot;이 중 온라인 &quot;,FIXED(SUMIF(H3:H14,&quot;법인카드(온라인)&quot;,F3:F14),0),&quot;원 · 세팅 필요&quot;))" title="=IF(SUMIF(H3:H14,&quot;법인카드(온라인)&quot;,F3:F14)=0,&quot;&quot;,CONCATENATE(&quot;이 중 온라인 &quot;,FIXED(SUMIF(H3:H14,&quot;법인카드(온라인)&quot;,F3:F14),0),&quot;원 · 세팅 필요&quot;))">
+				<p style="font-family:돋움체;font-size:8pt;color:rgb(204, 102, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="display:none;width:0px;height:25px;">
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+</div><!-- lint-ignore-end --></div>
+</section>
+
+<section class="wf-sec rv" id="form222">
+  <div class="eyebrow">03</div>
+  <h2>광고비 집행 보고서</h2>
+  <div class="wf-meta">
+    <div><span>작성</span><b>광고 집행 부서</b></div>
+    <div><span>시점</span><b>매월 · 월마감 전</b></div>
+    <div><span>결재</span><b>팀장 → 본부장 → 경영지원본부장 → 대표이사</b></div>
+    <div><span>필수</span><b>근거 품의 · 결제액 · 광고 기여 매출 · 결제 영수증</b></div>
+  </div>
+  <div class="wf-paper"><!-- lint-ignore-start --><div id="p222" style="background:#FFFFFF;padding:32px;min-width:830px;"><p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><b style="font-family:돋움;font-size:11pt;"></b></p>
+<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><span style="font-size:11pt;font-family:돋움;"><b><span style="font-family:'맑은 고딕';">&nbsp;</span></b></span></p>
+<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><span style="font-size:11pt;font-family:돋움;"><b><span style="font-family:'맑은 고딕';">&nbsp;</span></b></span></p>
+<table cellspacing="0" cellpadding="3" style="border-collapse:collapse;width:785px;table-layout:fixed;overflow-wrap:break-word;word-break:normal;">
+	<colgroup>
+	<col style="width:784px;">
+	</colgroup>
+	<tbody>
+		<tr>
+			<td style="width:777px;height:20px;border:1px solid rgb(0, 0, 0);">
+				<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><b style="font-family:돋움;font-size:11pt;"></b></p>
+				<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><span style="font-size:11pt;font-family:돋움;"><b><span style="font-size:9pt;font-family:'맑은 고딕';">​</span></b></span></p>
+				<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><span style="font-size:11pt;font-family:돋움;"><b><span style="font-family:'맑은 고딕';">&nbsp; 결재 라인</span></b></span></p>
+				<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><span style="font-family:'맑은 고딕';font-size:11pt;">&nbsp;</span></p>
+				<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><span style="font-family:'맑은 고딕';font-size:11pt;">&nbsp;&nbsp;</span><b><span style="font-size:10pt;font-family:'맑은 고딕';">기안자</span><span id="docs-internal-guid-df5a8926-7fff-bb06-7c39-cba1ddf95641" style="font-family:돋움;font-size:10pt;"><span style="font-variant-numeric:normal;font-variant-east-asian:normal;font-variant-alternates:normal;font-variant-position:normal;font-variant-emoji:normal;vertical-align:baseline;white-space-collapse:preserve;"> </span><b><span style="font-size:10pt;font-family:'맑은 고딕';">→</span></b><span style="font-variant-numeric:normal;font-variant-east-asian:normal;font-variant-alternates:normal;font-variant-position:normal;font-variant-emoji:normal;vertical-align:baseline;white-space-collapse:preserve;font-family:'맑은 고딕';"> 팀장 </span><b><span id="docs-internal-guid-df5a8926-7fff-bb06-7c39-cba1ddf95641" style="font-family:돋움;font-size:10pt;"><b><span style="font-size:10pt;font-family:'맑은 고딕';">→</span></b></span></b><span style="font-variant-numeric:normal;font-variant-east-asian:normal;font-variant-alternates:normal;font-variant-position:normal;font-variant-emoji:normal;vertical-align:baseline;white-space-collapse:preserve;font-family:'맑은 고딕';"> 본부장 </span><b><span style="font-size:10pt;font-family:'맑은 고딕';">→ 경영지원본부 본부장</span></b><b><span id="docs-internal-guid-df5a8926-7fff-bb06-7c39-cba1ddf95641" style="font-family:돋움;font-size:10pt;"><b><b><span id="docs-internal-guid-df5a8926-7fff-bb06-7c39-cba1ddf95641" style="font-size:10pt;"><b><span id="docs-internal-guid-df5a8926-7fff-bb06-7c39-cba1ddf95641" style="font-size:10pt;"><b><b><span id="docs-internal-guid-df5a8926-7fff-bb06-7c39-cba1ddf95641" style="font-size:10pt;font-family:'맑은 고딕';">&nbsp;→&nbsp;</span></b></b></span></b></span></b></b></span></b><span style="font-family:'맑은 고딕';font-variant-numeric:normal;font-variant-east-asian:normal;font-variant-alternates:normal;font-variant-position:normal;font-variant-emoji:normal;vertical-align:baseline;white-space-collapse:preserve;"> 대표이사</span></span></b></p>
+				<p style="font-size:10pt;line-height:1.2;font-family:돋움체;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;"><b style="font-size:10pt;"><span style="color:rgb(255, 0, 0);font-family:'맑은 고딕';font-variant-numeric:normal;font-variant-east-asian:normal;font-variant-alternates:normal;font-variant-position:normal;font-variant-emoji:normal;vertical-align:baseline;white-space-collapse:preserve;font-size:10pt;">   ※ 기안자 외 결재자 전결 체크 필수</span></b></p>
+				<p style="font-family:돋움체;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><span style="font-family:'맑은 고딕';">​</span></p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<table style="width:770px;border-collapse:collapse;table-layout:fixed;margin:6px 0px 0px;overflow-wrap:break-word;word-break:normal;">
+	<colgroup>
+	<col style="width:170px;" width="170">
+	<col style="width:214px;" width="214">
+	<col style="width:112px;" width="112">
+	<col style="width:273px;" width="273">
+	</colgroup>
+	<tbody>
+		<tr style="height:25px;">
+			<td colspan="4" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(227, 234, 243);font-weight:bold;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">■ 광고비 집행</p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">대상 월 <span style="color:#cc0000;">*</span></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+			<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><select style="width:100%;box-sizing:border-box;font-family:돋움체,Dotum,sans-serif;font-size:12px;">
+				<option selected="selected">―</option>
+				<option>1월</option>
+				<option>2월</option>
+				<option>3월</option>
+				<option>4월</option>
+				<option>5월</option>
+				<option>6월</option>
+				<option>7월</option>
+				<option>8월</option>
+				<option>9월</option>
+				<option>10월</option>
+				<option>11월</option>
+				<option>12월</option>
+				</select></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">근거 예산 품의 <span style="color:#cc0000;">*</span></p>
+				<p style="font-family:돋움체;font-size:11px;color:rgb(153, 153, 153);font-weight:normal;margin-top:0px;margin-bottom:0px;line-height:1.2;">문서번호</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">이번 달 결제액 <span style="color:#cc0000;">*</span></p>
+				<p style="font-family:돋움체;font-size:11px;color:rgb(153, 153, 153);font-weight:normal;margin-top:0px;margin-bottom:0px;line-height:1.2;">숫자만</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">사용 카드</p>
+				<p style="font-family:돋움체;font-size:11px;color:rgb(153, 153, 153);font-weight:normal;margin-top:0px;margin-bottom:0px;line-height:1.2;">끝 4자리</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:26px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">광고 기여 매출 <span style="color:#cc0000;">*</span></p>
+				<p style="font-family:돋움체;font-size:11px;color:rgb(153, 153, 153);font-weight:normal;margin-top:0px;margin-bottom:0px;line-height:1.2;">광고 관리자 기준</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;text-align:right;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">ROAS</p>
+				<p style="font-family:돋움체;font-size:11px;color:rgb(153, 153, 153);font-weight:normal;margin-top:0px;margin-bottom:0px;line-height:1.2;">자동</p>
+			</td>
+			<td data-dze-formula="=IFERROR(CONCATENATE(FIXED(B4/B3*100,0),&quot;%&quot;),&quot;&quot;)" title="=IFERROR(CONCATENATE(FIXED(B4/B3*100,0),&quot;%&quot;),&quot;&quot;)" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;font-weight:bold;text-align:right;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+		<tr style="height:60px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">주요 결과 · 코멘트</p>
+				<p style="font-family:돋움체;font-size:11px;color:rgb(153, 153, 153);font-weight:normal;margin-top:0px;margin-bottom:0px;line-height:1.2;">자유 기재</p>
+			</td>
+			<td colspan="3" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<table style="width:770px;border-collapse:collapse;table-layout:fixed;margin:10px 0px 0px;overflow-wrap:break-word;word-break:normal;">
+	<colgroup>
+	<col style="width:230px;" width="230">
+	<col style="width:539px;" width="539">
+	</colgroup>
+	<tbody>
+		<tr style="height:25px;">
+			<td colspan="2" style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(227, 234, 243);font-weight:bold;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">■ 첨부</p>
+			</td>
+		</tr>
+		<tr style="height:30px;">
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;background:rgb(250, 250, 250);font-weight:bold;word-break:keep-all;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;">플랫폼 결제 영수증 <span style="color:#cc0000;">*</span></p>
+				<p style="font-family:돋움체;font-size:11px;color:rgb(153, 153, 153);font-weight:normal;margin-top:0px;margin-bottom:0px;line-height:1.2;">메타 결제 활동 · 구글 거래 내역 등</p>
+			</td>
+			<td style="border:1px solid rgb(196, 196, 196);font-family:돋움체, Dotum, sans-serif;font-size:12px;padding:5px 7px;vertical-align:middle;">
+				<p style="font-family:돋움체;font-size:9pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<table cellspacing="0" cellpadding="3" style="border-collapse:collapse;width:797px;table-layout:fixed;overflow-wrap:break-word;word-break:normal;">
+	<colgroup>
+	<col style="width:108px;">
+	<col style="width:688px;">
+	</colgroup>
+	<tbody>
+		<tr>
+			<td style="width:101px;height:20px;border:1px solid rgb(0, 0, 0);background-color:rgb(242, 242, 242);">
+				<p style="font-family:'맑은 고딕';text-align:center;font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><b>첨부파일 목록</b></p>
+			</td>
+			<td style="width:681px;height:20px;border:1px solid rgb(0, 0, 0);">
+				<p style="font-family:'맑은 고딕';font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+				<p style="font-family:'맑은 고딕';font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+				<p style="font-family:'맑은 고딕';font-size:10pt;color:rgb(0, 0, 0);margin-top:0px;margin-bottom:0px;line-height:1.2;"><br></p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+</div><!-- lint-ignore-end --></div>
+</section>
+
+<section class="wf-sec rv">
+  <div class="eyebrow">04</div>
+  <h2>역할별 할 일</h2>
+  <div class="wf-roles">
+    <div class="wf-role"><h3>실무부서</h3><ul>
+      <li>집행 전 예산 품의서 작성 · 유형 선택</li>
+      <li>온라인 결제가 필요하면 「온라인 결제 · 사용」 선택</li>
+      <li>품의 금액 안에서 집행</li>
+      <li>광고비: 매월 월마감 전 광고비 집행 보고서 + 결제 영수증</li>
+    </ul></div>
+    <div class="wf-role"><h3>결재자</h3><ul>
+      <li>예산 품의서: 품의 금액 · 예정 지출일 확인</li>
+      <li>지출 내역의 결제방법 · 법인카드 결제분 확인</li>
+      <li>광고비 보고서: 결제액 · ROAS 확인</li>
+    </ul></div>
+    <div class="wf-role"><h3>재무회계팀</h3><ul>
+      <li>결재 완료 후 카드 번호 발급 · 한도 세팅 · 안내</li>
+      <li>광고비: 재무팀 광고 카드(모카드) 하위로 안내</li>
+      <li>광고비 보고서 취합 → 카드 승인내역 대조 → 지출결의서 작성</li>
+    </ul></div>
+  </div>
+</section>
+
+<p class="wf-foot">양식: 예산 품의서 · 광고비 집행 보고서 (회계시스템 기안양식) · 양식 화면은 회계시스템 본문 파일 원본에 예시값만 채운 것</p>
+</main>
+
+<script>
+(function(){
+var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ── 흐름 데이터: [레인(1 실무 2 결재 3 재무), 제목, 문서, 외부문서여부, 설명, 산출물] ── */
+var FLOWS = {
+  ad: [
+    [1,'광고 예산 품의','예산 품의서',0,'품의 유형 「광고」 선택. 매체 · 기간 · 목표 지표와 지출 내역(예정 지출일 · 결제방법)을 적습니다. 온라인 결제가 필요하면 「사용」 선택.','결재 요청'],
+    [2,'결재','',0,'팀장 → 본부장 → 경영지원본부장 → 대표이사.','결재 완료 품의'],
+    [3,'광고 카드 번호 안내','재무팀 광고 모카드',1,'재무회계팀이 재무팀 광고 카드(모카드) 하위로 카드 번호를 안내하고, 법인카드 결제분 기준으로 한도를 세팅합니다.','카드 번호 · 한도'],
+    [1,'월 광고 집행','',0,'안내받은 카드로 품의 금액 안에서 매체 결제.','플랫폼 결제 영수증'],
+    [1,'광고비 집행 보고서','광고비 집행 보고서',0,'월마감 전까지 작성. 대상 월 · 근거 품의 번호 · 결제액 · 광고 기여 매출(ROAS 자동) · 결제 영수증 첨부.','보고서 결재'],
+    [3,'취합 · 지출결의','지출결의서',1,'재무회계팀 담당자가 보고서를 취합해 카드 승인내역과 대조하고, 광고비 지출결의서를 작성합니다.','월마감 반영']
+  ],
+  gen: [
+    [1,'예산 품의','예산 품의서',0,'품의 유형을 고르면 칸 이름과 작성 예시가 바뀝니다. 지출 내역에 예정 지출일 · 결제방법을 적고, 온라인 결제가 필요하면 「사용」 선택.','결재 요청'],
+    [2,'결재','',0,'팀장 → 본부장 → 경영지원본부장 → 대표이사.','결재 완료 품의'],
+    [3,'카드 번호 발급 · 한도 세팅','',0,'법인카드 결제분(지출 내역에서 자동 집계) 기준으로 한도를 세팅하고 카드 번호를 안내합니다. 계좌이체분은 지급 일정에 맞춰 처리.','카드 번호 · 한도'],
+    [1,'집행','',0,'품의 금액 · 예정 지출일에 맞춰 결제.','카드 매출전표 · 계산서'],
+    [1,'월 사용내역 정리','법인카드 사용내역서',1,'기존 월마감 절차대로 법인카드 사용내역서 작성 · 증빙 첨부.','사용내역서 결재'],
+    [3,'검토 · 마감','',0,'재무회계팀이 품의 금액 대비 집행을 확인하고 월마감에 반영합니다.','월마감 반영']
+  ]
+};
+var grid=document.getElementById('grid'), svg=document.getElementById('svg'), detail=document.getElementById('detail');
+var cur='ad', idx=0, timer=null, steps=[];
+function draw(){
+  steps.forEach(function(s){s.remove()}); steps=[];
+  FLOWS[cur].forEach(function(d,i){
+    var el=document.createElement('div'); el.className='wf-step'; el.style.gridRow=d[0]; el.style.gridColumn=i+2;
+    el.innerHTML='<span class="n">'+(i+1)+'</span><b>'+d[1]+'</b>'+(d[2]?'<span class="doc'+(d[3]?' ext':'')+'">'+d[2]+'</span>':'');
+    el.title=d[4];
+    el.addEventListener('click',function(){stop();focus(i)});
+    grid.appendChild(el); steps.push(el);
+  });
+  requestAnimationFrame(function(){ lines(); steps.forEach(function(s,i){setTimeout(function(){s.classList.add('in')}, reduce?0:i*90)}); focus(0); play(); });
+}
+function lines(){
+  var g=grid.getBoundingClientRect(); svg.setAttribute('width',g.width); svg.setAttribute('height',g.height); svg.innerHTML='';
+  for(var i=0;i<steps.length-1;i++){
+    var a=steps[i].getBoundingClientRect(), b=steps[i+1].getBoundingClientRect();
+    var x1=a.right-g.left, y1=a.top+a.height/2-g.top, x2=b.left-g.left, y2=b.top+b.height/2-g.top, mx=(x1+x2)/2;
+    var p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d','M'+x1+' '+y1+' C'+mx+' '+y1+' '+mx+' '+y2+' '+x2+' '+y2);
+    svg.appendChild(p); var L=p.getTotalLength(); p.style.setProperty('--len',L);
+    (function(p,i){setTimeout(function(){p.classList.add('on')}, reduce?0:200+i*90)})(p,i);
+  }
+}
+function focus(i){
+  idx=i; var d=FLOWS[cur][i];
+  steps.forEach(function(s,k){s.classList.toggle('cur',k===i);s.classList.toggle('done',k<i)});
+  [].forEach.call(svg.children,function(p,k){p.classList.toggle('hot',k<i)});
+  detail.classList.add('out');
+  setTimeout(function(){
+    detail.innerHTML='<div class="t">'+(i+1)+'. '+d[1]+'</div><div class="k">하는 일</div><div class="v">'+d[4]+'</div><div class="k">산출물</div><div class="v">'+d[5]+'</div>';
+    detail.classList.remove('out');
+  }, reduce?0:120);
+}
+function play(){ stop(); if(reduce) return; timer=setInterval(function(){focus((idx+1)%FLOWS[cur].length)},2600); }
+function stop(){ clearInterval(timer); }
+document.getElementById('flowSeg').addEventListener('click',function(e){
+  var b=e.target.closest('button'); if(!b) return;
+  this.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
+  cur=b.dataset.f; draw();
+});
+window.addEventListener('resize',function(){lines()});
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ if(steps.length) lines(); });
+
+/* 미리보기에서 전결 안내 문구 숨김 */
+['p221','p222'].forEach(function(id){var w=document.createTreeWalker(document.getElementById(id),NodeFilter.SHOW_TEXT),n,hit=[];while((n=w.nextNode())){if(n.nodeValue.indexOf('전결')>=0)hit.push(n)}hit.forEach(function(n){var e=n.parentElement;(e&&e.tagName==='SPAN'?e:n).remove()})});
+
+/* ── 예산 품의서: 회계시스템 원본 수식에서 유형별 라벨을 읽어 채움 ── */
+var p221=document.getElementById('p221');
+var tabs221=[].slice.call(p221.querySelectorAll('table'));
+var T1=tabs221.find(function(t){return t.rows[0]&&t.rows[0].innerText.indexOf('기본 정보')>=0});
+var T2=tabs221.find(function(t){return t.rows[0]&&t.rows[0].innerText.indexOf('지출 내역')>=0});
+function setP(cell,txt){ var p=cell.querySelector('p')||cell; p.textContent=txt; }
+function pick(sel,txt){ [].forEach.call(sel.options,function(o){o.selected=(o.text===txt)}); }
+function evalLabel(f,t){ // =IF(B2="촬영","x",IF(B2="행사","y",...,"기본"))
+  var re=/B2="([^"]+)","([^"]*)"/g, m; while((m=re.exec(f))){ if(m[1]===t) return m[2]; }
+  var d=f.match(/,"([^"]*)"\)+$/); return d?d[1]:'';
+}
+var SAMPLE={
+  '촬영':{v:['스튜디오 A · 성수','모델 2명 · 포토 1 · 스타일리스트 1','룩북 40컷 · 공홈 · SNS'],o:'26FW 룩북 촬영, 11월 2주차 성수 스튜디오',b:'일 대관 60만 × 2일 + 모델 2명 × 75만',x:[['스튜디오 대관','스튜디오A','법인카드','2026.11.10',1200000],['모델료','에이전시B','계좌이체','2026.11.20',1500000],['소품 구매','','법인카드(온라인)','2026.11.05',300000]]},
+  '행사':{v:['11.21~11.23 · 백화점 팝업존','고객 약 1,200명','팝업스토어'],o:'겨울 시즌 팝업, 3일간 신상 체험 · 판매',b:'대관 3일 × 80만 + 집기 렌탈 · 케이터링',x:[['공간 대관','백화점A','계좌이체','2026.11.14',2400000],['집기 렌탈','렌탈C','법인카드','2026.11.20',450000],['케이터링','','법인카드(온라인)','2026.11.21',350000]]},
+  '광고':{v:['메타 · 구글','11.01~11.30','ROAS 400% · 구매 200건'],o:'FW 신상 퍼포먼스 광고 (메타 · 구글)',b:'메타 일 10만 × 30일 + 구글 일 3만 × 30일',x:[['메타 광고','Meta','법인카드(온라인)','2026.11.30',3000000],['구글 광고','Google','법인카드(온라인)','2026.11.30',900000],['소재 제작','디자인D','계좌이체','2026.11.07',500000]]},
+  '기타':{v:['11.15 · 본사','임직원 30명','교육 · 워크숍'],o:'브랜드 교육 워크숍',b:'항목별 단가 × 인원',x:[['강사료','강사E','계좌이체','2026.11.15',800000],['다과','','법인카드','2026.11.15',200000]]}
+};
+function won(n){return n.toLocaleString('ko-KR')}
+function fill221(t){
+  if(!T1||!T2) return;
+  var S=SAMPLE[t];
+  pick(T1.rows[1].cells[1].querySelector('select'),t); setP(T1.rows[1].cells[3],'A본부');
+  pick(T1.rows[2].cells[1].querySelector('select'),'4분기 (10·11·12월)'); setP(T1.rows[2].cells[3],'광고 · 끝 1234');
+  setP(T1.rows[3].cells[1],'2026.11.01~11.30'); pick(T1.rows[3].cells[3].querySelector('select'),'사용 (온라인 결제 오픈)');
+  [].forEach.call(T1.querySelectorAll('[data-dze-formula]'),function(c){ setP(c, evalLabel(c.getAttribute('data-dze-formula'),t)); c.classList.remove('wf-flash'); void c.offsetWidth; if(!reduce) c.classList.add('wf-flash'); });
+  // 유형별 입력값: 라벨 수식 칸 옆 입력칸 순서대로
+  var vals=[S.v[0],S.v[1],S.v[2],S.o,'시즌 매출 목표 달성 · 신규 고객 유입',S.b], k=0;
+  [].forEach.call(T1.rows,function(r,ri){
+    if(ri<5) return; var c=r.cells[r.cells.length-1];
+    if(r.cells.length>=2 && c.getAttribute('colspan')==='3'){ setP(c, vals[k]||''); k++; }
+  });
+  // 지출 내역
+  var total=0, card=0, online=0;
+  for(var i=0;i<12;i++){
+    var r=T2.rows[i+2], x=S.x[i];
+    setP(r.cells[1], x?x[0]:''); setP(r.cells[2], x?x[1]:''); pick(r.cells[3].querySelector('select'), x?x[2]:'―');
+    setP(r.cells[4], x?x[3]:''); setP(r.cells[5], x?won(x[4]):''); setP(r.cells[6],'');
+    if(x){ total+=x[4]; if(x[2]==='법인카드') card+=x[4]; if(x[2]==='법인카드(온라인)'){card+=x[4];online+=x[4];} }
+  }
+  var fs=[].slice.call(T2.querySelectorAll('[data-dze-formula]')).filter(function(c){return !/^=D\d+$/.test(c.getAttribute('data-dze-formula'))});
+  fs.forEach(function(c){
+    var f=c.getAttribute('data-dze-formula');
+    if(/^=FIXED\(SUM\(F3/.test(f)) setP(c,won(total));
+    else if(/^=FIXED\(SUMIF/.test(f)) setP(c,won(card));
+    else if(/결제방법 미선택/.test(f)) setP(c,'');
+    else if(/세팅 필요/.test(f)) setP(c, online?('이 중 온라인 '+won(online)+'원 · 세팅 필요'):'');
+  });
+}
+var typeSeg=document.getElementById('typeSeg'), tcur='광고', ttimer=null;
+function setType(t){ tcur=t; typeSeg.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.t===t))}); fill221(t); }
+setType('광고');
+typeSeg.addEventListener('click',function(e){var b=e.target.closest('button'); if(!b) return; clearInterval(ttimer); setType(b.dataset.t)});
+var ORDER=['촬영','행사','광고','기타'];
+
+/* ── 광고비 집행 보고서 ── */
+var p222=document.getElementById('p222');
+var A=[].slice.call(p222.querySelectorAll('table')).find(function(t){return t.rows[0]&&t.rows[0].innerText.indexOf('광고비 집행')>=0});
+if(A){
+  pick(A.rows[1].cells[1].querySelector('select'),'11월'); setP(A.rows[1].cells[3],'예산 품의서 · 2026-11 광고');
+  setP(A.rows[2].cells[1],'3900000'); setP(A.rows[2].cells[3],'1234');
+  setP(A.rows[3].cells[1],'15990000'); setP(A.rows[3].cells[3],'410%');
+  setP(A.rows[4].cells[1],'메타 구매 214건 · 구글 브랜드검색 CTR 3.1%. 12월은 메타 비중 확대 예정');
+}
+
+/* 등장 · 자동 재생은 화면에 들어왔을 때만 */
+var io=new IntersectionObserver(function(es){es.forEach(function(e){
+  if(!e.isIntersecting) return; e.target.classList.add('in'); io.unobserve(e.target);
+  if(e.target.id==='flow') draw();
+  if(e.target.id==='form221' && !reduce){ var i=ORDER.indexOf(tcur); ttimer=setInterval(function(){i=(i+1)%4; setType(ORDER[i])},3200); }
+});},{threshold:.2});
+document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+})();
+</script>
+</body>
+</html>

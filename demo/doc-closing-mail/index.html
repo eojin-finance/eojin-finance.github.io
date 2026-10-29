@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>월마감 안내 메일 (데모) — 데모 사용자 포트폴리오</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+body{margin:0;background:#EEF0F3;font-family:'Pretendard Variable',Pretendard,'Malgun Gothic',sans-serif;color:#191F28}
+.mail{max-width:740px;margin:32px auto 48px;background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.08);overflow:hidden}
+.mh{padding:16px 24px;border-bottom:1px solid #E5E8EB;font-size:13px;line-height:1.8;color:#4E5968}
+.mh b{display:inline-block;width:72px;color:#8B95A1;font-weight:400}
+.mh .s{font-size:16px;font-weight:700;color:#191F28}
+.mb{padding:32px 40px;overflow-x:auto}
+@media (max-width:600px){.mail{margin:16px}.mb{padding:24px 16px}}
+</style></head><body>
+<!--demobar:start-->
+<style>
+.dbr{--dbr-sf:#FFFFFF;--dbr-ln:#D1D6DB;--dbr-ink:#191F28;--dbr-ink2:#4E5968;--dbr-hv:#F2F4F6;--dbr-ws:#FFF3DC;--dbr-wi:#9A5F00;--dbr-gl:rgba(255,255,255,.86);--dbr-fc:rgba(49,130,246,.55);
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;font-size:14px;line-height:1.5;color:var(--dbr-ink);letter-spacing:0;text-align:left;box-sizing:border-box}
+@media (prefers-color-scheme:dark){.dbr{--dbr-sf:#1B2027;--dbr-ln:#323A45;--dbr-ink:#F2F4F6;--dbr-ink2:#B0B8C1;--dbr-hv:#252C35;--dbr-ws:#3A2B12;--dbr-wi:#FFC46B;--dbr-gl:rgba(27,32,39,.86);--dbr-fc:rgba(78,150,250,.6)}}
+.dbr *{box-sizing:border-box}
+#demobar{position:relative;z-index:5;display:block;padding:6px 12px;background:var(--dbr-sf);border-bottom:1px solid var(--dbr-ln)}
+.dbr-row{display:flex;align-items:center;gap:8px;min-height:40px}
+.dbr-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;min-width:40px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:var(--dbr-ink);font:inherit;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap}
+.dbr-btn:hover{background:var(--dbr-hv)}
+.dbr-btn svg,.dbr-tag svg{width:18px;height:18px;flex:none}
+.dbr-sq{padding:0;width:40px;font-size:16px}
+.dbr-nm{font-size:16px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dbr-tag{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;background:var(--dbr-ws);color:var(--dbr-ink);font-weight:600;white-space:nowrap}
+.dbr-tag svg{color:var(--dbr-wi)}
+.dbr-grow{flex:1}
+.dbr-info{margin:0;padding:4px 8px 6px 52px;color:var(--dbr-ink2);max-width:80ch}
+.dbr :focus-visible,.dbr-skip:focus{outline:3px solid var(--dbr-fc);outline-offset:2px}
+.dbr-skip{position:absolute;left:8px;top:8px;z-index:60;transform:translateY(-300%);padding:8px 12px;border-radius:8px;background:var(--dbr-ink);color:var(--dbr-sf);font-weight:600;text-decoration:none}
+.dbr-skip:focus{transform:none}
+#dbr-pill{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;display:flex;align-items:center;gap:4px;padding:4px;max-width:calc(100vw - 32px);border:1px solid var(--dbr-ln);border-radius:999px;background:var(--dbr-gl);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);box-shadow:0 8px 24px rgba(0,0,0,.16);transform:translate(-50%,0);opacity:1;transition:opacity .2s cubic-bezier(0,0,0,1),transform .2s cubic-bezier(0,0,0,1)}
+#dbr-pill[data-off]{opacity:0;transform:translate(-50%,12px);pointer-events:none}
+#dbr-pill .dbr-btn{height:44px;border-radius:999px}
+#dbr-pill .dbr-sq{width:44px}
+#dbr-pill .dbr-lb{display:inline-flex;align-items:center;gap:6px;padding:0 8px;font-weight:600;white-space:nowrap}
+#dbr-pill .dbr-lb svg{width:18px;height:18px;color:var(--dbr-wi)}
+#dbr-pop{position:absolute;left:0;right:0;bottom:calc(100% + 8px);margin:0;padding:12px 16px;border:1px solid var(--dbr-ln);border-radius:12px;background:var(--dbr-sf);color:var(--dbr-ink);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#dbr-pill{background:var(--dbr-sf)}}
+@media (max-width:600px){.dbr-info{padding-left:8px}}
+@media (max-width:420px){.dbr-tag span{display:none}.dbr-tag{padding:0 6px}}
+@media (max-width:400px){#dbr-pill .dbr-lb{display:none}}
+@media (prefers-reduced-motion:reduce){#dbr-pill{transition:none}}
+</style>
+<a class="dbr dbr-skip" href="#dbr-main">본문으로 건너뛰기</a>
+<nav id="demobar" class="dbr" aria-label="데모 안내"><div class="dbr-row"><a class="dbr-btn" href="../../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>포트폴리오</a><span class="dbr-nm">월마감 안내 메일</span><span class="dbr-tag" title="매월 전 구성원에게 보내는 월마감 안내 메일 본문. 메일 클라이언트 호환을 위해 표 레이아웃으로 짰습니다."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z"/></svg><span>가상 데이터</span></span><span class="dbr-grow"></span><button type="button" class="dbr-btn dbr-sq" id="dbr-q" aria-label="데모 설명" aria-expanded="false" aria-controls="dbr-info" title="데모 설명">?</button></div><p class="dbr-info" id="dbr-info" hidden>매월 전 구성원에게 보내는 월마감 안내 메일 본문. 메일 클라이언트 호환을 위해 표 레이아웃으로 짰습니다.</p></nav>
+<nav id="dbr-pill" class="dbr" aria-label="데모 안내 (떠 있는 단추)"><a class="dbr-btn" href="../../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>포트폴리오</a><span class="dbr-lb" title="매월 전 구성원에게 보내는 월마감 안내 메일 본문. 메일 클라이언트 호환을 위해 표 레이아웃으로 짰습니다."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z"/></svg>데모</span><button type="button" class="dbr-btn dbr-sq" id="dbr-q2" aria-label="데모 설명" aria-expanded="false" aria-controls="dbr-pop" title="데모 설명">?</button><p id="dbr-pop" hidden>매월 전 구성원에게 보내는 월마감 안내 메일 본문. 메일 클라이언트 호환을 위해 표 레이아웃으로 짰습니다.</p></nav>
+<span id="dbr-main" tabindex="-1"></span>
+<script>(function(){
+  var bar=document.getElementById('demobar'), pill=document.getElementById('dbr-pill'), b=document.body;
+  // 띠를 본문 여백 밖까지 펼친다 (데모마다 body 여백이 달라서 실제 값을 읽는다)
+  // 앱 CSS 가 띠보다 늦게 오는 데모가 있어(body margin 8 → 0) 로드 때 다시 잰다
+  function fit(){ var cs=getComputedStyle(b), pt=parseFloat(cs.paddingTop)+parseFloat(cs.marginTop), pl=parseFloat(cs.paddingLeft)+parseFloat(cs.marginLeft), pr=parseFloat(cs.paddingRight)+parseFloat(cs.marginRight);
+    bar.style.margin=(-pt)+'px '+(-pr)+'px '+pt+'px '+(-pl)+'px'; }
+  fit(); document.addEventListener('DOMContentLoaded',fit); window.addEventListener('load',fit);
+  function tg(btn,box){ btn.addEventListener('click',function(){ box.hidden=!box.hidden; btn.setAttribute('aria-expanded',String(!box.hidden)); }); }
+  tg(document.getElementById('dbr-q'),document.getElementById('dbr-info'));
+  tg(document.getElementById('dbr-q2'),document.getElementById('dbr-pop'));
+  document.addEventListener('keydown',function(e){ if(e.key!=='Escape')return; ['dbr-info','dbr-pop'].forEach(function(id,i){ var x=document.getElementById(id); if(!x.hidden){ x.hidden=true; document.getElementById(i?'dbr-q2':'dbr-q').setAttribute('aria-expanded','false'); } }); });
+  // 앱바가 화면에 있으면 알약은 숨긴다 (숨은 알약은 Tab 으로도 안 잡히게 inert)
+  function show(on){ if(on){ pill.removeAttribute('data-off'); pill.inert=false; } else { pill.setAttribute('data-off',''); pill.inert=true; document.getElementById('dbr-pop').hidden=true; document.getElementById('dbr-q2').setAttribute('aria-expanded','false'); } }
+  show(false);
+  if('IntersectionObserver' in window) new IntersectionObserver(function(en){ show(!en[0].isIntersecting); }).observe(bar);
+})();</script>
+<!--demobar:end-->
+<div class="mail">
+  <div class="mh"><div><b>보낸 사람</b>재무회계팀</div><div><b>받는 사람</b>전 구성원</div><div class="s"><b>제목</b>[재무회계팀] 10월 월 마감 안내</div></div>
+  <div class="mb"><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="660" style="width:660px;border-collapse:collapse;font-family:'Pretendard Variable',Pretendard,'맑은 고딕','Malgun Gothic',돋움,Dotum,sans-serif;color:#222222;word-break:keep-all;">
+
+  <tr>
+    <td style="padding:0 0 24px;font-size:14px;line-height:1.75;">안녕하세요,<br>재무회계팀입니다.</td>
+  </tr>
+
+  <!-- 머리 : 달력 타일 + 제목 -->
+  <tr>
+    <td style="padding:0 0 24px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+        <tr>
+          <td valign="top" width="96" style="width:96px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="96" style="width:96px;border-collapse:separate;border-spacing:0;">
+              <tr><td align="center" bgcolor="#1268B8" style="background:#1268B8;color:#FFFFFF;font-size:13px;font-weight:bold;line-height:1.2;padding:8px 0;border-radius:12px 12px 0 0;">11월</td></tr>
+              <tr><td align="center" bgcolor="#FFFFFF" style="background:#FFFFFF;font-size:28px;font-weight:bold;line-height:1.1;padding:12px 0 4px;border-left:1px solid #DCE9F7;border-right:1px solid #DCE9F7;">05</td></tr>
+              <tr><td align="center" bgcolor="#FFFFFF" style="background:#FFFFFF;font-size:13px;color:#666666;line-height:1.2;padding:0 0 12px;border-left:1px solid #DCE9F7;border-right:1px solid #DCE9F7;border-bottom:1px solid #DCE9F7;border-radius:0 0 12px 12px;">목 14:00</td></tr>
+            </table>
+          </td>
+          <td valign="middle" style="padding:0 0 0 20px;">
+            <div style="font-size:13px;font-weight:bold;color:#1268B8;line-height:1.5;">제출 기한 11월 5일(목) 14:00</div>
+            <div style="font-size:22px;font-weight:bold;line-height:1.3;padding:4px 0 8px;">10월 월 마감 안내</div>
+            <div style="font-size:14px;color:#666666;line-height:1.6;word-break:keep-all;">아래 세 가지를 기한 안에 제출해 주세요.</div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- 할 일 3개 : 아이콘 카드 -->
+  <tr>
+    <td style="padding:0 0 32px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="660" style="width:660px;border-collapse:separate;border-spacing:0;">
+        <tr>
+          <td width="180" valign="top" bgcolor="#EEF4FB" style="width:180px;background:#EEF4FB;border-radius:12px;padding:20px 16px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;"><tr><td width="44" height="44" align="center" valign="middle" bgcolor="#FFFFFF" style="width:44px;height:44px;background:#FFFFFF;border-radius:50%;font-size:22px;line-height:44px;">💳</td></tr></table>
+            <div style="font-size:16px;font-weight:bold;line-height:1.4;padding:12px 0 4px;">법인카드</div>
+            <div style="font-size:13px;line-height:1.6;word-break:keep-all;">10월 사용내역<br>회계시스템 상신</div>
+            <div style="padding:12px 0 0;font-size:13px;line-height:1.5;"><a href="#" style="color:#1268B8;text-decoration:none;font-weight:bold;">작성 방법 &rarr;</a></div>
+          </td>
+          <td width="12" style="width:12px;">&nbsp;</td>
+          <td width="180" valign="top" bgcolor="#EEF4FB" style="width:180px;background:#EEF4FB;border-radius:12px;padding:20px 16px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;"><tr><td width="44" height="44" align="center" valign="middle" bgcolor="#FFFFFF" style="width:44px;height:44px;background:#FFFFFF;border-radius:50%;font-size:22px;line-height:44px;">👛</td></tr></table>
+            <div style="font-size:16px;font-weight:bold;line-height:1.4;padding:12px 0 4px;">개인경비</div>
+            <div style="font-size:13px;line-height:1.6;word-break:keep-all;">10월 사용분<br>지출결의서 청구</div>
+            <div style="padding:12px 0 0;font-size:13px;line-height:1.5;"><a href="#" style="color:#1268B8;text-decoration:none;font-weight:bold;">작성 방법 &rarr;</a></div>
+          </td>
+          <td width="12" style="width:12px;">&nbsp;</td>
+          <td width="180" valign="top" bgcolor="#EEF4FB" style="width:180px;background:#EEF4FB;border-radius:12px;padding:20px 16px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;"><tr><td width="44" height="44" align="center" valign="middle" bgcolor="#FFFFFF" style="width:44px;height:44px;background:#FFFFFF;border-radius:50%;font-size:22px;line-height:44px;">💵</td></tr></table>
+            <div style="font-size:16px;font-weight:bold;line-height:1.4;padding:12px 0 4px;">전도금</div>
+            <div style="font-size:13px;line-height:1.6;word-break:keep-all;">10월 사용 내역서 작성<br>+ 증빙 제출 (본사)</div>
+            <div style="padding:12px 0 0;font-size:13px;line-height:1.5;"><a href="#" style="color:#1268B8;text-decoration:none;font-weight:bold;">작성 방법 &rarr;</a></div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- 유의사항 : 아이콘 목록 -->
+  <tr>
+    <td style="padding:0 0 8px;font-size:18px;font-weight:bold;line-height:1.4;">법인카드 작성 시 유의사항</td>
+  </tr>
+  <tr>
+    <td style="padding:0 0 8px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="660" style="width:660px;border-collapse:collapse;">
+        <tr>
+          <td width="40" valign="top" style="width:40px;padding:12px 0;border-bottom:1px solid #E6E6E6;font-size:18px;line-height:1.4;">🏷️</td>
+          <td valign="top" style="padding:12px 0;border-bottom:1px solid #E6E6E6;font-size:14px;line-height:1.7;word-break:keep-all;"><b>[변경]</b> 프로젝트 코드 입력 필수 &mdash; <b>26 FW A본부 지역 팝업 [P9101]</b> 추가<br><span style="color:#666666;">ALPHA DAY [P9102] / BETA 팝업 매장 [P9103] / A본부 지역 팝업 관련 건 [P9101]</span></td>
+        </tr>
+        <tr>
+          <td width="40" valign="top" style="width:40px;padding:12px 0;border-bottom:1px solid #E6E6E6;font-size:18px;line-height:1.4;">📝</td>
+          <td valign="top" style="padding:12px 0;border-bottom:1px solid #E6E6E6;font-size:14px;line-height:1.7;word-break:keep-all;">양식은 &lsquo;지출결의서&rsquo;가 아닌 <b>&lsquo;법인카드 사용내역서&rsquo;</b></td>
+        </tr>
+        <tr>
+          <td width="40" valign="top" style="width:40px;padding:12px 0;border-bottom:1px solid #E6E6E6;font-size:18px;line-height:1.4;">🧾</td>
+          <td valign="top" style="padding:12px 0;border-bottom:1px solid #E6E6E6;font-size:14px;line-height:1.7;word-break:keep-all;">영수증 생략 가능 &mdash; 티타임비 &middot; 식대 &middot; 여비교통비 &middot; 접대비<br><span style="color:#666666;">편의점 &middot; 마트 식대는 첨부 필수</span></td>
+        </tr>
+        <tr>
+          <td width="40" valign="top" style="width:40px;padding:12px 0;border-bottom:1px solid #E6E6E6;font-size:18px;line-height:1.4;">🌙</td>
+          <td valign="top" style="padding:12px 0;border-bottom:1px solid #E6E6E6;font-size:14px;line-height:1.7;word-break:keep-all;">Flex 근무기록 &mdash; 법인카드 야근식대는 <b>제출 불필요</b><br>내용란에 <b>야근식대_이OO, 박OO</b> 처럼 사용 인원 이름을 꼭 명시해 주세요.<br><span style="color:#666666;">개인카드로 결제해 개인경비로 청구하는 건, 외근 식대 &middot; 교통비는 종전과 같이 근무기록이 필요합니다.</span></td>
+        </tr>
+        <tr>
+          <td width="40" valign="top" style="width:40px;padding:12px 0;font-size:18px;line-height:1.4;">🚇</td>
+          <td valign="top" style="padding:12px 0;font-size:14px;line-height:1.7;word-break:keep-all;">교통카드 &middot; 하이패스 &mdash; 10월 사용분은 11월 초 이후 조회 가능</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <tr>
+    <td style="padding:24px 0;font-size:14px;line-height:1.75;">감사합니다.</td>
+  </tr>
+  <tr>
+    <td style="border-top:1px solid #E6E6E6;padding:16px 0 0;font-size:13px;line-height:1.8;color:#666666;">
+      📖 <a href="#" style="color:#1268B8;text-decoration:none;font-weight:bold;">전자결재 가이드</a> &mdash; 양식별 작성 방법 (로그인 없이 열립니다)<br>
+      문의 : 재무회계팀
+    </td>
+  </tr>
+</table></div>
+</div>
+</body></html>

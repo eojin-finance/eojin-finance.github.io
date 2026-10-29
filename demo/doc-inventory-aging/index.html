@@ -1,0 +1,1234 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>재고 에이징·충당 비교 (데모) — 이어진 포트폴리오</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* ============================================================
+   example-ui tokens.css  —  샘플기업 재무 웹앱 공용 디자인 토큰 v1.2 (2026-09-23 · 09-28 .dd 드롭다운 · .dlg 대화상자 · 10-02 .drp 기간 선택)
+   사용법: <style> 맨 위에 이 파일 내용을 붙이고, 앱 고유 CSS는 이 변수만 참조한다.
+   규칙: 색·크기·간격·반경·그림자·모션 값을 앱 CSS에 리터럴로 쓰지 않는다. 전부 var().
+   ============================================================ */
+
+/* ---------- 0. 폰트 ----------
+   Pretendard Variable (CDN). 오프라인·차단 환경이면 system-ui → Apple SD Gothic Neo → 맑은 고딕으로 내려간다.
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+*/
+
+:root{
+  /* 서체 */
+  --font-sans:"Pretendard Variable",Pretendard,system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,Consolas,"Malgun Gothic",monospace;   /* ID·코드·해시 전용. 금액엔 쓰지 않는다 */
+
+  /* 타입 스케일 — 8단계만 쓴다. 이 외 크기는 금지 */
+  --fs-11:11px;  /* caption  — eyebrow·단위·메타. 본문 금지 */
+  --fs-12:12px;  /* small    — 표 보조열·배지 */
+  --fs-13:13px;  /* body-s   — 밀도 높은 표 본문(최소 본문) */
+  --fs-14:14px;  /* body     — 기본 본문·입력·버튼 */
+  --fs-16:16px;  /* title-s  — 카드 제목 */
+  --fs-18:18px;  /* title    — 섹션 제목 */
+  --fs-22:22px;  /* headline — 화면 제목 */
+  --fs-28:28px;  /* display  — KPI 핵심 숫자 */
+  --lh-tight:1.2; --lh-body:1.5; --lh-display:1.1;
+  --fw-regular:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --ls-tight:-0.01em; --ls-display:-0.02em;
+
+  /* 간격 — 4px 기반 */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-10:40px; --sp-12:48px;
+
+  /* 반경 — 바깥 반경 = 안 반경 + 패딩 (동심원 규칙) */
+  --r-1:4px;   /* 칩·작은 입력 */
+  --r-2:8px;   /* 버튼·입력·탭 */
+  --r-3:12px;  /* 카드·패널 */
+  --r-4:16px;  /* 시트·모달·팝오버 */
+  --r-pill:999px;
+
+  /* 터치·클릭 목표 */
+  --hit:40px;        /* 데스크톱 최소 클릭 높이 (WCAG 24 이상, 권장 40) */
+  --hit-touch:44px;  /* 모바일 최소 (Apple 44pt) */
+  --row-dense:36px; --row-comfy:44px;   /* 표 행 높이 */
+
+  /* ---------- 색 (라이트) ----------
+     중립 회색 11단계 + 브랜드 1색 + 의미색 4종. 그 외 색은 만들지 않는다. */
+  --g0:#FFFFFF; --g50:#F9FAFB; --g100:#F2F4F6; --g200:#E5E8EB; --g300:#D1D6DB; --g400:#B0B8C1;
+  --g500:#8B95A1; --g600:#6B7684; --g700:#4E5968; --g800:#333D4B; --g900:#191F28;
+
+  --bg:var(--g50);            /* 페이지 바탕 */
+  --surface:var(--g0);        /* 카드·패널 */
+  --surface-2:var(--g100);    /* 표 머리·구분 영역 */
+  --line:var(--g200);         /* 기본 구분선 */
+  --line-strong:var(--g300);  /* 입력 테두리 */
+  --ink:var(--g900);          /* 본문 */
+  --ink-2:var(--g700);        /* 보조 */
+  --ink-3:var(--g600);        /* 라벨·캡션 (4.5:1 유지되는 가장 밝은 회색) */
+  --ink-4:var(--g400);        /* 비활성·플레이스홀더 */
+
+  --brand:#3182F6; --brand-hover:#1B64DA; --brand-soft:#E8F3FF; --brand-ink:#1B64DA; --on-brand:#FFFFFF;
+  --neg:#E5484D;  --neg-soft:#FDECEC;  --neg-ink:#C0353A;     /* 마이너스·오류·삭제 */
+  --pos:#1E9E5B;  --pos-soft:#E6F6EC;  --pos-ink:#177A46;     /* 완료·일치 (금액 +에는 쓰지 않는다) */
+  --warn:#DB8600; --warn-soft:#FFF3DC; --warn-ink:#9A5F00;    /* 대기·주의 */
+  --info:var(--brand); --info-soft:var(--brand-soft);
+
+  --focus:0 0 0 3px rgba(49,130,246,.35);
+  --shadow-1:0 1px 2px rgba(25,31,40,.06);
+  --shadow-2:0 2px 8px -2px rgba(25,31,40,.10),0 1px 2px rgba(25,31,40,.06);
+  --shadow-3:0 12px 32px -12px rgba(25,31,40,.22),0 2px 6px rgba(25,31,40,.08);
+
+  /* 글라스 — 떠 있는 층(앱바·툴바·시트)에만 */
+  --glass-bg:rgba(255,255,255,.66); --glass-line:rgba(255,255,255,.55); --glass-blur:18px; --glass-sat:1.4;
+
+  /* ---------- 모션 ----------
+     들어올 땐 ease-out·짧게, 나갈 땐 더 짧게. 레이아웃 속성은 애니메이션하지 않는다 (transform·opacity만). */
+  --dur-1:120ms;  /* hover·press·토글 */
+  --dur-2:200ms;  /* 열림·페이드·탭 전환 (기본) */
+  --dur-3:320ms;  /* 시트·모달·큰 이동 */
+  --dur-exit:150ms;
+  --ease-out:cubic-bezier(0,0,0,1);           /* 등장 */
+  --ease-in:cubic-bezier(0.3,0,1,1);          /* 퇴장 */
+  --ease-std:cubic-bezier(0.2,0,0,1);         /* 상태 전환 */
+  --ease-spring:cubic-bezier(0.34,1.56,0.64,1); /* 강조 튐 — 작은 요소에만 */
+}
+
+/* ---------- 색 (다크) ---------- */
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --g0:#101318; --g50:#14181E; --g100:#1B2027; --g200:#252C35; --g300:#323A45; --g400:#4A5462;
+  --g500:#6B7684; --g600:#8B95A1; --g700:#B0B8C1; --g800:#D1D6DB; --g900:#F2F4F6;
+  --bg:var(--g50); --surface:var(--g100); --surface-2:var(--g200); --line:var(--g200); --line-strong:var(--g300);
+  --brand:#4E96FA; --brand-hover:#74AEFF; --brand-soft:#17304F; --brand-ink:#8CBEFF; --on-brand:#0B1220;
+  --neg:#F0656A; --neg-soft:#3A1F21; --neg-ink:#FF8A8E;
+  --pos:#3FBF7A; --pos-soft:#17301F; --pos-ink:#6FDB9E;
+  --warn:#F0A63A; --warn-soft:#3A2B12; --warn-ink:#FFC46B;
+  --focus:0 0 0 3px rgba(78,150,250,.45);
+  --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 2px 8px -2px rgba(0,0,0,.5),0 1px 2px rgba(0,0,0,.4);
+  --shadow-3:0 12px 32px -12px rgba(0,0,0,.7),0 2px 6px rgba(0,0,0,.5);
+  --glass-bg:rgba(20,24,30,.58); --glass-line:rgba(255,255,255,.10);
+}}
+:root[data-theme="dark"]{
+  --g0:#101318; --g50:#14181E; --g100:#1B2027; --g200:#252C35; --g300:#323A45; --g400:#4A5462;
+  --g500:#6B7684; --g600:#8B95A1; --g700:#B0B8C1; --g800:#D1D6DB; --g900:#F2F4F6;
+  --bg:var(--g50); --surface:var(--g100); --surface-2:var(--g200); --line:var(--g200); --line-strong:var(--g300);
+  --brand:#4E96FA; --brand-hover:#74AEFF; --brand-soft:#17304F; --brand-ink:#8CBEFF; --on-brand:#0B1220;
+  --neg:#F0656A; --neg-soft:#3A1F21; --neg-ink:#FF8A8E;
+  --pos:#3FBF7A; --pos-soft:#17301F; --pos-ink:#6FDB9E;
+  --warn:#F0A63A; --warn-soft:#3A2B12; --warn-ink:#FFC46B;
+  --focus:0 0 0 3px rgba(78,150,250,.45);
+  --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 2px 8px -2px rgba(0,0,0,.5),0 1px 2px rgba(0,0,0,.4);
+  --shadow-3:0 12px 32px -12px rgba(0,0,0,.7),0 2px 6px rgba(0,0,0,.5);
+  --glass-bg:rgba(20,24,30,.58); --glass-line:rgba(255,255,255,.10);
+}
+
+/* ============================================================
+   1. 베이스 — 모든 앱 공통. 여기 있는 건 앱에서 다시 쓰지 않는다.
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:var(--fw-regular) var(--fs-14)/var(--lh-body) var(--font-sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:"tnum" 1;/* 숫자 폭 고정 = 표에서 자릿수 맞음 */
+  word-break:keep-all;overflow-wrap:break-word;/* 한글은 단어 단위로 끊고, 긴 URL·코드만 비상 분리 */}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{text-wrap:balance}   /* 제목 줄 길이 고르게 — keep-all 과 함께여야 한글에서 동작 */
+p{text-wrap:pretty}            /* 마지막 줄 외톨이 단어 방지 */
+em,i{font-style:normal;font-weight:var(--fw-semibold)} /* 한글엔 이탤릭이 없다 — 기울이지 말고 굵게 */
+h1{font-size:var(--fs-22);font-weight:var(--fw-bold);line-height:var(--lh-tight);letter-spacing:var(--ls-tight)}
+h2{font-size:var(--fs-18);font-weight:var(--fw-semibold);line-height:var(--lh-tight)}
+h3{font-size:var(--fs-16);font-weight:var(--fw-semibold);line-height:var(--lh-tight)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:none;box-shadow:var(--focus)}
+::selection{background:var(--brand-soft)}
+
+/* 숫자 */
+.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.num.neg{color:var(--neg-ink)}     /* 마이너스만 색 — 플러스는 잉크색 그대로 */
+.unit{font-size:var(--fs-12);color:var(--ink-3);margin-left:2px;font-weight:var(--fw-regular)}
+.mono{font-family:var(--font-mono);font-size:.93em}
+
+/* 텍스트 */
+.eyebrow{font-size:var(--fs-11);font-weight:var(--fw-semibold);letter-spacing:.04em;color:var(--ink-3);text-transform:uppercase}
+.caption{font-size:var(--fs-12);color:var(--ink-3)}
+.muted{color:var(--ink-3)}
+
+/* 표면 */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-3);box-shadow:var(--shadow-1)}
+.card>.card-h{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--line)}
+.card>.card-b{padding:var(--sp-4)}
+
+/* 버튼 — 4종만: primary / secondary / ghost / danger. 크기 2종 */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-2);height:var(--hit);padding:0 var(--sp-4);
+  border-radius:var(--r-2);border:1px solid transparent;font-weight:var(--fw-medium);font-size:var(--fs-14);white-space:nowrap;
+  transition:background-color var(--dur-1) var(--ease-std),border-color var(--dur-1) var(--ease-std),color var(--dur-1) var(--ease-std),transform var(--dur-1) var(--ease-std)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--brand);color:var(--on-brand)} .btn.primary:hover{background:var(--brand-hover)}
+.btn.secondary{background:var(--surface);border-color:var(--line-strong);color:var(--ink)} .btn.secondary:hover{background:var(--surface-2)}
+.btn.ghost{background:transparent;color:var(--ink-2)} .btn.ghost:hover{background:var(--surface-2);color:var(--ink)}
+.btn.danger{background:var(--neg-soft);color:var(--neg-ink)} .btn.danger:hover{background:var(--neg);color:#fff}
+.btn.sm{height:32px;padding:0 var(--sp-3);font-size:var(--fs-13)}
+.btn.sq{width:var(--hit);padding:0} .btn.sm.sq{width:32px}   /* 기호 하나짜리(?·×·⋯) 버튼은 정사각형 */
+/* 한 줄 = 높이 하나 — 툴바·동작칸·필터 줄에 놓인 버튼·드롭다운·입력·세그먼트는 같은 높이. .sm 은 표 칸·줄글 안에서만 */
+.toolbar .btn.sm,.actions .btn.sm{height:var(--hit);padding:0 var(--sp-4);font-size:var(--fs-14)}
+.toolbar .seg,.actions .seg{height:var(--hit);align-items:stretch} .toolbar .seg>button,.actions .seg>button{height:auto}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.busy{position:relative;color:transparent!important;pointer-events:none}
+.btn.busy::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;border:2px solid currentColor;
+  border-color:var(--ink-4) var(--ink-4) var(--ink-4) transparent;animation:spin .7s linear infinite}
+.btn.primary.busy::after{border-color:rgba(255,255,255,.75) rgba(255,255,255,.75) rgba(255,255,255,.75) transparent}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 입력 */
+.input,input[type=text],input[type=number],input[type=date],select,textarea{
+  height:var(--hit);padding:0 var(--sp-3);border:1px solid var(--line-strong);border-radius:var(--r-2);background:var(--surface);
+  transition:border-color var(--dur-1) var(--ease-std),box-shadow var(--dur-1) var(--ease-std)}
+textarea{height:auto;padding:var(--sp-2) var(--sp-3)}
+input:focus-visible,select:focus-visible,textarea:focus-visible{border-color:var(--brand);box-shadow:var(--focus)}
+input::placeholder{color:var(--ink-4)}
+input[aria-invalid="true"]{border-color:var(--neg)}
+.field{display:flex;flex-direction:column;gap:var(--sp-1)}
+.field>label{font-size:var(--fs-13);font-weight:var(--fw-medium);color:var(--ink-2)}
+.field>.help{font-size:var(--fs-12);color:var(--ink-3)} .field>.error{font-size:var(--fs-12);color:var(--neg-ink)}
+
+/* 세그먼트·탭 */
+.seg{display:inline-flex;padding:2px;background:var(--surface-2);border-radius:var(--r-2);gap:2px}
+.seg>button{height:32px;padding:0 var(--sp-3);border:0;border-radius:6px;background:transparent;color:var(--ink-2);font-weight:var(--fw-medium);font-size:var(--fs-13);
+  transition:background-color var(--dur-1) var(--ease-std),color var(--dur-1) var(--ease-std),box-shadow var(--dur-1) var(--ease-std)}
+.seg>button[aria-pressed="true"],.seg>button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-1)}
+.tabs{display:flex;gap:var(--sp-1);border-bottom:1px solid var(--line)}
+.tabs>button{position:relative;height:var(--hit);padding:0 var(--sp-3);border:0;background:transparent;color:var(--ink-3);font-weight:var(--fw-medium);
+  transition:color var(--dur-1) var(--ease-std)}
+.tabs>button:hover{color:var(--ink)}
+.tabs>button[aria-selected="true"]{color:var(--ink)}
+.tabs>button[aria-selected="true"]::after{content:"";position:absolute;left:var(--sp-3);right:var(--sp-3);bottom:-1px;height:2px;border-radius:1px;background:var(--brand)}
+
+/* 배지·칩 — 색은 의미색 4종만 */
+.badge{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 var(--sp-2);border-radius:var(--r-pill);font-size:var(--fs-12);font-weight:var(--fw-medium);white-space:nowrap;
+  background:var(--surface-2);color:var(--ink-2)}
+.badge.neg{background:var(--neg-soft);color:var(--neg-ink)} .badge.pos{background:var(--pos-soft);color:var(--pos-ink)}
+.badge.warn{background:var(--warn-soft);color:var(--warn-ink)} .badge.info{background:var(--brand-soft);color:var(--brand-ink)}
+.badge.dot::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* 표 — 세로선 없음, 가로선 1px, 머리 sticky, 숫자 우측 tabular */
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:var(--r-3);background:var(--surface)}
+table.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:var(--fs-13)}
+.tbl th{position:sticky;top:0;z-index:1;height:var(--row-dense);padding:0 var(--sp-3);background:var(--surface-2);color:var(--ink-3);
+  font-size:var(--fs-12);font-weight:var(--fw-semibold);text-align:left;white-space:nowrap;border-bottom:1px solid var(--line)}
+.tbl td{height:var(--row-dense);padding:0 var(--sp-3);border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr{transition:background-color var(--dur-1) var(--ease-std)}
+.tbl tbody tr:hover td{background:var(--surface-2)}
+.tbl tbody tr[aria-selected="true"] td{background:var(--brand-soft)}
+.tbl th.num,.tbl td.num{text-align:right}
+.tbl tr.total td{font-weight:var(--fw-semibold);background:var(--surface-2);border-top:1px solid var(--line-strong)}
+.tbl.comfy th,.tbl.comfy td{height:var(--row-comfy)}
+.tbl td.first{position:sticky;left:0;background:var(--surface);z-index:1}
+
+/* KPI 타일 — 숫자가 가장 크고, 라벨은 위에 작게 */
+.kpi{display:flex;flex-direction:column;gap:var(--sp-1);padding:var(--sp-4);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-3)}
+.kpi>.k{font-size:var(--fs-13);color:var(--ink-3);font-weight:var(--fw-medium)}
+.kpi>.v{font-size:var(--fs-28);font-weight:var(--fw-bold);letter-spacing:var(--ls-display);line-height:var(--lh-display);font-variant-numeric:tabular-nums}
+.kpi>.d{font-size:var(--fs-12);color:var(--ink-3)}
+.kpi>.d.neg{color:var(--neg-ink)} .kpi>.d.pos{color:var(--pos-ink)}
+
+/* 알림 — 결과는 남고, 정보는 사라진다 */
+.toasts{position:fixed;right:var(--sp-4);bottom:var(--sp-4);z-index:80;display:flex;flex-direction:column;gap:var(--sp-2);width:min(400px,calc(100vw - 32px));pointer-events:none}
+.toast{pointer-events:auto;display:flex;gap:var(--sp-3);align-items:flex-start;padding:var(--sp-3) var(--sp-4);border-radius:var(--r-3);
+  background:var(--g900);color:var(--g0);box-shadow:var(--shadow-3);font-size:var(--fs-13);
+  animation:toast-in var(--dur-2) var(--ease-out) both}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .toast{background:var(--g200);color:var(--g900)} }
+:root[data-theme="dark"] .toast{background:var(--g200);color:var(--g900)}
+.toast.out{animation:toast-out var(--dur-exit) var(--ease-in) both}
+@keyframes toast-in{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes toast-out{to{opacity:0;transform:translateY(6px)}}
+.toast .x{margin-left:auto;background:none;border:0;color:inherit;opacity:.6;padding:0 2px} .toast .x:hover{opacity:1}
+.inline-msg{display:flex;gap:var(--sp-2);padding:var(--sp-3) var(--sp-4);border-radius:var(--r-2);font-size:var(--fs-13);background:var(--surface-2);color:var(--ink-2)}
+.inline-msg.neg{background:var(--neg-soft);color:var(--neg-ink)} .inline-msg.warn{background:var(--warn-soft);color:var(--warn-ink)}
+.inline-msg.pos{background:var(--pos-soft);color:var(--pos-ink)} .inline-msg.info{background:var(--brand-soft);color:var(--brand-ink)}
+
+/* 스켈레톤 — 300ms 넘게 기다리면 스피너 대신 이걸 */
+.skel{position:relative;overflow:hidden;background:var(--surface-2);border-radius:var(--r-1);color:transparent!important;min-height:1em}
+.skel::after{content:"";position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);animation:shimmer 1.4s var(--ease-std) infinite}
+@keyframes shimmer{to{transform:translateX(100%)}}
+
+/* 빈 상태 */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-2);padding:var(--sp-12) var(--sp-4);text-align:center;color:var(--ink-3)}
+.empty>b{font-size:var(--fs-16);color:var(--ink);font-weight:var(--fw-semibold)}
+
+/* 떠 있는 층 — 글라스 */
+.glass{background:var(--glass-bg);-webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border:1px solid var(--glass-line);box-shadow:var(--shadow-2)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){ .glass{background:var(--surface)} }
+@media (prefers-reduced-transparency:reduce){ .glass{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none} }
+.appbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:var(--sp-3);height:56px;padding:0 var(--sp-5);border-bottom:1px solid var(--line)}
+
+/* 시트·모달·팝오버 — 등장 200 ease-out, 퇴장 150 ease-in */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(15,20,28,.45);animation:fade-in var(--dur-2) var(--ease-out) both}
+.sheet{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:61;width:min(560px,calc(100vw - 32px));max-height:min(80vh,720px);overflow:auto;
+  background:var(--surface);border-radius:var(--r-4);box-shadow:var(--shadow-3);animation:pop-in var(--dur-3) var(--ease-out) both}
+.sheet.out,.scrim.out{animation:fade-out var(--dur-exit) var(--ease-in) both}
+.popover{position:absolute;z-index:50;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-3);box-shadow:var(--shadow-3);padding:var(--sp-2);
+  animation:pop-in var(--dur-2) var(--ease-out) both;transform-origin:top left}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+@keyframes fade-out{to{opacity:0}}
+@keyframes pop-in{from{opacity:0;transform:translate(-50%,-50%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.popover{animation-name:pop-in-tl} @keyframes pop-in-tl{from{opacity:0;transform:scale(.96) translateY(-4px)}to{opacity:1;transform:none}}
+
+/* 드롭다운 — 내재화 (components.js ddEnhanceAll). 네이티브 <select> 목록은 OS 가 그려서 서체·색·다크모드·보조 문구를 못 바꾼다.
+   <select> 는 .dd 안에 숨겨 두고 .dd-btn(닫힌 모양) + .dd-list(펼친 목록, body 에 fixed) 를 앱이 그린다 */
+.dd{position:relative;display:inline-flex;max-width:100%}
+.dd[hidden],.dd>select{display:none}
+.dd-btn{display:inline-flex;align-items:center;gap:var(--sp-2);width:100%;min-width:120px;height:var(--hit);padding:0 var(--sp-2) 0 var(--sp-3);
+  border:1px solid var(--line-strong);border-radius:var(--r-2);background:var(--surface);color:var(--ink);text-align:left;white-space:nowrap;
+  transition:border-color var(--dur-1) var(--ease-std),background-color var(--dur-1) var(--ease-std)}
+.dd-btn:hover{background:var(--surface-2)}
+.dd-btn[aria-expanded="true"]{border-color:var(--brand)}
+.dd-btn:disabled{opacity:.45;cursor:not-allowed}
+.dd-btn.sm{height:32px;font-size:var(--fs-13)}
+.dd-v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.dd-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.dd-note{font-size:var(--fs-12);color:var(--ink-3);font-weight:var(--fw-regular)}
+.dd-chev{flex:none;color:var(--ink-3);transition:transform var(--dur-1) var(--ease-std)}
+.dd-btn[aria-expanded="true"] .dd-chev{transform:rotate(180deg)}
+.dd-list{position:fixed;z-index:70;overflow:auto;scrollbar-width:thin;scrollbar-gutter:stable;/* 폭을 잴 때도 스크롤바 자리를 넣는다 — 달이 많으면 «202…» 로 잘렸다 */max-width:min(480px,calc(100vw - 16px));padding:var(--sp-1);background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r-3);box-shadow:var(--shadow-3);font-size:var(--fs-14);
+  animation:dd-in var(--dur-2) var(--ease-out) both;transform-origin:top left}
+.dd-list.up{transform-origin:bottom left;animation-name:dd-in-up}
+.dd-list.out{animation:fade-out var(--dur-exit) var(--ease-in) both}
+.dd-q{position:sticky;top:0;z-index:1;width:100%;height:32px;margin-bottom:var(--sp-1);padding:0 var(--sp-3);border:1px solid var(--line-strong);border-radius:var(--r-2);background:var(--surface)}
+.dd-grp{padding:var(--sp-2) var(--sp-3) var(--sp-1);font-size:var(--fs-12);font-weight:var(--fw-semibold);color:var(--ink-3)}
+.dd-opt{display:flex;align-items:center;gap:var(--sp-2);min-height:36px;padding:0 var(--sp-3) 0 var(--sp-2);border-radius:var(--r-2);cursor:pointer;white-space:nowrap;color:var(--ink)}
+.dd-opt[data-act]{background:var(--surface-2)}
+.dd-check{flex:none;visibility:hidden;color:var(--brand)}
+.dd-opt[aria-selected="true"] .dd-check{visibility:visible}   /* 선택 = 체크 기호 + 브랜드색. 굵게는 안 쓴다 */
+.dd-opt[aria-disabled="true"]{color:var(--ink-4);cursor:default}
+.dd-opt .dd-note{margin-left:auto;padding-left:var(--sp-4)}
+.dd-none{padding:var(--sp-3);font-size:var(--fs-13);color:var(--ink-3)}
+/* 목록은 scale 하지 않는다 — 줄었다 커지는 동안 버튼과 끝선이 어긋나 보인다 */
+@keyframes dd-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes dd-in-up{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* 대화상자 — 내재화 (components.js ask·tell). alert/confirm/prompt 대신 <dialog class="dlg"> + showModal()
+   버튼은 왼쪽 "닫기"(ghost) · 오른쪽 행동 동사. 위험 동작은 기본 포커스가 "닫기" */
+dialog.dlg{width:min(440px,calc(100vw - 32px));padding:0;border:0;border-radius:var(--r-4);background:var(--surface);color:var(--ink);
+  box-shadow:var(--shadow-3);animation:dlg-in var(--dur-3) var(--ease-out) both}
+dialog.dlg::backdrop{background:rgba(15,20,28,.45);animation:fade-in var(--dur-2) var(--ease-out) both}
+dialog.dlg.out,dialog.dlg.out::backdrop{animation:fade-out var(--dur-exit) var(--ease-in) both}
+.dlg-h{padding:var(--sp-5) var(--sp-6) 0}
+.dlg-b{padding:var(--sp-3) var(--sp-6) var(--sp-5);color:var(--ink-2)}
+.dlg-b .input{width:100%;margin-top:var(--sp-3)}
+.dlg-f{display:flex;justify-content:flex-end;gap:var(--sp-2);padding:0 var(--sp-6) var(--sp-5)}
+@keyframes dlg-in{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+
+/* 기간 선택 — 내재화 (components.js drp). 기간 조회는 전부 이 래퍼 하나. date 입력 두 개를 나란히 두지 않는다.
+   버튼 = "시작 ~ 끝" + 달력 아이콘 / 펼침 = 빠른 선택 3줄 + 달력 2장 + 선택 기간 N일 · 닫기 · 적용 (회계시스템 기간 선택기 모양) */
+.drp{display:inline-flex;max-width:100%}
+.drp-btn{display:inline-flex;align-items:center;gap:var(--sp-2);height:var(--hit);padding:0 var(--sp-3);border:1px solid var(--line-strong);border-radius:var(--r-2);
+  background:var(--surface);color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;transition:border-color var(--dur-1) var(--ease-std),background-color var(--dur-1) var(--ease-std)}
+.drp-btn:hover{background:var(--surface-2)}
+.drp-btn[aria-expanded="true"]{border-color:var(--brand)}
+.drp-ic{flex:none;color:var(--ink-3)}
+.drp-pop{position:fixed;z-index:70;width:min(560px,calc(100vw - 16px));max-height:calc(100vh - 16px);overflow:auto;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-3);box-shadow:var(--shadow-3);animation:dd-in var(--dur-2) var(--ease-out) both}
+.drp-pop.out{animation:fade-out var(--dur-exit) var(--ease-in) both}
+.drp-pre{display:flex;flex-direction:column;gap:var(--sp-1);padding:var(--sp-3);border-bottom:1px solid var(--line)}
+.drp-row{display:grid;grid-template-columns:repeat(8,1fr);gap:var(--sp-1)}
+.drp-row:last-child{grid-template-columns:repeat(12,1fr)}
+.drp-p{height:32px;padding:0 var(--sp-1);border:1px solid var(--line);border-radius:var(--r-1);background:var(--surface);font-size:var(--fs-13);color:var(--ink-2);white-space:nowrap;
+  transition:background-color var(--dur-1) var(--ease-std),border-color var(--dur-1) var(--ease-std)}
+.drp-p:hover{background:var(--surface-2)}
+.drp-p[aria-pressed="true"]{border-color:var(--brand);color:var(--brand-ink);box-shadow:inset 0 -2px 0 var(--brand)}   /* 고른 빠른 선택 = 브랜드 테두리 + 밑줄 (굵게 안 씀) */
+.drp-cal{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);padding:var(--sp-3) var(--sp-4)}
+.drp-m{display:flex;flex-direction:column;gap:var(--sp-2);min-width:0}
+.drp-mh{display:grid;grid-template-columns:28px 28px 1fr 28px 28px;align-items:center;text-align:center}
+.drp-mh b{font-size:var(--fs-16);font-weight:var(--fw-semibold);font-variant-numeric:tabular-nums}
+.drp-nav{height:28px;border:0;border-radius:var(--r-1);background:transparent;color:var(--ink-3);font-size:var(--fs-16)}
+.drp-nav:hover{background:var(--surface-2);color:var(--ink)}
+.drp-g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px 0}
+.drp-w{font-size:var(--fs-12);font-weight:var(--fw-medium);color:var(--ink-3);text-align:center;padding-block:var(--sp-1)}
+.drp-w.sun{color:var(--neg-ink)}
+.drp-d{height:32px;border:0;background:transparent;font-size:var(--fs-13);font-variant-numeric:tabular-nums;color:var(--ink);border-radius:0}
+.drp-d:hover{background:var(--surface-2)}
+.drp-d.sun{color:var(--neg-ink)}
+.drp-d.out{color:var(--ink-4)}
+.drp-d.today{box-shadow:inset 0 0 0 1px var(--line-strong)}
+.drp-d.in{background:var(--brand-soft)}
+.drp-d.end{background:var(--brand);color:var(--on-brand);border-radius:var(--r-1)}
+.drp-d:disabled{color:var(--ink-4);cursor:not-allowed;background:transparent}
+.drp-f{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-3) var(--sp-4);border-top:1px solid var(--line)}
+.drp-n{margin-right:auto;font-size:var(--fs-13);color:var(--ink-3);font-variant-numeric:tabular-nums}
+.drp-nav.nx{visibility:hidden}
+@media (max-width:560px){ .drp-cal{grid-template-columns:1fr} .drp-cal .drp-m:last-child{display:none} .drp-nav.nx{visibility:visible}
+  .drp-row{grid-template-columns:repeat(4,1fr)} .drp-row:last-child{grid-template-columns:repeat(6,1fr)} }
+
+/* 탭 내용 전환 — 짧은 페이드+살짝 위로 */
+.tab-panel{animation:panel-in var(--dur-2) var(--ease-out) both}
+@keyframes panel-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* 숫자가 바뀔 때 — 배경 한 번 번쩍 (값 변화 알림) */
+.flash{animation:flash var(--dur-3) var(--ease-out)}
+@keyframes flash{0%{background:var(--brand-soft)}100%{background:transparent}}
+
+/* 접근성 — 모션 줄이기 요청 시 전부 끈다 */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ── 앱 (토큰만 참조) ── */
+:root{--a0:color-mix(in oklab,var(--brand) 16%,var(--surface));--a1:color-mix(in oklab,var(--brand) 32%,var(--surface));--a2:color-mix(in oklab,var(--brand) 48%,var(--surface));
+  --a3:color-mix(in oklab,var(--brand) 64%,var(--surface));--a4:color-mix(in oklab,var(--brand) 82%,var(--surface));--a5:var(--brand);--a6:var(--g400);--s25:var(--g700);--s26:var(--brand-ink);--sd:var(--warn-ink)}
+/* 시점 색 — 25말 회남 · 26.9말 파랑 · 증감 주황 (시트 [에이징 비교] 와 같은 규칙). 클래스 3번 겹쳐 표·툴팁 머리 색보다 앞서게 */
+.p25.p25.p25{color:var(--s25)} .p26.p26.p26{color:var(--s26)} .pd.pd.pd{color:var(--sd)}
+#sBase>button[aria-pressed="true"]{box-shadow:var(--shadow-1),inset 0 -2px 0 currentColor}
+#sBase>button[data-v="25"][aria-pressed="true"]{color:var(--s25)} #sBase>button[data-v="26"][aria-pressed="true"]{color:var(--s26)} #sBase>button[data-v="d"][aria-pressed="true"]{color:var(--sd)}
+body{min-height:100vh}
+.ag-bar{flex-wrap:wrap;height:auto;min-height:56px;padding:var(--sp-2) var(--sp-5);gap:var(--sp-2) var(--sp-4)}
+.ag-bar h1{font-size:var(--fs-18);margin-right:auto;white-space:nowrap}
+.ag-bar .tabs{border-bottom:0}
+.ag-main{max-width:1200px;margin:0 auto;padding:var(--sp-4) var(--sp-5) var(--sp-12);display:flex;flex-direction:column;gap:var(--sp-4)}
+.toolbar{display:flex;flex-wrap:wrap;gap:var(--sp-2) var(--sp-3);align-items:center}
+.toolbar .seg[hidden]{display:none}
+.seg>button[aria-disabled="true"]{color:var(--ink-4);cursor:not-allowed}
+.ag-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-3);margin-bottom:var(--sp-4)}
+.kpi .d{display:flex;gap:var(--sp-2);flex-wrap:wrap}
+.ag-grid{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:var(--sp-4)}
+.ag-col{display:flex;flex-direction:column;gap:var(--sp-4)}
+.ag-h{font-size:var(--fs-16);font-weight:var(--fw-semibold)}
+.ag-sub{font-size:var(--fs-12);color:var(--ink-3);font-weight:var(--fw-regular)}
+.legend{display:flex;flex-wrap:wrap;gap:var(--sp-1) var(--sp-3);font-size:var(--fs-12);color:var(--ink-3)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:var(--r-1);margin-right:var(--sp-1);vertical-align:-1px}
+.legend i.ln{height:2px;border-radius:1px;vertical-align:3px;width:16px}
+.legend i.ln.dash{background:repeating-linear-gradient(90deg,var(--s25) 0 4px,transparent 4px 7px)!important}
+/* 누적 막대 */
+.stk{display:flex;flex-direction:column;gap:var(--sp-3);margin-bottom:var(--sp-4)}
+.stk-row{display:grid;grid-template-columns:56px minmax(0,1fr);gap:var(--sp-2);align-items:center}
+.stk-l{font-size:var(--fs-13);font-weight:var(--fw-medium);color:var(--ink-2)}
+.stk-t{display:flex;align-items:center;gap:var(--sp-2);min-width:0}
+.stk-b{display:flex;gap:2px;height:28px;min-width:0}
+.stk-b>span{display:block;height:100%;min-width:2px;outline:none}
+.stk-b>span:first-child{border-radius:var(--r-1) 0 0 var(--r-1)} .stk-b>span:last-child{border-radius:0 var(--r-1) var(--r-1) 0}
+.stk-b>span:hover,.stk-b>span:focus-visible{filter:brightness(.92)}
+.stk-v{font-size:var(--fs-13);font-weight:var(--fw-semibold);white-space:nowrap}
+/* 꺾은선 */
+.ln-wrap{width:100%}
+.ln-wrap svg{display:block;width:100%;height:auto;overflow:visible}
+.ln-wrap text{font-size:var(--fs-12);fill:var(--ink-3);font-family:var(--font-sans)}
+.ln-wrap .lab{font-size:var(--fs-12);font-weight:var(--fw-semibold);fill:var(--ink-2)}
+.ln-wrap .grid{stroke:var(--line);stroke-width:1}
+.ln-wrap .hit{fill:transparent;cursor:pointer;outline:none}
+/* 막대 목록 */
+.bl{display:flex;flex-direction:column}
+.bl-row{display:grid;grid-template-columns:112px minmax(0,1fr) 96px;gap:var(--sp-3);align-items:center;min-height:var(--row-comfy);padding:0 var(--sp-2);border-radius:var(--r-2);
+  border:0;background:transparent;text-align:left;transition:background-color var(--dur-1) var(--ease-std)}
+.bl-row:hover{background:var(--surface-2)}
+.bl-row[aria-pressed="true"]{background:var(--brand-soft)}
+.bl-n{font-size:var(--fs-13);font-weight:var(--fw-medium);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bl-tr{position:relative;height:16px}
+.bl-tr>span{position:absolute;top:0;height:100%;border-radius:var(--r-1)}
+.bl-tr>.ax{width:1px;background:var(--line-strong);border-radius:0;top:-4px;height:24px}
+.bl-tr>.gh{background:transparent;box-shadow:inset 0 0 0 1px var(--s25)}
+.bl-v{font-size:var(--fs-13);font-weight:var(--fw-semibold);text-align:right;white-space:nowrap}
+/* 히트맵 — 열 폭 고정(값이 세어 올라가는 동안 열이 출렁이지 않게) */
+table.hm{table-layout:fixed;min-width:760px}
+.hm th:first-child{width:120px}
+.hm td.cell{padding:0}
+.hm td.cell>button{position:relative;display:flex;align-items:center;justify-content:flex-end;width:100%;height:var(--row-comfy);padding:0 var(--sp-2);border:0;font-size:var(--fs-12);
+  font-weight:var(--fw-medium);font-variant-numeric:tabular-nums;white-space:nowrap;
+  transition:background-color var(--dur-2) var(--ease-std),color var(--dur-2) var(--ease-std),box-shadow var(--dur-1) var(--ease-std)}
+.hm td.cell>button[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--ink)}
+.hm td.cell>button.fl::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 2px var(--brand);animation:ag-ring var(--dur-3) var(--ease-out) both}
+@keyframes ag-ring{from{opacity:1}to{opacity:0}}
+.hm td.first{font-weight:var(--fw-medium)}
+.hm tr.total td.first{font-weight:var(--fw-semibold)}
+.ag-two{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:var(--sp-4);align-items:start}
+.dt{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));gap:0;font-size:var(--fs-13)}
+.dt>div{padding:var(--sp-2) 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.dt>.h{font-size:var(--fs-12);color:var(--ink-3);font-weight:var(--fw-semibold)}
+.dt>.num{padding-left:var(--sp-2)}
+.dt>.on{font-weight:var(--fw-bold);color:var(--ink)}
+.dt-big{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-4)}
+.dt-big .k{font-size:var(--fs-12);color:var(--ink-3)} .dt-big .v{font-size:var(--fs-22);font-weight:var(--fw-bold);font-variant-numeric:tabular-nums;line-height:var(--lh-display)}
+/* 폭포 */
+.wf{display:flex;flex-direction:column;gap:var(--sp-1)}
+.wf-row{display:grid;grid-template-columns:120px minmax(0,1fr) 96px;gap:var(--sp-3);align-items:center;min-height:40px}
+.wf-tr{position:relative;height:24px}
+.wf-tr>span{position:absolute;top:0;height:100%;border-radius:var(--r-1)}
+.wf-n{font-size:var(--fs-13);font-weight:var(--fw-medium)} .wf-v{text-align:right;font-size:var(--fs-13);font-weight:var(--fw-semibold);white-space:nowrap}
+.mini{position:relative;display:inline-block;width:72px;height:10px;vertical-align:middle;margin-right:var(--sp-2)}
+.mini>span{position:absolute;top:0;height:100%;border-radius:2px}
+.mini>.ax{width:1px;background:var(--line-strong);left:50%;border-radius:0}
+.up{color:var(--ink-2)} .dn{color:var(--neg-ink)}
+/* 툴팁 — 4열 미니 표 */
+#tip{position:fixed;left:0;top:0;z-index:90;pointer-events:none;width:max-content;max-width:calc(100vw - 16px);padding:var(--sp-3);border-radius:var(--r-3);background:var(--surface);
+  border:1px solid var(--line-strong);box-shadow:var(--shadow-3);color:var(--ink-2);opacity:0;transform:translateY(4px);
+  transition:opacity var(--dur-exit) var(--ease-in),transform var(--dur-exit) var(--ease-in)}
+#tip.on{opacity:1;transform:none;transition:opacity var(--dur-2) var(--ease-out),transform var(--dur-2) var(--ease-out)}
+.tt-h{font-size:var(--fs-13);font-weight:var(--fw-semibold);color:var(--ink);margin-bottom:var(--sp-2);white-space:nowrap}
+.tt-g{display:grid;grid-template-columns:auto repeat(var(--c),max-content);column-gap:var(--sp-4);row-gap:var(--sp-1);font-size:var(--fs-12);font-weight:var(--fw-medium)}
+.tt-g>span{white-space:nowrap;line-height:var(--lh-body)}
+.tt-g>.h{color:var(--ink-3);text-align:right;padding-bottom:var(--sp-1);border-bottom:1px solid var(--line)}
+.tt-g>.h0{padding-bottom:var(--sp-1);border-bottom:1px solid var(--line)}
+.tt-g>.n{text-align:right;font-variant-numeric:tabular-nums}
+.tt-g>.on{color:var(--ink);font-weight:var(--fw-semibold)}
+.tt-g>.n.dn{color:var(--neg-ink)}
+.ck{font-size:var(--fs-12);color:var(--ink-3)}
+/* 4장 코호트 */
+.coh .stk-row{grid-template-columns:80px minmax(0,1fr)}
+.coh .stk-b{flex:1 1 auto}
+.coh .stk-v{width:52px;text-align:right}
+.coh-l .bl-n{display:flex;flex-direction:column;line-height:var(--lh-tight)}
+.coh-l .bl-n>span{overflow:hidden;text-overflow:ellipsis}
+/* 5장 해석 */
+.ie-ns{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--sp-3) var(--sp-4);margin-bottom:var(--sp-3)}
+.ie-n .k{font-size:var(--fs-12);color:var(--ink-3);font-weight:var(--fw-medium)}
+.ie-n .v{font-size:var(--fs-18);font-weight:var(--fw-bold);font-variant-numeric:tabular-nums;line-height:var(--lh-tight);white-space:nowrap}
+.ie-l{margin:var(--sp-2) 0 0;font-size:var(--fs-14);color:var(--ink-2)}
+.ie-sh{font-size:var(--fs-12);color:var(--ink-3);font-weight:var(--fw-semibold);margin:var(--sp-2) 0 var(--sp-1)}
+.ie-ul{margin:0;padding-left:var(--sp-5);display:flex;flex-direction:column;gap:var(--sp-2);font-size:var(--fs-14);color:var(--ink-2)}
+.ie-ul .btn{color:var(--brand-ink)}
+.ie-chips{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin-bottom:var(--sp-1)}
+/* 모션 — 탭 전환은 누를 때만(첫 화면은 정지 상태로 다 보임), 막대는 transform 으로 자람 */
+.tab-panel{animation:none}
+.tab-panel.in{animation:panel-in var(--dur-2) var(--ease-out) both}
+@keyframes ag-gx{from{transform:scaleX(0)}to{transform:none}}
+@keyframes ag-up{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.gx{transform-origin:left center;animation:ag-gx var(--dur-3) var(--ease-out) backwards;animation-delay:calc(min(var(--i,0),7) * 25ms)}
+.gx.r{transform-origin:right center}
+.wf-row{animation:ag-up var(--dur-2) var(--ease-out) backwards;animation-delay:calc(var(--i,0) * 30ms)}
+@media (prefers-reduced-motion:reduce){ .gx,.wf-row,.tab-panel.in,.hm td.cell>button.fl::after{animation:none!important} }
+@media (max-width:1100px){.ag-two{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:900px){.ag-grid{grid-template-columns:minmax(0,1fr)} .ag-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){
+  .ag-bar{padding:var(--sp-2) var(--sp-4)} .ag-main{padding:var(--sp-3) var(--sp-4) var(--sp-10)}
+  .kpi{padding:var(--sp-3)} .kpi>.v{font-size:var(--fs-22)}
+  .bl-row{grid-template-columns:84px minmax(0,1fr) 80px;gap:var(--sp-2)} .wf-row{grid-template-columns:88px minmax(0,1fr) 80px;gap:var(--sp-2)}
+  .tabs>button{padding:0 var(--sp-2)}
+  .hm th:first-child{width:104px}
+}
+</style>
+</head>
+<body>
+<!--demobar:start-->
+<style>
+.dbr{--dbr-sf:#FFFFFF;--dbr-ln:#D1D6DB;--dbr-ink:#191F28;--dbr-ink2:#4E5968;--dbr-hv:#F2F4F6;--dbr-ws:#FFF3DC;--dbr-wi:#9A5F00;--dbr-gl:rgba(255,255,255,.86);--dbr-fc:rgba(49,130,246,.55);
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;font-size:14px;line-height:1.5;color:var(--dbr-ink);letter-spacing:0;text-align:left;box-sizing:border-box}
+@media (prefers-color-scheme:dark){.dbr{--dbr-sf:#1B2027;--dbr-ln:#323A45;--dbr-ink:#F2F4F6;--dbr-ink2:#B0B8C1;--dbr-hv:#252C35;--dbr-ws:#3A2B12;--dbr-wi:#FFC46B;--dbr-gl:rgba(27,32,39,.86);--dbr-fc:rgba(78,150,250,.6)}}
+.dbr *{box-sizing:border-box}
+#demobar{position:relative;z-index:5;display:block;padding:6px 12px;background:var(--dbr-sf);border-bottom:1px solid var(--dbr-ln)}
+.dbr-row{display:flex;align-items:center;gap:8px;min-height:40px}
+.dbr-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;min-width:40px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:var(--dbr-ink);font:inherit;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap}
+.dbr-btn:hover{background:var(--dbr-hv)}
+.dbr-btn svg,.dbr-tag svg{width:18px;height:18px;flex:none}
+.dbr-sq{padding:0;width:40px;font-size:16px}
+.dbr-nm{font-size:16px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dbr-tag{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;background:var(--dbr-ws);color:var(--dbr-ink);font-weight:600;white-space:nowrap}
+.dbr-tag svg{color:var(--dbr-wi)}
+.dbr-grow{flex:1}
+.dbr-info{margin:0;padding:4px 8px 6px 52px;color:var(--dbr-ink2);max-width:80ch}
+.dbr :focus-visible,.dbr-skip:focus{outline:3px solid var(--dbr-fc);outline-offset:2px}
+.dbr-skip{position:absolute;left:8px;top:8px;z-index:60;transform:translateY(-300%);padding:8px 12px;border-radius:8px;background:var(--dbr-ink);color:var(--dbr-sf);font-weight:600;text-decoration:none}
+.dbr-skip:focus{transform:none}
+#dbr-pill{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;display:flex;align-items:center;gap:4px;padding:4px;max-width:calc(100vw - 32px);border:1px solid var(--dbr-ln);border-radius:999px;background:var(--dbr-gl);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);box-shadow:0 8px 24px rgba(0,0,0,.16);transform:translate(-50%,0);opacity:1;transition:opacity .2s cubic-bezier(0,0,0,1),transform .2s cubic-bezier(0,0,0,1)}
+#dbr-pill[data-off]{opacity:0;transform:translate(-50%,12px);pointer-events:none}
+#dbr-pill .dbr-btn{height:44px;border-radius:999px}
+#dbr-pill .dbr-sq{width:44px}
+#dbr-pill .dbr-lb{display:inline-flex;align-items:center;gap:6px;padding:0 8px;font-weight:600;white-space:nowrap}
+#dbr-pill .dbr-lb svg{width:18px;height:18px;color:var(--dbr-wi)}
+#dbr-pop{position:absolute;left:0;right:0;bottom:calc(100% + 8px);margin:0;padding:12px 16px;border:1px solid var(--dbr-ln);border-radius:12px;background:var(--dbr-sf);color:var(--dbr-ink);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#dbr-pill{background:var(--dbr-sf)}}
+@media (max-width:600px){.dbr-info{padding-left:8px}}
+@media (max-width:420px){.dbr-tag span{display:none}.dbr-tag{padding:0 6px}}
+@media (max-width:400px){#dbr-pill .dbr-lb{display:none}}
+@media (prefers-reduced-motion:reduce){#dbr-pill{transition:none}}
+</style>
+<a class="dbr dbr-skip" href="#dbr-main">본문으로 건너뛰기</a>
+<nav id="demobar" class="dbr" aria-label="데모 안내"><div class="dbr-row"><a class="dbr-btn" href="../../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>포트폴리오</a><span class="dbr-nm">재고 에이징·충당 비교</span><span class="dbr-tag" title="결산 재고 에이징·평가충당금 비교 리포트. 금액·수량은 전부 같은 비율로 바꾼 가상 값이고, 설정률·비율은 그대로입니다."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z"/></svg><span>가상 데이터</span></span><span class="dbr-grow"></span><button type="button" class="dbr-btn dbr-sq" id="dbr-q" aria-label="데모 설명" aria-expanded="false" aria-controls="dbr-info" title="데모 설명">?</button></div><p class="dbr-info" id="dbr-info" hidden>결산 재고 에이징·평가충당금 비교 리포트. 금액·수량은 전부 같은 비율로 바꾼 가상 값이고, 설정률·비율은 그대로입니다.</p></nav>
+<nav id="dbr-pill" class="dbr" aria-label="데모 안내 (떠 있는 단추)"><a class="dbr-btn" href="../../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>포트폴리오</a><span class="dbr-lb" title="결산 재고 에이징·평가충당금 비교 리포트. 금액·수량은 전부 같은 비율로 바꾼 가상 값이고, 설정률·비율은 그대로입니다."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z"/></svg>데모</span><button type="button" class="dbr-btn dbr-sq" id="dbr-q2" aria-label="데모 설명" aria-expanded="false" aria-controls="dbr-pop" title="데모 설명">?</button><p id="dbr-pop" hidden>결산 재고 에이징·평가충당금 비교 리포트. 금액·수량은 전부 같은 비율로 바꾼 가상 값이고, 설정률·비율은 그대로입니다.</p></nav>
+<span id="dbr-main" tabindex="-1"></span>
+<script>(function(){
+  var bar=document.getElementById('demobar'), pill=document.getElementById('dbr-pill'), b=document.body;
+  // 띠를 본문 여백 밖까지 펼친다 (데모마다 body 여백이 달라서 실제 값을 읽는다)
+  // 앱 CSS 가 띠보다 늦게 오는 데모가 있어(body margin 8 → 0) 로드 때 다시 잰다
+  function fit(){ var cs=getComputedStyle(b), pt=parseFloat(cs.paddingTop)+parseFloat(cs.marginTop), pl=parseFloat(cs.paddingLeft)+parseFloat(cs.marginLeft), pr=parseFloat(cs.paddingRight)+parseFloat(cs.marginRight);
+    bar.style.margin=(-pt)+'px '+(-pr)+'px '+pt+'px '+(-pl)+'px'; }
+  fit(); document.addEventListener('DOMContentLoaded',fit); window.addEventListener('load',fit);
+  function tg(btn,box){ btn.addEventListener('click',function(){ box.hidden=!box.hidden; btn.setAttribute('aria-expanded',String(!box.hidden)); }); }
+  tg(document.getElementById('dbr-q'),document.getElementById('dbr-info'));
+  tg(document.getElementById('dbr-q2'),document.getElementById('dbr-pop'));
+  document.addEventListener('keydown',function(e){ if(e.key!=='Escape')return; ['dbr-info','dbr-pop'].forEach(function(id,i){ var x=document.getElementById(id); if(!x.hidden){ x.hidden=true; document.getElementById(i?'dbr-q2':'dbr-q').setAttribute('aria-expanded','false'); } }); });
+  // 앱바가 화면에 있으면 알약은 숨긴다 (숨은 알약은 Tab 으로도 안 잡히게 inert)
+  function show(on){ if(on){ pill.removeAttribute('data-off'); pill.inert=false; } else { pill.setAttribute('data-off',''); pill.inert=true; document.getElementById('dbr-pop').hidden=true; document.getElementById('dbr-q2').setAttribute('aria-expanded','false'); } }
+  show(false);
+  if('IntersectionObserver' in window) new IntersectionObserver(function(en){ show(!en[0].isIntersecting); }).observe(bar);
+})();</script>
+<!--demobar:end-->
+<header class="appbar glass ag-bar">
+  <h1>재고 에이징·충당 비교</h1>
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-t="a" aria-selected="true">그룹 × 연차</button>
+    <button role="tab" data-t="b" aria-selected="false">연차 추이</button>
+    <button role="tab" data-t="c" aria-selected="false">변동</button>
+    <button role="tab" data-t="d" aria-selected="false">코호트</button>
+    <button role="tab" data-t="e" aria-selected="false">해석</button>
+  </nav>
+</header>
+<main class="ag-main">
+  <div class="toolbar" id="tb">
+    <div class="seg" role="group" aria-label="기준" id="sBase"><button data-v="25">25말</button><button data-v="26">26.9말</button><button data-v="d">증감</button></div>
+    <div class="seg" role="group" aria-label="지표" id="sMet"><button data-v="book">장부</button><button data-v="prov">충당</button><button data-v="rate">설정률</button><button data-v="q">수량</button></div>
+    <div class="seg" role="group" aria-label="축" id="sAx"><button data-v="age">연차별</button><button data-v="grp">그룹별</button><button data-v="hm">그룹 × 연차</button></div>
+    <select id="sGrp" aria-label="그룹" hidden></select>
+  </div>
+  <section class="tab-panel" id="pa"></section>
+  <section class="tab-panel" id="pb" hidden></section>
+  <section class="tab-panel" id="pc" hidden></section>
+  <section class="tab-panel" id="pd" hidden></section>
+  <section class="tab-panel" id="pe" hidden></section>
+  <div class="ck" id="ck"></div>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+/* ============================================================
+   example-ui components.js — 드롭다운·대화상자 내재화 v1 (2026-09-28)
+   붙이는 법: <script> 맨 위에 이 파일 내용을 붙이고
+     · 드롭다운  ddEnhanceAll()                 페이지의 <select> 전부를 앱이 그리는 목록으로 바꾼다(나중에 생기는 것도)
+     · 확인      await ask({title, body, ok:"삭제", danger:true})   → true / false      (confirm 대신)
+     · 알림      await tell({title, body})                            → 닫으면 끝          (alert 대신)
+     · 입력      await ask({title, body, ok:"저장", input:{value:""}}) → 문자열 / null    (prompt 대신)
+     · 기간      drp(자리, {from, to, onChange})  또는  <input data-drp> + drpEnhanceAll()   (기간 조회는 전부 이것 — v1.1 2026-10-02)
+   (같은 이름 함수가 앱에 이미 있으면 덮지 않는다 → ui.ask() · ui.tell() · ui.ddEnhanceAll() 로 부른다)
+   CSS 는 tokens.css 의 .dd* · .dlg* 를 쓴다. 앱 팔레트가 따로면 같은 클래스 이름으로 앱 변수만 바꿔 그린다.
+
+   ★ <select> 는 지우지 않고 숨긴다(겉만 바꾼다). 그래서 기존 코드가 그대로 돈다 —
+     sel.value = x · sel.selectedIndex = n · sel.innerHTML = "<option…>" · sel.onchange · addEventListener("change")
+     · sel.hidden · sel.disabled 전부 새 버튼에 자동 반영. 로직은 한 줄도 안 고친다.
+   옵션 표기: <option value="2026-07" data-label="2026-07" data-note="미산출">2026-07 (미산출)</option>
+     data-label = 보이는 이름, data-note = 오른쪽 흐린 보조 문구. 없으면 글자 그대로.
+   내재화 제외: <select multiple> · <select data-native>
+   ============================================================ */
+(function(){
+  const SEARCH_AT = 12;                 /* 옵션이 이보다 많으면 목록 맨 위에 검색칸 */
+  let seq = 0, openDD = null;
+  const mk = (tag, cls, text) => { const e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; };
+  const svg = (cls, d, w) => `<svg class="${cls}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+  const CHEV = svg("dd-chev", "m6 9 6 6 6-6", 2), CHECK = svg("dd-check", "M20 6 9 17l-5-5", 2.2);
+  const P = HTMLSelectElement.prototype;
+  const dV = Object.getOwnPropertyDescriptor(P, "value"), dI = Object.getOwnPropertyDescriptor(P, "selectedIndex");
+
+  function ddEnhance(sel){
+    if(sel._dd || sel.multiple || sel.hasAttribute("data-native")) return sel._dd;
+    if(!sel.isConnected || !sel.parentNode) return null;   /* 그리는 사이 떼어진 select — 꾸밀 자리가 없다 */
+    const id = "dd" + (++seq);
+    const wrap = mk("span", "dd"); wrap.style.cssText = sel.style.cssText;
+    const btn = mk("button", "dd-btn"); btn.type = "button";
+    if(sel.classList.contains("sm")) btn.classList.add("sm");
+    btn.setAttribute("role", "combobox"); btn.setAttribute("aria-haspopup", "listbox");
+    btn.setAttribute("aria-expanded", "false"); btn.setAttribute("aria-controls", id + "-l");
+    const forLab = sel.id ? document.querySelector('label[for="' + sel.id + '"]') : null;
+    const lab = (sel.getAttribute("aria-label") || (forLab && forLab.textContent) || sel.title || "").trim();
+    if(lab) btn.setAttribute("aria-label", lab);
+    const list = mk("div", "dd-list"); list.id = id + "-l"; list.setAttribute("role", "listbox"); list.hidden = true;
+    let q = null, act = -1, shown = [], typed = "", typedAt = 0;
+    sel.parentNode.insertBefore(wrap, sel); wrap.append(sel, btn);
+    const isOpen = () => btn.getAttribute("aria-expanded") === "true";
+    const optLabel = o => o.dataset.label || o.text;
+
+    const paint = () => {
+      const o = sel.options[dI.get.call(sel)];
+      btn.replaceChildren(mk("span", "dd-v", o ? optLabel(o) : ""));
+      if(o && o.dataset.note) btn.append(mk("span", "dd-note", o.dataset.note));
+      btn.insertAdjacentHTML("beforeend", CHEV);
+      btn.disabled = sel.disabled; wrap.hidden = sel.hidden;
+    };
+    const build = () => {
+      const f = q && !q.hidden ? q.value.trim().toLowerCase() : "";
+      list.querySelectorAll(".dd-opt,.dd-grp,.dd-none").forEach(e => e.remove());
+      shown = [];
+      const cur = dI.get.call(sel);
+      [...sel.options].forEach((o, i) => {
+        if(f && !(optLabel(o) + " " + (o.dataset.note || "")).toLowerCase().includes(f)) return;
+        const g = o.parentElement && o.parentElement.tagName === "OPTGROUP" ? o.parentElement.label : "";
+        if(g && (!shown.length || shown[shown.length - 1].g !== g)) list.append(mk("div", "dd-grp", g));
+        const d = mk("div", "dd-opt"); d.id = id + "-" + i; d.dataset.i = i;
+        d.setAttribute("role", "option"); d.setAttribute("aria-selected", String(i === cur));
+        if(o.disabled) d.setAttribute("aria-disabled", "true");
+        d.insertAdjacentHTML("beforeend", CHECK);
+        d.append(mk("span", "dd-t", optLabel(o)));
+        if(o.dataset.note) d.append(mk("span", "dd-note", o.dataset.note));
+        list.append(d); shown.push({i, g, el: d});
+      });
+      if(!shown.length) list.append(mk("div", "dd-none", "맞는 항목이 없어요"));
+    };
+    const mark = scroll => {
+      shown.forEach(s => s.el.toggleAttribute("data-act", s.i === act));
+      const cur = shown.find(s => s.i === act), host = q && !q.hidden ? q : btn;
+      if(cur){ host.setAttribute("aria-activedescendant", cur.el.id); if(scroll) cur.el.scrollIntoView({block: "nearest"}); }
+      else host.removeAttribute("aria-activedescendant");
+    };
+    /* 폭 — 버튼을 가장 긴 옵션에 미리 맞추고, 펼친 목록은 버튼과 **같은 폭**으로 연다.
+       (목록이 버튼보다 넓으면 두 상자 끝선이 어긋나 보이고, 고른 값마다 버튼 폭이 흔들린다 — 2026-09-28 어진 "폭 안 맞춤") */
+    const fit = () => {
+      if(isOpen() || !sel.options.length) return;
+      if(!list.isConnected) document.body.append(list);
+      const qh = q ? q.hidden : null;
+      build(); if(q) q.hidden = true;
+      list.style.cssText = "visibility:hidden;left:-9999px;top:0;width:auto;min-width:0;max-height:none;animation:none";
+      list.hidden = false;
+      const w = Math.ceil(list.getBoundingClientRect().width);
+      list.hidden = true; list.style.cssText = ""; if(q) q.hidden = qh;
+      if(w) btn.style.minWidth = w + "px";
+    };
+    const place = () => {
+      const r = btn.getBoundingClientRect(), vh = innerHeight, gap = 4;
+      list.style.width = list.style.minWidth = r.width + "px"; list.style.maxHeight = "320px"; list.style.top = r.bottom + gap + "px"; list.style.bottom = "";
+      const below = vh - r.bottom - gap - 8, above = r.top - gap - 8;
+      const up = list.offsetHeight > below && above > below;
+      list.style.maxHeight = Math.min(320, up ? above : below) + "px";
+      if(up){ list.style.top = ""; list.style.bottom = (vh - r.top + gap) + "px"; }
+      list.style.left = Math.max(8, Math.min(r.left, innerWidth - list.offsetWidth - 8)) + "px";
+      list.classList.toggle("up", up);
+    };
+    const move = d => {
+      const en = shown.filter(s => !sel.options[s.i].disabled);
+      if(!en.length) return;
+      let k = en.findIndex(s => s.i === act);
+      k = d === "home" ? 0 : d === "end" ? en.length - 1 : k < 0 ? (d > 0 ? 0 : en.length - 1) : Math.max(0, Math.min(en.length - 1, k + d));
+      act = en[k].i; mark(true);
+    };
+    const open = () => {
+      if(sel.disabled || isOpen()) return;
+      if(openDD) openDD.close(false);
+      (sel.closest("dialog") || document.body).append(list);   /* 모달 안이면 모달 위(top layer)에 그려야 보인다 */
+      const many = sel.options.length > SEARCH_AT;
+      if(many && !q){
+        q = mk("input", "dd-q"); q.type = "search"; q.placeholder = "검색";
+        q.setAttribute("aria-label", (lab || "항목") + " 검색"); q.setAttribute("aria-controls", list.id);
+        q.oninput = () => { build(); const f = shown.find(s => !sel.options[s.i].disabled); act = f ? f.i : -1; mark(true); };
+        q.onkeydown = key; list.prepend(q);
+      }
+      if(q){ q.hidden = !many; q.value = ""; }
+      build(); act = dI.get.call(sel);
+      list.classList.remove("out"); list.hidden = false; place(); mark(true);
+      btn.setAttribute("aria-expanded", "true"); openDD = api;
+      if(q && !q.hidden) q.focus();
+    };
+    const close = focus => {
+      if(!isOpen()) return;
+      btn.setAttribute("aria-expanded", "false"); btn.removeAttribute("aria-activedescendant"); openDD = null;
+      list.classList.add("out");
+      setTimeout(() => { if(!isOpen()){ list.hidden = true; list.classList.remove("out"); } }, 150);
+      if(focus) btn.focus();
+    };
+    const pick = i => {
+      const o = sel.options[i]; if(!o || o.disabled) return;
+      const changed = dI.get.call(sel) !== i;
+      dI.set.call(sel, i); paint(); close(true);
+      if(changed){ sel.dispatchEvent(new Event("input", {bubbles: true})); sel.dispatchEvent(new Event("change", {bubbles: true})); }
+    };
+    function key(e){
+      const k = e.key;
+      if(!isOpen()){
+        if(e.target === btn && ["ArrowDown", "ArrowUp", "Enter", " "].includes(k)){ e.preventDefault(); e.stopPropagation(); open(); }
+        return;
+      }
+      const stop = () => { e.preventDefault(); e.stopPropagation(); };
+      if(k === "Escape"){ stop(); close(true); return; }
+      if(k === "Tab"){ close(false); return; }
+      if(k === "ArrowDown" || k === "ArrowUp"){ stop(); move(k === "ArrowDown" ? 1 : -1); return; }
+      if(k === "PageDown" || k === "PageUp"){ stop(); move(k === "PageDown" ? 8 : -8); return; }
+      if((k === "Home" || k === "End") && !(q && !q.hidden)){ stop(); move(k === "Home" ? "home" : "end"); return; }
+      if(k === "Enter" || (k === " " && !(q && !q.hidden))){ stop(); if(act >= 0) pick(act); return; }
+      if(q && !q.hidden){ e.stopPropagation(); return; }            /* 검색칸 타이핑이 화면 단축키로 새지 않게 */
+      if(k.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey){  /* 첫 글자로 건너뛰기 */
+        stop();
+        const now = Date.now(); typed = (now - typedAt < 700 ? typed : "") + k.toLowerCase(); typedAt = now;
+        const hit = shown.find(s => !sel.options[s.i].disabled && optLabel(sel.options[s.i]).toLowerCase().startsWith(typed));
+        if(hit){ act = hit.i; mark(true); }
+      }
+    }
+    btn.addEventListener("keydown", key);
+    btn.addEventListener("keyup", e => { if(e.key === " ") e.preventDefault(); });   /* 스페이스 keyup 의 클릭이 다시 열지 않게 */
+    btn.addEventListener("click", () => isOpen() ? close(true) : open());
+    list.addEventListener("pointerdown", e => { if(e.target !== q) e.preventDefault(); });   /* 포커스는 버튼(검색칸)에 둔다 */
+    list.addEventListener("click", e => { const o = e.target.closest(".dd-opt"); if(o) pick(+o.dataset.i); });
+    list.addEventListener("pointermove", e => { const o = e.target.closest(".dd-opt"); if(o && +o.dataset.i !== act && !o.hasAttribute("aria-disabled")){ act = +o.dataset.i; mark(false); } });
+    if(forLab) forLab.addEventListener("click", e => { e.preventDefault(); btn.focus(); });
+
+    /* 기존 코드가 값을 직접 바꿔도 버튼이 따라오게 */
+    Object.defineProperty(sel, "value", {configurable: true, get(){ return dV.get.call(this); }, set(v){ dV.set.call(this, v); paint(); }});
+    Object.defineProperty(sel, "selectedIndex", {configurable: true, get(){ return dI.get.call(this); }, set(v){ dI.set.call(this, v); paint(); }});
+    sel.focus = () => btn.focus();
+    new MutationObserver(ms => {
+      paint();
+      if(isOpen()){ build(); mark(false); }
+      else if(ms.some(m => m.type !== "attributes" || /^(label|data-)/.test(m.attributeName))) fit();   /* 옵션이 바뀌면 폭 다시 */
+    }).observe(sel, {childList: true, subtree: true, characterData: true, attributes: true,
+                     attributeFilter: ["hidden", "disabled", "label", "data-label", "data-note"]});
+    const api = {open, close, paint, fit, btn, list, sel};
+    sel._dd = api; paint(); fit();
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(fit);   /* 웹폰트가 늦게 오면 폭이 달라진다 */
+    return api;
+  }
+
+  /* 바깥 클릭·스크롤·창 크기 변경 → 닫기 (열린 건 언제나 하나) */
+  document.addEventListener("pointerdown", e => {
+    if(openDD && !openDD.btn.contains(e.target) && !openDD.list.contains(e.target)) openDD.close(false);
+  }, true);
+  document.addEventListener("scroll", e => { if(openDD && !openDD.list.contains(e.target)) openDD.close(false); }, true);
+  addEventListener("resize", () => { if(openDD) openDD.close(false); });
+
+  function ddEnhanceAll(root){
+    (root || document).querySelectorAll("select").forEach(ddEnhance);
+    if(ddEnhanceAll._mo) return;
+    ddEnhanceAll._mo = new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => {
+      if(n.nodeType !== 1) return;
+      if(n.tagName === "SELECT") ddEnhance(n); else n.querySelectorAll && n.querySelectorAll("select").forEach(ddEnhance);
+    })));
+    ddEnhanceAll._mo.observe(document.body, {childList: true, subtree: true});
+  }
+
+  /* ── 대화상자 — alert / confirm / prompt 대신 ──
+     브라우저 창은 "127.0.0.1:8765 내용:" 같은 주소를 달고, 버튼 글자("확인/취소")·서체·다크모드를 못 바꾸고,
+     크롬이 "이 페이지가 추가 대화상자를 만들지 않도록" 체크로 통째로 꺼 버릴 수 있다. */
+  function dialog(o){
+    return new Promise(res => {
+      const d = mk("dialog", "dlg");
+      const h = mk("div", "dlg-h"); h.append(mk("h3", null, o.title || "")); d.append(h);
+      const b = mk("div", "dlg-b");
+      if(o.body instanceof Node) b.append(o.body); else if(o.body) b.append(mk("p", null, o.body));
+      let inp = null;
+      if(o.input){ inp = mk("input", "input"); inp.type = "text"; inp.value = o.input.value || ""; inp.placeholder = o.input.placeholder || ""; b.append(inp); }
+      d.append(b);
+      const f = mk("div", "dlg-f");
+      const bc = o.tell ? null : mk("button", "btn ghost", o.cancel || "닫기");
+      const bo = mk("button", "btn " + (o.tell ? "secondary" : o.danger ? "danger" : "primary"), o.tell ? (o.ok || "닫기") : (o.ok || "계속"));
+      bc && f.append(bc); f.append(bo); d.append(f);
+      let done = false;
+      const end = v => {
+        if(done) return; done = true;
+        d.classList.add("out");
+        setTimeout(() => { d.close(); d.remove(); res(v); }, 150);
+      };
+      const no = () => end(o.input ? null : false), yes = () => end(o.input ? inp.value : true);
+      d.addEventListener("cancel", e => { e.preventDefault(); o.tell ? end(true) : no(); });
+      bc && (bc.onclick = no);
+      bo.onclick = () => o.tell ? end(true) : yes();
+      if(inp) inp.addEventListener("keydown", e => { if(e.key === "Enter" && !e.isComposing){ e.preventDefault(); yes(); } });
+      document.body.append(d); d.showModal();
+      (inp || (o.danger ? bc : bo)).focus();     /* 위험한 건 기본 포커스를 "닫기" 에 — Enter 한 번에 지워지지 않게 */
+    });
+  }
+  const ask = o => dialog(Object.assign({}, o));
+  const tell = o => dialog(Object.assign({}, o, {tell: true}));
+
+  /* ── 기간 선택 — 기간 조회는 전부 이 래퍼 하나 (2026-10-02 어진: 회계시스템 기간 선택기 모양으로 통일) ──
+     <input type="date"> 두 개를 나란히 두지 않는다. 버튼(시작 ~ 끝 + 달력 아이콘) → 펼치면
+     빠른 선택(올해·오늘까지·오늘·전일·주간·전주·당월·이전달 / 전년도·전전년도·1~4분기·상반기·하반기 / 1~12월)
+     + 달력 두 장(첫 클릭 시작, 둘째 클릭 끝) + "선택 기간 N일" · 닫기 · 적용.
+     const p = drp(el, {from:"2026-09-01", to:"2026-09-30", onChange:(from,to)=>{}, holidays:["2026-09-24"], max:"2026-10-02"})
+       el = 버튼을 넣을 자리(빈 span/div) 또는 <input data-drp>(값 "YYYY-MM-DD ~ YYYY-MM-DD", 적용 시 change 이벤트)
+       p.value → {from,to} · p.set(from,to) · p.open() */
+  const CAL = svg("drp-ic", "M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z", 1.8);
+  const pad = n => String(n).padStart(2, "0");
+  const ymd = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  const dOf = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const addD = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  const mEnd = (y, m) => new Date(y, m + 1, 0);
+  const DAY = ["일", "월", "화", "수", "목", "금", "토"];
+  let openDRP = null;
+
+  function presets(today, y){
+    const t = today, ty = t.getFullYear(), tm = t.getMonth();
+    const wk = addD(t, -((t.getDay() + 6) % 7));            /* 이번 주 월요일 */
+    const R = (a, b) => [ymd(a), ymd(b)];
+    return [
+      [["올해", R(new Date(ty, 0, 1), new Date(ty, 11, 31))], ["오늘까지", R(new Date(ty, 0, 1), t)], ["오늘", R(t, t)], ["전일", R(addD(t, -1), addD(t, -1))],
+       ["주간", R(wk, addD(wk, 6))], ["전주", R(addD(wk, -7), addD(wk, -1))], ["당월", R(new Date(ty, tm, 1), mEnd(ty, tm))], ["이전달", R(new Date(ty, tm - 1, 1), mEnd(ty, tm - 1))]],
+      [["전년도", R(new Date(ty - 1, 0, 1), new Date(ty - 1, 11, 31))], ["전전년도", R(new Date(ty - 2, 0, 1), new Date(ty - 2, 11, 31))],
+       ...[0, 1, 2, 3].map(q => [(q + 1) + "분기", R(new Date(y, q * 3, 1), mEnd(y, q * 3 + 2))]),
+       ["상반기", R(new Date(y, 0, 1), mEnd(y, 5))], ["하반기", R(new Date(y, 6, 1), mEnd(y, 11))]],
+      Array.from({length: 12}, (_, m) => [(m + 1) + "월", R(new Date(y, m, 1), mEnd(y, m))])
+    ];
+  }
+
+  function drp(el, o){
+    o = o || {};
+    const isInput = el.tagName === "INPUT";
+    const host = isInput ? (() => { const s = mk("span", "drp"); el.after(s); el.hidden = true; return s; })() : (el.classList.add("drp"), el);
+    let from = o.from, to = o.to;
+    if(isInput && el.value && el.value.includes("~")){ [from, to] = el.value.split("~").map(s => s.trim()); }
+    const today = o.today ? dOf(o.today) : new Date();
+    if(!from){ from = ymd(new Date(today.getFullYear(), today.getMonth(), 1)); to = ymd(mEnd(today.getFullYear(), today.getMonth())); }
+    const hol = new Set(o.holidays || []);
+    const btn = mk("button", "drp-btn"); btn.type = "button"; btn.setAttribute("aria-haspopup", "dialog"); btn.setAttribute("aria-expanded", "false");
+    const lab = mk("span", "drp-v"); btn.append(lab); btn.insertAdjacentHTML("beforeend", CAL);
+    host.append(btn);
+    const paint = () => { lab.textContent = from + " ~ " + to; btn.title = "기간 " + (Math.round((dOf(to) - dOf(from)) / 864e5) + 1) + "일"; };
+    paint();
+
+    function open(){
+      if(openDRP) openDRP.close();
+      let a = from, b = to, pick = null;                     /* pick = 시작만 고른 상태 */
+      let view = dOf(a); view = new Date(view.getFullYear(), view.getMonth(), 1);
+      const pop = mk("div", "drp-pop"); pop.setAttribute("role", "dialog"); pop.setAttribute("aria-label", "기간 선택");
+      const pre = mk("div", "drp-pre"), cal = mk("div", "drp-cal"), foot = mk("div", "drp-f");
+      const days = mk("span", "drp-n"), bc = mk("button", "btn ghost sm", "닫기"), bo = mk("button", "btn primary sm", "적용");
+      bc.type = bo.type = "button"; foot.append(days, bc, bo);
+      pop.append(pre, cal, foot);
+      const draw = () => {
+        pre.innerHTML = "";
+        presets(today, view.getFullYear()).forEach(row => {
+          const r = mk("div", "drp-row");
+          row.forEach(([name, [f, t]]) => {
+            const x = mk("button", "drp-p", name); x.type = "button";
+            x.setAttribute("aria-pressed", String(!pick && f === a && t === b));
+            x.onclick = () => { a = f; b = t; pick = null; view = new Date(dOf(f).getFullYear(), dOf(f).getMonth(), 1); draw(); };
+            r.append(x);
+          });
+          pre.append(r);
+        });
+        cal.innerHTML = "";
+        [0, 1].forEach(k => {
+          const m0 = new Date(view.getFullYear(), view.getMonth() + k, 1);
+          const box = mk("div", "drp-m");
+          const hd = mk("div", "drp-mh");
+          const nav = (txt, lbl, dm) => { const z = mk("button", "drp-nav", txt); z.type = "button"; z.setAttribute("aria-label", lbl); z.onclick = () => { view = new Date(view.getFullYear(), view.getMonth() + dm, 1); draw(); }; return z; };
+          /* 다음 달 화살표는 둘째 달 머리에 — 폭이 좁아 둘째 달을 숨기면 첫째 달 머리의 .nx 가 대신 보인다 */
+          if(k === 0) hd.append(nav("«", "1년 전", -12), nav("‹", "이전 달", -1)); else hd.append(mk("span"), mk("span"));
+          hd.append(mk("b", null, m0.getFullYear() + "." + pad(m0.getMonth() + 1)));
+          if(k === 1) hd.append(nav("›", "다음 달", 1), nav("»", "1년 뒤", 12));
+          else { const n1 = nav("›", "다음 달", 1), n2 = nav("»", "1년 뒤", 12); n1.classList.add("nx"); n2.classList.add("nx"); hd.append(n1, n2); }
+          const g = mk("div", "drp-g");
+          DAY.forEach((n, i) => { const w = mk("span", "drp-w" + (i === 0 ? " sun" : ""), n); g.append(w); });
+          const s = addD(m0, -m0.getDay());
+          for(let i = 0; i < 42; i++){
+            const d = addD(s, i), v = ymd(d), lo = pick || a, hi = pick ? null : b;
+            const c = mk("button", "drp-d", String(d.getDate())); c.type = "button"; c.dataset.v = v;
+            if(d.getMonth() !== m0.getMonth()) c.classList.add("out");
+            if(d.getDay() === 0 || hol.has(v)) c.classList.add("sun");
+            if(v === ymd(today)) c.classList.add("today");
+            if(hi && v > lo && v < hi) c.classList.add("in");
+            if(v === lo || v === hi) c.classList.add("end");
+            if(o.max && v > o.max){ c.disabled = true; }
+            c.onclick = () => { if(!pick){ pick = v; } else { [a, b] = v < pick ? [v, pick] : [pick, v]; pick = null; } draw(); };
+            c.onmouseenter = () => { if(!pick) return; g.querySelectorAll(".drp-d").forEach(z => { const zv = z.dataset.v, l = v < pick ? v : pick, h = v < pick ? pick : v; z.classList.toggle("in", zv > l && zv < h); }); };
+            g.append(c);
+          }
+          box.append(hd, g); cal.append(box);
+        });
+        days.textContent = pick ? "끝 날짜를 고르세요" : "선택 기간 " + (Math.round((dOf(b) - dOf(a)) / 864e5) + 1) + "일";
+        bo.disabled = !!pick;
+      };
+      draw();
+      document.body.append(pop);
+      const place = () => { const r = btn.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
+        let x = Math.min(r.left, innerWidth - w - 8), y = r.bottom + 4;
+        if(y + h > innerHeight - 8 && r.top - h - 4 > 8){ y = r.top - h - 4; }
+        pop.style.left = Math.max(8, x) + "px"; pop.style.top = Math.max(8, y) + "px"; };
+      place();
+      btn.setAttribute("aria-expanded", "true");
+      const close = () => { if(openDRP !== st) return; openDRP = null; btn.setAttribute("aria-expanded", "false"); pop.classList.add("out"); setTimeout(() => pop.remove(), 150); document.removeEventListener("mousedown", outside, true); document.removeEventListener("keydown", key, true); btn.focus(); };
+      const apply = () => { if(pick) return; from = a; to = b; paint(); close(); if(isInput){ el.value = from + " ~ " + to; el.dispatchEvent(new Event("change", {bubbles: true})); } o.onChange && o.onChange(from, to); };
+      const outside = e => { if(!pop.contains(e.target) && !btn.contains(e.target)) close(); };
+      const key = e => { if(e.key === "Escape"){ e.preventDefault(); e.stopPropagation(); close(); } else if(e.key === "Enter" && !pick && !(e.target.closest && e.target.closest(".drp-d,.drp-p,.drp-nav"))){ e.preventDefault(); apply(); } };
+      bc.onclick = close; bo.onclick = apply;
+      document.addEventListener("mousedown", outside, true); document.addEventListener("keydown", key, true);
+      const st = {close}; openDRP = st;
+      (pop.querySelector('.drp-p[aria-pressed="true"]') || pop.querySelector(".drp-d.end") || bo).focus();
+    }
+    btn.onclick = () => (btn.getAttribute("aria-expanded") === "true" ? openDRP && openDRP.close() : open());
+    addEventListener("resize", () => openDRP && openDRP.close());
+    return { get value(){ return {from, to}; }, set(f, t){ from = f; to = t; paint(); if(isInput) el.value = f + " ~ " + t; }, open };
+  }
+  function drpEnhanceAll(root){ (root || document).querySelectorAll("input[data-drp]").forEach(i => { if(!i._drp) i._drp = drp(i, {}); }); }
+
+  /* 앱에 같은 이름(ask 등)이 이미 있으면 덮지 않는다 — 그때는 ui.ask() 로 부른다 */
+  const pub = {ddEnhance, ddEnhanceAll, ask, tell, drp, drpEnhanceAll};
+  window.ui = Object.assign(window.ui || {}, pub);
+  Object.keys(pub).forEach(k => { if(!(k in window)) window[k] = pub[k]; });
+})();
+
+</script>
+<script>
+const D = {"buckets": ["0년차", "1년차", "2년차", "3년차", "4년차", "4년차 초과", "판단 불가"], "groups": ["A본부", "B본부", "패션(영업)", "브랜드S", "패션(멤버십몰)", "패션 그룹F", "브랜드 그룹K"], "ranges25": ["254~", "244~253", "234~243", "224~233", "214~223", "~213", "–"], "ranges26": ["264~", "254~263", "244~253", "234~243", "224~233", "~223", "–"], "cells": {"25": {"A본부": {"0년차": [24092, 554550802, 0, 554550802], "1년차": [73560, 1166778399, -280746626, 1166778399], "2년차": [27049, 465045903, -329982178, 465045903], "3년차": [9243, 243752479, -243752479, 243752479], "4년차": [3787, 80322806, -80322806, 80322806], "4년차 초과": [3708, 51260439, -51260439, 51260439], "판단 불가": [916, 207097, -207097, 207097]}, "B본부": {"0년차": [6140, 137768651, 0, 137768651], "1년차": [23723, 365066948, -93, 365066948], "2년차": [7586, 103169058, -308625, 103169058], "3년차": [1819, 29547999, -8069203, 29547999], "4년차": [1294, 11755034, 0, 11755034], "4년차 초과": [0, 0, 0, 0], "판단 불가": [0, 0, 0, 0]}, "패션(영업)": {"0년차": [6284, 87528911, 0, 87528911], "1년차": [27867, 310242380, 0, 310242380], "2년차": [6544, 76493017, -585981, 76493017], "3년차": [1542, 22739936, -22739936, 22739936], "4년차": [226, 3552246, -3552246, 3552246], "4년차 초과": [256, 1920869, -1920869, 1920869], "판단 불가": [1255, 3813314, -3813314, 3813314]}, "브랜드S": {"0년차": [804, 12260744, -12260744, 12260744], "1년차": [3509, 50206979, -50206979, 50206979], "2년차": [6670, 105943465, -105943465, 105943465], "3년차": [2721, 37289894, -37289894, 37289894], "4년차": [998, 20178545, -20178545, 20327399], "4년차 초과": [88, 847207, -847207, 847207], "판단 불가": [25, 271465, -271465, 271465]}, "패션(멤버십몰)": {"0년차": [18382, 194990857, 0, 194990857], "1년차": [3715, 50634452, -1297291, 50634452], "2년차": [0, 0, 0, 0], "3년차": [0, 0, 0, 0], "4년차": [0, 0, 0, 0], "4년차 초과": [0, 0, 0, 0], "판단 불가": [0, 0, 0, 0]}, "패션 그룹F": {"0년차": [3048, 62554748, 0, 62554748], "1년차": [5360, 98241897, 0, 98241897], "2년차": [0, 0, 0, 0], "3년차": [0, 0, 0, 0], "4년차": [0, 0, 0, 0], "4년차 초과": [0, 0, 0, 0], "판단 불가": [0, 0, 0, 0]}, "브랜드 그룹K": {"0년차": [2301, 55278949, 0, 55278949], "1년차": [0, 0, 0, 0], "2년차": [360, 17066857, -3529537, 17066857], "3년차": [0, 0, 0, 0], "4년차": [0, 0, 0, 0], "4년차 초과": [0, 0, 0, 0], "판단 불가": [0, 0, 0, 0]}}, "26": {"A본부": {"0년차": [1804, 78548301, 0, 82249074], "1년차": [61174, 1079029088, -9263371, 1079143522], "2년차": [52956, 865316523, -299065224, 871105055], "3년차": [19311, 333450000, -207283374, 334282751], "4년차": [5872, 170042197, -145740898, 170079115], "4년차 초과": [6409, 112398343, -112616118, 112616118], "판단 불가": [985, 207097, -207097, 207097]}, "B본부": {"0년차": [3239, 36734250, 0, 36734250], "1년차": [25197, 436002849, -7762899, 436032589], "2년차": [19880, 315843646, -119138367, 315843646], "3년차": [7586, 102508788, -57514430, 102554391], "4년차": [1819, 29446883, -22589200, 29446883], "4년차 초과": [1291, 11644049, -11646439, 11646439], "판단 불가": [0, 0, 0, 0]}, "패션(영업)": {"0년차": [8464, 136233836, 0, 136233836], "1년차": [52898, 635784138, -21119827, 635784138], "2년차": [10051, 124315236, -23371864, 124315236], "3년차": [4166, 51887571, -29931540, 52473848], "4년차": [961, 14911953, -12813393, 15159173], "4년차 초과": [387, 4083714, -4083714, 4083714], "판단 불가": [1024, 3753695, -4120318, 4120318]}, "브랜드S": {"0년차": [0, 0, 0, 0], "1년차": [249, 3963257, -1218415, 3963257], "2년차": [158, 2727636, -1342783, 3084700], "3년차": [172, 32626, -3087217, 5774930], "4년차": [121, 2018997, -2475860, 3623646], "4년차 초과": [356, 6183734, -6246626, 6246626], "판단 불가": [25, 271465, -271465, 271465]}, "패션(멤버십몰)": {"0년차": [0, 0, 0, 0], "1년차": [23851, 289739110, -3662467, 289863688], "2년차": [2212, 34465011, -22527895, 35630784], "3년차": [0, 0, 0, 0], "4년차": [0, 0, 0, 0], "4년차 초과": [0, 0, 0, 0], "판단 불가": [0, 0, 0, 0]}, "패션 그룹F": {"0년차": [4687, 116259635, 0, 116259635], "1년차": [18828, 373234066, 0, 373234066], "2년차": [2544, 45642451, -12725184, 45642451], "3년차": [0, 0, 0, 0], "4년차": [0, 0, 0, 0], "4년차 초과": [0, 0, 0, 0], "판단 불가": [0, 0, 0, 0]}, "브랜드 그룹K": {"0년차": [136, 8037629, 0, 8037629], "1년차": [7310, 175298684, -51176692, 175298684], "2년차": [0, 0, 0, 0], "3년차": [334, 15821493, -14537551, 15821493], "4년차": [0, 0, 0, 0], "4년차 초과": [0, 0, 0, 0], "판단 불가": [0, 0, 0, 0]}}}, "bridge": {"steps": [["기초 충당 (25말)", -1259087019], ["① 소멸", 412059803], ["② 재평가", -279574646], ["③ 신규", -80938366], ["기말 충당 (9/30)", -1207540228]], "byGroup": {"A본부": [-986271625, 197638788, 18584695, -4127940, -774176082], "B본부": [-8377921, 0, -210083753, -189661, -218651335], "패션(영업)": [-32612346, 9286932, -50956814, -21158428, -95440656], "브랜드S": [-226998299, 204239378, 8116552, 3, -14642366], "패션(멤버십몰)": [-1297291, 637156, -12474786, -13055441, -26190362], "패션 그룹F": [0, 0, -12721812, -3372, -12725184], "브랜드 그룹K": [-3529537, 257549, -20038728, -42403527, -65714243]}, "byAge": {"0년차": [0, 0, 0, 0, 0], "1년차": [-12260744, 8369709, -20005503, -70307133, -94203671], "2년차": [-332250989, 106916778, -242702852, -10134254, -478171317], "3년차": [-440349787, 161542221, -33546549, 3, -312354112], "4년차": [-311851511, 95808179, 32428422, -4441, -183619351], "4년차 초과": [-158082113, 39190169, -15692748, -8205, -134592897], "판단 불가": [-4291875, 232747, -55416, -484336, -4598880]}}, "cohort": {"fields": ["q25", "bk25", "qS", "qO", "qL", "bS", "bO", "bL", "bL26", "p25", "pGone", "pLeft", "pNew"], "cells": {"A본부": {"0년차": [24092, 554550802, 11098, 1093, 11901, 191966391, 8577712, 354006699, 354006698, 0, 0, 0, -5871888], "1년차": [73560, 1166778399, 19076, 1258, 53226, 296095114, 3365341, 867317944, 867395785, -280746626, 59213598, -221533028, -298328768], "2년차": [27049, 465045903, 7568, 113, 19368, 95861521, 1419007, 367765375, 334282751, -329982178, 61153561, -268828617, -207283374], "3년차": [9243, 243752479, 3312, 53, 5878, 54043008, 504418, 189205053, 170079115, -243752479, 54547426, -189205053, -145740898], "4년차": [3787, 80322806, 895, 25, 2867, 19818509, 405119, 60099178, 73257793, -80322806, 20223628, -60099178, -73257793], "4년차 초과": [3708, 51260439, 96, 56, 3556, 1761335, 739240, 48759864, 39358325, -51260439, 2500575, -48759864, -39358325], "판단 불가": [916, 207097, 0, 0, 916, 0, 0, 207097, 207097, -207097, 0, -207097, -207097]}, "B본부": {"0년차": [6140, 137768651, 1131, 27, 4982, 12586529, 305213, 124876909, 124758702, 0, 0, 0, -7574689], "1년차": [23723, 365066948, 3681, 162, 19880, 46512936, 2017571, 316536441, 315835247, -93, 0, -93, -119136915], "2년차": [7586, 103169058, 0, 0, 7586, 0, 9245, 103159813, 102554391, -308625, 0, -308625, -57514430], "3년차": [1819, 29547999, 0, 0, 1819, 0, 0, 29547999, 29446883, -8069203, 0, -8069203, -22589200], "4년차": [1294, 11755034, 2, 0, 1292, 4781, 0, 11750253, 11646439, 0, 0, 0, -11646439], "4년차 초과": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "판단 불가": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, "패션(영업)": {"0년차": [6284, 87528911, 2570, 844, 2870, 46781296, 794269, 39953346, 39953346, 0, 0, 0, -458380], "1년차": [27867, 310242380, 17303, 527, 10037, 184272899, 1648822, 124320659, 124315236, 0, 0, 0, -23371864], "2년차": [6544, 76493017, 2095, 194, 4255, 22653213, 1365956, 52473848, 52473848, -585981, 4449, -581532, -29931540], "3년차": [1542, 22739936, 498, 0, 1044, 7590042, 0, 15149894, 15153393, -22739936, 7590042, -15149894, -12808952], "4년차": [226, 3552246, 41, 0, 185, 828393, 0, 2723853, 2777208, -3552246, 828393, -2723853, -2777208], "4년차 초과": [256, 1920869, 26, 29, 201, 299031, 332270, 1289568, 1298301, -1920869, 631301, -1289568, -1298301], "판단 불가": [1255, 3813314, 12, 127, 1116, 19165, 213582, 3580567, 3635982, -3813314, 232747, -3580567, -3635982]}, "브랜드S": {"0년차": [804, 12260744, 554, 1, 249, 8372757, 10529, 3877458, 3963257, -12260744, 8369709, -3891035, -1218415], "1년차": [3509, 50206979, 3327, 0, 182, 47115617, 6662, 3084700, 3084700, -50206979, 47066023, -3140956, -1342783], "2년차": [6670, 105943465, 5692, 487, 491, 99277994, 890541, 5774930, 5774930, -105943465, 100126664, -5816801, -3087217], "3년차": [2721, 37289894, 2447, 13, 261, 33620871, 49840, 3619183, 3623646, -37289894, 33670711, -3619183, -2475860], "4년차": [998, 20178545, 697, 2, 299, 14740554, 22534, 5415457, 5627463, -20178545, 14763088, -5415457, -5627463], "4년차 초과": [88, 847207, 28, 0, 60, 243183, 0, 604024, 619163, -847207, 243183, -604024, -619163], "판단 불가": [25, 271465, 0, 0, 25, 0, 0, 271465, 271465, -271465, 0, -271465, -271465]}, "패션(멤버십몰)": {"0년차": [18382, 194990857, 17946, 2, 434, 190901947, 17602, 4071308, 4071308, 0, 0, 0, 0], "1년차": [3715, 50634452, 2228, 1, 1486, 29856833, 11981, 20765638, 20765638, -1297291, 637156, -660135, -13134921], "2년차": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "3년차": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "4년차": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "4년차 초과": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "판단 불가": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, "패션 그룹F": {"0년차": [3048, 62554748, 1612, 1, 1435, 33326127, 26088, 29202533, 29148792, 0, 0, 0, 0], "1년차": [5360, 98241897, 2720, 97, 2543, 51116005, 1422196, 45703696, 45634903, 0, 0, 0, -12721812], "2년차": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "3년차": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "4년차": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "4년차 초과": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "판단 불가": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, "브랜드 그룹K": {"0년차": [2301, 55278949, 982, 49, 1270, 24214322, 1390069, 29674558, 29639502, 0, 0, 0, -8773165], "1년차": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "2년차": [360, 17066857, 24, 1, 335, 1167415, 77948, 15821494, 15821493, -3529537, 257549, -3271988, -14537551], "3년차": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "4년차": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "4년차 초과": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "판단 불가": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}}, "trans": {"0년차": {"1년차": 585541605}, "1년차": {"2년차": 1377031509}, "2년차": {"3년차": 510907413}, "3년차": {"4년차": 218303037}, "4년차": {"4년차 초과": 93308903}, "4년차 초과": {"4년차 초과": 41275789}, "판단 불가": {"판단 불가": 4114544}}, "cc": {"전사": [136, 3820, 55085102], "A본부": [136, 3820, 55085102]}, "untracked": [0, 0, 0, 0]}, "check": "9/30 재고 · 시트 값 10-26"};
+const B = D.buckets, G = D.groups, R25 = D.ranges25, R26 = D.ranges26;
+const S = {t:'a', base:'d', met:'book', ax:'hm', axc:'age', sel:{}, grp:''};
+const $ = s => document.querySelector(s);
+const MN = {book:'장부', prov:'충당', rate:'설정률', q:'수량'}, PN = {'25':'25말', '26':'26.9말', d:'증감'};
+const PCL = {'25':'p25', '26':'p26', d:'pd'}, LC = {'25말':'p25', '26.9말':'p26', '증감':'pd'};
+const pt = (p, t = PN[p]) => `<span class="${PCL[p]}">${t}</span>`;   // 시점 글자에 시점 색
+const RM = matchMedia('(prefers-reduced-motion: reduce)');
+const DUR3 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dur-3')) || 320;
+// ── 숫자
+const MINUS = '−';
+const sgn = v => v < 0 ? MINUS : '';
+const won = v => sgn(v) + Math.round(Math.abs(v)).toLocaleString('ko-KR') + '원';
+const eok = (v, plus) => (v < 0 ? MINUS : (plus && v > 0 ? '+' : '')) + (Math.abs(v) / 1e8).toFixed(2) + '억';
+const qty = (v, plus) => (v < 0 ? MINUS : (plus && v > 0 ? '+' : '')) + Math.round(Math.abs(v)).toLocaleString('ko-KR');
+const pct = v => v == null ? '–' : (v * 100).toFixed(1) + '%';
+const pp = v => v == null ? '–' : (v < 0 ? MINUS : v > 0 ? '+' : '') + Math.abs(v).toFixed(1) + '%p';
+const arrow = v => v > 0 ? '▲' : v < 0 ? '▼' : '';
+// ── 집계
+function agg(per, f){ const o = {q:0, book:0, prov:0, pos:0}; const c = D.cells[per];
+  for (const g of G) for (const b of B) if (f(g, b)) { const x = c[g][b]; o.q += x[0]; o.book += x[1]; o.prov += x[2]; o.pos += x[3]; } return o; }
+const keyF = k => (g, b) => (k.g == null || k.g === g) && (k.b == null || k.b === b);
+const mv = (o, m) => m === 'rate' ? (o.pos ? -o.prov / o.pos : null) : o[m];
+function val(base, m, k){ const f = keyF(k);
+  if (base !== 'd') return mv(agg(base, f), m);
+  const a = mv(agg('25', f), m), b = mv(agg('26', f), m);
+  if (m === 'rate') return (a == null || b == null) ? null : (b - a) * 100;
+  return b - a; }
+function fv(base, m, v){ if (v == null || (m !== 'rate' && Math.abs(v) < 0.5)) return '–';
+  if (m === 'rate') return base === 'd' ? pp(v) : pct(v);
+  if (m === 'q') return qty(v, base === 'd'); return eok(v, base === 'd'); }
+function fw(base, m, v){ if (v == null) return '–';
+  if (m === 'rate') return base === 'd' ? pp(v) : (v * 100).toFixed(2) + '%';
+  if (m === 'q') return qty(v, base === 'd') + '개'; return (base === 'd' && v > 0 ? '+' : '') + won(v); }
+const kname = k => k.g && k.b ? k.g + ' · ' + k.b : (k.g || k.b || '전체');
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+// 툴팁 표: 제목 + [빈칸, 열 머리…] + 행마다 [항목, 값…]. 값 = [표시(억·%), 원 단위(title), 음수?]
+function tipGrid(title, head, rows){
+  return `<div class="tt-h">${title}</div><div class="tt-g" style="--c:${head.length}"><span class="h0"></span>` + head.map(h => `<span class="h ${LC[h] || ''}">${h}</span>`).join('') +
+    rows.map(([lab, cs, on]) => `<span class="${on ? 'on' : ''}">${lab}</span>` + cs.map(c => `<span class="n${on ? ' on' : ''}${c[2] ? ' dn' : ''}" title="${esc(c[1])}">${c[0]}</span>`).join('')).join('') + '</div>'; }
+const cols = (m, k) => ['25', '26', 'd'].map(p => { const v = val(p, m, k); return [fv(p, m, v), fw(p, m, v), p === 'd' && v < 0]; });
+const tipFor = (k, pre = '') => tipGrid(pre + kname(k), ['25말', '26.9말', '증감'], ['q', 'book', 'prov', 'rate'].map(m => [MN[m], cols(m, k), m === S.met]));
+// ── 툴팁: 오른쪽·아래 끝이면 커서 반대쪽으로 뒤집는다
+const tip = $('#tip');
+function showTip(el, x, y){ if (tip._h !== el.dataset.tip) { tip.innerHTML = tip._h = el.dataset.tip; }
+  tip.classList.add('on');
+  const w = tip.offsetWidth, h = tip.offsetHeight, vw = document.documentElement.clientWidth, vh = innerHeight, g = 12;
+  let l = x + g; if (l + w > vw - 8) l = x - g - w; l = Math.max(8, Math.min(l, vw - w - 8));
+  let t = y + g + 4; if (t + h > vh - 8) t = y - g - h; t = Math.max(8, Math.min(t, vh - h - 8));
+  tip.style.left = l + 'px'; tip.style.top = t + 'px'; }
+document.addEventListener('pointermove', e => { const el = e.target.closest('[data-tip]'); el ? showTip(el, e.clientX, e.clientY) : tip.classList.remove('on'); });
+document.addEventListener('focusin', e => { const el = e.target.closest('[data-tip]'); if (el) { const r = el.getBoundingClientRect(); showTip(el, r.left + r.width / 2, r.bottom); } });
+document.addEventListener('focusout', () => tip.classList.remove('on'));
+// ── 모션 도우미: 숫자 세기(최종 값을 먼저 써 두고 프레임마다 덮어씀 — 프레임이 안 돌아도 값은 보인다) · 칸 한 번 번쩍
+function tween(el, from, to, f){ el.textContent = f(to); const tk = el._tk = {};
+  if (RM.matches || to == null || from == null || from === to) return;
+  const t0 = performance.now();
+  const step = now => { if (el._tk !== tk) return; const p = Math.max(0, Math.min(1, (now - t0) / DUR3)), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = f(p < 1 ? from + (to - from) * e : to); if (p < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step); }
+function flash(el){ el.classList.remove('fl'); void el.offsetWidth; el.classList.add('fl'); }
+// ── 1장 그룹 × 연차
+const KP = [['book', '장부'], ['prov', '충당'], ['rate', '설정률'], ['q', '수량']];
+const kf = m => m === 'rate' ? pct : m === 'q' ? (v => qty(v)) : (v => eok(v));
+function kpi(m, lab){ const a = val('25', m, {}), b = val('26', m, {}), d = val('d', m, {}), f = kf(m);
+  return `<div class="kpi" data-tip="${esc(tipGrid(lab, ['25말', '26.9말', '증감'], [[MN[m], cols(m, {}), true]]))}">
+    <div class="k">${lab}</div><div class="v">${f(b)}</div>
+    <div class="d"><span>${pt('25')} ${f(a)}</span><span>${pt('d')} <span class="${d < 0 ? 'dn' : 'up'}">${arrow(d)} ${fv('d', m, d)}</span></span></div></div>`; }
+function heat(v, mx){ if (v == null || !mx) return 'background:transparent';
+  const t = Math.min(1, Math.abs(v) / mx), p = Math.round(6 + t * 84), hue = S.base === '25' ? 'var(--s25)' : S.base === '26' ? 'var(--s26)' : v < 0 ? 'var(--neg)' : 'var(--brand)';  // 증감 양/음은 의미색 그대로
+  return `background:color-mix(in oklab,${hue} ${p}%,var(--surface));color:${p > 56 ? 'var(--on-brand)' : 'var(--ink)'}`; }
+const same = k => (k.g || null) === (S.sel.g || null) && (k.b || null) === (S.sel.b || null);
+function pageA(){
+  if (!$('#kp')) { // KPI 줄은 한 번만 그리고, 처음 로드 때만 세어 올라간다
+    $('#pa').innerHTML = `<div class="ag-kpis" id="kp">${KP.map(x => kpi(...x)).join('')}</div><div id="pam"></div>`;
+    $('#kp').querySelectorAll('.kpi>.v').forEach((el, i) => tween(el, 0, val('26', KP[i][0], {}), kf(KP[i][0])));
+  }
+  const m = S.met, base = S.base;
+  const hd = `${S.ax === 'hm' ? '그룹 × 연차' : S.ax === 'grp' ? '그룹별' : '연차 구간별'} ${MN[m]} · ${pt(base)}`;
+  if (S.ax === 'hm' && $('#pam table.hm')) { $('#amh').innerHTML = hd; fillHm(true); selA(); return; } // 같은 표를 제자리에서 바꾼다 → 세기·색 전환·번쩍
+  let main;
+  if (S.ax === 'hm') {
+    const td = k => `<td class="cell"><button data-k="${esc(JSON.stringify(k))}"></button></td>`;
+    main = `<div class="table-wrap"><table class="tbl hm"><thead><tr><th>그룹</th>${B.map(b => `<th class="num">${b}</th>`).join('')}<th class="num">합계</th></tr></thead><tbody>` +
+      G.map(g => `<tr><td class="first">${g}</td>${B.map(b => td({g, b})).join('')}${td({g})}</tr>`).join('') +
+      `<tr class="total"><td class="first">합계</td>${B.map(b => td({b})).join('')}${td({})}</tr></tbody></table></div>`;
+  } else {
+    const cats = S.ax === 'grp' ? G.map(g => ({g})) : B.map(b => ({b}));
+    const vs = cats.map(k => val(base, m, k)), mx = Math.max(...vs.filter(v => v != null).map(Math.abs)) || 1;
+    const other = base === '25' ? '26' : '25', div = base === 'd';
+    main = `<div class="bl">` + cats.map((k, i) => { const v = vs[i]; let tr = '';
+      if (v != null) { if (div) { const w = Math.abs(v) / mx * 50; tr = `<span class="ax" style="left:50%"></span><span class="gx${v < 0 ? ' r' : ''}" style="--i:${i};left:${v < 0 ? 50 - w : 50}%;width:${w}%;background:${v < 0 ? 'var(--neg)' : 'var(--brand)'}"></span>`; }
+        else { const o = val(other, m, k), mxx = Math.max(mx, ...cats.map(c => Math.abs(val(other, m, c) || 0)));
+          tr = `<span class="gx" style="--i:${i};left:0;width:${Math.abs(v) / mxx * 100}%;background:var(--s${base})"></span>` + (o != null ? `<span class="gh gx" style="--i:${i};left:0;width:${Math.abs(o) / mxx * 100}%;box-shadow:inset 0 0 0 1px var(--s${other})"></span>` : ''); } }
+      return `<button class="bl-row" data-k="${esc(JSON.stringify(k))}" data-tip="${esc(tipFor(k))}"><span class="bl-n">${kname(k)}</span><span class="bl-tr">${tr}</span><span class="bl-v ${div && v < 0 ? 'dn' : ''}">${div && v ? arrow(v) + ' ' : ''}${fv(base, m, v)}</span></button>`; }).join('') + `</div>` +
+      (div ? '' : `<div class="legend" style="margin-top:var(--sp-3)"><span><i style="background:var(--s${base})"></i>${pt(base)}</span><span><i style="background:transparent;box-shadow:inset 0 0 0 1px var(--s${other})"></i>${pt(other)}</span></div>`);
+  }
+  $('#pam').innerHTML = `<div class="ag-two"><div class="card"><div class="card-h"><span class="ag-h" id="amh">${hd}</span></div><div class="card-b">${main}</div></div>
+    <div class="card" aria-live="polite" id="adt"></div></div>`;
+  if (S.ax === 'hm') fillHm(false);
+  selA();
+}
+function fillHm(anim){
+  const m = S.met, base = S.base, kind = m + (m === 'rate' && base === 'd' ? 'd' : ''); // 단위가 같을 때만 이전 값에서 센다
+  const inner = []; for (const g of G) for (const b of B) inner.push(val(base, m, {g, b}));
+  const mx = Math.max(...inner.filter(v => v != null).map(Math.abs));
+  const f = v => (base === 'd' && v ? arrow(v) + ' ' : '') + fv(base, m, v);
+  for (const el of $('#pam').querySelectorAll('table.hm button[data-k]')) {
+    const k = JSON.parse(el.dataset.k), v = val(base, m, k), txt = f(v);
+    el.dataset.tip = tipFor(k); el.setAttribute('style', k.g != null && k.b != null ? heat(v, mx) : 'background:transparent');
+    if (anim && el.textContent !== txt) { tween(el, el._u === kind ? el._v : 0, v, f); flash(el); } else el.textContent = txt;
+    el._v = v; el._u = kind; } }
+function selA(){ const k = S.sel, base = S.base;
+  $('#pam').querySelectorAll('[data-k]').forEach(el => el.setAttribute('aria-pressed', String(same(JSON.parse(el.dataset.k)))));
+  const row = m2 => { const v = [val('25', m2, k), val('26', m2, k), val('d', m2, k)];
+    return `<div>${MN[m2]}</div>` + ['25', '26', 'd'].map((p, i) => `<div class="num ${p === base ? 'on' : ''} ${p === 'd' && v[i] < 0 ? 'dn' : ''}" title="${fw(p, m2, v[i])}">${p === 'd' && v[i] ? arrow(v[i]) + ' ' : ''}${fv(p, m2, v[i])}</div>`).join(''); };
+  const big = ['q', 'book', 'prov', 'rate'].map(m2 => { const v = val(base, m2, k); return `<div title="${fw(base, m2, v)}"><div class="k">${MN[m2]}</div><div class="v ${base === 'd' && v < 0 ? 'dn' : ''}">${fv(base, m2, v)}</div></div>`; }).join('');
+  const rng = k.b ? `<span class="ag-sub">${pt('25')} ${R25[B.indexOf(k.b)]} · ${pt('26')} ${R26[B.indexOf(k.b)]}</span>` : '';
+  $('#adt').innerHTML = `<div class="card-h"><span class="ag-h">${kname(k)}</span>${rng}</div><div class="card-b"><div class="dt-big">${big}</div>
+    <div class="dt"><div class="h"></div><div class="h num p25">25말</div><div class="h num p26">26.9말</div><div class="h num pd">증감</div>${['q', 'book', 'prov', 'rate'].map(row).join('')}</div></div>`; }
+$('#pa').addEventListener('click', e => { const el = e.target.closest('[data-k]'); if (!el) return; const k2 = JSON.parse(el.dataset.k); S.sel = same(k2) ? {} : k2; selA(); });
+// ── 2장 연차 추이
+function pageB(){
+  const m = S.met === 'rate' ? 'book' : S.met;
+  const tot = p => B.map(b => Math.abs(val(p, m, {b}) || 0));
+  const t25 = tot('25'), t26 = tot('26'), mx = Math.max(t25.reduce((a, b) => a + b), t26.reduce((a, b) => a + b));
+  const bar = (p, arr, i) => { const s = arr.reduce((a, b) => a + b);
+    return `<div class="stk-row"><span class="stk-l ${PCL[p]}">${PN[p]}</span><div class="stk-t"><div class="stk-b gx" style="--i:${i};width:${(s / mx * 82).toFixed(2)}%">` +
+      arr.map((v, j) => v ? `<span tabindex="0" style="flex:${v} 0 0;background:var(--a${j})" data-tip="${esc(tipFor({b: B[j]}, PN[p] + ' · '))}"></span>` : '').join('') +
+      `</div><span class="stk-v">${fv(p, m, val(p, m, {}))}</span></div></div>`; };
+  const leg = B.map((b, i) => `<span><i style="background:var(--a${i})"></i>${b}</span>`).join('');
+  $('#pb').innerHTML = `<div class="ag-grid">
+    <div class="card"><div class="card-h"><span class="ag-h">연차 구간별 ${MN[m]}</span><span class="ag-sub">${pt('25')} 0년차 254~ · ${pt('26')} 264~</span></div>
+      <div class="card-b"><div class="stk">${bar('25', t25, 0)}${bar('26', t26, 1)}</div><div class="legend">${leg}</div></div></div>
+    <div class="card"><div class="card-h"><span class="ag-h">설정률</span><div class="legend"><span><i class="ln dash" style="background:var(--s25)"></i>${pt('25')}</span><span><i class="ln" style="background:var(--s26)"></i>${pt('26')}</span></div></div>
+      <div class="card-b"><div class="ln-wrap" id="ln"></div></div></div>
+   </div>`;
+  drawLine(); }
+function drawLine(){ const el = $('#ln'); if (!el) return;
+  const W = Math.max(280, el.clientWidth), H = 220, L = 36, Rr = 56, T = 12, Bm = 40;
+  const cats = B, key = c => ({b: c});
+  const x = i => L + (W - L - Rr) * (cats.length === 1 ? .5 : i / (cats.length - 1)), y = v => T + (H - T - Bm) * (1 - v);
+  let s = '';
+  for (const g of [0, .25, .5, .75, 1]) s += `<line class="grid" x1="${L}" x2="${W - Rr}" y1="${y(g)}" y2="${y(g)}"/><text x="${L - 6}" y="${y(g) + 4}" text-anchor="end">${g * 100}%</text>`;
+  cats.forEach((c, i) => { const p2 = c.split(' '); s += `<text x="${x(i)}" y="${H - Bm + 16}" text-anchor="middle">${p2[0]}</text>` + (p2[1] ? `<text x="${x(i)}" y="${H - Bm + 30}" text-anchor="middle">${p2[1]}</text>` : ''); });
+  for (const p of ['25', '26']) { const pts = cats.map((c, i) => [x(i), val(p, 'rate', key(c))]).filter(q => q[1] != null);
+    const col = p === '25' ? 'var(--s25)' : 'var(--s26)';
+    s += `<polyline fill="none" stroke="${col}" stroke-width="2" ${p === '25' ? 'stroke-dasharray="5 4"' : ''} stroke-linejoin="round" points="${pts.map(q => q[0] + ',' + y(q[1])).join(' ')}"/>`;
+    pts.forEach(q => s += `<circle cx="${q[0]}" cy="${y(q[1])}" r="4" fill="${col}" stroke="var(--surface)" stroke-width="2"/>`);
+    const last = pts[pts.length - 1]; if (last) s += `<text class="lab" style="fill:${col}" x="${last[0] + 8}" y="${y(last[1]) + (p === '25' ? -6 : 14)}">${PN[p]}</text>`; }
+  cats.forEach((c, i) => s += `<rect class="hit" tabindex="0" x="${x(i) - 16}" y="${T}" width="32" height="${H - T - Bm}" data-tip="${esc(tipFor(key(c)))}"/>`);
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="설정률 25말·26.9말">${s}</svg>`; }
+// ── 3장 변동
+function pageC(){
+  const st = D.bridge.steps; let run = 0; const mags = [];
+  st.forEach((s, i) => { if (i === 0) run = s[1]; else if (i < st.length - 1) run += s[1]; mags.push(Math.abs(i === st.length - 1 ? s[1] : run)); });
+  const mx = Math.max(...mags, Math.abs(st[0][1])) * 1.05; let prev = Math.abs(st[0][1]);
+  // 단계 막대는 앞 단계가 끝난 자리에서 자란다 → 순서대로 이어져 보인다
+  const wf = st.map((s, i) => { const tot = i === 0 || i === st.length - 1; let l, w, col, r = false;
+    if (tot) { l = 0; w = Math.abs(s[1]); col = i === 0 ? 'var(--s25)' : 'var(--s26)'; prev = Math.abs(s[1]); }
+    else { const nx = prev - s[1]; l = Math.min(prev, nx); w = Math.abs(s[1]); col = s[1] > 0 ? 'var(--brand)' : 'var(--neg)'; r = nx < prev; prev = nx; }
+    return `<div class="wf-row" style="--i:${i}" data-tip="${esc(tipGrid(s[0], ['충당'], [['', [[(tot ? eok(s[1]) : eok(s[1], true)), (s[1] > 0 && !tot ? '+' : '') + won(s[1]), s[1] < 0 && !tot]], true]]))}"><span class="wf-n">${s[0]}</span><span class="wf-tr"><span class="gx${r ? ' r' : ''}" style="--i:${i};left:${l / mx * 100}%;width:${w / mx * 100}%;background:${col}"></span></span><span class="wf-v ${!tot && s[1] < 0 ? 'dn' : ''}">${tot ? eok(s[1]) : arrow(s[1]) + ' ' + eok(s[1], true)}</span></div>`; }).join('');
+  const by = S.axc === 'grp' ? D.bridge.byGroup : D.bridge.byAge, keys = Object.keys(by);
+  const nets = keys.map(k => by[k][4] - by[k][0]), nmx = Math.max(...nets.map(Math.abs)) || 1;
+  const H = ['기초 충당', '① 소멸', '② 재평가', '③ 신규', '기말 충당', '순 환입'], HC = ['p25', '', '', '', 'p26', 'pd'];
+  const cell = (v, d) => `<td class="num ${d && v < 0 ? 'dn' : ''}" title="${(d && v > 0 ? '+' : '') + won(v)}">${Math.abs(v) < 0.5 ? "–" : (d && v ? arrow(v) + " " : "") + eok(v, d)}</td>`;
+  const rows = keys.map((k, i) => { const r = by[k], n = nets[i], w = Math.abs(n) / nmx * 50;
+    return `<tr><td class="first">${k}</td>${cell(r[0])}${cell(r[1], 1)}${cell(r[2], 1)}${cell(r[3], 1)}${cell(r[4])}<td class="num ${n < 0 ? 'dn' : ''}" title="${(n > 0 ? '+' : '') + won(n)}"><span class="mini"><span class="ax"></span><span style="left:${n < 0 ? 50 - w : 50}%;width:${w}%;background:${n < 0 ? 'var(--neg)' : 'var(--brand)'}"></span></span>${n ? arrow(n) + ' ' : ''}${eok(n, 1)}</td></tr>`; }).join('');
+  const T = keys.map(k => by[k]).reduce((a, r) => a.map((x, i) => x + r[i]), [0, 0, 0, 0, 0]), tn = T[4] - T[0];
+  $('#pc').innerHTML = `<div class="ag-col"><div class="card"><div class="card-h"><span class="ag-h">충당 변동 25말 → 26.9말</span><span class="ag-sub">+ 환입 · − 추가 설정</span></div><div class="card-b"><div class="wf">${wf}</div></div></div>
+    <div class="card"><div class="card-h"><span class="ag-h">${S.axc === 'grp' ? '그룹별' : '26.9말 연차 구간별'} 변동</span></div><div class="card-b"><div class="table-wrap"><table class="tbl"><thead><tr><th>${S.axc === 'grp' ? '그룹' : '연차 구간'}</th>${H.map((h, j) => `<th class="num ${HC[j]}">${h}</th>`).join('')}</tr></thead><tbody>${rows}
+      <tr class="total"><td class="first">합계</td>${cell(T[0])}${cell(T[1], 1)}${cell(T[2], 1)}${cell(T[3], 1)}${cell(T[4])}${cell(tn, 1)}</tr></tbody></table></div></div></div></div>`;
+}
+// ── 4장 코호트 — 25말 재고를 같은 품번으로 26.9말까지 따라간다 (남은 25말분 = [품번] «남은 기초분» 식)
+const C = D.cohort, CF = C.fields;
+function cAgg(g, b){ const o = Object.fromEntries(CF.map(f => [f, 0]));
+  for (const gg of G) if (!g || g === gg) for (const bb of B) if (!b || b === bb) C.cells[gg][bb].forEach((v, i) => o[CF[i]] += v); return o; }
+const cFlow = (o, m) => m === 'q' ? [o.q25, o.qS, o.qO, o.qL] : [o.bk25, o.bS, o.bO, o.bL];
+const cTo = b => Object.keys(C.trans[b]).filter(k => Math.abs(C.trans[b][k]) > 0.5).join('·') || '–';
+const cq = v => [Math.abs(v) < 0.5 ? '–' : qty(v), qty(v) + '개', v < 0], cb = (v, p) => [Math.abs(v) < 0.5 ? '–' : eok(v, p), (p && v > 0 ? '+' : '') + won(v), v < 0];
+const share = (n, a) => a > 0 ? n / a : null;
+function pageD(){
+  const m = S.met === 'q' ? 'q' : 'book', g = S.grp, gl = g || '전사', f = v => Math.abs(v) < 0.5 ? '–' : (m === 'q' ? qty(v) : eok(v));
+  const fW = v => m === 'q' ? qty(v) + '개' : won(v);
+  const rows = B.map(b => [b, cAgg(g, b)]), T = cAgg(g, null), [a0, s0, x0, l0] = cFlow(T, m), cc = C.cc[gl];
+  const tipRow = (lab, o) => tipGrid(lab, ['수량', '장부'], [['25말', [cq(o.q25), cb(o.bk25)]], ['판매', [cq(o.qS), cb(o.bS)]], ['판매 외 출고', [cq(o.qO), cb(o.bO)]],
+    ['남음', [cq(o.qL), cb(o.bL)], true], ['소진율', [[pct(share(o.qS + o.qO, o.q25)), ''], [pct(share(o.bS + o.bO, o.bk25)), '']]], ['남은 장부 26.9말', [['', ''], cb(o.bL26)]]]);
+  const kp = [[pt('25', '25말') + ' 재고', f(a0), fW(a0), cc && cc[0] ? `<span title="원 품번 → 새 품번 매핑 후 추적 · ${qty(cc[1])}개 · ${won(cc[2])}">코드 바뀜 ${qty(cc[0])}품번 포함</span>` : ''],
+    ['나감', f(s0 + x0), fW(s0 + x0), `<span>소진율 ${pct(share(s0 + x0, a0))}</span>`],
+    ['남음', f(l0), fW(l0), `<span title="${won(T.bL26)}">${pt('26')} 장부 ${eok(T.bL26)}</span>`],
+    [pt('25', '25말') + ' 충당 소멸', eok(T.pGone, true), '+' + won(T.pGone), `<span title="${won(T.pLeft)}">남은 충당 ${eok(T.pLeft)}</span>`]];
+  const pctW = (v, a) => a > 0 ? Math.max(0, v / a * 100).toFixed(2) : 0;
+  const seg3 = (o, a, s, x, l) => [[s, 'var(--brand)'], [x, 'var(--a2)'], [l, 'var(--a6)']].filter(([v]) => v > 0 && a > 0).map(([v, c]) => `<span style="flex:${pctW(v, a)} 0 0;background:${c}"></span>`).join('');
+  const bars = rows.map(([b, o], i) => { const [a, s, x, l] = cFlow(o, m);
+    return `<div class="stk-row" tabindex="0" data-tip="${esc(tipRow('25말 ' + b + ' · ' + gl, o))}"><span class="stk-l">${b}</span><div class="stk-t"><div class="stk-b gx" style="--i:${i}">${seg3(o, a, s, x, l)}</div><span class="stk-v">${a > 0 ? pct((s + x) / a) : '–'}</span></div></div>`; }).join('');
+  const mxL = Math.max(...rows.map(([, o]) => Math.abs(o.bL26))) || 1;
+  const left = rows.map(([b, o], i) => `<div class="bl-row" tabindex="0" data-tip="${esc(tipRow('25말 ' + b + ' → 26.9말 ' + cTo(b) + ' · ' + gl, o))}"><span class="bl-n"><span class="p26">→ ${cTo(b)}</span><span class="ag-sub">${pt('25')} ${b}</span></span>` +
+    `<span class="bl-tr"><span class="gx" style="--i:${i};left:0;width:${Math.max(0, o.bL26) / mxL * 100}%;background:var(--s26)"></span></span><span class="bl-v" title="${won(o.bL26)}">${eok(o.bL26)}</span></div>`).join('');
+  const td = (v, t, cls = '') => `<td class="num ${cls}" title="${t}">${v}</td>`;
+  const tr = (lab, o, cls = '') => { const [a, s, x, l] = cFlow(o, m);
+    return `<tr class="${cls}"><td class="first">${lab}</td>${[a, s, x, l].map(v => td(f(v), fW(v))).join('')}${td(pct(share(s + x, a)), '')}<td>${cls ? '' : cTo(lab)}</td>` +
+      `${td(eok(o.bL26), won(o.bL26))}${td(eok(o.p25), won(o.p25))}${td(eok(o.pGone, true), '+' + won(o.pGone))}${td(eok(o.pLeft), won(o.pLeft))}</tr>`; };
+  const U = C.untracked, un = U[0] && !g ? `<tr><td class="first">코드 바뀜·추적 불가 ${qty(U[0])}품번</td>${td(f(m === 'q' ? U[1] : U[2]), fW(m === 'q' ? U[1] : U[2]))}<td colspan="6"></td>${td(eok(U[3]), won(U[3]))}<td colspan="2"></td></tr>` : '';
+  const HD = ['25말', '판매', '판매 외', '남음', '소진율'], HD2 = [['26.9말 연차', '', 'p26'], ['남은 장부', '남은 25말분의 26.9말 장부', 'p26'], ['25말 충당', '', 'p25'], ['소멸', '나간 25말분 충당 환입 ([요약] ① 소멸과 같은 식)', ''], ['남은 충당', '25말 충당 − 소멸', '']];
+  $('#pd').innerHTML = `<div class="ag-kpis">${kp.map(([k, v, t, d]) => `<div class="kpi" title="${t}"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join('')}</div>
+    <div class="ag-col"><div class="ag-grid">
+      <div class="card"><div class="card-h"><span class="ag-h">${pt('25')} 연차별 소진 · ${gl}</span><span class="ag-sub">${MN[m]} · 소진율</span></div>
+        <div class="card-b"><div class="stk coh">${bars}</div><div class="legend"><span><i style="background:var(--brand)"></i>판매</span><span><i style="background:var(--a2)"></i>판매 외 출고</span><span><i style="background:var(--a6)"></i>남음</span></div></div></div>
+      <div class="card"><div class="card-h"><span class="ag-h">남은 재고 ${pt('26')} 장부</span><span class="ag-sub">${eok(T.bL26)}</span></div><div class="card-b"><div class="bl coh-l">${left}</div></div></div>
+    </div>
+    <div class="card"><div class="card-h"><span class="ag-h">${pt('25')} 연차별 흐름 · ${gl}</span><span class="ag-sub">${m === 'q' ? '개' : '억'}</span></div><div class="card-b"><div class="table-wrap"><table class="tbl">
+      <thead><tr><th class="p25">25말 연차</th>${HD.map(h => `<th class="num ${h === '25말' ? 'p25' : ''}">${h}</th>`).join('')}${HD2.map(([h, t, c]) => `<th class="${h === '26.9말 연차' ? '' : 'num'} ${c}" ${t ? `title="${t}"` : ''}>${h}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(([b, o]) => tr(b, o)).join('')}${un}${tr('합계', T, 'total')}</tbody></table></div></div></div></div>`;
+}
+// ── 5장 해석 — 숫자는 전부 D 에서
+function pageE(){
+  const a = agg('25', () => true), b = agg('26', () => true), rate = o => o.pos ? -o.prov / o.pos : 0;
+  const dBook = b.book - a.book, dProv = b.prov - a.prov, dRate = (rate(b) - rate(a)) * 100;
+  const yng = p => { const t = agg(p, () => true).book; return agg(p, (g, c) => c === B[0] || c === B[1]).book / t; };
+  let mix = 0, ev = 0;   // 설정률 차 = Σ(26 비중 − 25 비중)×25 설정률 [구성] + Σ 26 비중×(26 − 25 설정률) [평가]
+  for (const bb of B) { const x = agg('25', (g, c) => c === bb), y = agg('26', (g, c) => c === bb);
+    mix += (y.pos / b.pos - x.pos / a.pos) * rate(x); ev += y.pos / b.pos * (rate(y) - rate(x)); }
+  const OLD = B.slice(2, 6), od = G.map(g => [g, OLD.reduce((s, c) => s + D.cells['26'][g][c][1] - D.cells['25'][g][c][1], 0)]).sort((x, y) => y[1] - x[1]);
+  const up = od.filter(x => x[1] > 0.5), omx = Math.max(...od.map(x => Math.abs(x[1]))) || 1;
+  const T = cAgg('', null), lOld = B.reduce((s, c) => s + OLD.reduce((t, k) => t + (C.trans[c][k] || 0), 0), 0);
+  const nextY = agg('26', (g, c) => c === B[2] || c === B[3]).book, st = D.bridge.steps;
+  const nb = (k, v, t, cls = '') => `<div class="ie-n" title="${t}"><div class="k">${k}</div><div class="v ${cls}">${v}</div></div>`;
+  const card = (h, body) => `<div class="card"><div class="card-h"><span class="ag-h">${h}</span></div><div class="card-b ie">${body}</div></div>`;
+  const ln = s => `<p class="ie-l">${s}</p>`;
+  const odRows = od.map(([g, v], i) => { const w = Math.abs(v) / omx * 50;
+    return `<div class="bl-row"><span class="bl-n">${g}</span><span class="bl-tr"><span class="ax" style="left:50%"></span><span class="gx${v < 0 ? ' r' : ''}" style="--i:${i};left:${v < 0 ? 50 - w : 50}%;width:${w}%;background:${v < 0 ? 'var(--neg)' : 'var(--brand)'}"></span></span><span class="bl-v ${v < 0 ? 'dn' : ''}" title="${(v > 0 ? '+' : '') + won(v)}">${arrow(v)} ${eok(v, true)}</span></div>`; }).join('');
+  $('#pe').innerHTML = `<div class="ag-col">` +
+    card(`재고 ${dBook >= 0 ? '증가' : '감소'} · 충당 ${dProv >= 0 ? '감소' : '증가'}`,
+      `<div class="ie-ns">${nb('장부 ' + pt('d'), eok(dBook, true), `25말 ${won(a.book)} → 26.9말 ${won(b.book)}`)}${nb('충당 ' + pt('d'), eok(dProv, true), `25말 ${won(a.prov)} → 26.9말 ${won(b.prov)}`)}${nb('설정률', `${pt('25', pct(rate(a)))} → ${pt('26', pct(rate(b)))}`, pp(dRate))}
+        ${nb('0~1년차 장부 비중', `${pt('25', pct(yng('25')))} → ${pt('26', pct(yng('26')))}`, '25말 0~1년차 / 26.9말 0~1년차')}${nb('구성 효과', pp(mix * 100), '25말 연차별 설정률을 26.9말 연차 구성에 적용한 차이', mix < 0 ? 'dn' : '')}${nb('평가 효과', pp(ev * 100), '연차별 설정률 변화 (25년 3년 초과 100% + NRV → 26년 소진율·할인율 기반)', ev < 0 ? 'dn' : '')}</div>` +
+      ln(`설정률 ${pt('d', pp(dRate))} 중 연차 구성 변화가 ${pp(mix * 100)}, 평가 방식 변경이 ${pp(ev * 100)}예요.`)) +
+    card('고연차 적체',
+      `<div class="ie-ns">${nb('남아서 넘어간 장부 ' + pt('26'), eok(T.bL26), '25말 재고 중 26.9말에 남은 분 · ' + won(T.bL26))}${nb('이 중 26말 2년차 이상', eok(lOld), won(lOld))}${nb('내년 3·4년차 진입', eok(nextY), '26.9말 2·3년차 장부 · ' + won(nextY))}</div>
+       <div class="ie-sh">2년차 이상 장부 증감 · 그룹</div><div class="bl">${odRows}</div>` +
+      ln('남은 재고가 한 해씩 밀려 3·4년차에 들어가면 설정률이 올라 충당이 늘어요.')) +
+    card('충당 변동 분해',
+      `<div class="ie-ns">${st.slice(1, 4).map(s => nb(s[0], eok(s[1], true), (s[1] > 0 ? '+' : '') + won(s[1]), s[1] < 0 ? 'dn' : '')).join('')}${nb('순 환입 ' + pt('d'), eok(st[4][1] - st[0][1], true), won(st[4][1] - st[0][1]))}</div>` +
+      ln('나간 25말분 충당이 환입되고, 재평가·신규 설정이 그 일부를 다시 쌓았어요.')) +
+    card('읽을 때 주의',
+      `<ul class="ie-ul"><li>25말은 12월, 26.9말은 FW 입고 직후라 재고가 많은 시점이에요. 공정 비교는 25.9말이나 12월 결산과 해요.</li>
+        <li>연차 칸끼리는 같은 재고가 아니에요. 한 칸씩 밀리고 입고·판매가 섞여서, 같은 재고는 <button class="btn ghost sm" data-go="d">코호트</button> 장에서 봐요.</li></ul>`) +
+    card('관리 포인트',
+      `<div class="ie-chips">${up.map(([g, v]) => `<span class="badge" title="${'+' + won(v)}">${g} ${eok(v, true)}</span>`).join('') || '<span class="badge">–</span>'}</div>` +
+      ln('2년차 이상 장부가 늘어난 그룹이 이월 소진 행사 후보예요.') + ln('12월 결산 때 같은 화면으로 다시 비교해요.')) + `</div>`;
+}
+$('#pe').addEventListener('click', e => { const el = e.target.closest('[data-go]'); if (el) go(el.dataset.go); });
+// ── 상태·토글
+function seg(id, key){ const el = $(id); el.querySelectorAll('button').forEach(b => { b.setAttribute('aria-pressed', String(b.dataset.v === S[key]));
+  b.onclick = () => { if (b.getAttribute('aria-disabled') === 'true') return; S[key] = b.dataset.v; if (key === 'ax') S.sel = {}; render(); }; }); }
+const TS = ['a', 'b', 'c', 'd', 'e'];
+const gs = $('#sGrp'); gs.innerHTML = ['', ...G].map(g => `<option value="${g}">${g || '전사'}</option>`).join(''); gs.onchange = () => { S.grp = gs.value; render(); };
+function render(){ const t = S.t, c = t === 'c';
+  if (t === 'd' && (S.met === 'prov' || S.met === 'rate')) S.met = 'book';
+  $('#tb').hidden = t === 'e'; $('#sBase').hidden = t !== 'a'; $('#sMet').hidden = c || t === 'e'; $('#sAx').hidden = !(t === 'a' || c); gs.hidden = t !== 'd';
+  $('#sAx [data-v="hm"]').setAttribute('aria-disabled', String(c));
+  for (const v of ['prov', 'rate']) $(`#sMet [data-v="${v}"]`).setAttribute('aria-disabled', String(t === 'd'));
+  seg('#sBase', 'base'); seg('#sMet', 'met'); seg('#sAx', c ? 'axc' : 'ax');
+  for (const x of TS) $('#p' + x).hidden = t !== x;
+  document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.t === t)));
+  ({a: pageA, b: pageB, c: pageC, d: pageD, e: pageE})[t]();
+}
+function go(t){ if (t === S.t) return; S.t = t; render(); const p = $('#p' + t); p.classList.remove('in'); void p.offsetWidth; p.classList.add('in'); }
+document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.dataset.t));
+$('#tabs').addEventListener('keydown', e => { const i = TS.indexOf(S.t);
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { go(TS[(i + (e.key === 'ArrowRight' ? 1 : TS.length - 1)) % TS.length]); $('#tabs [data-t="' + S.t + '"]').focus(); } });
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => S.t === 'b' && drawLine(), 120); });
+$('#ck').textContent = D.check;
+ddEnhanceAll();
+const h0 = location.hash.slice(1).split(','); if (TS.includes(h0[0])) S.t = h0[0];
+if (['age', 'grp', 'hm'].includes(h0[1])) { if (S.t === 'c') { if (h0[1] !== 'hm') S.axc = h0[1]; } else S.ax = h0[1]; }
+if (S.t === 'd' && ['q', 'book'].includes(h0[1])) S.met = h0[1];
+if (['light', 'dark'].includes(h0[2])) document.documentElement.dataset.theme = h0[2];
+render();
+</script>
+</body>
+</html>

@@ -264,6 +264,18 @@
   .map .tg i { font-style: normal; font-size: var(--fs-12); font-weight: var(--fw-medium); color: var(--brand-ink); background: var(--brand-soft); padding: 2px var(--sp-2); border-radius: var(--r-1); }
   @media (max-width: 980px) { .map .row { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 600px) { .map .row { grid-template-columns: 1fr; } .map .hub { justify-items: start; text-align: left; } .map .hub .tg { justify-content: flex-start; } }
+
+  .demos.four { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 980px) { .demos.four { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .demos.four { grid-template-columns: 1fr; } }
+  .sh2 { display: flex; align-items: center; gap: var(--sp-3); margin: var(--sp-10) 0 var(--sp-4); }
+  .sh2 h3 { font-size: var(--fs-18); font-weight: var(--fw-bold); margin: 0; }
+  .map .plan { display: grid; gap: var(--sp-1); justify-items: center; text-align: center; text-decoration: none; color: var(--ink); background: var(--brand-soft); border-radius: var(--r-card); padding: var(--sp-4) var(--sp-5); transition: transform var(--dur-1) var(--ease-std); }
+  .map .plan b { font-size: var(--fs-18); font-weight: var(--fw-bold); }
+  .map .plan .eb { font-size: var(--fs-12); font-weight: var(--fw-semibold); color: var(--brand-ink); }
+  .map .plan .tg { justify-content: center; }
+  .map .plan .tg i { background: var(--surface); }
+  @media (max-width: 600px) { .map .plan { justify-items: start; text-align: left; } .map .plan .tg { justify-content: flex-start; } }
 </style>
 </head>
 <body>
@@ -271,7 +283,7 @@
 
 <header class="topbar glass"><div class="in">
   <a class="n" href="#">이어진</a>
-  <a class="l" href="#s-map">작업 지도</a><a class="l" href="#c1">월마감</a><a class="l" href="#c2">정산</a><a class="l" href="#c4">결재</a><a class="l" href="#s-demo">데모</a><a class="l" href="#s-way">일하는 방식</a><a class="l" href="#s-faq">FAQ</a>
+  <a class="l" href="#s-map">작업 지도</a><a class="l" href="#c1">경영기획</a><a class="l" href="#c2">월마감</a><a class="l" href="#c3">정산</a><a class="l" href="#c5">결재</a><a class="l" href="#s-demo">데모</a><a class="l" href="#s-way">일하는 방식</a><a class="l" href="#s-faq">FAQ</a>
   <a class="pill pri" href="mailto:lee-ding@naver.com">연락하기</a>
 </div></header>
 
@@ -280,8 +292,8 @@
   <div>
     <span class="chip"><span class="dot"></span>재무 AX · AI 업무 설계 · 재무회계 · 패션 이커머스</span>
     <h1><span class="ln"><span>재무 업무를</span></span><span class="ln"><span><em>AI</em>로 다시 짭니다.</span></span></h1>
-    <p class="lead">월마감을 업무별 AI 세션 여러 개로 나눠 돌립니다. 세션마다 그룹웨어·ERP·협업툴·채널 API에 직접 붙어 일하고, 결재·전표 발행·결제 같은 확정은 제가 합니다.</p>
-    <div class="cta"><a class="pill pri" href="#s-map">AI 작업 지도 보기</a><a class="pill sec" href="#s-demo">데모 6개 열기</a></div>
+    <p class="lead">월마감을 업무별 AI 세션 여러 개로 나눠 돌리고, 모인 숫자로 경영 질문에 답합니다. 세션마다 그룹웨어·ERP·협업툴·채널 API에 직접 붙어 일하고, 결재·전표 발행 같은 확정과 방법론 판단은 제가 합니다.</p>
+    <div class="cta"><a class="pill pri" href="#s-map">AI 작업 지도 보기</a><a class="pill sec" href="#s-demo">데모 9개 열기</a></div>
   </div>
   <div class="stack" aria-hidden="true">
     <div class="s s1" data-depth="1"><img src="assets/shots/fund-cycle.jpg" alt=""></div>
@@ -304,12 +316,13 @@
   <div class="sh rv"><span class="lb">AI 작업 지도</span><h2>업무마다 AI 세션 하나, 확정은 사람이.</h2><p class="sub">체크리스트 세션이 마감 전체를 보고, 정산·결재 세션이 각자 맡은 시스템에 붙어 일합니다. 세션끼리는 메시지로 숫자를 주고받습니다.</p></div>
   <div class="map">
     <div class="hum rv"><span class="who">사람이 확정</span><i>로그인·인증번호</i><i>결제</i><i>전표 발행</i><i>결재 상신</i><i>예외·정책 판단</i></div>
-    <a class="hub rv" href="#c1"><span class="eb">허브 세션</span><b>월마감 체크리스트</b><span>약 90항목 · 섹션마다 담당 세션 지정 · 새 업무를 배우면 항목 추가</span><div class="tg"><i>Sheets MCP</i><i>Apps Script</i><i>예약 작업</i></div></a>
+    <a class="plan rv" href="#c1"><span class="eb">경영기획</span><b>세션이 모은 숫자로 경영 질문에 답한다</b><div class="tg"><i>재고 충당</i><i>월간 경영보고</i><i>시즌 현금흐름</i><i>자금 의사결정</i><i>투자계약</i><i>손익 원장</i></div></a>
+    <a class="hub rv" href="#c2"><span class="eb">허브 세션</span><b>월마감 체크리스트</b><span>약 90항목 · 섹션마다 담당 세션 지정 · 새 업무를 배우면 항목 추가</span><div class="tg"><i>Sheets MCP</i><i>Apps Script</i><i>예약 작업</i></div></a>
     <div class="row">
-      <a class="ses rv" href="#c2"><b>자사몰 정산</b><span>4개 몰 매일 대사, 월마감 버튼 세 번</span><div class="tg"><i>쇼핑몰 Admin API</i><i>결제대행 수집</i><i>로컬 보드</i></div></a>
-      <a class="ses rv" href="#c3"><b>위탁 정산</b><span>34채널 수집 → 건별 대사 → 전표 대기</span><div class="tg"><i>채널 API 28</i><i>로그인 자동 수집 11</i><i>회계 API</i></div></a>
-      <a class="ses rv" href="#c4"><b>결재·카드</b><span>신청서 30분마다 처리, 결제 직전까지</span><div class="tg"><i>그룹웨어 내부 API</i><i>홈택스</i><i>협업툴 MCP</i></div></a>
-      <a class="ses rv" href="#c5"><b>결산·검증</b><span>원장 대조·충당금·다른 모델 반박</span><div class="tg"><i>회계 API</i><i>ERP 화면 자동화</i><i>교차검증 모델</i></div></a>
+      <a class="ses rv" href="#c3"><b>자사몰 정산</b><span>4개 몰 매일 대사, 월마감 버튼 세 번</span><div class="tg"><i>쇼핑몰 Admin API</i><i>결제대행 수집</i><i>로컬 보드</i></div></a>
+      <a class="ses rv" href="#c4"><b>위탁 정산</b><span>34채널 수집 → 건별 대사 → 전표 대기</span><div class="tg"><i>채널 API 28</i><i>로그인 자동 수집 11</i><i>회계 API</i></div></a>
+      <a class="ses rv" href="#c5"><b>결재·카드</b><span>신청서 30분마다 처리, 결제 직전까지</span><div class="tg"><i>그룹웨어 내부 API</i><i>홈택스</i><i>협업툴 MCP</i></div></a>
+      <a class="ses rv" href="#c6"><b>결산·검증</b><span>원장 대조·충당금·다른 모델 반박</span><div class="tg"><i>회계 API</i><i>ERP 화면 자동화</i><i>교차검증 모델</i></div></a>
     </div>
     <div class="base rv"><span class="who">공통 기반</span><i>기준 문서 2</i><i>스킬 15</i><i>규칙·함정 기록 183</i><i>교차검증 문서 117</i><i>주간 운영일지</i></div>
   </div>
@@ -317,20 +330,35 @@
 
 <!-- 01 -->
 <section class="chap" id="c1"><div class="wrap grid">
-  <div class="side rv"><div class="no">01</div><span class="lb">월마감 허브</span><h2>월마감은 체크리스트 세션이 지휘합니다.</h2><p class="sub">마감 항목을 3단 트리로 관리하는 시트를 AI 세션 하나가 맡고, 정산·결재 세션이 각자 맡은 줄을 채웁니다. 새 업무를 가르치면 그 자리에서 항목이 늘어납니다.</p></div>
+  <div class="side rv"><div class="no">01</div><span class="lb">경영기획</span><h2>경영 질문에 숫자와 판정 문장으로.</h2><p class="sub">질문을 받으면 원장·DB·API에서 숫자를 모아 원 단위로 맞추고, 여러 에이전트와 다른 모델에 반박을 맡긴 뒤 결론을 한 문장으로 올립니다. 방법론과 가정은 사람이 정합니다.</p></div>
   <div class="bento">
-    <div class="cd txt inv w rv"><div class="b" style="min-height:0"><div class="eb">구글시트 + Apps Script · Sheets MCP</div><h3>마감 체크리스트 약 90항목</h3><p>대분류 › 업무 › 세부 3단, 항목마다 목표일(D+n 영업일)·상태·자동화 방식·주의점. 섹션마다 담당 세션을 정해 두고 세션끼리 메시지로 숫자를 요청합니다.</p><div class="k"><div><b>90</b><span>항목</span></div><div><b>3</b><span>단 트리</span></div></div><div class="pf"><b>사람</b>원장을 확인하기 전엔 «완료»로 바꾸지 않음</div></div></div>
-    <div class="cd txt rv"><div class="b"><div class="eb">그룹웨어 내부 API</div><h3>법인카드 수집내역, 매일 전일분</h3><p>휴폐업 조회·거래처 등록·불공제 규칙(택시·항공·주유 등)을 매일 전일분에만 적용합니다. 9월 555건 조회, 133건 불공 처리.</p><div class="k"><div><b>555</b><span>건 조회</span></div><div><b>133</b><span>건 불공</span></div></div><div class="pf"><b>사람</b>가승인 취소분 삭제·전표 발행</div></div></div>
-    <div class="cd txt rv"><div class="b"><div class="eb">회계 API · 로컬 스크립트</div><h3>내가 쓴 전표 전수 점검</h3><p>한 달 동안 작성한 전표 302장 1,307줄을 규칙으로 훑어 고칠 5장을 골라냅니다. 놓친 유형은 다음 달 점검 규칙에 추가합니다.</p><div class="k"><div><b>302</b><span>장 점검</span></div><div><b>5</b><span>장 수정</span></div></div><div class="pf"><b>사람</b>수정 여부 판단</div></div></div>
-    <div class="cd txt rv"><div class="b"><div class="eb">예약 작업</div><h3>마감 안내는 AI가 먼저 준비</h3><p>익월 첫 영업일 3영업일 전에 안내 메일 초안과 그룹웨어 팝업 기간을 먼저 만들어 둡니다. 공휴일은 체크리스트 설정 탭에서 읽습니다.</p><div class="pf"><b>사람</b>메일 발송·팝업 게시</div></div></div>
-    <a class="cd rv hot" href="demo/one-close/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱" loading="lazy"></div><div class="b"><div class="eb">실운영 앱</div><h3>월 매입 마감</h3><p>발주↔입고 대사, 수입 부대비용 배부, 필증 검증, 결재를 한 흐름으로. 예외만 사람이 봅니다.</p><div class="pf"><b>사람</b>취득원가 확정·결재</div></div></a>
-    <a class="cd rv hot" href="demo/overtime-meal/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/overtime-meal.jpg" alt="야근식대·택시 대조" loading="lazy"></div><div class="b"><div class="eb">실운영 앱</div><h3>경비 자동 판정</h3><p>근태와 회계 전표·택시 이용내역을 사람별로 대조해 규정 충족을 판정하고 안내문구까지 만듭니다.</p><div class="pf"><b>사람</b>안내 발송</div></div></a>
+    <div class="cd txt inv w rv"><div class="b" style="min-height:0"><div class="eb">재고 평가충당금 · 연말 방법론</div><h3>충당 방법론 재설계와 감사 대응</h3><p>3,862품번 전수에 새 방법론을 이식하고, 동종 상장사 18곳의 공시를 조사해 대안을 비교했습니다. 감사 쟁점 14개를 «감사인 질문 → 근거 숫자 → 반박 → 민감도» 순서로 정리하고 민감도 시나리오 25개를 붙였습니다.</p><div class="k"><div><b>3,862</b><span>품번 전수</span></div><div><b>25</b><span>민감도 시나리오</span></div><div><b>14</b><span>감사 쟁점</span></div></div><div class="pf"><b>사람</b>방법론·가정 채택, CFO 승인</div></div></div>
+    <a class="cd rv hot" href="demo/doc-inventory-aging/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/doc-inventory-aging.jpg" alt="재고 에이징·충당 비교" loading="lazy"></div><div class="b"><div class="eb">자료 · CFO·투자사 공유</div><h3>재고 에이징·충당 비교</h3><p>처음엔 «신상 비중이 늘어 설정률이 내렸다»고 읽었다가 숫자로 다시 확인해 «평가 방식 변경 효과»로 스스로 정정하고, 같은 품번을 추적하는 코호트 보기를 더했습니다.</p><div class="pf"><b>사람</b>해석 확정·공유 범위</div></div></a>
+    <div class="cd txt rv"><div class="b"><div class="eb">월간 경영보고</div><h3>브랜드별 매출·원가 보고</h3><p>회계 원장 API로 1~9월 매출·원가를 모으고, 정산 세션 3곳에 숫자 확인을 요청해 미출고 차이를 원 단위로 규명했습니다. 완결성·재계산·변동 가능성·회계 기준·서식을 검수 에이전트 5개가 나눠 본 뒤 보고했습니다.</p><div class="k"><div><b>77</b><span>검증 항목 ✓</span></div><div><b>5</b><span>검수 에이전트</span></div></div><div class="pf"><b>사람</b>숫자 기준·보고 시점 결정</div></div></div>
+    <a class="cd w rv hot" href="demo/fund-cycle/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드" loading="lazy"></div><div class="b"><div class="eb">자금 의사결정</div><h3>자금 대시보드와 회의 모드</h3><p>최저잔액이 언제까지 떨어지는지, 판매율·할인·조달 수단 같은 레버 6개로 어떻게 막는지를 회의에서 직접 돌려 보게 6장면 회의 모드를 붙였습니다. 에이전트 38개 전수 점검으로 고유 결함 17건을 고쳤습니다.</p><div class="pf"><b>사람</b>조달 수단 선택</div></div></a>
+    <div class="cd txt rv"><div class="b"><div class="eb">현금흐름</div><h3>시즌·부서별 영업·잉여현금흐름</h3><p>CFO 질문 9개를 질문지 시트로 받아 «저 → 다른 모델 → CFO» 순으로 확정했습니다. 에이전트 26개 점검에서 결함 5건을 고치자 한 부서의 결론이 뒤집혔습니다.</p><div class="k"><div><b>9</b><span>질문</span></div><div><b>26</b><span>점검 에이전트</span></div></div><div class="pf"><b>사람</b>시즌 귀속·공통비 배부 기준(CFO 확정)</div></div></div>
+    <div class="cd txt rv"><div class="b"><div class="eb">투자계약</div><h3>투자계약 19건을 자금 일정으로</h3><p>스캔 계약서를 OCR로 읽어 동의 매트릭스와 상환·상장 기한 타임라인을 만들고, 에이전트 4개와 다른 모델이 원문 249항목을 대조해 불일치 16건을 정정했습니다.</p><div class="k"><div><b>249</b><span>대조 항목</span></div><div><b>16</b><span>정정</span></div></div><div class="pf"><b>사람</b>동의·상환 대응 판단</div></div></div>
+    <a class="cd rv hot" href="demo/linesheet-fin/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계" loading="lazy"></div><div class="b"><div class="eb">상품 계획 → 자금</div><h3>라인시트에서 지급월까지</h3><p>시즌 계획표로 발주처 × 납기월 → 지급조건 → 지급월을 미리 계산하고, 확정 발주 6,550품목을 사내 BI에서 받아 입고 예정일이 빈 품목을 자금 예측의 빈칸으로 특정했습니다.</p><div class="pf"><b>사람</b>지급조건 예외 판단</div></div></a>
+    <div class="cd txt rv"><div class="b"><div class="eb">손익</div><h3>손익 원장을 언제든 다시 쪼갠다</h3><p>회계 API로 손익 원장을 받아 판관비 7대 분류·지급수수료 성격·고정변동·경상구분·시즌을 수식으로 붙였습니다. 2025 영업손익을 감사보고서와 원 단위로 맞춘 뒤 분석을 시작합니다.</p><div class="pf"><b>사람</b>시즌·분류 규칙 확정</div></div></div>
   </div>
 </div></section>
 
 <!-- 02 -->
 <section class="chap" id="c2"><div class="wrap grid">
-  <div class="side rv"><div class="no">02</div><span class="lb">자사몰 정산</span><h2>자사몰 4곳의 월마감, 버튼 세 번.</h2><p class="sub">매일 아침 배치가 주문·환불·교환과 결제대행 정산을 모아 대사해 두고, 월말엔 수집 → 전표 파일 → 전표 대기 전송 세 단계로 끝납니다.</p></div>
+  <div class="side rv"><div class="no">02</div><span class="lb">월마감 허브</span><h2>월마감은 체크리스트 세션이 지휘합니다.</h2><p class="sub">마감 항목을 3단 트리로 관리하는 시트를 AI 세션 하나가 맡고, 정산·결재 세션이 각자 맡은 줄을 채웁니다. 새 업무를 가르치면 그 자리에서 항목이 늘어납니다.</p></div>
+  <div class="bento">
+    <div class="cd txt inv w rv"><div class="b" style="min-height:0"><div class="eb">구글시트 + Apps Script · Sheets MCP</div><h3>마감 체크리스트 약 90항목</h3><p>대분류 › 업무 › 세부 3단, 항목마다 목표일(D+n 영업일)·상태·자동화 방식·주의점. 섹션마다 담당 세션을 정해 두고 세션끼리 메시지로 숫자를 요청합니다.</p><div class="k"><div><b>90</b><span>항목</span></div><div><b>3</b><span>단 트리</span></div></div><div class="pf"><b>사람</b>원장을 확인하기 전엔 «완료»로 바꾸지 않음</div></div></div>
+    <div class="cd txt rv"><div class="b"><div class="eb">그룹웨어 내부 API</div><h3>법인카드 수집내역, 매일 전일분</h3><p>휴폐업 조회·거래처 등록·불공제 규칙(택시·항공·주유 등)을 매일 전일분에만 적용합니다. 9월 555건 조회, 133건 불공 처리.</p><div class="k"><div><b>555</b><span>건 조회</span></div><div><b>133</b><span>건 불공</span></div></div><div class="pf"><b>사람</b>가승인 취소분 삭제·전표 발행</div></div></div>
+    <div class="cd txt rv"><div class="b"><div class="eb">회계 API · 로컬 스크립트</div><h3>내가 쓴 전표 전수 점검</h3><p>한 달 동안 작성한 전표 302장 1,307줄을 규칙으로 훑어 고칠 5장을 골라냅니다. 놓친 유형은 다음 달 점검 규칙에 추가합니다.</p><div class="k"><div><b>302</b><span>장 점검</span></div><div><b>5</b><span>장 수정</span></div></div><div class="pf"><b>사람</b>수정 여부 판단</div></div></div>
+    <a class="cd rv hot" href="demo/doc-closing-mail/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/doc-closing-mail.jpg" alt="월마감 안내 메일" loading="lazy"></div><div class="b"><div class="eb">자료 · 예약 작업</div><h3>마감 안내는 AI가 먼저 준비</h3><p>익월 첫 영업일 3영업일 전에 안내 메일 초안과 그룹웨어 팝업 기간을 먼저 만들어 둡니다. 메일 클라이언트에서도 깨지지 않게 표 레이아웃으로 짭니다.</p><div class="pf"><b>사람</b>메일 발송·팝업 게시</div></div></a></div>
+    <a class="cd rv hot" href="demo/one-close/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱" loading="lazy"></div><div class="b"><div class="eb">실운영 앱</div><h3>월 매입 마감</h3><p>발주↔입고 대사, 수입 부대비용 배부, 필증 검증, 결재를 한 흐름으로. 예외만 사람이 봅니다.</p><div class="pf"><b>사람</b>취득원가 확정·결재</div></div></a>
+    <a class="cd rv hot" href="demo/overtime-meal/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/overtime-meal.jpg" alt="야근식대·택시 대조" loading="lazy"></div><div class="b"><div class="eb">실운영 앱</div><h3>경비 자동 판정</h3><p>근태와 회계 전표·택시 이용내역을 사람별로 대조해 규정 충족을 판정하고 안내문구까지 만듭니다.</p><div class="pf"><b>사람</b>안내 발송</div></div></a>
+  </div>
+</div></section>
+
+<!-- 03 -->
+<section class="chap" id="c3"><div class="wrap grid">
+  <div class="side rv"><div class="no">03</div><span class="lb">자사몰 정산</span><h2>자사몰 4곳의 월마감, 버튼 세 번.</h2><p class="sub">매일 아침 배치가 주문·환불·교환과 결제대행 정산을 모아 대사해 두고, 월말엔 수집 → 전표 파일 → 전표 대기 전송 세 단계로 끝납니다.</p></div>
   <div class="bento">
     <div class="cd txt inv w rv"><div class="b" style="min-height:0"><div class="eb">쇼핑몰 Admin API · 결제대행 수집 · 로컬 보드</div><h3>매일 07:30 자동 대사</h3><p>주문·환불·교환 수집, 놓친 환불과 이월 출고 재조회, 일별 인식매출, 확정월 재검증까지 10단계 넘게 매일 돌리고 결과를 보드에 띄웁니다. 첫 실마감에서 원장과 생성 파일이 4개 몰 모두 원 단위로 맞았습니다.</p><div class="k"><div><b>4/4</b><span>몰 원 단위 일치</span></div><div><b>3</b><span>번 누르면 마감</span></div></div><div class="pf"><b>사람</b>결제사 인증번호 입력·전표 발행</div></div></div>
     <div class="cd txt rv"><div class="b"><div class="eb">검증</div><h3>손으로 만든 정산 파일과 0.152% 차이, 전부 규명</h3><p>8월분을 기존 수기 정산 파일과 맞춰 본 차이를 원인 5가지로 원 단위까지 설명했습니다. 첫 실마감 날 밤엔 출고됐지만 매출로 잡히지 않은 이월 품목을 찾아 배치에 단계를 더했습니다.</p></div></div>
@@ -339,9 +367,9 @@
   </div>
 </div></section>
 
-<!-- 03 -->
-<section class="chap" id="c3"><div class="wrap grid">
-  <div class="side rv"><div class="no">03</div><span class="lb">위탁 정산</span><h2>34채널 정산을 수기 파일 없이.</h2><p class="sub">사이트마다 원천 파일 45개를 받아 붙이던 월마감을 채널 API·로그인 자동 수집·건별 파이프라인·전표 대기 전송으로 바꿨습니다. 두 번 버려진 자동화 뒤의 세 번째 설계입니다.</p></div>
+<!-- 04 -->
+<section class="chap" id="c4"><div class="wrap grid">
+  <div class="side rv"><div class="no">04</div><span class="lb">위탁 정산</span><h2>34채널 정산을 수기 파일 없이.</h2><p class="sub">사이트마다 원천 파일 45개를 받아 붙이던 월마감을 채널 API·로그인 자동 수집·건별 파이프라인·전표 대기 전송으로 바꿨습니다. 두 번 버려진 자동화 뒤의 세 번째 설계입니다.</p></div>
   <div class="bento">
     <div class="cd txt inv w rv"><div class="b" style="min-height:0"><div class="eb">검증식 · 채널마다 같은 식</div><h3>정산서 입금액 = ERP 실판매 − 수수료 − 반품 ± 상시차이</h3>
       <div class="eq" aria-label="검증식 구조 (비율은 예시)">
@@ -355,51 +383,61 @@
     <div class="cd txt rv"><div class="b"><div class="eb">채널 API 28 · 로그인 자동 수집 11</div><h3>수집은 사람 손 없이</h3><p>API가 있는 채널은 직접 호출하고, 없는 채널은 이 PC에서만 풀리는 암호화 금고와 OTP 자동 생성으로 로그인해 내려받습니다.</p><div class="k"><div><b>28</b><span>API 채널</span></div><div><b>11</b><span>자동 로그인 채널</span></div></div><div class="pf"><b>사람</b>문자 인증번호 6자리 입력</div></div></div>
     <div class="cd txt rv"><div class="b"><div class="eb">재현 검증</div><h3>수기 파일 9,730행을 원 단위로 재현</h3><p>수집본을 전부 지우고 다시 받아 8월 수기 파일을 원 단위로 재현했습니다. 남은 차이는 수기 파일 쪽 오류였고, 매달 반복되던 중복 키·계정 혼입 결함도 함께 드러났습니다.</p><div class="k"><div><b>9,730</b><span>행 일치</span></div></div></div></div>
     <div class="cd txt rv"><div class="b"><div class="eb">실패에서 재설계</div><h3>앞선 두 번은 쓰이지 않았다</h3><p>이전 자동화 두 번은 «켜기 번거롭고, 새 채널이 안 맞고, 결과를 못 믿겠다»는 이유로 버려졌습니다. 그래서 원 단위 재현·사이트 화면 자동 대조·로그인 시 자동 실행을 처음부터 요구사항으로 넣었습니다.</p></div></div>
+    <a class="cd w rv hot" href="demo/wita-local/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/wita-local.jpg" alt="위탁 정산 보드" loading="lazy"></div><div class="b"><div class="eb">실운영 로컬 앱</div><h3>위탁 정산 보드</h3><p>수집·피벗·마감·건별 대장·미정산·전표·입금·외상잔액까지 메뉴 10개. 채널별 수집 상태와 인증번호 우편함, 전표 대기 전송을 한 화면에서 봅니다.</p><div class="pf"><b>사람</b>인증번호 입력·전표 발행</div></div></a>
     <div class="cd txt rv"><div class="b"><div class="eb">회계 API</div><h3>9월, 첫 무파일 마감</h3><p>사이트 정산 화면 24곳과 자동 대조해 전부 일치, 수식 오류 0. 전표 35장은 대기함까지 보내고 발행은 확인 후 제가 누릅니다.</p><div class="k"><div><b>24/24</b><span>화면 대조</span></div><div><b>35</b><span>장 전표 대기</span></div></div><div class="pf"><b>사람</b>전표 발행</div></div></div>
   </div>
 </div></section>
 
-<!-- 04 -->
-<section class="chap" id="c4"><div class="wrap grid">
-  <div class="side rv"><div class="no">04</div><span class="lb">결재 자동화</span><h2>신청서는 AI가 처리하고, 애매하면 넘깁니다.</h2><p class="sub">평일 30분마다 예약 작업이 결재함을 확인해 거래처·프로젝트 등록과 직원구매 현금영수증을 끝까지 처리합니다. 화면 클릭 없이 그룹웨어 내부 API로 돌고, 판단이 필요한 건은 멈추고 알립니다.</p></div>
+<!-- 05 -->
+<section class="chap" id="c5"><div class="wrap grid">
+  <div class="side rv"><div class="no">05</div><span class="lb">결재 자동화</span><h2>신청서는 AI가 처리하고, 애매하면 넘깁니다.</h2><p class="sub">평일 30분마다 예약 작업이 결재함을 확인해 거래처·프로젝트 등록과 직원구매 현금영수증을 끝까지 처리합니다. 화면 클릭 없이 그룹웨어 내부 API로 돌고, 판단이 필요한 건은 멈추고 알립니다.</p></div>
   <div class="bento">
     <div class="cd txt inv w rv"><div class="b" style="min-height:0"><div class="eb">그룹웨어 내부 API · 홈택스 · 예약 작업</div><h3>17일 동안 26건 무인 처리</h3><p>거래처 9건·프로젝트 4건 등록과 현금영수증 13건 발급을 검증 → 등록 → 결재 댓글 → 합의까지. 올해 1~9월 같은 양식 322건, 월 약 36건을 사람이 하던 일입니다.</p><div class="k"><div><b>26</b><span>건 무인 처리</span></div><div><b>322</b><span>건 연간 대상(1~9월)</span></div></div><div class="pf"><b>사람</b>해외 거래처·상호 불일치·출고 전 발급 요청은 넘겨받음</div></div></div>
     <div class="cd txt rv"><div class="b"><div class="eb">멈춤 규칙</div><h3>AI가 일부러 넘긴 건</h3><p>은행 정보가 빈 해외 거래처, 신청서와 사업자등록증 상호가 다른 건, 입금은 됐지만 «출고 후 발행» 요청이 붙은 건. 규칙으로 판단할 수 없으면 등록하지 않고 알립니다.</p></div></div>
     <div class="cd txt rv"><div class="b"><div class="eb">브라우저 · 협업툴 MCP</div><h3>카드 결제 신청서, 결제 직전까지</h3><p>미시행 신청서를 읽어 결제 사이트를 열고 옵션·금액을 맞춘 뒤 결제수단 화면에서 멈춥니다. 결제 뒤엔 매출전표를 PDF로 받아 결재 댓글과 협업툴 공유 글에 붙이고 시행 처리합니다.</p><div class="pf"><b>사람</b>로그인·카드번호·결제</div></div></div>
     <div class="cd txt rv"><div class="b"><div class="eb">공식 회계 API</div><h3>전표는 대기함까지</h3><p>위탁·교반품·직원구매 전표를 API로 대기함에 올리고, 발행 요청마다 «원장 잔액 X → 반영 후 Y ✔»를 붙입니다. 보낸 뒤 다시 읽어 계정·금액·관리항목이 그대로 들어갔는지 확인합니다.</p><div class="pf"><b>사람</b>전표 발행</div></div></div>
     <div class="cd txt rv"><div class="b"><div class="eb">데스크톱 화면 자동화</div><h3>API 없는 물류 ERP도 직접</h3><p>프로그램을 켜고 메뉴로 화면을 열어 기간 조회 → 엑셀 저장 → 합계행 자동 검증까지. 사람에게 추출을 부탁하던 단계가 없어졌습니다.</p></div></div>
-    <a class="cd w rv hot" href="demo/epay-guide/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/epay-guide.jpg" alt="전자결재 사용 가이드" loading="lazy"></div><div class="b"><div class="eb">전사 배포</div><h3>전자결재 사용 가이드</h3><p>결재 절차 36개를 6묶음 웹앱으로. 양식 마법사·전체 검색·지급요청일 계산·전결 확인을 붙였습니다.</p></div></a>
+    <a class="cd rv hot" href="demo/epay-guide/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/epay-guide.jpg" alt="전자결재 사용 가이드" loading="lazy"></div><div class="b"><div class="eb">전사 배포</div><h3>전자결재 사용 가이드</h3><p>결재 절차 36개를 6묶음 웹앱으로. 양식 마법사·전체 검색·지급요청일 계산·전결 확인을 붙였습니다.</p></div></a>
+    <a class="cd rv hot" href="demo/doc-budget-flow/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/doc-budget-flow.jpg" alt="예산 지출 업무 흐름" loading="lazy"></div><div class="b"><div class="eb">자료 · 제도 설계</div><h3>예산 지출 업무 흐름</h3><p>촬영·행사·광고 품의를 예산 품의서 하나로 묶고, 광고비는 월 집행 보고서로 마감까지 잇는 흐름. 유형을 바꾸면 양식 칸과 예시가 바뀝니다.</p><div class="pf"><b>사람</b>제도 변경 승인</div></div></a>
+    <a class="cd w rv hot" href="demo/meeting-minutes/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/meeting-minutes.jpg" alt="회의록 웹앱" loading="lazy"></div><div class="b"><div class="eb">실운영 웹앱</div><h3>회의록 웹앱</h3><p>회의록·액션 아이템·멘션·첨부를 한 앱에서 쓰고 팀 캘린더와 동기화합니다. 액션 보드에서 담당·기한·상태를 관리합니다.</p></div></a>
   </div>
 </div></section>
 
-<!-- 05 -->
-<section class="chap" id="c5"><div class="wrap grid">
-  <div class="side rv"><div class="no">05</div><span class="lb">검증 체계</span><h2>초안은 AI, 반박은 다른 모델, 확정은 사람.</h2><p class="sub">판단이 필요한 회계 항목은 표로 쪼개 근거를 적고, 다른 회사의 모델을 검토자로 세워 반박이 없어질 때까지 돌립니다. 기준과 기록은 모든 세션이 먼저 읽습니다.</p></div>
+<!-- 06 -->
+<section class="chap" id="c6"><div class="wrap grid">
+  <div class="side rv"><div class="no">06</div><span class="lb">검증 체계</span><h2>초안은 AI, 반박은 다른 모델, 확정은 사람.</h2><p class="sub">판단이 필요한 회계 항목은 표로 쪼개 근거를 적고, 다른 회사의 모델을 검토자로 세워 반박이 없어질 때까지 돌립니다. 기준과 기록은 모든 세션이 먼저 읽습니다.</p></div>
   <div class="bento">
     <div class="cd txt inv w rv"><div class="b" style="min-height:0"><div class="eb">확정 전 네 단계</div><h3>재현되지 않으면 처음으로</h3><p>원 단위로 재현되지 않거나 반박이 남으면 1단계로 돌아갑니다.</p><div class="k"><div><b>1</b><span>AI 초안</span></div><div><b>2</b><span>다른 모델 반박</span></div><div><b>3</b><span>원 단위 재현</span></div><div><b>4</b><span>사람 확정</span></div></div></div></div>
     <a class="cd w rv hot" href="demo/nrv-simulator/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/nrv-simulator.jpg" alt="NRV 시뮬레이터" loading="lazy"></div><div class="b"><div class="eb">재고 평가충당금</div><h3>NRV 판단 15항목, 7라운드</h3><p>에이징 구간·계절지수·순실현가치 추정을 항목별 대안과 근거로 확정하고, 이전 확정본을 원 단위로 재현한 뒤에만 확정했습니다.</p><div class="pf"><b>사람</b>충당금률 채택·승인 요청</div></div></a>
-    <div class="cd txt rv"><div class="b"><div class="eb">Codex CLI</div><h3>교차검증 문서 117건</h3><p>숫자와 방법론의 반박을 다른 모델에 맡기고 의뢰·답변 문서를 왕복으로 남깁니다. 투자계약 19건은 원문과 249항목을 대조해 불일치 16건을 반영했습니다.</p><div class="k"><div><b>117</b><span>검토 문서</span></div><div><b>249</b><span>계약 대조 항목</span></div></div></div></div>
+    <div class="cd txt rv"><div class="b"><div class="eb">Codex CLI</div><h3>교차검증 문서 117건</h3><p>숫자와 방법론의 반박을 다른 모델에 맡기고 의뢰·답변 문서를 왕복으로 남깁니다. 재고 충당·현금흐름 질문지·상반기 분석처럼 판단이 필요한 작업마다 씁니다.</p><div class="k"><div><b>117</b><span>검토 문서</span></div></div></div></div>
     <div class="cd txt rv"><div class="b"><div class="eb">기준 레이어</div><h3>형용사 대신 통과 조건</h3><p>수식 오류 0건, 원천 합계 = 결과 합계(원 단위), 덮어쓰기 금지 같은 조건을 기준 문서에 적고, 지난 함정은 기록으로 남겨 모든 세션이 먼저 읽게 했습니다.</p><div class="k"><div><b>183</b><span>규칙·함정 기록</span></div><div><b>15</b><span>스킬</span></div></div></div></div>
     <div class="cd txt rv"><div class="b"><div class="eb">주간 운영일지</div><h3>AI 사용도 장부처럼</h3><p>세션·도구 호출·주요 결과물을 주 단위로 집계해 남깁니다. 25주 동안 세션 524개, 도구 호출 8만 1천 회.</p><div class="k"><div><b>25</b><span>주</span></div><div><b>524</b><span>세션</span></div></div></div></div>
-    <a class="cd rv hot" href="demo/fund-cycle/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드" loading="lazy"></div><div class="b"><div class="eb">실운영 앱</div><h3>자금 대시보드</h3><p>원천 15테이블을 매일 동기화하고, 열 때마다 체크섬 7종으로 원천과 대조합니다.</p></div></a>
   </div>
 </div></section>
 
 <!-- 06 데모 -->
 <section class="sect" id="s-demo"><div class="wrap">
-  <div class="sh rv"><span class="lb">06 · 데모</span><h2>실제로 돌아가는 화면 6.</h2><p class="sub">샘플 데이터로, 계산·판정 로직은 실제 구현과 동일합니다. 실운영 앱은 서버 코드까지 브라우저에서 그대로 실행됩니다.</p></div>
+  <div class="sh rv"><span class="lb">07 · 데모</span><h2>실제로 돌아가는 화면 9.</h2><p class="sub">샘플 데이터로, 계산·판정 로직은 실제 구현과 동일합니다. 실운영 앱은 서버 코드까지 브라우저에서 그대로 실행됩니다.</p></div>
   <div class="demos">
-    <a class="cd rv hot" href="demo/one-close/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱" loading="lazy"></div><div class="b"><div class="eb">실운영 · 직접 설계</div><h3>월 매입 마감 앱</h3><p>입고 검수 → B/L 연결 → 부대비용 배부 → 취득원가</p></div></a>
-    <a class="cd rv hot" href="demo/nrv-simulator/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/nrv-simulator.jpg" alt="NRV 시뮬레이터" loading="lazy"></div><div class="b"><div class="eb">실운영</div><h3>NRV 시뮬레이터</h3><p>가정을 움직이면 전 품번 즉시 재계산</p></div></a>
-    <a class="cd rv hot" href="demo/linesheet-fin/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계" loading="lazy"></div><div class="b"><div class="eb">실운영</div><h3>라인시트 재무 집계</h3><p>매입 약정 기준 집계 · 결제조건 · 유효성</p></div></a>
-    <a class="cd rv hot" href="demo/fund-cycle/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드" loading="lazy"></div><div class="b"><div class="eb">실운영</div><h3>자금 대시보드</h3><p>잔액 추이 · 수금 예측 · 체크섬 7종</p></div></a>
-    <a class="cd rv hot" href="demo/epay-guide/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/epay-guide.jpg" alt="전자결재 사용 가이드" loading="lazy"></div><div class="b"><div class="eb">전사 배포</div><h3>전자결재 가이드</h3><p>절차 36개 · 양식 마법사 · 지급일 계산</p></div></a>
-    <a class="cd rv hot" href="demo/overtime-meal/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/overtime-meal.jpg" alt="야근식대·택시 대조" loading="lazy"></div><div class="b"><div class="eb">실운영</div><h3>야근식대·택시 대조</h3><p>근태 vs 전표·택시 이용내역 사람별 판정</p></div></a>
+    <a class="cd rv hot" href="demo/one-close/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/one-close.jpg" alt="월 매입 마감 앱" loading="lazy"></div><div class="b"><h3>월 매입 마감 앱</h3><p>입고 검수 → B/L 연결 → 부대비용 배부 → 취득원가</p></div></a>
+    <a class="cd rv hot" href="demo/wita-local/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/wita-local.jpg" alt="위탁 정산 보드" loading="lazy"></div><div class="b"><h3>위탁 정산 보드</h3><p>34채널 수집 → 건별 대사 → 전표 대기</p></div></a>
+    <a class="cd rv hot" href="demo/fund-cycle/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/fund-cycle.jpg" alt="자금 대시보드" loading="lazy"></div><div class="b"><h3>자금 대시보드</h3><p>잔액 추이 · 수금 예측 · 회의 모드</p></div></a>
+    <a class="cd rv hot" href="demo/nrv-simulator/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/nrv-simulator.jpg" alt="NRV 시뮬레이터" loading="lazy"></div><div class="b"><h3>NRV 시뮬레이터</h3><p>가정을 움직이면 전 품번 즉시 재계산</p></div></a>
+    <a class="cd rv hot" href="demo/linesheet-fin/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/linesheet-fin.jpg" alt="라인시트 재무 집계" loading="lazy"></div><div class="b"><h3>라인시트 재무 집계</h3><p>매입 약정 · 지급월 · 유효성</p></div></a>
+    <a class="cd rv hot" href="demo/overtime-meal/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/overtime-meal.jpg" alt="야근식대·택시 대조" loading="lazy"></div><div class="b"><h3>야근식대·택시 대조</h3><p>근태 vs 전표·택시 이용내역 판정</p></div></a>
+    <a class="cd rv hot" href="demo/epay-guide/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/epay-guide.jpg" alt="전자결재 사용 가이드" loading="lazy"></div><div class="b"><h3>전자결재 가이드</h3><p>절차 36개 · 양식 마법사 · 지급일 계산</p></div></a>
+    <a class="cd rv hot" href="demo/meeting-minutes/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/meeting-minutes.jpg" alt="회의록 웹앱" loading="lazy"></div><div class="b"><h3>회의록 웹앱</h3><p>회의록 · 액션 보드 · 캘린더 동기화</p></div></a>
+    <a class="cd rv hot" href="demo/flow-diagram/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/flow-diagram.jpg" alt="전사 업무 흐름도" loading="lazy"></div><div class="b"><h3>전사 업무 흐름도</h3><p>계획 → 자금 → 실적 경로 한 장</p></div></a>
   </div>
-  <details class="more"><summary><span class="pill sec">분석·설계 산출물 4개<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+  <div class="sh2 rv"><span class="lb">자료</span><h3>AI와 만든 보고·안내 자료</h3></div>
+  <div class="demos four">
+    <a class="cd rv hot" href="demo/doc-inventory-aging/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/doc-inventory-aging.jpg" alt="재고 에이징·충당 비교" loading="lazy"></div><div class="b"><h3>재고 에이징·충당 비교</h3><p>그룹 × 연차 히트맵 · 충당 브리지 · 코호트</p></div></a>
+    <a class="cd rv hot" href="demo/doc-budget-flow/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/doc-budget-flow.jpg" alt="예산 지출 업무 흐름" loading="lazy"></div><div class="b"><h3>예산 지출 업무 흐름</h3><p>품의 → 집행 보고 → 지출결의 흐름과 양식 예시</p></div></a>
+    <a class="cd rv hot" href="demo/doc-closing-mail/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/doc-closing-mail.jpg" alt="월마감 안내 메일" loading="lazy"></div><div class="b"><h3>월마감 안내 메일</h3><p>매월 전 구성원 대상 마감 안내</p></div></a>
+    <a class="cd rv hot" href="demo/card-notice/"><span class="go glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span><div class="thumb"><img src="assets/shots/card-notice.jpg" alt="법인카드 개편 공지" loading="lazy"></div><div class="b"><h3>법인카드 개편 공지</h3><p>정책 변경 전후 · 한도 근거 · 상황별 안내</p></div></a>
+  </div>
+  <details class="more"><summary><span class="pill sec">설계 산출물 2개<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></summary>
     <div class="demos fade">
-      <a class="cd" href="demo/card-notice/"><div class="thumb"><img src="assets/shots/card-notice.jpg" alt="법인카드 개편 공지" loading="lazy"></div><div class="b"><h3>법인카드 개편 공지</h3><p>정책 변경 전후 · 한도 근거 · 상황별 가이드</p></div></a>
-      <a class="cd" href="demo/flow-diagram/"><div class="thumb"><img src="assets/shots/flow-diagram.jpg" alt="전사 업무 흐름도" loading="lazy"></div><div class="b"><h3>전사 업무 흐름도</h3><p>계획→자금→실적 경로 한 장</p></div></a>
       <a class="cd" href="demo/one-erp/"><div class="thumb"><img src="assets/shots/one-erp.jpg" alt="ONE ERP 목업" loading="lazy"></div><div class="b"><h3>ONE ERP 목업</h3><p>시스템 통합 시 화면 목업</p></div></a>
       <a class="cd" href="demo/dashboard-cart/"><div class="thumb"><img src="assets/shots/dashboard-cart.jpg" alt="Dashboard Cart" loading="lazy"></div><div class="b"><h3>Dashboard Cart</h3><p>보고 화면 설계 도구</p></div></a>
     </div>
@@ -507,11 +545,11 @@
 
 <footer><div class="wrap">
   <div><strong>이어진</strong> · 패션 이커머스(브랜드 복수 운영) 재무회계팀 매니저 · 재직 중 1년 6개월 · <a href="mailto:lee-ding@naver.com">lee-ding@naver.com</a></div>
-  <div>개인 포트폴리오이며 소속 회사와 무관하게 작성했습니다. 회사 내부 데이터는 포함하지 않습니다. 2026-10 갱신 · <span id="build">build ax-v2</span></div>
+  <div>개인 포트폴리오이며 소속 회사와 무관하게 작성했습니다. 회사 내부 데이터는 포함하지 않습니다. 2026-10 갱신 · <span id="build">build ax-v3</span></div>
 </div></footer>
 
 <nav class="dock glass" aria-label="챕터">
-  <a href="#c1"><i>01</i><span>월마감</span></a><a href="#c2"><i>02</i><span>자사몰</span></a><a href="#c3"><i>03</i><span>위탁</span></a><a href="#c4"><i>04</i><span>결재</span></a><a href="#c5"><i>05</i><span>검증</span></a><a href="#s-demo"><i>06</i><span>데모</span></a>
+  <a href="#c1"><i>01</i><span>경영기획</span></a><a href="#c2"><i>02</i><span>월마감</span></a><a href="#c3"><i>03</i><span>자사몰</span></a><a href="#c4"><i>04</i><span>위탁</span></a><a href="#c5"><i>05</i><span>결재</span></a><a href="#c6"><i>06</i><span>검증</span></a><a href="#s-demo"><i>07</i><span>데모</span></a>
 </nav>
 
 <script>
